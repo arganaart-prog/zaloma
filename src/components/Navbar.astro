@@ -40,9 +40,9 @@ const isMobileFaq = currentPath.startsWith('/faq/');
             <!-- Absolute shield hanging down -->
             <div class="absolute left-0 top-0 w-24 sm:w-26 md:w-28 h-28 sm:h-30 md:h-32 z-[100]">
               <a href={withBase('/')} class="brand-shield block w-full h-full relative group" id="logo-shield">
-                <!-- SVG Shield Background with warm cream color #FAF7ED and gold lines -->
+                <!-- SVG Shield Background with warm cream color #FDF7F7 and gold lines -->
                 <svg width="100" height="115" class="absolute inset-0 w-full h-full drop-shadow-[0_4px_8px_rgba(0,0,0,0.15)] transition-transform duration-300 group-hover:scale-105" viewBox="0 0 100 115" fill="none" xmlns="http://www.w3.org/2000/svg">
-                  <path d="M0 0 H100 V55 C100 88 50 115 50 115 C50 115 0 88 0 55 Z" fill="#FAF7ED"/>
+                  <path d="M0 0 H100 V55 C100 88 50 115 50 115 C50 115 0 88 0 55 Z" fill="#FDF7F7"/>
                 </svg>
                 <!-- Brand Logo Centered -->
                 <div class="absolute inset-0 flex items-center justify-center pb-3 md:pb-4">
@@ -131,8 +131,8 @@ const isMobileFaq = currentPath.startsWith('/faq/');
                   </a>
 
                   <!-- Category Dropdown Menu -->
-                  <div class="absolute left-1/2 top-full z-50 w-[20rem] lg:w-[23rem] -translate-x-1/2 translate-y-3 rounded-lg border border-soft-cream/70 bg-[#FAF7ED] p-3 opacity-0 invisible shadow-[0_22px_60px_rgba(15,23,42,0.18)] transition-all duration-200 group-hover:visible group-hover:translate-y-0 group-hover:opacity-100">
-                    <div class="absolute -top-1.5 left-1/2 h-3 w-3 -translate-x-1/2 rotate-45 border-l border-t border-soft-cream/70 bg-[#FAF7ED]"></div>
+                  <div class="absolute left-1/2 top-full z-50 w-[20rem] lg:w-[23rem] -translate-x-1/2 translate-y-3 rounded-lg border border-soft-cream/70 bg-[#FDF7F7] p-3 opacity-0 invisible shadow-[0_22px_60px_rgba(15,23,42,0.18)] transition-all duration-200 group-hover:visible group-hover:translate-y-0 group-hover:opacity-100">
+                    <div class="absolute -top-1.5 left-1/2 h-3 w-3 -translate-x-1/2 rotate-45 border-l border-t border-soft-cream/70 bg-[#FDF7F7]"></div>
                     <p class="px-3 pb-2 text-[0.62rem] font-bold uppercase tracking-[0.22em] text-secondary-dark">Kategori Produk</p>
                     <div class="grid gap-1.5">
                       <div class="relative group/sub">
@@ -147,7 +147,7 @@ const isMobileFaq = currentPath.startsWith('/faq/');
                           <span class="text-sm font-bold text-secondary-dark" aria-hidden="true">&gt;</span>
                         </a>
 
-                        <div class="absolute left-[calc(100%-1px)] top-0 hidden min-w-[13rem] lg:min-w-[15rem] rounded-lg border border-soft-cream/70 bg-[#FAF7ED] p-2 shadow-[0_20px_54px_rgba(15,23,42,0.16)] group-hover/sub:block">
+                        <div class="absolute left-[calc(100%-1px)] top-0 hidden min-w-[13rem] lg:min-w-[15rem] rounded-lg border border-soft-cream/70 bg-[#FDF7F7] p-2 shadow-[0_20px_54px_rgba(15,23,42,0.16)] group-hover/sub:block">
                           {bungaPapanCategories.map((category) => (
                             <a
                               href={withBase(`/kategori/${category.slug}/`)}
@@ -209,7 +209,7 @@ const isMobileFaq = currentPath.startsWith('/faq/');
           <div class="absolute left-0 top-0 w-[58px] h-[82px] z-[100]">
             <a href={withBase('/')} class="brand-shield block w-full h-full relative" id="mobile-logo-shield">
               <svg width="100" height="115" class="absolute inset-0 w-full h-full drop-shadow-[0_2px_4px_rgba(0,0,0,0.15)]" viewBox="0 0 100 115" fill="none" xmlns="http://www.w3.org/2000/svg">
-                <path d="M0 0 H100 V55 C100 88 50 115 50 115 C50 115 0 88 0 55 Z" fill="#FAF7ED"/>
+                <path d="M0 0 H100 V55 C100 88 50 115 50 115 C50 115 0 88 0 55 Z" fill="#FDF7F7"/>
               </svg>
               <div class="absolute inset-0 flex items-center justify-center pb-2.5">
                 <img 
@@ -275,10 +275,10 @@ const isMobileFaq = currentPath.startsWith('/faq/');
   <!-- MOBILE MENU DRAWER (Hidden by default, shown when toggled) -->
   <div class="hidden md:hidden fixed inset-0 z-[140] mobile-menu-shell" id="mobile-menu" aria-hidden="true">
     <button id="mobile-menu-backdrop" type="button" class="mobile-menu-backdrop absolute inset-0 bg-slate-900/35 backdrop-blur-[2px]" aria-label="Tutup menu"></button>
-    <aside class="mobile-menu-panel relative flex h-full w-[82vw] max-w-[410px] flex-col bg-[#FAF7ED] px-5 py-7 shadow-2xl rounded-r-2xl select-none">
+    <aside class="mobile-menu-panel relative flex h-full w-[82vw] max-w-[410px] flex-col bg-[#FDF7F7] px-5 py-7 shadow-2xl rounded-r-2xl select-none">
       <div class="flex items-start justify-between gap-4 px-1">
         <h2 class="font-serif text-[1.75rem] font-bold leading-none text-primary">Zaloma Florist</h2>
-        <button id="mobile-menu-close" type="button" class="inline-flex h-11 w-11 min-h-[44px] min-w-[44px] items-center justify-center rounded-full text-[#555a50] hover:bg-primary/5 hover:text-primary" aria-label="Tutup menu">
+        <button id="mobile-menu-close" type="button" class="inline-flex h-11 w-11 min-h-[44px] min-w-[44px] items-center justify-center rounded-full text-slate-600 hover:bg-primary/5 hover:text-primary" aria-label="Tutup menu">
           <svg class="h-6 w-6" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2">
             <path stroke-linecap="round" stroke-linejoin="round" d="M6 6l12 12M18 6 6 18" />
           </svg>
@@ -286,31 +286,31 @@ const isMobileFaq = currentPath.startsWith('/faq/');
       </div>
 
       <nav class="mt-9 space-y-2.5" aria-label="Menu mobile Zaloma Florist">
-        <a href={withBase('/')} class={`block rounded-lg border px-4 py-3.5 transition-colors ${isMobileHome ? 'border-secondary/40 bg-[#ead9be] text-primary shadow-sm' : 'border-transparent text-[#4f584a] hover:border-soft-cream/70 hover:bg-primary/5 hover:text-primary'}`}>
+        <a href={withBase('/')} class={`block rounded-lg border px-4 py-3.5 transition-colors ${isMobileHome ? 'border-primary/25 bg-primary/10 text-primary shadow-sm' : 'border-transparent text-slate-700 hover:border-soft-cream/70 hover:bg-primary/5 hover:text-primary'}`}>
           <span class="block font-serif text-[1.24rem] font-bold leading-tight tracking-wide">Beranda</span>
           <span class="mt-1 block text-[0.66rem] font-bold uppercase tracking-[0.2em] opacity-60">Halaman utama</span>
         </a>
 
-        <details open={isMobileKatalog} class={`rounded-lg border transition-colors ${isMobileKatalog ? 'border-secondary/40 bg-[#ead9be] text-primary shadow-sm' : 'border-transparent text-[#4f584a] hover:border-soft-cream/70 hover:bg-primary/5 hover:text-primary'}`}>
+        <details open={isMobileKatalog} class={`rounded-lg border transition-colors ${isMobileKatalog ? 'border-primary/25 bg-primary/10 text-primary shadow-sm' : 'border-transparent text-slate-700 hover:border-soft-cream/70 hover:bg-primary/5 hover:text-primary'}`}>
           <summary class="cursor-pointer px-4 py-3.5">
             <span class="block font-serif text-[1.24rem] font-bold leading-tight tracking-wide">Katalog</span>
             <span class="mt-1 block text-[0.66rem] font-bold uppercase tracking-[0.2em] opacity-60">Semua kategori produk</span>
           </summary>
 
           <div class="space-y-2 px-3 pb-3">
-            <a href={withBase('/katalog/')} class="block rounded-md px-3 py-2.5 font-serif text-[1rem] font-bold text-[#4f584a] transition-colors hover:bg-white/70 hover:text-primary">
+            <a href={withBase('/katalog/')} class="block rounded-md px-3 py-2.5 font-serif text-[1rem] font-bold text-slate-700 transition-colors hover:bg-white/70 hover:text-primary">
               Semua Produk
             </a>
 
             <details open={currentPath.startsWith('/kategori/bunga-papan-') || currentPath.startsWith('/produk/bunga-papan-')} class="rounded-md bg-white/55">
               <summary class="cursor-pointer px-3 py-2.5">
-                <span class="block font-serif text-[1rem] font-bold text-[#4f584a]">Bunga Papan</span>
-                <span class="mt-1 block text-[0.58rem] font-bold uppercase tracking-[0.16em] text-[#7b806f]">Duka cita, wedding, congratulations</span>
+                <span class="block font-serif text-[1rem] font-bold text-slate-700">Bunga Papan</span>
+                <span class="mt-1 block text-[0.58rem] font-bold uppercase tracking-[0.16em] text-slate-500">Duka cita, wedding, congratulations</span>
               </summary>
 
               <div class="border-t border-soft-cream/80 px-2 py-2">
                 {bungaPapanCategories.map((category) => (
-                  <a href={withBase(`/kategori/${category.slug}/`)} class="block rounded-md px-3 py-2 text-[0.9rem] font-semibold text-[#4f584a] transition-colors hover:bg-primary/10 hover:text-primary">
+                  <a href={withBase(`/kategori/${category.slug}/`)} class="block rounded-md px-3 py-2 text-[0.9rem] font-semibold text-slate-700 transition-colors hover:bg-primary/10 hover:text-primary">
                     {shortBungaPapanName(category.name)}
                   </a>
                 ))}
@@ -318,29 +318,29 @@ const isMobileFaq = currentPath.startsWith('/faq/');
             </details>
 
             {otherCategories.map((category) => (
-              <a href={withBase(`/kategori/${category.slug}/`)} class="block rounded-md px-3 py-2.5 font-serif text-[1rem] font-bold text-[#4f584a] transition-colors hover:bg-white/70 hover:text-primary">
+              <a href={withBase(`/kategori/${category.slug}/`)} class="block rounded-md px-3 py-2.5 font-serif text-[1rem] font-bold text-slate-700 transition-colors hover:bg-white/70 hover:text-primary">
                 {category.name}
               </a>
             ))}
           </div>
         </details>
 
-        <a href={withBase('/cara-pesan/')} class={`block rounded-lg border px-4 py-3.5 transition-colors ${isMobileCaraPesan ? 'border-secondary/40 bg-[#ead9be] text-primary shadow-sm' : 'border-transparent text-[#4f584a] hover:border-soft-cream/70 hover:bg-primary/5 hover:text-primary'}`}>
+        <a href={withBase('/cara-pesan/')} class={`block rounded-lg border px-4 py-3.5 transition-colors ${isMobileCaraPesan ? 'border-primary/25 bg-primary/10 text-primary shadow-sm' : 'border-transparent text-slate-700 hover:border-soft-cream/70 hover:bg-primary/5 hover:text-primary'}`}>
           <span class="block font-serif text-[1.24rem] font-bold leading-tight tracking-wide">Cara Pesan</span>
           <span class="mt-1 block text-[0.66rem] font-bold uppercase tracking-[0.2em] opacity-60">Alur pemesanan</span>
         </a>
 
-        <a href={withBase('/faq/')} class={`block rounded-lg border px-4 py-3.5 transition-colors ${isMobileFaq ? 'border-secondary/40 bg-[#ead9be] text-primary shadow-sm' : 'border-transparent text-[#4f584a] hover:border-soft-cream/70 hover:bg-primary/5 hover:text-primary'}`}>
+        <a href={withBase('/faq/')} class={`block rounded-lg border px-4 py-3.5 transition-colors ${isMobileFaq ? 'border-primary/25 bg-primary/10 text-primary shadow-sm' : 'border-transparent text-slate-700 hover:border-soft-cream/70 hover:bg-primary/5 hover:text-primary'}`}>
           <span class="block font-serif text-[1.24rem] font-bold leading-tight tracking-wide">FAQ</span>
           <span class="mt-1 block text-[0.66rem] font-bold uppercase tracking-[0.2em] opacity-60">Bantuan pelanggan</span>
         </a>
 
-        <a href={withBase('/tentang/')} class={`block rounded-lg border px-4 py-3.5 transition-colors ${isMobileTentang ? 'border-secondary/40 bg-[#ead9be] text-primary shadow-sm' : 'border-transparent text-[#4f584a] hover:border-soft-cream/70 hover:bg-primary/5 hover:text-primary'}`}>
+        <a href={withBase('/tentang/')} class={`block rounded-lg border px-4 py-3.5 transition-colors ${isMobileTentang ? 'border-primary/25 bg-primary/10 text-primary shadow-sm' : 'border-transparent text-slate-700 hover:border-soft-cream/70 hover:bg-primary/5 hover:text-primary'}`}>
           <span class="block font-serif text-[1.24rem] font-bold leading-tight tracking-wide">Tentang Kami</span>
           <span class="mt-1 block text-[0.66rem] font-bold uppercase tracking-[0.2em] opacity-60">Profil toko</span>
         </a>
 
-        <a href={withBase('/kontak/')} class={`block rounded-lg border px-4 py-3.5 transition-colors ${isMobileKontak ? 'border-secondary/40 bg-[#ead9be] text-primary shadow-sm' : 'border-transparent text-[#4f584a] hover:border-soft-cream/70 hover:bg-primary/5 hover:text-primary'}`}>
+        <a href={withBase('/kontak/')} class={`block rounded-lg border px-4 py-3.5 transition-colors ${isMobileKontak ? 'border-primary/25 bg-primary/10 text-primary shadow-sm' : 'border-transparent text-slate-700 hover:border-soft-cream/70 hover:bg-primary/5 hover:text-primary'}`}>
           <span class="block font-serif text-[1.24rem] font-bold leading-tight tracking-wide">Kontak</span>
           <span class="mt-1 block text-[0.66rem] font-bold uppercase tracking-[0.2em] opacity-60">Hubungi admin</span>
         </a>
