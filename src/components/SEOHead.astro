@@ -25,7 +25,7 @@ const canonicalURL = new URL(withBase(stripBase(Astro.url.pathname)), Astro.site
 const ogImageURL = new URL(withBase(image), Astro.site);
 const siteName = 'Zaloma Florist';
 const fullTitle = title.toLowerCase().includes(siteName.toLowerCase()) ? title : `${title} | ${siteName}`;
-const defaultKeywords = 'Zaloma Florist, Zaloma Florist Malang, Zaloma Florist toko bunga, toko bunga Zaloma Florist, toko bunga Malang murah, toko bunga Malang berkualitas, florist Malang murah, florist Malang berkualitas, karangan bunga Malang murah, bunga papan Malang, hand bouquet Malang, standing flower Malang, tanbulampot Malang, pohon ucapan Malang, bunga ucapan tanaman, ucapan bibit pohon buah, karangan bibit tanaman';
+const defaultKeywords = 'Zaloma Florist, Zaloma Florist Malang, toko bunga Malang terpercaya, florist Malang 11 tahun, bunga papan Malang, bunga papan ucapan duka cita Malang, bunga papan wedding Malang, bunga papan ucapan selamat Malang, hand bouquet Malang, buket bunga Malang, standing flower Malang, bunga meja Malang, rangkaian bunga segar Malang, toko bunga Malang murah berkualitas, florist Malang pengiriman cepat, karangan bunga Malang, bunga papan Surabaya, bunga papan Gresik, bunga papan Kediri, toko bunga Jawa Timur';
 const securityPolicy = [
   "default-src 'self'",
   "base-uri 'self'",
@@ -49,6 +49,7 @@ const securityPolicy = [
 <meta name="robots" content={robots} />
 <meta name="google-site-verification" content="7Us_oOZCthT_K5TWBYtY-dri9dXwXgOBdp8SlustlLM" />
 <meta name="google-site-verification" content="nwjkhiONn33gIymTNY90xOpP1sNgkK_bruwBNxZxk4k" />
+<meta name="google-site-verification" content="google9ce433d6edbefe53" />
 <meta name="referrer" content="strict-origin-when-cross-origin" />
 <!-- <meta http-equiv="Content-Security-Policy" content={securityPolicy} /> -->
 <link rel="canonical" href={canonicalURL} />

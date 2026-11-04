@@ -4,10 +4,10 @@ import Breadcrumb from '../components/Breadcrumb.astro';
 import { WHATSAPP_NUMBER } from '../data/constants';
 import { withBase } from '../utils/paths';
 
-const title = "Tentang Zaloma Florist - Toko Bunga Malang";
-const description = "Zaloma Florist adalah toko bunga di Malang yang menyediakan berbagai karangan bunga papan, buket, standing flower, bunga meja, paper flower, dan tanaman buah dalam pot (tanbulampot) berkualitas.";
+const title = "Tentang Zaloma Florist - Toko Bunga Malang Terpercaya 11 Tahun";
+const description = "Zaloma Florist adalah toko bunga Malang terpercaya dengan pengalaman 11 tahun. Kami menyediakan bunga papan, hand bouquet, standing flower, bunga meja, dan rangkaian bunga segar berkualitas untuk seluruh wilayah Malang Raya dan Jawa Timur.";
 
-const whatsappUrl = `https://wa.me/${WHATSAPP_NUMBER}?text=${encodeURIComponent('Halo Zaloma Florist, saya ingin berkonsultasi dan memesan karangan bunga/tanaman dari Zaloma Florist di Malang.')}`;
+const whatsappUrl = `https://wa.me/${WHATSAPP_NUMBER}?text=${encodeURIComponent('Halo Zaloma Florist, saya ingin berkonsultasi dan memesan karangan bunga dari Zaloma Florist di Malang.')}`;
 
 const process = [
   {
@@ -23,12 +23,30 @@ const process = [
   {
     num: '03',
     title: 'Proses Perangkaian',
-    body: 'Pesanan dirangkai langsung di tempat oleh florist Zaloma Florist dengan susunan rapi dan teks ucapan yang jelas terbaca.'
+    body: 'Pesanan dirangkai langsung oleh florist senior Zaloma Florist dengan susunan rapi dan teks ucapan yang jelas terbaca — rata-rata selesai dalam 1–3 jam.'
   },
   {
     num: '04',
     title: 'Foto Hasil & Pengiriman',
     body: 'Sebelum berangkat, foto hasil jadi dikirimkan ke WhatsApp Anda untuk dicek. Setelah disetujui, pesanan langsung diantar ke lokasi tujuan.'
+  }
+];
+
+const teamValues = [
+  {
+    num: '01',
+    title: 'Ketepatan Waktu',
+    body: 'Kami memahami betapa pentingnya momen ucapan — terutama duka cita. Rata-rata pengerjaan bunga papan kami selesai dalam 1–3 jam, cocok untuk pesanan mendadak.'
+  },
+  {
+    num: '02',
+    title: 'Bunga Segar Berkualitas',
+    body: 'Bunga potong baru dirangkai pada hari pengiriman agar tetap segar selama acara berlangsung. Foto hasil jadi dikirimkan sebelum pesanan diberangkatkan.'
+  },
+  {
+    num: '03',
+    title: 'Kerapian Rangkaian',
+    body: 'Setiap karangan bunga dirangkai dengan tata letak yang tertata, huruf ucapan yang jelas terbaca, dan kombinasi warna bunga yang harmonis sesuai request.'
   }
 ];
 ---
@@ -44,35 +62,32 @@ const process = [
   <!-- HERO: asymmetric split -->
   <section class="ta-hero">
     <div class="ta-hero-text">
-      <p class="ta-label">Toko Bunga Malang</p>
+      <p class="ta-label">Toko Bunga Malang Terpercaya</p>
       <h1 class="ta-hero-title">
-        Melayani pemesanan kerajinan bunga di Malang untuk ucapan duka cita, pernikahan, dan peresmian.
+        Florist Terbaik di Malang — Pengalaman 11 Tahun Merangkai Momen Bermakna
       </h1>
       <div class="ta-hero-body">
         <p>
-          Zaloma Florist melayani pemesanan kerajinan bunga di Malang, mulai dari karangan bunga papan, buket bunga segar, standing flower, 
-          bunga meja, paper flower, hingga tanaman pohon ucapan.
+          Tim kami terdiri dari florist senior yang sudah berpengalaman lebih dari 11 tahun dalam dunia karangan bunga. Berawal dari Surabaya — di mana kami berhasil membangun toko bunga selama 6 tahun — kami kemudian melihat peluang di Malang dan membuka cabang di area Batu Malang untuk hadir lebih dekat bagi pelanggan Malang Raya.
         </p>
         <p>
-          Setiap pesanan dirangkai menggunakan bunga segar pilihan dengan pengerjaan rata-rata 3 hingga 4 jam. 
-          Sebelum pesanan diberangkatkan, foto hasil jadi dikirimkan ke WhatsApp Anda untuk memastikan 
-          ejaan nama, kalimat ucapan, dan kerapian susunan bunga sudah tepat sebelum tiba di lokasi.
+          Zaloma Florist melayani pemesanan bunga papan wedding, bunga papan ucapan duka cita, bunga papan ucapan selamat (congratulation), bunga meja, hand bouquet, standing flower, paper flower, dan tanaman pohon ucapan. Kami mengutamakan kecepatan, kerapian, ketepatan waktu, dan kepuasan pelanggan di atas segalanya.
         </p>
       </div>
       <div class="ta-hero-stats">
         <div class="ta-stat">
-          <span class="ta-stat-n">500+</span>
-          <span class="ta-stat-l">Pesanan terkirim</span>
+          <span class="ta-stat-n">11 Tahun</span>
+          <span class="ta-stat-l">Pengalaman Florist</span>
         </div>
         <div class="ta-stat-sep" aria-hidden="true"></div>
         <div class="ta-stat">
-          <span class="ta-stat-n">3&ndash;4 jam</span>
-          <span class="ta-stat-l">Pengerjaan cepat</span>
+          <span class="ta-stat-n">1–3 Jam</span>
+          <span class="ta-stat-l">Rata-rata pengerjaan</span>
         </div>
         <div class="ta-stat-sep" aria-hidden="true"></div>
         <div class="ta-stat">
-          <span class="ta-stat-n">Malang Raya</span>
-          <span class="ta-stat-l">Jangkauan kirim</span>
+          <span class="ta-stat-n">Jawa Timur</span>
+          <span class="ta-stat-l">Area pengiriman</span>
         </div>
       </div>
     </div>
@@ -82,7 +97,7 @@ const process = [
         <span class="image-skeleton" aria-hidden="true"></span>
         <img
           src={withBase('/images/produk/tanbulampot/875.webp')}
-          alt="Tanaman buah dalam pot (tanbulampot) berkualitas dari Zaloma Florist Malang"
+          alt="Karangan bunga segar berkualitas dari Zaloma Florist Malang — florist terpercaya 11 tahun"
           width="640"
           height="800"
           loading="eager"
@@ -96,7 +111,105 @@ const process = [
       <!-- Offset accent block -->
       <div class="ta-hero-accent" aria-hidden="true">
         <span class="ta-hero-accent-num">Zaloma Florist</span>
-        <span class="ta-hero-accent-sub">Malang &middot; Est. 2022</span>
+        <span class="ta-hero-accent-sub">Malang &middot; 11 Tahun Pengalaman</span>
+      </div>
+    </div>
+  </section>
+
+  <!-- STORY SECTION -->
+  <section class="ta-story">
+    <div class="ta-story-inner">
+      <div class="ta-story-text">
+        <p class="ta-label">Cerita Kami</p>
+        <h2 class="ta-story-title">Dari Surabaya ke Malang — Membawa Standar Florist Terbaik</h2>
+        <div class="ta-story-body">
+          <p>
+            Perjalanan Zaloma Florist dimulai dari Surabaya, di mana selama 6 tahun kami sukses melayani ribuan pesanan karangan bunga dari berbagai kalangan — mulai dari perusahaan besar, instansi pemerintah, hingga keluarga yang ingin menyampaikan ucapan tulus kepada orang tersayang.
+          </p>
+          <p>
+            Melihat potensi besar di Malang dan belum banyaknya toko bunga yang hadir dengan standar ketepatan waktu yang baik, tim kami memutuskan membuka cabang di Batu Malang. Sejak itu, kami terus berkembang dan kini menjadi salah satu pilihan utama florist di Malang Raya.
+          </p>
+          <p>
+            Kami bangga dengan reputasi yang kami bangun selama lebih dari satu dekade: cepat, rapi, tepat waktu, dan selalu mengutamakan kepuasan setiap pelanggan.
+          </p>
+        </div>
+      </div>
+      <div class="ta-story-highlights">
+        <div class="ta-highlight">
+          <div class="ta-highlight-icon" aria-hidden="true">
+            <svg width="22" height="22" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="1.8"><path stroke-linecap="round" stroke-linejoin="round" d="M12 8v4l3 3m6-3a9 9 0 11-18 0 9 9 0 0118 0z"/></svg>
+          </div>
+          <div>
+            <h3 class="ta-highlight-title">Pengerjaan 1–3 Jam</h3>
+            <p class="ta-highlight-body">Rata-rata bunga papan kami selesai dalam 1–3 jam — cocok untuk kebutuhan mendadak, terutama ucapan duka cita yang membutuhkan ketepatan waktu.</p>
+          </div>
+        </div>
+        <div class="ta-highlight">
+          <div class="ta-highlight-icon" aria-hidden="true">
+            <svg width="22" height="22" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="1.8"><path stroke-linecap="round" stroke-linejoin="round" d="M17.657 16.657L13.414 20.9a1.998 1.998 0 01-2.827 0l-4.244-4.243a8 8 0 1111.314 0z"/><path stroke-linecap="round" stroke-linejoin="round" d="M15 11a3 3 0 11-6 0 3 3 0 016 0z"/></svg>
+          </div>
+          <div>
+            <h3 class="ta-highlight-title">Jangkauan Luas Jawa Timur</h3>
+            <p class="ta-highlight-body">Melayani pengiriman ke Malang Raya, Surabaya, Gresik, Mojokerto, Jombang, Kediri, Blitar, Tulungagung, dan sekitarnya. Hubungi kami untuk info pengiriman ke luar area.</p>
+          </div>
+        </div>
+        <div class="ta-highlight">
+          <div class="ta-highlight-icon" aria-hidden="true">
+            <svg width="22" height="22" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="1.8"><path stroke-linecap="round" stroke-linejoin="round" d="M3 9a2 2 0 012-2h.93a2 2 0 001.664-.89l.812-1.22A2 2 0 0110.07 4h3.86a2 2 0 011.664.89l.812 1.22A2 2 0 0018.07 7H19a2 2 0 012 2v9a2 2 0 01-2 2H5a2 2 0 01-2-2V9z"/><path stroke-linecap="round" stroke-linejoin="round" d="M15 13a3 3 0 11-6 0 3 3 0 016 0z"/></svg>
+          </div>
+          <div>
+            <h3 class="ta-highlight-title">Difoto Sebelum Diantar</h3>
+            <p class="ta-highlight-body">Setiap pesanan difoto setelah selesai dirangkai dan dikirimkan ke WhatsApp Anda sebelum keberangkatan. Pastikan ejaan ucapan dan kerapian sudah sesuai harapan.</p>
+          </div>
+        </div>
+      </div>
+    </div>
+  </section>
+
+  <!-- BUNGA PAPAN SECTION -->
+  <section class="ta-papan">
+    <div class="ta-papan-inner">
+      <div class="ta-papan-head">
+        <p class="ta-label">Produk Unggulan</p>
+        <h2 class="ta-papan-title">Bunga Papan Malang — Ucapan Bermakna untuk Setiap Momen</h2>
+      </div>
+      <div class="ta-papan-body">
+        <p>
+          Bunga papan telah menjadi pilihan favorit bagi perusahaan maupun personal yang ingin menyampaikan ucapan selamat maupun duka cita kepada rekan atau mitra mereka. Ucapan selamat yang diungkapkan melalui bunga papan meliputi acara pembukaan gedung atau perusahaan, pernikahan, anniversary, kenaikan jabatan, wisuda, dan berbagai momen spesial lainnya.
+        </p>
+        <p>
+          Setiap bunga papan kami dirancang dengan sekumpulan bunga segar dan rangkaian kata-kata yang menggambarkan perasaan pemberi kepada penerima — rapi, elegan, dan tepat waktu sampai di lokasi.
+        </p>
+      </div>
+      <div class="ta-papan-sizes">
+        <p class="ta-papan-sizes-title">Pilihan Ukuran Bunga Papan</p>
+        <div class="ta-size-grid">
+          <div class="ta-size-card ta-size-card--popular">
+            <div class="ta-size-badge">Paling Diminati</div>
+            <div class="ta-size-dim">2 × 1,25 m</div>
+            <div class="ta-size-label">Ukuran Standar</div>
+            <div class="ta-size-price">Rp 400.000 – Rp 750.000</div>
+            <p class="ta-size-desc">Pilihan ekonomis dan paling sering dipesan — cocok untuk segala jenis ucapan.</p>
+          </div>
+          <div class="ta-size-card">
+            <div class="ta-size-dim">2 × 1,5 m</div>
+            <div class="ta-size-label">Ukuran Medium</div>
+            <div class="ta-size-price">Rp 750.000 – Rp 1.500.000</div>
+            <p class="ta-size-desc">Tampilan lebih besar dan berkesan — tepat untuk acara pernikahan dan peresmian kantor.</p>
+          </div>
+          <div class="ta-size-card">
+            <div class="ta-size-dim">2 × 3 m</div>
+            <div class="ta-size-label">Ukuran Premium</div>
+            <div class="ta-size-price">Rp 1.500.000+</div>
+            <p class="ta-size-desc">Kehadiran yang impresif untuk perusahaan atau momen prestisius yang ingin tampil menonjol.</p>
+          </div>
+          <div class="ta-size-card">
+            <div class="ta-size-dim">2 × 3 m+</div>
+            <div class="ta-size-label">Custom Jumbo</div>
+            <div class="ta-size-price">Hubungi Kami</div>
+            <p class="ta-size-desc">Pesanan custom hingga 10 meter untuk perusahaan prestisius atau tokoh terkemuka. Harga sesuai spesifikasi.</p>
+          </div>
+        </div>
       </div>
     </div>
   </section>
@@ -105,36 +218,41 @@ const process = [
   <section class="ta-values">
     <div class="ta-values-head">
       <p class="ta-label">Standar Pengerjaan</p>
-      <h2 class="ta-values-title">Komitmen layanan pemesanan bunga di Zaloma Florist</h2>
+      <h2 class="ta-values-title">Komitmen layanan Zaloma Florist untuk setiap pesanan</h2>
     </div>
 
     <div class="ta-values-grid">
+      {teamValues.map((val) => (
+        <div class="ta-val">
+          <div class="ta-val-num" aria-hidden="true">{val.num}</div>
+          <h3 class="ta-val-title">{val.title}</h3>
+          <p class="ta-val-body">{val.body}</p>
+        </div>
+      ))}
+    </div>
+  </section>
 
-      <div class="ta-val">
-        <div class="ta-val-num" aria-hidden="true">01</div>
-        <h3 class="ta-val-title">Bunga Segar Pilihan</h3>
-        <p class="ta-val-body">
-          Bunga potong baru dirangkai pada hari pengiriman agar tetap segar selama acara berlangsung.
-          Foto hasil jadi dikirimkan sebelum pesanan diberangkatkan.
-        </p>
+  <!-- RANGKAIAN BUNGA SECTION -->
+  <section class="ta-rangkaian">
+    <div class="ta-rangkaian-inner">
+      <div class="ta-rangkaian-head">
+        <p class="ta-label">Koleksi Rangkaian</p>
+        <h2 class="ta-rangkaian-title">Rangkaian Bunga Segar & Buket Berkualitas di Malang</h2>
       </div>
-
-      <div class="ta-val">
-        <div class="ta-val-num" aria-hidden="true">02</div>
-        <h3 class="ta-val-title">Rangkaian Tertata Rapi</h3>
-        <p class="ta-val-body">
-          Setiap karangan bunga dirangkai dengan tata letak huruf ucapan yang jelas terbaca dan kombinasi warna bunga yang selaras.
-        </p>
+      <div class="ta-rangkaian-grid">
+        <div class="ta-rangkaian-item">
+          <h3 class="ta-rangkaian-item-title">Hand Bouquet (Buket Bunga)</h3>
+          <p class="ta-rangkaian-item-body">
+            Buket bunga kami umumnya terdiri dari mawar, lily, tulip, gerbera, anyelir, dan bunga pilihan lainnya — ditata rapi dalam balutan wrapping elegan. Sangat cocok untuk wisuda, ulang tahun, anniversary pernikahan, maupun momen spesial lainnya. Sampaikan perasaan tulus Anda dengan buket bunga segar dari Zaloma Florist.
+          </p>
+        </div>
+        <div class="ta-rangkaian-item">
+          <h3 class="ta-rangkaian-item-title">Rangkaian Bunga Meja & Standing Flower</h3>
+          <p class="ta-rangkaian-item-body">
+            Rangkaian bunga terbaik kami tersusun dari bunga segar pilihan, daun hijau yang menambah keindahan, dan tempat rangkaian yang tertata rapi. Tersedia dalam dua pilihan: rangkaian bunga segar untuk tampilan hidup yang menawan, dan rangkaian bunga artificial yang tahan lama dan cocok sebagai dekorasi kantor maupun ruang pameran.
+          </p>
+        </div>
       </div>
-
-      <div class="ta-val">
-        <div class="ta-val-num" aria-hidden="true">03</div>
-        <h3 class="ta-val-title">Pengantaran Langsung oleh Kurir</h3>
-        <p class="ta-val-body">
-          Pesanan diantar menggunakan kendaraan yang sesuai, menjaga papan bunga atau buket tetap aman dari terpaan angin hingga tiba di lokasi.
-        </p>
-      </div>
-
     </div>
   </section>
 
@@ -159,7 +277,7 @@ const process = [
     </div>
   </section>
 
-  <!-- PHOTOS: tanbulampot evidence -->
+  <!-- PHOTOS: product evidence -->
   <section class="ta-photos">
     <div class="ta-photo-wrap">
       <div class="ta-photo image-load-shell is-loaded" data-image-frame>
@@ -178,7 +296,7 @@ const process = [
         <span class="image-skeleton" aria-hidden="true"></span>
         <img
           src={withBase('/images/produk/tanbulampot/845.webp')}
-          alt="Pohon buah tanbulampot berkualitas dari Zaloma Florist Malang"
+          alt="Bunga papan dan rangkaian bunga segar berkualitas dari Zaloma Florist Malang"
           width="520" height="680"
           loading="eager" decoding="async"
           data-image-loader="true"
@@ -190,7 +308,7 @@ const process = [
     <div class="ta-photo-caption">
       <p class="ta-label">Dokumentasi Produk</p>
       <p class="ta-photo-body">
-        Semua foto produk di website ini adalah dokumentasi asli dari pesanan yang dibuat dan dikirimkan oleh Zaloma Florist di wilayah Malang Raya, Surabaya, Gresik, Mojokerto, Jombang, Kediri, Blitar, Tulungagung, dan sekitarnya.
+        Semua foto produk di website ini adalah dokumentasi nyata dari pesanan yang kami kerjakan dan kirimkan ke wilayah Malang Raya, Surabaya, Gresik, Mojokerto, Jombang, Kediri, Blitar, Tulungagung, dan sekitarnya. Percayakan momen istimewa Anda kepada florist berpengalaman 11 tahun.
       </p>
       <a href={whatsappUrl} target="_blank" rel="noopener noreferrer" class="ta-cta-link" id="tentang-wa-cta">
         Konsultasi & Pesan Sekarang
@@ -343,7 +461,7 @@ const process = [
     position: absolute;
     bottom: 2rem;
     left: 2rem;
-    background: rgba(26, 40, 16, 0.82);
+    background: rgba(103, 30, 47, 0.88);
     backdrop-filter: blur(8px);
     -webkit-backdrop-filter: blur(8px);
     border-radius: 10px;
@@ -368,6 +486,205 @@ const process = [
     letter-spacing: 0.1em;
     text-transform: uppercase;
     color: #C59253;
+  }
+
+  /* --------------------------------------------------------------------------
+     STORY SECTION
+     -------------------------------------------------------------------------- */
+  .ta-story {
+    border-bottom: 1px solid #F6E3E1;
+    background: #fff;
+  }
+
+  .ta-story-inner {
+    max-width: 1200px;
+    margin: 0 auto;
+    padding: 5rem 2rem;
+    display: grid;
+    grid-template-columns: 1fr 1fr;
+    gap: 5rem;
+    align-items: start;
+  }
+
+  .ta-story-title {
+    font-family: var(--font-serif, Georgia, serif);
+    font-size: clamp(1.5rem, 2.5vw, 2.1rem);
+    font-weight: 700;
+    line-height: 1.22;
+    letter-spacing: -0.022em;
+    color: #2E0C15;
+    margin: 0 0 1.5rem;
+  }
+
+  .ta-story-body {
+    display: flex;
+    flex-direction: column;
+    gap: 1rem;
+  }
+
+  .ta-story-body p {
+    font-size: 0.895rem;
+    line-height: 1.78;
+    color: #64748b;
+    margin: 0;
+  }
+
+  .ta-story-highlights {
+    display: flex;
+    flex-direction: column;
+    gap: 1.75rem;
+    padding-top: 0.5rem;
+  }
+
+  .ta-highlight {
+    display: flex;
+    gap: 1.1rem;
+    align-items: flex-start;
+  }
+
+  .ta-highlight-icon {
+    flex-shrink: 0;
+    width: 42px;
+    height: 42px;
+    border-radius: 10px;
+    background: #FAF0F1;
+    border: 1px solid #F6E3E1;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    color: #893144;
+  }
+
+  .ta-highlight-title {
+    font-family: var(--font-serif, Georgia, serif);
+    font-size: 1rem;
+    font-weight: 700;
+    color: #2E0C15;
+    margin: 0 0 0.4rem;
+    line-height: 1.3;
+  }
+
+  .ta-highlight-body {
+    font-size: 0.84rem;
+    line-height: 1.72;
+    color: #64748b;
+    margin: 0;
+  }
+
+  /* --------------------------------------------------------------------------
+     BUNGA PAPAN SECTION
+     -------------------------------------------------------------------------- */
+  .ta-papan {
+    background: #FDF7F7;
+    border-bottom: 1px solid #F6E3E1;
+  }
+
+  .ta-papan-inner {
+    max-width: 1200px;
+    margin: 0 auto;
+    padding: 5rem 2rem;
+  }
+
+  .ta-papan-head {
+    margin-bottom: 2rem;
+  }
+
+  .ta-papan-title {
+    font-family: var(--font-serif, Georgia, serif);
+    font-size: clamp(1.5rem, 2.5vw, 2.1rem);
+    font-weight: 700;
+    line-height: 1.22;
+    letter-spacing: -0.022em;
+    color: #2E0C15;
+    margin: 0;
+    max-width: 680px;
+  }
+
+  .ta-papan-body {
+    display: flex;
+    flex-direction: column;
+    gap: 1rem;
+    margin-bottom: 3rem;
+    max-width: 760px;
+  }
+
+  .ta-papan-body p {
+    font-size: 0.895rem;
+    line-height: 1.78;
+    color: #64748b;
+    margin: 0;
+  }
+
+  .ta-papan-sizes-title {
+    font-family: var(--font-serif, Georgia, serif);
+    font-size: 1.1rem;
+    font-weight: 700;
+    color: #2E0C15;
+    margin: 0 0 1.5rem;
+  }
+
+  .ta-size-grid {
+    display: grid;
+    grid-template-columns: repeat(4, 1fr);
+    gap: 1rem;
+  }
+
+  .ta-size-card {
+    background: #fff;
+    border: 1px solid #F6E3E1;
+    border-radius: 10px;
+    padding: 1.5rem 1.25rem;
+    position: relative;
+  }
+
+  .ta-size-card--popular {
+    border-color: #C59253;
+    box-shadow: 0 4px 16px rgba(197, 146, 83, 0.15);
+  }
+
+  .ta-size-badge {
+    display: inline-block;
+    font-size: 0.6rem;
+    font-weight: 800;
+    letter-spacing: 0.12em;
+    text-transform: uppercase;
+    background: #C59253;
+    color: #fff;
+    padding: 0.2rem 0.5rem;
+    border-radius: 4px;
+    margin-bottom: 0.75rem;
+  }
+
+  .ta-size-dim {
+    font-family: var(--font-serif, Georgia, serif);
+    font-size: 1.3rem;
+    font-weight: 700;
+    color: #893144;
+    line-height: 1;
+    margin-bottom: 0.3rem;
+  }
+
+  .ta-size-label {
+    font-size: 0.65rem;
+    font-weight: 700;
+    letter-spacing: 0.1em;
+    text-transform: uppercase;
+    color: #C59253;
+    margin-bottom: 0.6rem;
+  }
+
+  .ta-size-price {
+    font-size: 0.88rem;
+    font-weight: 700;
+    color: #2E0C15;
+    margin-bottom: 0.6rem;
+  }
+
+  .ta-size-desc {
+    font-size: 0.8rem;
+    line-height: 1.65;
+    color: #64748b;
+    margin: 0;
   }
 
   /* --------------------------------------------------------------------------
@@ -440,6 +757,64 @@ const process = [
   }
 
   /* --------------------------------------------------------------------------
+     RANGKAIAN SECTION
+     -------------------------------------------------------------------------- */
+  .ta-rangkaian {
+    background: #fff;
+    border-bottom: 1px solid #F6E3E1;
+  }
+
+  .ta-rangkaian-inner {
+    max-width: 1200px;
+    margin: 0 auto;
+    padding: 5rem 2rem;
+  }
+
+  .ta-rangkaian-head {
+    margin-bottom: 2.5rem;
+  }
+
+  .ta-rangkaian-title {
+    font-family: var(--font-serif, Georgia, serif);
+    font-size: clamp(1.5rem, 2.5vw, 2rem);
+    font-weight: 700;
+    line-height: 1.22;
+    letter-spacing: -0.022em;
+    color: #2E0C15;
+    margin: 0;
+    max-width: 640px;
+  }
+
+  .ta-rangkaian-grid {
+    display: grid;
+    grid-template-columns: 1fr 1fr;
+    gap: 2rem;
+  }
+
+  .ta-rangkaian-item {
+    background: #FDF7F7;
+    border: 1px solid #F6E3E1;
+    border-radius: 10px;
+    padding: 2rem 1.75rem;
+  }
+
+  .ta-rangkaian-item-title {
+    font-family: var(--font-serif, Georgia, serif);
+    font-size: 1.1rem;
+    font-weight: 700;
+    color: #2E0C15;
+    margin: 0 0 0.75rem;
+    line-height: 1.3;
+  }
+
+  .ta-rangkaian-item-body {
+    font-size: 0.875rem;
+    line-height: 1.75;
+    color: #64748b;
+    margin: 0;
+  }
+
+  /* --------------------------------------------------------------------------
      PROCESS
      -------------------------------------------------------------------------- */
   .ta-process {
@@ -485,7 +860,7 @@ const process = [
     font-family: var(--font-serif, Georgia, serif);
     font-size: 3rem;
     font-weight: 700;
-    color: rgba(138, 171, 110, 0.25);
+    color: rgba(197, 146, 83, 0.25);
     line-height: 1;
     margin-bottom: 1.25rem;
     letter-spacing: -0.04em;
@@ -494,11 +869,11 @@ const process = [
   /* Horizontal connector line */
   .ta-step-connector {
     position: absolute;
-    top: 1.35rem; /* aligns with mid-height of the number */
+    top: 1.35rem;
     right: 0;
     width: calc(100% - 2.5rem);
     height: 1px;
-    background: linear-gradient(to right, rgba(138,171,110,0.3), rgba(138,171,110,0.05));
+    background: linear-gradient(to right, rgba(197,146,83,0.3), rgba(197,146,83,0.05));
     transform: translateX(50%);
   }
 
@@ -616,6 +991,15 @@ const process = [
       padding: 3rem 1.5rem;
     }
 
+    .ta-story-inner {
+      grid-template-columns: 1fr;
+      gap: 3rem;
+    }
+
+    .ta-size-grid {
+      grid-template-columns: repeat(2, 1fr);
+    }
+
     .ta-steps {
       grid-template-columns: repeat(2, 1fr);
       gap: 2.5rem;
@@ -686,6 +1070,20 @@ const process = [
     .ta-stat-sep {
       display: none;
     }
+
+    .ta-rangkaian-grid {
+      grid-template-columns: 1fr;
+    }
+
+    .ta-size-grid {
+      grid-template-columns: 1fr 1fr;
+    }
+
+    .ta-story-inner,
+    .ta-papan-inner,
+    .ta-rangkaian-inner {
+      padding: 3.5rem 1.25rem;
+    }
   }
 
   @media (max-width: 480px) {
@@ -695,6 +1093,10 @@ const process = [
 
     .ta-photo--offset {
       margin: 0;
+    }
+
+    .ta-size-grid {
+      grid-template-columns: 1fr;
     }
   }
 </style>
