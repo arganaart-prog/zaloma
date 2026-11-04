@@ -1,4 +1,4 @@
----
+﻿---
 import Layout from '../layouts/Layout.astro';
 import ProductCard from '../components/ProductCard.astro';
 import HeroBanner from '../components/HeroBanner.astro';
@@ -148,7 +148,7 @@ const description = "Zaloma Florist menyediakan bunga papan, hand bouquet, stand
       
       <!-- Carousel wrapper: full bleed di mobile -->
       <div class="featured-products-carousel-wrap">
-        <!-- Fade hint di kanan – mobile only -->
+        <!-- Fade hint di kanan â€“ mobile only -->
         <div class="featured-products-fade-hint" aria-hidden="true"></div>
 
         <!-- 8 Featured Products (Rotasi Setiap 3 Hari) -->
@@ -164,7 +164,7 @@ const description = "Zaloma Florist menyediakan bunga papan, hand bouquet, stand
         </div>
       </div>
 
-      <!-- Dot indicator + CTA – mobile only -->
+      <!-- Dot indicator + CTA â€“ mobile only -->
       <div class="featured-products-mobile-footer md:hidden px-4">
         <div id="fp-dots" class="fp-dots" aria-hidden="true"></div>
         <a
@@ -224,7 +224,7 @@ const description = "Zaloma Florist menyediakan bunga papan, hand bouquet, stand
         margin-bottom: 2rem;
       }
 
-      /* ── Featured Products – Mobile Marketplace Carousel ─────── */
+      /* â”€â”€ Featured Products â€“ Mobile Marketplace Carousel â”€â”€â”€â”€â”€â”€â”€ */
       .featured-products-section {
         padding-top: 2rem;
         padding-bottom: 2.5rem;
@@ -263,7 +263,7 @@ const description = "Zaloma Florist menyediakan bunga papan, hand bouquet, stand
         color: #6b7280;
       }
 
-      /* ── Carousel wrapper: full bleed ────────────────────────── */
+      /* â”€â”€ Carousel wrapper: full bleed â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€ */
       .featured-products-carousel-wrap {
         position: relative;
       }
@@ -281,7 +281,7 @@ const description = "Zaloma Florist menyediakan bunga papan, hand bouquet, stand
         border-radius: 0 14px 14px 0;
       }
 
-      /* ── Horizontal scroll carousel ─────────────────────────── */
+      /* â”€â”€ Horizontal scroll carousel â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€ */
       .featured-products-slider {
         display: flex;
         flex-direction: row;
@@ -310,7 +310,7 @@ const description = "Zaloma Florist menyediakan bunga papan, hand bouquet, stand
         display: none !important;
       }
 
-      /* ── Card: lebar 72% viewport = peek card berikutnya ─────── */
+      /* â”€â”€ Card: lebar 72% viewport = peek card berikutnya â”€â”€â”€â”€â”€â”€â”€ */
       .featured-products-slider .classic-product-card {
         flex: 0 0 72vw;
         max-width: 280px;
@@ -336,7 +336,7 @@ const description = "Zaloma Florist menyediakan bunga papan, hand bouquet, stand
         box-shadow: 0 2px 8px rgba(15, 23, 42, 0.04);
       }
 
-      /* Gambar – lebih tinggi agar visual dominan */
+      /* Gambar â€“ lebih tinggi agar visual dominan */
       .featured-products-slider .classic-product-image {
         display: block;
         width: 100%;
@@ -369,7 +369,7 @@ const description = "Zaloma Florist menyediakan bunga papan, hand bouquet, stand
         font-weight: 700;
       }
 
-      /* Info area – compact, no min-height */
+      /* Info area â€“ compact, no min-height */
       .featured-products-slider .classic-product-info {
         padding: 0.65rem 0.8rem 0.75rem;
         text-align: left;
@@ -412,7 +412,7 @@ const description = "Zaloma Florist menyediakan bunga papan, hand bouquet, stand
         margin-bottom: 0.55rem;
       }
 
-      /* Area harga – langsung menempel setelah judul */
+      /* Area harga â€“ langsung menempel setelah judul */
       .featured-products-slider .classic-product-price-wrap {
         padding-top: 0;
         margin-top: 0;
@@ -470,7 +470,7 @@ const description = "Zaloma Florist menyediakan bunga papan, hand bouquet, stand
         line-height: 1.2;
       }
 
-      /* ── Footer: dots + link ────────────────────────────────── */
+      /* â”€â”€ Footer: dots + link â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€ */
       .featured-products-mobile-footer {
         display: flex;
         align-items: center;
@@ -550,7 +550,7 @@ const description = "Zaloma Florist menyediakan bunga papan, hand bouquet, stand
         var reduceMotionQuery = window.matchMedia('(prefers-reduced-motion: reduce)');
         var intervalId = 0;
 
-        /* ── Dot Indicator ─────────────────────────────────────── */
+        /* â”€â”€ Dot Indicator â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€ */
         var dotsContainer = document.getElementById('fp-dots');
 
         function getVisibleCards() {
@@ -621,7 +621,7 @@ const description = "Zaloma Florist menyediakan bunga papan, hand bouquet, stand
           startAutoSlide();
         });
 
-        /* ── Auto Slide ──────────────────────────────────────────── */
+        /* â”€â”€ Auto Slide â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€ */
         function stopAutoSlide() {
           if (!intervalId) return;
           window.clearInterval(intervalId);
@@ -771,64 +771,188 @@ const description = "Zaloma Florist menyediakan bunga papan, hand bouquet, stand
   <!-- Tanbulampot Section -->
   <TanbulampotSection />
 
-  <!-- Service Area Section -->
-  <section class="py-20 bg-primary text-white relative overflow-hidden">
+  <!-- Service Area Section (Jawa Timur & Malang Raya) -->
+  <section class="py-20 bg-primary text-white relative overflow-hidden" id="area-pengiriman">
+    <!-- Subtle Background Accent -->
+    <div class="absolute inset-0 bg-[radial-gradient(circle_at_top_right,rgba(191,167,122,0.18),transparent_50%)] pointer-events-none"></div>
+
     <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 relative z-10">
-      <div class="grid grid-cols-1 lg:grid-cols-2 gap-12 items-center">
-        <div>
-          <span class="text-secondary-light text-xs font-bold uppercase tracking-widest block mb-2">Area Layanan Florist</span>
-          <h2 class="font-serif text-3xl sm:text-4xl font-bold leading-tight">Pengiriman Karangan Bunga Area Malang Raya &amp; Batu</h2>
-          <p class="text-white/90 text-sm mt-4 leading-relaxed">
-            Zaloma Florist melayani pemesanan dan pengantaran karangan bunga ke seluruh Kota Malang, Kabupaten Malang, dan Kota Batu. Setiap pesanan diantar langsung oleh kurir tim kami agar bunga tiba dalam kondisi segar dan tertata rapi.
-          </p>
-          <div class="grid grid-cols-2 gap-4 mt-8">
-            <div class="flex items-center space-x-2 text-sm text-white/95">
-              <svg class="h-5 w-5 text-secondary-light flex-shrink-0" fill="currentColor" viewBox="0 0 20 20">
-                <path fill-rule="evenodd" d="M10 18a8 8 0 100-16 8 8 0 000 16zm3.707-9.293a1 1 0 00-1.414-1.414L9 10.586 7.707 9.293a1 1 0 00-1.414 1.414l2 2a1 1 0 001.414 0l4-4z" clip-rule="evenodd"/>
-              </svg>
-              <span>Kota Malang (Gratis Ongkir)</span>
-            </div>
-            <div class="flex items-center space-x-2 text-sm text-white/95">
-              <svg class="h-5 w-5 text-secondary-light flex-shrink-0" fill="currentColor" viewBox="0 0 20 20">
-                <path fill-rule="evenodd" d="M10 18a8 8 0 100-16 8 8 0 000 16zm3.707-9.293a1 1 0 00-1.414-1.414L9 10.586 7.707 9.293a1 1 0 00-1.414 1.414l2 2a1 1 0 001.414 0l4-4z" clip-rule="evenodd"/>
-              </svg>
-              <span>Kota Batu</span>
-            </div>
-            <div class="flex items-center space-x-2 text-sm text-white/95">
-              <svg class="h-5 w-5 text-secondary-light flex-shrink-0" fill="currentColor" viewBox="0 0 20 20">
-                <path fill-rule="evenodd" d="M10 18a8 8 0 100-16 8 8 0 000 16zm3.707-9.293a1 1 0 00-1.414-1.414L9 10.586 7.707 9.293a1 1 0 00-1.414 1.414l2 2a1 1 0 001.414 0l4-4z" clip-rule="evenodd"/>
-              </svg>
-              <span>Malang Utara (Singosari, Lawang)</span>
-            </div>
-            <div class="flex items-center space-x-2 text-sm text-white/95">
-              <svg class="h-5 w-5 text-secondary-light flex-shrink-0" fill="currentColor" viewBox="0 0 20 20">
-                <path fill-rule="evenodd" d="M10 18a8 8 0 100-16 8 8 0 000 16zm3.707-9.293a1 1 0 00-1.414-1.414L9 10.586 7.707 9.293a1 1 0 00-1.414 1.414l2 2a1 1 0 001.414 0l4-4z" clip-rule="evenodd"/>
-              </svg>
-              <span>Malang Selatan (Kepanjen, Bululawang)</span>
+      <!-- Section Heading -->
+      <div class="max-w-3xl mb-12">
+        <span class="inline-flex items-center gap-1.5 px-3 py-1 rounded-full text-xs font-bold uppercase tracking-widest bg-white/10 text-secondary-light border border-secondary/30 mb-3">
+          <svg class="w-3.5 h-3.5 text-secondary-light flex-shrink-0" fill="currentColor" viewBox="0 0 20 20">
+            <path fill-rule="evenodd" d="M5.05 4.05a7 7 0 119.9 9.9L10 18.9l-4.95-4.95a7 7 0 010-9.9zM10 11a2 2 0 100-4 2 2 0 000 4z" clip-rule="evenodd" />
+          </svg>
+          Jangkauan Pengiriman Luas &amp; Terpercaya
+        </span>
+        <h2 class="font-serif text-3xl sm:text-4xl lg:text-5xl font-bold leading-tight">
+          Melayani Pengiriman Bunga Malang Raya &amp; Berbagai Kota di Jawa Timur
+        </h2>
+        <p class="text-white/85 text-base sm:text-lg mt-4 leading-relaxed">
+          Zaloma Florist siap melayani pemesanan dan pengantaran karangan bunga segar, bunga papan, standing flower, dan buket ke seluruh wilayah Malang Raya serta berbagai kota tujuan di Jawa Timur dengan armada dan kurir terpercaya.
+        </p>
+      </div>
+
+      <div class="grid grid-cols-1 lg:grid-cols-12 gap-8 items-stretch">
+        <!-- Left Column: Daftar Kota Yang Dilayani -->
+        <div class="lg:col-span-7 flex flex-col justify-between space-y-6">
+          <div class="bg-primary-dark/60 border border-white/10 rounded-2xl p-6 sm:p-8 backdrop-blur-xs shadow-xl">
+            <h3 class="font-serif text-xl sm:text-2xl font-bold text-white mb-2 flex items-center gap-2">
+              <span class="w-2.5 h-2.5 rounded-full bg-secondary"></span>
+              Kota &amp; Wilayah Jangkauan Pengiriman
+            </h3>
+            <p class="text-sm text-white/80 mb-6">
+              Berikut daftar kota jangkauan pengiriman karangan bunga Zaloma Florist untuk acara pernikahan, duka cita, grand opening, hingga wisuda:
+            </p>
+
+            <div class="grid grid-cols-1 sm:grid-cols-2 gap-3 sm:gap-4">
+              <!-- Malang Raya -->
+              <div class="flex items-start gap-2.5 p-3 rounded-xl bg-white/5 border border-white/10 hover:border-secondary/40 transition-colors">
+                <svg class="h-5 w-5 text-secondary flex-shrink-0 mt-0.5" fill="currentColor" viewBox="0 0 20 20">
+                  <path fill-rule="evenodd" d="M10 18a8 8 0 100-16 8 8 0 000 16zm3.707-9.293a1 1 0 00-1.414-1.414L9 10.586 7.707 9.293a1 1 0 00-1.414 1.414l2 2a1 1 0 001.414 0l4-4z" clip-rule="evenodd"/>
+                </svg>
+                <div>
+                  <span class="font-bold text-sm text-white block">Malang Raya &amp; Batu</span>
+                  <span class="text-[11px] text-white/70">Kota Malang (Gratis Ongkir), Kab. Malang, &amp; Kota Batu</span>
+                </div>
+              </div>
+
+              <!-- Surabaya -->
+              <div class="flex items-start gap-2.5 p-3 rounded-xl bg-white/5 border border-white/10 hover:border-secondary/40 transition-colors">
+                <svg class="h-5 w-5 text-secondary flex-shrink-0 mt-0.5" fill="currentColor" viewBox="0 0 20 20">
+                  <path fill-rule="evenodd" d="M10 18a8 8 0 100-16 8 8 0 000 16zm3.707-9.293a1 1 0 00-1.414-1.414L9 10.586 7.707 9.293a1 1 0 00-1.414 1.414l2 2a1 1 0 001.414 0l4-4z" clip-rule="evenodd"/>
+                </svg>
+                <div>
+                  <span class="font-bold text-sm text-white block">Surabaya</span>
+                  <span class="text-[11px] text-white/70">Seluruh area kota Surabaya &amp; sekitarnya</span>
+                </div>
+              </div>
+
+              <!-- Gresik -->
+              <div class="flex items-start gap-2.5 p-3 rounded-xl bg-white/5 border border-white/10 hover:border-secondary/40 transition-colors">
+                <svg class="h-5 w-5 text-secondary flex-shrink-0 mt-0.5" fill="currentColor" viewBox="0 0 20 20">
+                  <path fill-rule="evenodd" d="M10 18a8 8 0 100-16 8 8 0 000 16zm3.707-9.293a1 1 0 00-1.414-1.414L9 10.586 7.707 9.293a1 1 0 00-1.414 1.414l2 2a1 1 0 001.414 0l4-4z" clip-rule="evenodd"/>
+                </svg>
+                <div>
+                  <span class="font-bold text-sm text-white block">Gresik</span>
+                  <span class="text-[11px] text-white/70">Area Gresik Kota, Driyorejo, Kebomas &amp; sekitarnya</span>
+                </div>
+              </div>
+
+              <!-- Mojokerto -->
+              <div class="flex items-start gap-2.5 p-3 rounded-xl bg-white/5 border border-white/10 hover:border-secondary/40 transition-colors">
+                <svg class="h-5 w-5 text-secondary flex-shrink-0 mt-0.5" fill="currentColor" viewBox="0 0 20 20">
+                  <path fill-rule="evenodd" d="M10 18a8 8 0 100-16 8 8 0 000 16zm3.707-9.293a1 1 0 00-1.414-1.414L9 10.586 7.707 9.293a1 1 0 00-1.414 1.414l2 2a1 1 0 001.414 0l4-4z" clip-rule="evenodd"/>
+                </svg>
+                <div>
+                  <span class="font-bold text-sm text-white block">Mojokerto</span>
+                  <span class="text-[11px] text-white/70">Kota Mojokerto &amp; Kabupaten Mojokerto</span>
+                </div>
+              </div>
+
+              <!-- Jombang -->
+              <div class="flex items-start gap-2.5 p-3 rounded-xl bg-white/5 border border-white/10 hover:border-secondary/40 transition-colors">
+                <svg class="h-5 w-5 text-secondary flex-shrink-0 mt-0.5" fill="currentColor" viewBox="0 0 20 20">
+                  <path fill-rule="evenodd" d="M10 18a8 8 0 100-16 8 8 0 000 16zm3.707-9.293a1 1 0 00-1.414-1.414L9 10.586 7.707 9.293a1 1 0 00-1.414 1.414l2 2a1 1 0 001.414 0l4-4z" clip-rule="evenodd"/>
+                </svg>
+                <div>
+                  <span class="font-bold text-sm text-white block">Jombang</span>
+                  <span class="text-[11px] text-white/70">Pusat kota Jombang &amp; area sekitarnya</span>
+                </div>
+              </div>
+
+              <!-- Kediri -->
+              <div class="flex items-start gap-2.5 p-3 rounded-xl bg-white/5 border border-white/10 hover:border-secondary/40 transition-colors">
+                <svg class="h-5 w-5 text-secondary flex-shrink-0 mt-0.5" fill="currentColor" viewBox="0 0 20 20">
+                  <path fill-rule="evenodd" d="M10 18a8 8 0 100-16 8 8 0 000 16zm3.707-9.293a1 1 0 00-1.414-1.414L9 10.586 7.707 9.293a1 1 0 00-1.414 1.414l2 2a1 1 0 001.414 0l4-4z" clip-rule="evenodd"/>
+                </svg>
+                <div>
+                  <span class="font-bold text-sm text-white block">Kediri</span>
+                  <span class="text-[11px] text-white/70">Kota Kediri, Pare, &amp; Kabupaten Kediri</span>
+                </div>
+              </div>
+
+              <!-- Blitar -->
+              <div class="flex items-start gap-2.5 p-3 rounded-xl bg-white/5 border border-white/10 hover:border-secondary/40 transition-colors">
+                <svg class="h-5 w-5 text-secondary flex-shrink-0 mt-0.5" fill="currentColor" viewBox="0 0 20 20">
+                  <path fill-rule="evenodd" d="M10 18a8 8 0 100-16 8 8 0 000 16zm3.707-9.293a1 1 0 00-1.414-1.414L9 10.586 7.707 9.293a1 1 0 00-1.414 1.414l2 2a1 1 0 001.414 0l4-4z" clip-rule="evenodd"/>
+                </svg>
+                <div>
+                  <span class="font-bold text-sm text-white block">Blitar</span>
+                  <span class="text-[11px] text-white/70">Kota Blitar, Wlingi, &amp; sekitarnya</span>
+                </div>
+              </div>
+
+              <!-- Tulungagung -->
+              <div class="flex items-start gap-2.5 p-3 rounded-xl bg-white/5 border border-white/10 hover:border-secondary/40 transition-colors">
+                <svg class="h-5 w-5 text-secondary flex-shrink-0 mt-0.5" fill="currentColor" viewBox="0 0 20 20">
+                  <path fill-rule="evenodd" d="M10 18a8 8 0 100-16 8 8 0 000 16zm3.707-9.293a1 1 0 00-1.414-1.414L9 10.586 7.707 9.293a1 1 0 00-1.414 1.414l2 2a1 1 0 001.414 0l4-4z" clip-rule="evenodd"/>
+                </svg>
+                <div>
+                  <span class="font-bold text-sm text-white block">Tulungagung</span>
+                  <span class="text-[11px] text-white/70">Pusat kota Tulungagung &amp; sekitarnya</span>
+                </div>
+              </div>
             </div>
           </div>
         </div>
-        
-        <!-- Interactive Service Area Map Visual Placeholder -->
-        <div class="relative bg-primary-light border border-secondary/20 rounded-xl p-8 shadow-2xl flex flex-col justify-center space-y-6">
-          <div class="text-center space-y-2">
-            <div class="inline-flex p-3 bg-white/10 rounded-full text-secondary-light">
-              <svg class="h-8 w-8" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2">
-                <path stroke-linecap="round" stroke-linejoin="round" d="M17.657 16.657L13.414 20.9a1.998 1.998 0 01-2.827 0l-4.244-4.243a8 8 0 1111.314 0z" />
-                <path stroke-linecap="round" stroke-linejoin="round" d="M15 11a3 3 0 11-6 0 3 3 0 016 0z" />
-              </svg>
+
+        <!-- Right Column: Dedicated Special Announcement Card -->
+        <div class="lg:col-span-5 flex flex-col justify-between">
+          <div class="relative bg-gradient-to-br from-primary-light to-primary-dark border-2 border-secondary/40 rounded-2xl p-6 sm:p-8 shadow-2xl flex flex-col justify-between h-full space-y-6">
+            <div class="space-y-4">
+              <div class="inline-flex items-center gap-2 px-3 py-1 bg-secondary/20 text-secondary-light border border-secondary/30 rounded-full text-xs font-bold uppercase tracking-wider">
+                <span class="w-2 h-2 rounded-full bg-emerald-400 animate-pulse"></span>
+                Pengiriman Antarkota Aktif
+              </div>
+
+              <h3 class="font-serif text-2xl sm:text-3xl font-bold text-white leading-tight">
+                Menerima Pesanan &amp; Pengiriman Luar Kota
+              </h3>
+
+              <p class="text-sm text-white/90 leading-relaxed">
+                Kini Zaloma Florist menerima pesanan karangan bunga untuk pengiriman langsung ke <strong>Surabaya, Gresik, Mojokerto, Jombang, Kediri, Blitar, dan Tulungagung</strong>.
+              </p>
+
+              <div class="bg-black/20 p-4 rounded-xl border border-white/10 space-y-2 text-xs text-white/85">
+                <div class="flex items-center gap-2 text-secondary-light font-semibold">
+                  <svg class="w-4 h-4 shrink-0 fill-current" viewBox="0 0 20 20">
+                    <path fill-rule="evenodd" d="M16.707 5.293a1 1 0 010 1.414l-8 8a1 1 0 01-1.414 0l-4-4a1 1 0 011.414-1.414L8 12.586l7.293-7.293a1 1 0 011.414 0z" clip-rule="evenodd"/>
+                  </svg>
+                  <span>Bunga Papan, Standing Flower &amp; Buket Segar</span>
+                </div>
+                <div class="flex items-center gap-2 text-secondary-light font-semibold">
+                  <svg class="w-4 h-4 shrink-0 fill-current" viewBox="0 0 20 20">
+                    <path fill-rule="evenodd" d="M16.707 5.293a1 1 0 010 1.414l-8 8a1 1 0 01-1.414 0l-4-4a1 1 0 011.414-1.414L8 12.586l7.293-7.293a1 1 0 011.414 0z" clip-rule="evenodd"/>
+                  </svg>
+                  <span>Foto Dokumentasi Lokasi Sebelum &amp; Sesudah Tiba</span>
+                </div>
+                <div class="flex items-center gap-2 text-secondary-light font-semibold">
+                  <svg class="w-4 h-4 shrink-0 fill-current" viewBox="0 0 20 20">
+                    <path fill-rule="evenodd" d="M16.707 5.293a1 1 0 010 1.414l-8 8a1 1 0 01-1.414 0l-4-4a1 1 0 011.414-1.414L8 12.586l7.293-7.293a1 1 0 011.414 0z" clip-rule="evenodd"/>
+                  </svg>
+                  <span>Pengerjaan Cepat &amp; Desain Rapi Elegan</span>
+                </div>
+              </div>
             </div>
-            <h3 class="font-serif text-xl font-bold">Cek Ongkos Kirim ke Lokasi Anda</h3>
-            <p class="text-xs text-white/90 max-w-sm mx-auto">Kirimkan alamat tujuan pengantaran via WhatsApp untuk mengecek status gratis ongkir dan perkiraan jam tiba.</p>
+
+            <div class="pt-2">
+              <a 
+                href={`https://wa.me/${WHATSAPP_NUMBER}?text=${encodeURIComponent('Halo Zaloma Florist, saya ingin tanya info pemesanan dan pengiriman karangan bunga ke kota [Surabaya / Gresik / Mojokerto / Jombang / Kediri / Blitar / Tulungagung / Lainnya].')}`}
+                target="_blank" 
+                rel="noopener noreferrer" 
+                class="w-full inline-flex items-center justify-center gap-2 px-5 py-3.5 bg-secondary hover:bg-secondary-light text-primary-dark font-extrabold text-sm sm:text-base rounded-xl shadow-lg hover:shadow-xl transition-all duration-300 hover:scale-[1.02] active:scale-95"
+              >
+                <svg class="w-5 h-5 fill-current shrink-0" viewBox="0 0 24 24">
+                  <path d="M12.031 6.172c-3.181 0-5.767 2.586-5.768 5.766-.001 1.298.38 2.27 1.019 3.287l-.711 2.598 2.669-.699c.969.54 1.838.847 2.791.848 3.18 0 5.767-2.587 5.768-5.766.001-3.18-2.585-5.834-5.768-5.834zm3.377 8.243c-.147.411-.75.76-1.042.812-.292.052-.663.097-2.072-.49-1.409-.587-2.327-2.016-2.398-2.112-.07-.095-.572-.76-.572-1.45 0-.69.362-1.029.49-1.173.129-.144.281-.18.375-.18.094 0 .188.001.27.006.086.005.201-.033.315.241.114.275.39 1.025.424 1.107.034.082.057.178.002.288-.055.11-.082.179-.164.275-.082.096-.173.214-.247.288-.082.083-.168.172-.072.337.096.165.427.705.916 1.141.63.562 1.161.736 1.326.818.165.082.261.069.358-.041.096-.11.413-.48.523-.645.11-.165.22-.138.371-.082.151.055.955.45 1.12.533.165.082.275.124.316.192.041.069.041.399-.106.81zM12.012 2.002C6.488 2.002 2 6.49 2 12.014c0 1.942.553 3.755 1.517 5.289L2 22l4.821-1.488A9.97 9.97 0 0 0 12.012 22C17.535 22 22 17.51 22 12.014c0-5.524-4.465-10.012-9.988-10.012z"/>
+                </svg>
+                Hubungi untuk Info Lebih Lanjut
+              </a>
+              <p class="text-center text-[11px] text-white/70 mt-2">
+                Konsultasikan jadwal kirim, model karangan bunga &amp; cek ongkos kirim ke WhatsApp.
+              </p>
+            </div>
           </div>
-          <a 
-            href={`https://wa.me/${WHATSAPP_NUMBER}?text=Halo%20Zaloma%20Florist,%20apakah%20pengiriman%20bunga%20ke%20alamat%20[Ketik%20Alamat]%20masuk%20gratis%20ongkir?`} 
-            target="_blank" 
-            rel="noopener noreferrer" 
-            class="w-full min-h-[44px] flex items-center justify-center px-4 py-3 bg-white text-primary font-bold text-sm rounded-md hover:bg-clean-ivory shadow-sm transition-colors duration-300"
-          >
-            Cek Ongkir via WhatsApp
-          </a>
         </div>
       </div>
     </div>
@@ -837,7 +961,7 @@ const description = "Zaloma Florist menyediakan bunga papan, hand bouquet, stand
 </Layout>
 
 <style>
-  /* ── Hero Promo Section Wrapper ─────────────────────────── */
+  /* â”€â”€ Hero Promo Section Wrapper â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€ */
   .promo-hero-wrap {
     width: 100%;
     padding: 0.5rem 0.5rem 0.75rem;
@@ -848,7 +972,7 @@ const description = "Zaloma Florist menyediakan bunga papan, hand bouquet, stand
   .hero-split-grid {
     display: flex;
     flex-direction: column;
-    /* gap: 0 on mobile — HeroBanner component handles its own internal spacing (image + CTA strip) */
+    /* gap: 0 on mobile â€” HeroBanner component handles its own internal spacing (image + CTA strip) */
     gap: 0;
     width: 100%;
   }

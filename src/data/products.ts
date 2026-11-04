@@ -113,7 +113,7 @@ export const PRODUCTS: Product[] = [
     featured: true,
     whatsappText: "Halo Zaloma Florist, saya ingin pesan karangan Bunga Papan Duka Cita Malang 001 (BP-DC-03). Mohon info harga detail dan format pemesanannya.",
     processingTime: "3 - 4 Jam",
-    serviceArea: ["Kota Malang", "Kabupaten Malang", "Kota Batu"]
+    serviceArea: ["Kota Malang", "Kabupaten Malang", "Kota Batu", "Surabaya", "Gresik", "Mojokerto", "Jombang", "Kediri", "Blitar", "Tulungagung"]
   },
   {
     id: "BP-DC-04",
@@ -131,7 +131,7 @@ export const PRODUCTS: Product[] = [
     featured: false,
     whatsappText: "Halo Zaloma Florist, saya ingin pesan karangan Bunga Papan Duka Cita Malang 002 (BP-DC-04). Mohon info harga detail dan format pemesanannya.",
     processingTime: "3 - 4 Jam",
-    serviceArea: ["Kota Malang", "Kabupaten Malang", "Kota Batu"]
+    serviceArea: ["Kota Malang", "Kabupaten Malang", "Kota Batu", "Surabaya", "Gresik", "Mojokerto", "Jombang", "Kediri", "Blitar", "Tulungagung"]
   },
   {
     id: "BP-DC-05",
@@ -149,7 +149,7 @@ export const PRODUCTS: Product[] = [
     featured: false,
     whatsappText: "Halo Zaloma Florist, saya ingin pesan karangan Bunga Papan Duka Cita Malang 003 (BP-DC-05). Mohon info harga detail dan format pemesanannya.",
     processingTime: "3 - 4 Jam",
-    serviceArea: ["Kota Malang", "Kabupaten Malang", "Kota Batu"]
+    serviceArea: ["Kota Malang", "Kabupaten Malang", "Kota Batu", "Surabaya", "Gresik", "Mojokerto", "Jombang", "Kediri", "Blitar", "Tulungagung"]
   },
   {
     id: "BP-DC-06",
@@ -167,7 +167,7 @@ export const PRODUCTS: Product[] = [
     featured: false,
     whatsappText: "Halo Zaloma Florist, saya ingin pesan karangan Bunga Papan Duka Cita Malang 004 (BP-DC-06). Mohon info harga detail dan format pemesanannya.",
     processingTime: "3 - 4 Jam",
-    serviceArea: ["Kota Malang", "Kabupaten Malang", "Kota Batu"]
+    serviceArea: ["Kota Malang", "Kabupaten Malang", "Kota Batu", "Surabaya", "Gresik", "Mojokerto", "Jombang", "Kediri", "Blitar", "Tulungagung"]
   },
   {
     id: "BP-DC-07",
@@ -185,7 +185,7 @@ export const PRODUCTS: Product[] = [
     featured: false,
     whatsappText: "Halo Zaloma Florist, saya ingin pesan karangan Bunga Papan Duka Cita Malang 005 (BP-DC-07). Mohon info harga detail dan format pemesanannya.",
     processingTime: "3 - 4 Jam",
-    serviceArea: ["Kota Malang", "Kabupaten Malang", "Kota Batu"]
+    serviceArea: ["Kota Malang", "Kabupaten Malang", "Kota Batu", "Surabaya", "Gresik", "Mojokerto", "Jombang", "Kediri", "Blitar", "Tulungagung"]
   },
   {
     id: "BP-DC-08",
@@ -203,7 +203,7 @@ export const PRODUCTS: Product[] = [
     featured: false,
     whatsappText: "Halo Zaloma Florist, saya ingin pesan karangan Bunga Papan Duka Cita Malang 006 (BP-DC-08). Mohon info harga detail dan format pemesanannya.",
     processingTime: "3 - 4 Jam",
-    serviceArea: ["Kota Malang", "Kabupaten Malang", "Kota Batu"]
+    serviceArea: ["Kota Malang", "Kabupaten Malang", "Kota Batu", "Surabaya", "Gresik", "Mojokerto", "Jombang", "Kediri", "Blitar", "Tulungagung"]
   },
   {
     id: "BP-DC-09",
@@ -221,7 +221,7 @@ export const PRODUCTS: Product[] = [
     featured: false,
     whatsappText: "Halo Zaloma Florist, saya ingin pesan karangan Bunga Papan Duka Cita Malang 007 (BP-DC-09). Mohon info harga detail dan format pemesanannya.",
     processingTime: "3 - 4 Jam",
-    serviceArea: ["Kota Malang", "Kabupaten Malang", "Kota Batu"]
+    serviceArea: ["Kota Malang", "Kabupaten Malang", "Kota Batu", "Surabaya", "Gresik", "Mojokerto", "Jombang", "Kediri", "Blitar", "Tulungagung"]
   },
   {
     id: "BP-DC-10",
@@ -239,7 +239,7 @@ export const PRODUCTS: Product[] = [
     featured: false,
     whatsappText: "Halo Zaloma Florist, saya ingin pesan karangan Bunga Papan Duka Cita Malang 008 (BP-DC-10). Mohon info harga detail dan format pemesanannya.",
     processingTime: "3 - 4 Jam",
-    serviceArea: ["Kota Malang", "Kabupaten Malang", "Kota Batu"]
+    serviceArea: ["Kota Malang", "Kabupaten Malang", "Kota Batu", "Surabaya", "Gresik", "Mojokerto", "Jombang", "Kediri", "Blitar", "Tulungagung"]
   },
   {
     id: "BP-DC-11",
@@ -257,7 +257,7 @@ export const PRODUCTS: Product[] = [
     featured: false,
     whatsappText: "Halo Zaloma Florist, saya ingin pesan karangan Bunga Papan Duka Cita Malang 009 (BP-DC-11). Mohon info harga detail dan format pemesanannya.",
     processingTime: "3 - 4 Jam",
-    serviceArea: ["Kota Malang", "Kabupaten Malang", "Kota Batu"]
+    serviceArea: ["Kota Malang", "Kabupaten Malang", "Kota Batu", "Surabaya", "Gresik", "Mojokerto", "Jombang", "Kediri", "Blitar", "Tulungagung"]
   },
   {
     id: "BP-DC-12",
@@ -275,7 +275,7 @@ export const PRODUCTS: Product[] = [
     featured: false,
     whatsappText: "Halo Zaloma Florist, saya ingin pesan karangan Bunga Papan Duka Cita Malang 010 (BP-DC-12). Mohon info harga detail dan format pemesanannya.",
     processingTime: "3 - 4 Jam",
-    serviceArea: ["Kota Malang", "Kabupaten Malang", "Kota Batu"]
+    serviceArea: ["Kota Malang", "Kabupaten Malang", "Kota Batu", "Surabaya", "Gresik", "Mojokerto", "Jombang", "Kediri", "Blitar", "Tulungagung"]
   },
   {
     id: "BP-DC-13",
@@ -293,7 +293,7 @@ export const PRODUCTS: Product[] = [
     featured: false,
     whatsappText: "Halo Zaloma Florist, saya ingin pesan karangan Bunga Papan Duka Cita Malang 011 (BP-DC-13). Mohon info harga detail dan format pemesanannya.",
     processingTime: "3 - 4 Jam",
-    serviceArea: ["Kota Malang", "Kabupaten Malang", "Kota Batu"]
+    serviceArea: ["Kota Malang", "Kabupaten Malang", "Kota Batu", "Surabaya", "Gresik", "Mojokerto", "Jombang", "Kediri", "Blitar", "Tulungagung"]
   },
 
   // Bunga Papan Wedding
@@ -313,7 +313,7 @@ export const PRODUCTS: Product[] = [
     featured: true,
     whatsappText: "Halo Zaloma Florist, saya ingin pesan karangan Bunga Papan Wedding Malang 001 (BP-WD-03). Mohon info harga detail dan format pemesanannya.",
     processingTime: "3 - 4 Jam",
-    serviceArea: ["Kota Malang", "Kabupaten Malang", "Kota Batu"]
+    serviceArea: ["Kota Malang", "Kabupaten Malang", "Kota Batu", "Surabaya", "Gresik", "Mojokerto", "Jombang", "Kediri", "Blitar", "Tulungagung"]
   },
   {
     id: "BP-WD-04",
@@ -331,7 +331,7 @@ export const PRODUCTS: Product[] = [
     featured: false,
     whatsappText: "Halo Zaloma Florist, saya ingin pesan karangan Bunga Papan Wedding Malang 002 (BP-WD-04). Mohon info harga detail dan format pemesanannya.",
     processingTime: "3 - 4 Jam",
-    serviceArea: ["Kota Malang", "Kabupaten Malang", "Kota Batu"]
+    serviceArea: ["Kota Malang", "Kabupaten Malang", "Kota Batu", "Surabaya", "Gresik", "Mojokerto", "Jombang", "Kediri", "Blitar", "Tulungagung"]
   },
   {
     id: "BP-WD-05",
@@ -349,7 +349,7 @@ export const PRODUCTS: Product[] = [
     featured: false,
     whatsappText: "Halo Zaloma Florist, saya ingin pesan karangan Bunga Papan Wedding Malang 003 (BP-WD-05). Mohon info harga detail dan format pemesanannya.",
     processingTime: "3 - 4 Jam",
-    serviceArea: ["Kota Malang", "Kabupaten Malang", "Kota Batu"]
+    serviceArea: ["Kota Malang", "Kabupaten Malang", "Kota Batu", "Surabaya", "Gresik", "Mojokerto", "Jombang", "Kediri", "Blitar", "Tulungagung"]
   },
   {
     id: "BP-WD-06",
@@ -367,7 +367,7 @@ export const PRODUCTS: Product[] = [
     featured: false,
     whatsappText: "Halo Zaloma Florist, saya ingin pesan karangan Bunga Papan Wedding Malang 004 (BP-WD-06). Mohon info harga detail dan format pemesanannya.",
     processingTime: "3 - 4 Jam",
-    serviceArea: ["Kota Malang", "Kabupaten Malang", "Kota Batu"]
+    serviceArea: ["Kota Malang", "Kabupaten Malang", "Kota Batu", "Surabaya", "Gresik", "Mojokerto", "Jombang", "Kediri", "Blitar", "Tulungagung"]
   },
   {
     id: "BP-WD-07",
@@ -385,7 +385,7 @@ export const PRODUCTS: Product[] = [
     featured: false,
     whatsappText: "Halo Zaloma Florist, saya ingin pesan karangan Bunga Papan Wedding Malang 005 (BP-WD-07). Mohon info harga detail dan format pemesanannya.",
     processingTime: "4 - 5 Jam",
-    serviceArea: ["Kota Malang", "Kabupaten Malang", "Kota Batu"]
+    serviceArea: ["Kota Malang", "Kabupaten Malang", "Kota Batu", "Surabaya", "Gresik", "Mojokerto", "Jombang", "Kediri", "Blitar", "Tulungagung"]
   },
   {
     id: "BP-WD-08",
@@ -403,7 +403,7 @@ export const PRODUCTS: Product[] = [
     featured: false,
     whatsappText: "Halo Zaloma Florist, saya ingin pesan karangan Bunga Papan Wedding Malang 006 (BP-WD-08). Mohon info harga detail dan format pemesanannya.",
     processingTime: "3 - 4 Jam",
-    serviceArea: ["Kota Malang", "Kabupaten Malang", "Kota Batu"]
+    serviceArea: ["Kota Malang", "Kabupaten Malang", "Kota Batu", "Surabaya", "Gresik", "Mojokerto", "Jombang", "Kediri", "Blitar", "Tulungagung"]
   },
   {
     id: "BP-WD-09",
@@ -421,7 +421,7 @@ export const PRODUCTS: Product[] = [
     featured: false,
     whatsappText: "Halo Zaloma Florist, saya ingin pesan karangan Bunga Papan Wedding Malang 007 (BP-WD-09). Mohon info harga detail dan format pemesanannya.",
     processingTime: "3 - 4 Jam",
-    serviceArea: ["Kota Malang", "Kabupaten Malang", "Kota Batu"]
+    serviceArea: ["Kota Malang", "Kabupaten Malang", "Kota Batu", "Surabaya", "Gresik", "Mojokerto", "Jombang", "Kediri", "Blitar", "Tulungagung"]
   },
   {
     id: "BP-WD-10",
@@ -439,7 +439,7 @@ export const PRODUCTS: Product[] = [
     featured: false,
     whatsappText: "Halo Zaloma Florist, saya ingin pesan karangan Bunga Papan Wedding Malang 008 (BP-WD-10). Mohon info harga detail dan format pemesanannya.",
     processingTime: "3 - 4 Jam",
-    serviceArea: ["Kota Malang", "Kabupaten Malang", "Kota Batu"]
+    serviceArea: ["Kota Malang", "Kabupaten Malang", "Kota Batu", "Surabaya", "Gresik", "Mojokerto", "Jombang", "Kediri", "Blitar", "Tulungagung"]
   },
   {
     id: "BP-WD-11",
@@ -457,7 +457,7 @@ export const PRODUCTS: Product[] = [
     featured: false,
     whatsappText: "Halo Zaloma Florist, saya ingin pesan karangan Bunga Papan Wedding Malang 009 (BP-WD-11). Mohon info harga detail dan format pemesanannya.",
     processingTime: "3 - 4 Jam",
-    serviceArea: ["Kota Malang", "Kabupaten Malang", "Kota Batu"]
+    serviceArea: ["Kota Malang", "Kabupaten Malang", "Kota Batu", "Surabaya", "Gresik", "Mojokerto", "Jombang", "Kediri", "Blitar", "Tulungagung"]
   },
   {
     id: "BP-WD-12",
@@ -475,7 +475,7 @@ export const PRODUCTS: Product[] = [
     featured: false,
     whatsappText: "Halo Zaloma Florist, saya ingin pesan karangan Bunga Papan Wedding Malang 010 (BP-WD-12). Mohon info harga detail dan format pemesanannya.",
     processingTime: "3 - 4 Jam",
-    serviceArea: ["Kota Malang", "Kabupaten Malang", "Kota Batu"]
+    serviceArea: ["Kota Malang", "Kabupaten Malang", "Kota Batu", "Surabaya", "Gresik", "Mojokerto", "Jombang", "Kediri", "Blitar", "Tulungagung"]
   },
   {
     id: "BP-WD-13",
@@ -493,7 +493,7 @@ export const PRODUCTS: Product[] = [
     featured: false,
     whatsappText: "Halo Zaloma Florist, saya ingin pesan karangan Bunga Papan Wedding Malang 011 (BP-WD-13). Mohon info harga detail dan format pemesanannya.",
     processingTime: "3 - 4 Jam",
-    serviceArea: ["Kota Malang", "Kabupaten Malang", "Kota Batu"]
+    serviceArea: ["Kota Malang", "Kabupaten Malang", "Kota Batu", "Surabaya", "Gresik", "Mojokerto", "Jombang", "Kediri", "Blitar", "Tulungagung"]
   },
   {
     id: "BP-WD-14",
@@ -511,7 +511,7 @@ export const PRODUCTS: Product[] = [
     featured: false,
     whatsappText: "Halo Zaloma Florist, saya ingin pesan karangan Bunga Papan Wedding Malang 012 (BP-WD-14). Mohon info harga detail dan format pemesanannya.",
     processingTime: "3 - 4 Jam",
-    serviceArea: ["Kota Malang", "Kabupaten Malang", "Kota Batu"]
+    serviceArea: ["Kota Malang", "Kabupaten Malang", "Kota Batu", "Surabaya", "Gresik", "Mojokerto", "Jombang", "Kediri", "Blitar", "Tulungagung"]
   },
   {
     id: "BP-WD-15",
@@ -529,7 +529,7 @@ export const PRODUCTS: Product[] = [
     featured: false,
     whatsappText: "Halo Zaloma Florist, saya ingin pesan karangan Bunga Papan Wedding Malang 013 (BP-WD-15). Mohon info harga detail dan format pemesanannya.",
     processingTime: "4 - 5 Jam",
-    serviceArea: ["Kota Malang", "Kabupaten Malang", "Kota Batu"]
+    serviceArea: ["Kota Malang", "Kabupaten Malang", "Kota Batu", "Surabaya", "Gresik", "Mojokerto", "Jombang", "Kediri", "Blitar", "Tulungagung"]
   },
 
   // Bunga Papan Congratulations
@@ -549,7 +549,7 @@ export const PRODUCTS: Product[] = [
     featured: true,
     whatsappText: "Halo Zaloma Florist, saya ingin pesan karangan Bunga Papan Congratulations Malang 001 (BP-CG-01). Mohon info harga detail dan format pemesanannya.",
     processingTime: "3 - 4 Jam",
-    serviceArea: ["Kota Malang", "Kabupaten Malang", "Kota Batu"]
+    serviceArea: ["Kota Malang", "Kabupaten Malang", "Kota Batu", "Surabaya", "Gresik", "Mojokerto", "Jombang", "Kediri", "Blitar", "Tulungagung"]
   },
   {
     id: "BP-CG-02",
@@ -567,7 +567,7 @@ export const PRODUCTS: Product[] = [
     featured: false,
     whatsappText: "Halo Zaloma Florist, saya ingin pesan karangan Bunga Papan Congratulations Malang 002 (BP-CG-02). Mohon info harga detail dan format pemesanannya.",
     processingTime: "3 - 4 Jam",
-    serviceArea: ["Kota Malang", "Kabupaten Malang", "Kota Batu"]
+    serviceArea: ["Kota Malang", "Kabupaten Malang", "Kota Batu", "Surabaya", "Gresik", "Mojokerto", "Jombang", "Kediri", "Blitar", "Tulungagung"]
   },
   {
     id: "BP-CG-04",
@@ -585,7 +585,7 @@ export const PRODUCTS: Product[] = [
     featured: false,
     whatsappText: "Halo Zaloma Florist, saya ingin pesan karangan Bunga Papan Congratulations Malang 003 (BP-CG-04). Mohon info harga detail dan format pemesanannya.",
     processingTime: "3 - 4 Jam",
-    serviceArea: ["Kota Malang", "Kabupaten Malang", "Kota Batu"]
+    serviceArea: ["Kota Malang", "Kabupaten Malang", "Kota Batu", "Surabaya", "Gresik", "Mojokerto", "Jombang", "Kediri", "Blitar", "Tulungagung"]
   },
   {
     id: "BP-CG-05",
@@ -603,7 +603,7 @@ export const PRODUCTS: Product[] = [
     featured: false,
     whatsappText: "Halo Zaloma Florist, saya ingin pesan karangan Bunga Papan Congratulations Malang 004 (BP-CG-05). Mohon info harga detail dan format pemesanannya.",
     processingTime: "3 - 4 Jam",
-    serviceArea: ["Kota Malang", "Kabupaten Malang", "Kota Batu"]
+    serviceArea: ["Kota Malang", "Kabupaten Malang", "Kota Batu", "Surabaya", "Gresik", "Mojokerto", "Jombang", "Kediri", "Blitar", "Tulungagung"]
   },
   {
     id: "BP-CG-06",
@@ -621,7 +621,7 @@ export const PRODUCTS: Product[] = [
     featured: false,
     whatsappText: "Halo Zaloma Florist, saya ingin pesan karangan Bunga Papan Congratulations Malang 005 (BP-CG-06). Mohon info harga detail dan format pemesanannya.",
     processingTime: "3 - 4 Jam",
-    serviceArea: ["Kota Malang", "Kabupaten Malang", "Kota Batu"]
+    serviceArea: ["Kota Malang", "Kabupaten Malang", "Kota Batu", "Surabaya", "Gresik", "Mojokerto", "Jombang", "Kediri", "Blitar", "Tulungagung"]
   },
   {
     id: "BP-CG-07",
@@ -639,7 +639,7 @@ export const PRODUCTS: Product[] = [
     featured: false,
     whatsappText: "Halo Zaloma Florist, saya ingin pesan karangan Bunga Papan Congratulations Malang 006 (BP-CG-07). Mohon info harga detail dan format pemesanannya.",
     processingTime: "3 - 4 Jam",
-    serviceArea: ["Kota Malang", "Kabupaten Malang", "Kota Batu"]
+    serviceArea: ["Kota Malang", "Kabupaten Malang", "Kota Batu", "Surabaya", "Gresik", "Mojokerto", "Jombang", "Kediri", "Blitar", "Tulungagung"]
   },
   {
     id: "BP-CG-08",
@@ -657,7 +657,7 @@ export const PRODUCTS: Product[] = [
     featured: false,
     whatsappText: "Halo Zaloma Florist, saya ingin pesan karangan Bunga Papan Congratulations Malang 007 (BP-CG-08). Mohon info harga detail dan format pemesanannya.",
     processingTime: "3 - 4 Jam",
-    serviceArea: ["Kota Malang", "Kabupaten Malang", "Kota Batu"]
+    serviceArea: ["Kota Malang", "Kabupaten Malang", "Kota Batu", "Surabaya", "Gresik", "Mojokerto", "Jombang", "Kediri", "Blitar", "Tulungagung"]
   },
   {
     id: "BP-CG-09",
@@ -675,7 +675,7 @@ export const PRODUCTS: Product[] = [
     featured: false,
     whatsappText: "Halo Zaloma Florist, saya ingin pesan karangan Bunga Papan Congratulations Malang 008 (BP-CG-09). Mohon info harga detail dan format pemesanannya.",
     processingTime: "3 - 4 Jam",
-    serviceArea: ["Kota Malang", "Kabupaten Malang", "Kota Batu"]
+    serviceArea: ["Kota Malang", "Kabupaten Malang", "Kota Batu", "Surabaya", "Gresik", "Mojokerto", "Jombang", "Kediri", "Blitar", "Tulungagung"]
   },
 
 
@@ -696,7 +696,7 @@ export const PRODUCTS: Product[] = [
     featured: true,
     whatsappText: "Halo Zaloma Florist, saya ingin pesan Standing Flower - Paket 725 (SF-01). Mohon info harga detail dan format pemesanannya.",
     processingTime: "2 - 3 Jam",
-    serviceArea: ["Kota Malang", "Kabupaten Malang", "Kota Batu"]
+    serviceArea: ["Kota Malang", "Kabupaten Malang", "Kota Batu", "Surabaya", "Gresik", "Mojokerto", "Jombang", "Kediri", "Blitar", "Tulungagung"]
   },
   {
     id: "SF-02",
@@ -714,7 +714,7 @@ export const PRODUCTS: Product[] = [
     featured: false,
     whatsappText: "Halo Zaloma Florist, saya ingin pesan Standing Flower - Paket 1150 (SF-02). Mohon info harga detail dan format pemesanannya.",
     processingTime: "3 Jam",
-    serviceArea: ["Kota Malang", "Kabupaten Malang", "Kota Batu"]
+    serviceArea: ["Kota Malang", "Kabupaten Malang", "Kota Batu", "Surabaya", "Gresik", "Mojokerto", "Jombang", "Kediri", "Blitar", "Tulungagung"]
   },
   {
     id: "SF-03",
@@ -732,7 +732,7 @@ export const PRODUCTS: Product[] = [
     featured: false,
     whatsappText: "Halo Zaloma Florist, saya ingin pesan Standing Flower - Paket 835 (SF-03). Mohon info harga detail dan format pemesanannya.",
     processingTime: "2 - 3 Jam",
-    serviceArea: ["Kota Malang", "Kabupaten Malang", "Kota Batu"]
+    serviceArea: ["Kota Malang", "Kabupaten Malang", "Kota Batu", "Surabaya", "Gresik", "Mojokerto", "Jombang", "Kediri", "Blitar", "Tulungagung"]
   },
   {
     id: "SF-04",
@@ -750,7 +750,7 @@ export const PRODUCTS: Product[] = [
     featured: false,
     whatsappText: "Halo Zaloma Florist, saya ingin pesan Standing Flower - Paket 1175 (SF-04). Mohon info harga detail dan format pemesanannya.",
     processingTime: "2 - 3 Jam",
-    serviceArea: ["Kota Malang", "Kabupaten Malang", "Kota Batu"]
+    serviceArea: ["Kota Malang", "Kabupaten Malang", "Kota Batu", "Surabaya", "Gresik", "Mojokerto", "Jombang", "Kediri", "Blitar", "Tulungagung"]
   },
   {
     id: "SF-05",
@@ -768,7 +768,7 @@ export const PRODUCTS: Product[] = [
     featured: false,
     whatsappText: "Halo Zaloma Florist, saya ingin pesan Standing Flower - Paket 1250 (SF-05). Mohon info harga detail dan format pemesanannya.",
     processingTime: "2 - 3 Jam",
-    serviceArea: ["Kota Malang", "Kabupaten Malang", "Kota Batu"]
+    serviceArea: ["Kota Malang", "Kabupaten Malang", "Kota Batu", "Surabaya", "Gresik", "Mojokerto", "Jombang", "Kediri", "Blitar", "Tulungagung"]
   },
   {
     id: "SF-06",
@@ -786,7 +786,7 @@ export const PRODUCTS: Product[] = [
     featured: false,
     whatsappText: "Halo Zaloma Florist, saya ingin pesan Standing Flower - Paket 1500 Kombinasi Mawar & Lily (SF-06). Mohon info harga detail dan format pemesanannya.",
     processingTime: "2 - 3 Jam",
-    serviceArea: ["Kota Malang", "Kabupaten Malang", "Kota Batu"]
+    serviceArea: ["Kota Malang", "Kabupaten Malang", "Kota Batu", "Surabaya", "Gresik", "Mojokerto", "Jombang", "Kediri", "Blitar", "Tulungagung"]
   },
   {
     id: "SF-07",
@@ -804,7 +804,7 @@ export const PRODUCTS: Product[] = [
     featured: false,
     whatsappText: "Halo Zaloma Florist, saya ingin pesan Standing Flower - Paket 1755 (SF-07). Mohon info harga detail dan format pemesanannya.",
     processingTime: "3 - 4 Jam",
-    serviceArea: ["Kota Malang", "Kabupaten Malang", "Kota Batu"]
+    serviceArea: ["Kota Malang", "Kabupaten Malang", "Kota Batu", "Surabaya", "Gresik", "Mojokerto", "Jombang", "Kediri", "Blitar", "Tulungagung"]
   },
 
   // Hand Bouquet
@@ -824,7 +824,7 @@ export const PRODUCTS: Product[] = [
     featured: true,
     whatsappText: "Halo Zaloma Florist, saya ingin pesan Hand Bouquet Snack Oreo & Beng-Beng - Paket 125 (HB-01). Mohon info ketersediaan bunga dan format pemesanannya.",
     processingTime: "2 - 3 Jam",
-    serviceArea: ["Kota Malang", "Kabupaten Malang", "Kota Batu"]
+    serviceArea: ["Kota Malang", "Kabupaten Malang", "Kota Batu", "Surabaya", "Gresik", "Mojokerto", "Jombang", "Kediri", "Blitar", "Tulungagung"]
   },
   {
     id: "HB-02",
@@ -842,7 +842,7 @@ export const PRODUCTS: Product[] = [
     featured: false,
     whatsappText: "Halo Zaloma Florist, saya ingin pesan Hand Bouquet Snack Lemonilo Crispy - Paket 130 (HB-02). Mohon info ketersediaan bunga dan format pemesanannya.",
     processingTime: "2 - 3 Jam",
-    serviceArea: ["Kota Malang", "Kabupaten Malang", "Kota Batu"]
+    serviceArea: ["Kota Malang", "Kabupaten Malang", "Kota Batu", "Surabaya", "Gresik", "Mojokerto", "Jombang", "Kediri", "Blitar", "Tulungagung"]
   },
   {
     id: "HB-03",
@@ -860,7 +860,7 @@ export const PRODUCTS: Product[] = [
     featured: false,
     whatsappText: "Halo Zaloma Florist, saya ingin pesan Hand Bouquet Snack Choki Choki - Paket 145 (HB-03). Mohon info ketersediaan bunga dan format pemesanannya.",
     processingTime: "2 - 3 Jam",
-    serviceArea: ["Kota Malang", "Kabupaten Malang", "Kota Batu"]
+    serviceArea: ["Kota Malang", "Kabupaten Malang", "Kota Batu", "Surabaya", "Gresik", "Mojokerto", "Jombang", "Kediri", "Blitar", "Tulungagung"]
   },
   {
     id: "HB-04",
@@ -878,7 +878,7 @@ export const PRODUCTS: Product[] = [
     featured: true,
     whatsappText: "Halo Zaloma Florist, saya ingin pesan Hand Bouquet Mawar Merah & Aster Pink - Paket 150 (HB-04). Mohon info ketersediaan bunga dan format pemesanannya.",
     processingTime: "2 - 3 Jam",
-    serviceArea: ["Kota Malang", "Kabupaten Malang", "Kota Batu"]
+    serviceArea: ["Kota Malang", "Kabupaten Malang", "Kota Batu", "Surabaya", "Gresik", "Mojokerto", "Jombang", "Kediri", "Blitar", "Tulungagung"]
   },
   {
     id: "HB-05",
@@ -896,7 +896,7 @@ export const PRODUCTS: Product[] = [
     featured: false,
     whatsappText: "Halo Zaloma Florist, saya ingin pesan Hand Bouquet Snack Nabati & Mawar Putih - Paket 150 (HB-05). Mohon info ketersediaan bunga dan format pemesanannya.",
     processingTime: "2 - 3 Jam",
-    serviceArea: ["Kota Malang", "Kabupaten Malang", "Kota Batu"]
+    serviceArea: ["Kota Malang", "Kabupaten Malang", "Kota Batu", "Surabaya", "Gresik", "Mojokerto", "Jombang", "Kediri", "Blitar", "Tulungagung"]
   },
   {
     id: "HB-06",
@@ -914,7 +914,7 @@ export const PRODUCTS: Product[] = [
     featured: false,
     whatsappText: "Halo Zaloma Florist, saya ingin pesan Hand Bouquet Mawar Pink Pastel - Paket 155 (HB-06). Mohon info ketersediaan bunga dan format pemesanannya.",
     processingTime: "2 - 3 Jam",
-    serviceArea: ["Kota Malang", "Kabupaten Malang", "Kota Batu"]
+    serviceArea: ["Kota Malang", "Kabupaten Malang", "Kota Batu", "Surabaya", "Gresik", "Mojokerto", "Jombang", "Kediri", "Blitar", "Tulungagung"]
   },
   {
     id: "HB-07",
@@ -932,7 +932,7 @@ export const PRODUCTS: Product[] = [
     featured: false,
     whatsappText: "Halo Zaloma Florist, saya ingin pesan Hand Bouquet Mawar Tiga Warna - Paket 175 (HB-07). Mohon info ketersediaan bunga dan format pemesanannya.",
     processingTime: "2 - 3 Jam",
-    serviceArea: ["Kota Malang", "Kabupaten Malang", "Kota Batu"]
+    serviceArea: ["Kota Malang", "Kabupaten Malang", "Kota Batu", "Surabaya", "Gresik", "Mojokerto", "Jombang", "Kediri", "Blitar", "Tulungagung"]
   },
   {
     id: "HB-08",
@@ -950,7 +950,7 @@ export const PRODUCTS: Product[] = [
     featured: true,
     whatsappText: "Halo Zaloma Florist, saya ingin pesan Hand Bouquet Mawar Pastel Mewah - Paket 200 (HB-08). Mohon info ketersediaan bunga dan format pemesanannya.",
     processingTime: "2 - 3 Jam",
-    serviceArea: ["Kota Malang", "Kabupaten Malang", "Kota Batu"]
+    serviceArea: ["Kota Malang", "Kabupaten Malang", "Kota Batu", "Surabaya", "Gresik", "Mojokerto", "Jombang", "Kediri", "Blitar", "Tulungagung"]
   },
 
   // Paper Flower
@@ -970,7 +970,7 @@ export const PRODUCTS: Product[] = [
     featured: true,
     whatsappText: "Halo Zaloma Florist, saya ingin pesan Paper Flower - Paket 600 (PF-01). Mohon info harga detail dan format pemesanannya.",
     processingTime: "1 - 2 Hari",
-    serviceArea: ["Kota Malang", "Kabupaten Malang", "Kota Batu"]
+    serviceArea: ["Kota Malang", "Kabupaten Malang", "Kota Batu", "Surabaya", "Gresik", "Mojokerto", "Jombang", "Kediri", "Blitar", "Tulungagung"]
   },
   {
     id: "PF-02",
@@ -988,7 +988,7 @@ export const PRODUCTS: Product[] = [
     featured: false,
     whatsappText: "Halo Zaloma Florist, saya ingin pesan Paper Flower - Paket 700 (PF-02). Mohon info harga detail dan format pemesanannya.",
     processingTime: "2 - 3 Hari",
-    serviceArea: ["Kota Malang", "Kabupaten Malang", "Kota Batu"]
+    serviceArea: ["Kota Malang", "Kabupaten Malang", "Kota Batu", "Surabaya", "Gresik", "Mojokerto", "Jombang", "Kediri", "Blitar", "Tulungagung"]
   },
 
   // Bunga Meja
@@ -1008,7 +1008,7 @@ export const PRODUCTS: Product[] = [
     featured: true,
     whatsappText: "Halo Zaloma Florist, saya ingin pesan Bunga Meja - Paket 700 (BM-01). Mohon info harga detail dan format pemesanannya.",
     processingTime: "2 - 3 Jam",
-    serviceArea: ["Kota Malang", "Kabupaten Malang", "Kota Batu"]
+    serviceArea: ["Kota Malang", "Kabupaten Malang", "Kota Batu", "Surabaya", "Gresik", "Mojokerto", "Jombang", "Kediri", "Blitar", "Tulungagung"]
   },
   {
     id: "BM-02",
@@ -1026,7 +1026,7 @@ export const PRODUCTS: Product[] = [
     featured: false,
     whatsappText: "Halo Zaloma Florist, saya ingin pesan Bunga Meja - Paket 950 (BM-02). Mohon info harga detail dan format pemesanannya.",
     processingTime: "2 - 3 Jam",
-    serviceArea: ["Kota Malang", "Kabupaten Malang", "Kota Batu"]
+    serviceArea: ["Kota Malang", "Kabupaten Malang", "Kota Batu", "Surabaya", "Gresik", "Mojokerto", "Jombang", "Kediri", "Blitar", "Tulungagung"]
   },
   {
     id: "BM-03",
@@ -1044,7 +1044,7 @@ export const PRODUCTS: Product[] = [
     featured: false,
     whatsappText: "Halo Zaloma Florist, saya ingin pesan Bunga Meja - Paket 725 (BM-03). Mohon info harga detail dan format pemesanannya.",
     processingTime: "2 - 3 Jam",
-    serviceArea: ["Kota Malang", "Kabupaten Malang", "Kota Batu"]
+    serviceArea: ["Kota Malang", "Kabupaten Malang", "Kota Batu", "Surabaya", "Gresik", "Mojokerto", "Jombang", "Kediri", "Blitar", "Tulungagung"]
   },
   {
     id: "BM-04",
@@ -1062,7 +1062,7 @@ export const PRODUCTS: Product[] = [
     featured: false,
     whatsappText: "Halo Zaloma Florist, saya ingin pesan Bunga Meja - Paket 865 (BM-04). Mohon info harga detail dan format pemesanannya.",
     processingTime: "2 - 3 Jam",
-    serviceArea: ["Kota Malang", "Kabupaten Malang", "Kota Batu"]
+    serviceArea: ["Kota Malang", "Kabupaten Malang", "Kota Batu", "Surabaya", "Gresik", "Mojokerto", "Jombang", "Kediri", "Blitar", "Tulungagung"]
   },
   {
     id: "BM-05",
@@ -1080,7 +1080,7 @@ export const PRODUCTS: Product[] = [
     featured: false,
     whatsappText: "Halo Zaloma Florist, saya ingin pesan Bunga Meja - Paket 875 (BM-05). Mohon info harga detail dan format pemesanannya.",
     processingTime: "2 - 3 Jam",
-    serviceArea: ["Kota Malang", "Kabupaten Malang", "Kota Batu"]
+    serviceArea: ["Kota Malang", "Kabupaten Malang", "Kota Batu", "Surabaya", "Gresik", "Mojokerto", "Jombang", "Kediri", "Blitar", "Tulungagung"]
   },
 
   // Tanbulampot & Pohon Ucapan
@@ -1100,7 +1100,7 @@ export const PRODUCTS: Product[] = [
     featured: true,
     whatsappText: "Halo Zaloma Florist, saya ingin pesan Pohon Ucapan Tanbulampot - Paket 875 (TBL-01). Mohon info ketersediaan dan format pemesanannya.",
     processingTime: "1 - 2 Hari",
-    serviceArea: ["Kota Malang", "Kabupaten Malang", "Kota Batu"]
+    serviceArea: ["Kota Malang", "Kabupaten Malang", "Kota Batu", "Surabaya", "Gresik", "Mojokerto", "Jombang", "Kediri", "Blitar", "Tulungagung"]
   },
   {
     id: "TBL-02",
@@ -1118,7 +1118,7 @@ export const PRODUCTS: Product[] = [
     featured: false,
     whatsappText: "Halo Zaloma Florist, saya ingin pesan Pohon Ucapan Tanbulampot Berbuah - Paket 1250 (TBL-02). Mohon info ketersediaan dan format pemesanannya.",
     processingTime: "1 - 2 Hari",
-    serviceArea: ["Kota Malang", "Kabupaten Malang", "Kota Batu"]
+    serviceArea: ["Kota Malang", "Kabupaten Malang", "Kota Batu", "Surabaya", "Gresik", "Mojokerto", "Jombang", "Kediri", "Blitar", "Tulungagung"]
   },
   {
     id: "TBL-03",
@@ -1136,7 +1136,7 @@ export const PRODUCTS: Product[] = [
     featured: false,
     whatsappText: "Halo Zaloma Florist, saya ingin pesan Pohon Ucapan Tanbulampot - Paket 835 (TBL-03). Mohon info ketersediaan dan format pemesanannya.",
     processingTime: "1 - 2 Hari",
-    serviceArea: ["Kota Malang", "Kabupaten Malang", "Kota Batu"]
+    serviceArea: ["Kota Malang", "Kabupaten Malang", "Kota Batu", "Surabaya", "Gresik", "Mojokerto", "Jombang", "Kediri", "Blitar", "Tulungagung"]
   },
   {
     id: "TBL-04",
@@ -1154,7 +1154,7 @@ export const PRODUCTS: Product[] = [
     featured: false,
     whatsappText: "Halo Zaloma Florist, saya ingin pesan Pohon Ucapan Tanbulampot - Paket 845 (TBL-04). Mohon info ketersediaan dan format pemesanannya.",
     processingTime: "1 - 2 Hari",
-    serviceArea: ["Kota Malang", "Kabupaten Malang", "Kota Batu"]
+    serviceArea: ["Kota Malang", "Kabupaten Malang", "Kota Batu", "Surabaya", "Gresik", "Mojokerto", "Jombang", "Kediri", "Blitar", "Tulungagung"]
   },
   {
     id: "TBL-05",
@@ -1172,7 +1172,7 @@ export const PRODUCTS: Product[] = [
     featured: false,
     whatsappText: "Halo Zaloma Florist, saya ingin pesan Pohon Ucapan Tanbulampot - Paket 1165 (TBL-05). Mohon info ketersediaan dan format pemesanannya.",
     processingTime: "1 - 2 Hari",
-    serviceArea: ["Kota Malang", "Kabupaten Malang", "Kota Batu"]
+    serviceArea: ["Kota Malang", "Kabupaten Malang", "Kota Batu", "Surabaya", "Gresik", "Mojokerto", "Jombang", "Kediri", "Blitar", "Tulungagung"]
   }
 ];
 

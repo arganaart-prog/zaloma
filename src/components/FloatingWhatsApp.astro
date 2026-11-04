@@ -2,62 +2,30 @@
 import { WHATSAPP_NUMBER } from '../data/constants';
 
 interface Props {
-  orderMessage?: string;
   consultMessage?: string;
 }
 
 const {
-  orderMessage = "Halo Zaloma Florist, saya ingin langsung memesan karangan bunga. Mohon informasi format pemesanan dan katalognya.",
-  consultMessage = "Halo Zaloma Florist, saya ingin tanya dan konsultasi mengenai rekomendasi karangan bunga untuk acara saya."
+  consultMessage = "Halo Zaloma Florist, saya ingin tanya dan konsultasi mengenai pemesanan karangan bunga."
 } = Astro.props;
 
-const orderWaUrl = `https://wa.me/${WHATSAPP_NUMBER}?text=${encodeURIComponent(orderMessage)}`;
 const consultWaUrl = `https://wa.me/${WHATSAPP_NUMBER}?text=${encodeURIComponent(consultMessage)}`;
 ---
 
-<!-- 1. Side Sticky Badge: PESAN SEKARANG (Sisi Kanan Layar) -->
-<aside aria-label="CTA Pesan Sekarang WhatsApp">
-  <a
-    href={orderWaUrl}
-    target="_blank"
-    rel="noopener noreferrer"
-    class="fixed right-2 sm:right-4 top-1/2 -translate-y-1/2 z-40 flex flex-col items-center bg-white/95 backdrop-blur-md border border-rose-100/90 shadow-[0_8px_25px_rgba(0,0,0,0.1)] hover:shadow-[0_12px_32px_rgba(126,41,75,0.25)] rounded-2xl py-3 px-2 sm:px-2.5 transition-all duration-300 hover:-translate-x-1 group focus:outline-hidden"
-    aria-label="Pesan Bunga Sekarang via WhatsApp"
-    title="Pesan Bunga Sekarang via WhatsApp"
-  >
-    <!-- Rounded WhatsApp Square Icon -->
-    <div class="w-9 h-9 sm:w-10 sm:h-10 rounded-xl bg-gradient-to-b from-[#7E294B] to-[#993A60] text-white flex items-center justify-center shadow-sm group-hover:scale-105 transition-transform duration-300">
-      <svg class="w-5 h-5 sm:w-5.5 sm:h-5.5 fill-current" viewBox="0 0 24 24" aria-hidden="true">
-        <path d="M.057 24l1.687-6.163c-1.041-1.804-1.588-3.849-1.587-5.946C.06 5.348 5.397.01 12.008.01c3.202.001 6.212 1.246 8.477 3.514 2.266 2.268 3.507 5.28 3.505 8.484-.004 6.657-5.34 11.997-11.953 11.997-2.005-.001-3.973-.502-5.724-1.455L0 24zm6.59-4.846c1.6.95 3.188 1.449 4.825 1.451 5.436 0 9.86-4.37 9.864-9.799.002-2.63-1.023-5.101-2.885-6.965C16.588 2.02 14.12 1.022 11.5 1.022c-5.438 0-9.863 4.372-9.867 9.802-.001 1.73.473 3.42 1.37 4.947l-.994 3.63 3.734-.967c1.554.84 3.123 1.282 4.304 1.282zm11.304-6.858c-.31-.155-1.838-.895-2.122-.997-.284-.102-.49-.153-.696.155-.205.308-.796.997-.975 1.199-.179.203-.359.227-.669.073-.31-.155-1.31-.476-2.494-1.516-.922-.811-1.545-1.812-1.725-2.12-.179-.31-.018-.478.137-.631.14-.139.31-.359.464-.539.155-.179.206-.308.31-.513.102-.206.051-.385-.026-.539-.077-.154-.696-1.649-.953-2.263-.25-.596-.503-.515-.69-.525l-.59-.01c-.206 0-.54.077-.822.385-.282.308-1.079 1.052-1.079 2.565 0 1.513 1.103 2.977 1.257 3.182.155.206 2.17 3.267 5.257 4.569.735.31 1.307.495 1.753.634.739.231 1.412.197 1.944.119.593-.087 1.838-.739 2.095-1.453.258-.713.258-1.325.18-1.453-.077-.128-.283-.205-.593-.36z" />
-      </svg>
-    </div>
-
-    <!-- Vertical "PESAN SEKARANG" Text -->
-    <span
-      class="my-2.5 text-[10px] sm:text-[11px] font-extrabold tracking-[0.22em] text-[#7E294B] group-hover:text-[#A84065] transition-colors select-none"
-      style="writing-mode: vertical-rl; transform: rotate(180deg);"
-    >
-      PESAN SEKARANG
-    </span>
-
-    <!-- Divider Bar -->
-    <span class="w-0.5 h-5 bg-[#7E294B]/30 rounded-full"></span>
-  </a>
-</aside>
-
-<!-- 2. Bottom Floating Capsule: TANYA KAMI / Chat WhatsApp (Pojok Kanan Bawah) -->
+<!-- Floating Capsule CTA: TANYA KAMI / Chat WhatsApp (Pojok Kanan Bawah) -->
+<!-- Warna diselaraskan dengan identitas visual website (Primary Sage Green & Gold) -->
 <aside aria-label="CTA Tanya Kami WhatsApp">
   <a
     href={consultWaUrl}
     target="_blank"
     rel="noopener noreferrer"
-    class="fixed bottom-5 right-4 sm:bottom-6 sm:right-6 z-50 flex items-center gap-3 bg-white/95 backdrop-blur-md border border-rose-100/90 shadow-[0_10px_30px_rgba(0,0,0,0.12)] hover:shadow-[0_15px_35px_rgba(216,74,120,0.25)] rounded-full p-2 pr-5 sm:pr-6 transition-all duration-300 hover:scale-105 active:scale-95 group focus:outline-hidden"
+    class="fixed bottom-5 right-4 sm:bottom-6 sm:right-6 z-50 flex items-center gap-3 bg-white/95 backdrop-blur-md border border-primary/25 shadow-[0_10px_30px_rgba(63,75,55,0.15)] hover:shadow-[0_15px_35px_rgba(85,101,75,0.3)] rounded-full p-2 pr-5 sm:pr-6 transition-all duration-300 hover:scale-105 active:scale-95 group focus:outline-hidden"
     aria-label="Tanya Kami via WhatsApp"
     title="Tanya Kami via WhatsApp"
   >
-    <!-- Circular Icon with Live/Online Pulse Badge -->
-    <div class="relative w-11 h-11 sm:w-12 sm:h-12 rounded-full bg-gradient-to-tr from-[#D84A78] to-[#EA6D96] text-white flex items-center justify-center shadow-md shrink-0 group-hover:rotate-6 transition-transform duration-300">
-      <!-- Equalizer / Chat Waveform Icon (sesuai referensi gambar) -->
+    <!-- Circular Icon in Brand Primary Color with Live/Online Pulse Badge -->
+    <div class="relative w-11 h-11 sm:w-12 sm:h-12 rounded-full bg-gradient-to-tr from-primary-dark via-primary to-primary-light text-white flex items-center justify-center shadow-md shrink-0 group-hover:rotate-6 transition-transform duration-300 border border-secondary/30">
+      <!-- Equalizer / Chat Waveform Icon -->
       <svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" class="w-5 h-5 sm:w-6 sm:h-6 drop-shadow-xs">
         <path d="M21 15a2 2 0 0 1-2 2H7l-4 4V5a2 2 0 0 1 2-2h14a2 2 0 0 1 2 2z"></path>
         <path d="M9 10v4"></path>
@@ -73,13 +41,13 @@ const consultWaUrl = `https://wa.me/${WHATSAPP_NUMBER}?text=${encodeURIComponent
 
     <!-- Text Block: TANYA KAMI / Chat WhatsApp -->
     <div class="flex flex-col">
-      <span class="text-[10px] sm:text-[11px] font-bold uppercase tracking-wider text-[#A84065] flex items-center gap-1">
+      <span class="text-[10px] sm:text-[11px] font-bold uppercase tracking-wider text-primary flex items-center gap-1">
         TANYA KAMI
         <span class="inline-block w-1.5 h-1.5 rounded-full bg-emerald-500 animate-pulse"></span>
       </span>
-      <span class="text-sm sm:text-[15px] font-extrabold text-slate-800 group-hover:text-[#D84A78] transition-colors leading-tight flex items-center gap-1.5">
+      <span class="text-sm sm:text-[15px] font-extrabold text-slate-800 group-hover:text-primary transition-colors leading-tight flex items-center gap-1.5">
         Chat WhatsApp
-        <svg class="w-3.5 h-3.5 text-emerald-500 shrink-0 fill-current" viewBox="0 0 24 24">
+        <svg class="w-3.5 h-3.5 text-emerald-600 shrink-0 fill-current" viewBox="0 0 24 24" aria-hidden="true">
           <path d="M12.031 6.172c-3.181 0-5.767 2.586-5.768 5.766-.001 1.298.38 2.27 1.019 3.287l-.711 2.598 2.669-.699c.969.54 1.838.847 2.791.848 3.18 0 5.767-2.587 5.768-5.766.001-3.18-2.585-5.834-5.768-5.834zm3.377 8.243c-.147.411-.75.76-1.042.812-.292.052-.663.097-2.072-.49-1.409-.587-2.327-2.016-2.398-2.112-.07-.095-.572-.76-.572-1.45 0-.69.362-1.029.49-1.173.129-.144.281-.18.375-.18.094 0 .188.001.27.006.086.005.201-.033.315.241.114.275.39 1.025.424 1.107.034.082.057.178.002.288-.055.11-.082.179-.164.275-.082.096-.173.214-.247.288-.082.083-.168.172-.072.337.096.165.427.705.916 1.141.63.562 1.161.736 1.326.818.165.082.261.069.358-.041.096-.11.413-.48.523-.645.11-.165.22-.138.371-.082.151.055.955.45 1.12.533.165.082.275.124.316.192.041.069.041.399-.106.81zM12.012 2.002C6.488 2.002 2 6.49 2 12.014c0 1.942.553 3.755 1.517 5.289L2 22l4.821-1.488A9.97 9.97 0 0 0 12.012 22C17.535 22 22 17.51 22 12.014c0-5.524-4.465-10.012-9.988-10.012z"/>
         </svg>
       </span>
