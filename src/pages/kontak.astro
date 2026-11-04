@@ -4,8 +4,8 @@ import Breadcrumb from '../components/Breadcrumb.astro';
 import { WHATSAPP_NUMBER, WHATSAPP_LABEL, INSTAGRAM_URL, INSTAGRAM_HANDLE } from '../data/constants';
 
 // SEO Meta
-const title = "Kontak & Hubungi Floragate - Toko Bunga Malang";
-const description = "Hubungi Floragate untuk konsultasi dan pemesanan karangan bunga di Malang. WhatsApp Business aktif setiap hari 09.00-23.00 WIB; di luar jam tersebut slow respon. Layanan cepat & terpercaya.";
+const title = "Kontak & Hubungi Zaloma Florist - Toko Bunga Malang";
+const description = "Hubungi Zaloma Florist untuk konsultasi dan pemesanan karangan bunga di Malang. WhatsApp Business aktif setiap hari 09.00-23.00 WIB; di luar jam tersebut slow respon. Layanan cepat & terpercaya.";
 ---
 
 <Layout title={title} description={description}>
@@ -16,7 +16,7 @@ const description = "Hubungi Floragate untuk konsultasi dan pemesanan karangan b
 
     <!-- Page Header -->
     <div class="text-center max-w-2xl mx-auto mt-6 mb-16">
-      <h1 class="font-serif text-3xl sm:text-4xl font-bold text-slate-800">Hubungi Floragate</h1>
+      <h1 class="font-serif text-3xl sm:text-4xl font-bold text-slate-800">Hubungi Zaloma Florist</h1>
       <p class="text-slate-500 text-sm mt-3 leading-relaxed">
         Hubungi admin kami untuk konsultasi model bunga, cek ongkos kirim ke alamat tujuan, atau memesan langsung via WhatsApp.
       </p>
@@ -27,7 +27,7 @@ const description = "Hubungi Floragate untuk konsultasi dan pemesanan karangan b
       <!-- Left: Contact Form → WhatsApp -->
       <div class="bg-white p-6 sm:p-8 rounded-xl border border-soft-cream/60 shadow-xs">
         <h2 class="font-serif text-xl font-bold text-slate-800 mb-2">Kirim Pesan Langsung</h2>
-        <p class="text-xs text-slate-500 mb-6">Isi formulir berikut untuk langsung terhubung ke WhatsApp admin Floragate dengan pesan yang sudah terisi otomatis.</p>
+        <p class="text-xs text-slate-500 mb-6">Isi formulir berikut untuk langsung terhubung ke WhatsApp admin Zaloma Florist dengan pesan yang sudah terisi otomatis.</p>
         
         <form id="contact-form" class="space-y-5" data-phone={WHATSAPP_NUMBER}>
           <div>
@@ -176,8 +176,8 @@ const description = "Hubungi Floragate untuk konsultasi dan pemesanan karangan b
 
       if (!name || !subject || !message) return;
       
-      const phone = (form.getAttribute('data-phone') || '628158842097').replace(/\D/g, '') || '628158842097';
-      const waText = `Halo Floragate, saya ${name}.\n\nKeperluan: ${subject}\n\nPesan:\n${message}\n\nMohon direspon, terima kasih.`;
+      const phone = (form.getAttribute('data-phone') || '6282228165589').replace(/\D/g, '') || '6282228165589';
+      const waText = `Halo Zaloma Florist, saya ${name}.\n\nKeperluan: ${subject}\n\nPesan:\n${message}\n\nMohon direspon, terima kasih.`;
       const encodedText = encodeURIComponent(waText);
       const waUrl = `https://wa.me/${phone}?text=${encodedText}`;
       

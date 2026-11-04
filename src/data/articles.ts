@@ -33,7 +33,7 @@ export const ARTICLES: Article[] = [
     date: '14 Oktober 2026',
     isoDate: '2026-10-14',
     image: '/images/produk/wedding-luxury.webp',
-    author: 'Tim Florist Floragate',
+    author: 'Tim Zaloma Florist',
     authorRole: 'Master Florist & Desainer Ucapan',
     content: {
       lead: 'Karangan bunga papan merupakan representasi penghormatan dan rasa peduli Anda kepada keluarga, sahabat, maupun rekan bisnis. Di Malang, tradisi mengirim bunga papan memiliki etika pemilihan warna dan tata bahasa ucapan tersendiri yang perlu diperhatikan.',
@@ -44,7 +44,7 @@ export const ARTICLES: Article[] = [
             'Untuk momen Duka Cita, gunakan dominasi warna teduh seperti hitam, putih, kuning lembut, ungu tua, atau biru tua. Hindari warna merah menyala atau motif ceria.',
             'Sebaliknya, untuk Pernikahan (Happy Wedding) dan Grand Opening atau Sertijab, gunakan palet warna cerah dan energik seperti merah marun, emas (gold), oranye hangat, dan hijau segar sebagai simbol keberuntungan dan kegembiraan.'
           ],
-          tip: 'Floragate selalu memberikan foto preview bunga papan sebelum dikirim ke lokasi acara di Malang Raya.'
+          tip: 'Zaloma Florist selalu memberikan foto preview bunga papan sebelum dikirim ke lokasi acara di Malang Raya.'
         },
         {
           heading: '2. Ukuran Papan Standar vs Ukuran Jumbo',
@@ -57,11 +57,11 @@ export const ARTICLES: Article[] = [
           heading: '3. Waktu Pemesanan yang Ideal',
           body: [
             'Untuk acara pernikahan atau peresmian gedung, disarankan memesan H-1 agar papan dapat dipasang 2 jam sebelum tamu undangan hadir.',
-            'Namun bila terjadi peristiwa duka cita mendadak, Floragate menyediakan layanan ekspres 3 jam selesai dengan garansi tiba tepat waktu di seluruh rumah duka di Kota Malang.'
+            'Namun bila terjadi peristiwa duka cita mendadak, Zaloma Florist menyediakan layanan ekspres 3 jam selesai dengan garansi tiba tepat waktu di seluruh rumah duka di Kota Malang.'
           ]
         }
       ],
-      conclusion: 'Memilih karangan bunga papan yang tepat menunjukkan ketulusan dan profesionalitas Anda. Konsultasikan kebutuhan desain dan kalimat ucapan Anda bersama tim Floragate Malang.'
+      conclusion: 'Memilih karangan bunga papan yang tepat menunjukkan ketulusan dan profesionalitas Anda. Konsultasikan kebutuhan desain dan kalimat ucapan Anda bersama tim Zaloma Florist Malang.'
     },
     tags: ['Bunga Papan', 'Florist Malang', 'Etika Karangan Bunga', 'Tips Pesan Bunga']
   },
@@ -117,7 +117,7 @@ export const ARTICLES: Article[] = [
     date: '10 Oktober 2026',
     isoDate: '2026-10-10',
     image: '/images/produk/standing-flower/1500 kombinasi bunga mawar dan lily.webp',
-    author: 'Florist Floragate',
+    author: 'Zaloma Florist',
     authorRole: 'Konsultan Estetika Bunga',
     content: {
       lead: 'Setiap warna kelopak bunga memiliki bahasa tersirat (floriography) yang telah diwariskan sejak berabad-abad lalu. Memahami makna warna akan membuat ucapan Anda terasa jauh lebih personal dan menyentuh hati penerima.',
@@ -145,7 +145,7 @@ export const ARTICLES: Article[] = [
           ]
         }
       ],
-      conclusion: 'Bingung meracik paduan warna yang tepat? Diskusikan pesan dan nuansa yang ingin Anda sampaikan kepada desainer bunga Floragate.'
+      conclusion: 'Bingung meracik paduan warna yang tepat? Diskusikan pesan dan nuansa yang ingin Anda sampaikan kepada desainer bunga Zaloma Florist.'
     },
     tags: ['Makna Bunga', 'Filosofi Bunga', 'Mawar', 'Inspirasi Kado']
   },
@@ -162,7 +162,7 @@ export const ARTICLES: Article[] = [
     author: 'Dian Saputra',
     authorRole: 'Spesialis Tanaman & Lanskap',
     content: {
-      lead: 'Bosan dengan karangan bunga konvensional yang layu setelah 3 hari? Di Malang, hadir tren baru kado ucapan berupa Tanbulampot (Tanaman Buah dalam Pot) berhias pita dan kartu ucapan akrilik eksklusif dari Floragate.',
+      lead: 'Bosan dengan karangan bunga konvensional yang layu setelah 3 hari? Di Malang, hadir tren baru kado ucapan berupa Tanbulampot (Tanaman Buah dalam Pot) berhias pita dan kartu ucapan akrilik eksklusif dari Zaloma Florist.',
       sections: [
         {
           heading: '1. Kado Hidup yang Tahan Bertahun-tahun',
@@ -170,7 +170,7 @@ export const ARTICLES: Article[] = [
             'Berbeda dengan bunga potong yang hanya bertahan hitungan hari, tanbulampot adalah hadiah hidup yang akan terus tumbuh subur dan dirawat oleh penerima.',
             'Setiap kali menyiram dan melihat pohon tumbuh, penerima akan selalu teringat pada ketulusan Anda yang mengirimkannya.'
           ],
-          tip: 'Pilihan tanaman favorit di Floragate meliputi Jeruk Nagami, Jeruk Chokun, Jambu Kristal, dan Sawo Manila yang rajin berbuah di dataran Malang.'
+          tip: 'Pilihan tanaman favorit di Zaloma Florist meliputi Jeruk Nagami, Jeruk Chokun, Jambu Kristal, dan Sawo Manila yang rajin berbuah di dataran Malang.'
         },
         {
           heading: '2. Simbol Berkah, Rezeki, dan Produktivitas',
@@ -187,7 +187,7 @@ export const ARTICLES: Article[] = [
           ]
         }
       ],
-      conclusion: 'Jadikan momen ucapan Anda berbeda dan lebih bermakna dengan mengirimkan pohon ucapan tanbulampot dari Floragate Malang.'
+      conclusion: 'Jadikan momen ucapan Anda berbeda dan lebih bermakna dengan mengirimkan pohon ucapan tanbulampot dari Zaloma Florist Malang.'
     },
     tags: ['Tanbulampot', 'Pohon Ucapan', 'Kado Ramah Lingkungan', 'Florist Malang']
   },
@@ -201,7 +201,7 @@ export const ARTICLES: Article[] = [
     date: '06 Oktober 2026',
     isoDate: '2026-10-06',
     image: '/images/produk/wedding-luxury.webp',
-    author: 'Tim Florist Floragate',
+    author: 'Tim Zaloma Florist',
     authorRole: 'Master Florist & Desainer Ucapan',
     content: {
       lead: 'Wisuda adalah momen bersejarah yang menandai babak baru kehidupan seseorang. Membawa atau mengirimkan bunga yang tepat dapat membuat hari tersebut terasa semakin istimewa dan bermakna bagi sang wisudawan.',
@@ -229,7 +229,7 @@ export const ARTICLES: Article[] = [
           ]
         }
       ],
-      conclusion: 'Apa pun pilihannya, yang terpenting adalah niat tulus yang Anda sampaikan bersama bunga tersebut. Tim Floragate siap membantu Anda meracik rangkaian terbaik untuk momen wisuda yang tak terlupakan.'
+      conclusion: 'Apa pun pilihannya, yang terpenting adalah niat tulus yang Anda sampaikan bersama bunga tersebut. Tim Zaloma Florist siap membantu Anda meracik rangkaian terbaik untuk momen wisuda yang tak terlupakan.'
     },
     tags: ['Wisuda', 'Bunga Wisuda', 'Hand Bouquet', 'Florist Malang']
   },
@@ -243,7 +243,7 @@ export const ARTICLES: Article[] = [
     date: '04 Oktober 2026',
     isoDate: '2026-10-04',
     image: '/images/produk/standing-flower/1500 kombinasi bunga mawar dan lily.webp',
-    author: 'Tim Florist Floragate',
+    author: 'Tim Zaloma Florist',
     authorRole: 'Master Florist & Desainer Ucapan',
     content: {
       lead: 'Mengirim bunga duka cita adalah salah satu cara paling universal untuk menyampaikan rasa simpati dan belasungkawa. Namun, ada sejumlah etika yang perlu diperhatikan agar gestur baik Anda tidak terasa canggung atau menyinggung keluarga yang sedang berduka.',
@@ -267,7 +267,7 @@ export const ARTICLES: Article[] = [
           heading: '3. Waktu Pengiriman yang Tepat',
           body: [
             'Idealnya, bunga duka cita dikirim pada hari yang sama dengan pemberitahuan kabar duka, atau paling lambat pada hari pertama masa berkabung.',
-            'Floragate menyediakan layanan pengiriman ekspres yang menjamin bunga tiba dalam 3 jam sejak pemesanan, bahkan untuk pesanan mendadak di malam hari.'
+            'Zaloma Florist menyediakan layanan pengiriman ekspres yang menjamin bunga tiba dalam 3 jam sejak pemesanan, bahkan untuk pesanan mendadak di malam hari.'
           ]
         }
       ],
@@ -313,7 +313,7 @@ export const ARTICLES: Article[] = [
           ]
         }
       ],
-      conclusion: 'Percayakan dekorasi bunga pernikahan Anda kepada tim profesional Floragate yang berpengalaman merias ratusan pernikahan di Malang Raya dengan sentuhan personal yang detail.'
+      conclusion: 'Percayakan dekorasi bunga pernikahan Anda kepada tim profesional Zaloma Florist yang berpengalaman merias ratusan pernikahan di Malang Raya dengan sentuhan personal yang detail.'
     },
     tags: ['Bunga Pernikahan', 'Dekorasi Pernikahan', 'Florist Malang', 'Pernikahan Malang']
   },
@@ -369,7 +369,7 @@ export const ARTICLES: Article[] = [
     date: '28 September 2026',
     isoDate: '2026-09-28',
     image: '/images/produk/bunga-meja/400000/700.webp',
-    author: 'Tim Florist Floragate',
+    author: 'Tim Zaloma Florist',
     authorRole: 'Master Florist & Desainer Ucapan',
     content: {
       lead: 'Bunga adalah kado yang hampir selalu tepat untuk ulang tahun siapa pun. Namun memilih jenis rangkaian yang paling sesuai dengan penerima dan hubungan Anda dengan mereka akan membuat hadiah itu terasa jauh lebih bermakna.',
@@ -422,7 +422,7 @@ export const ARTICLES: Article[] = [
             'Florist yang profesional dan transparan biasanya memiliki portofolio pesanan nyata (bukan hanya foto stok), ulasan pelanggan yang dapat diverifikasi, serta bersedia memberikan foto real sebelum pengiriman.',
             'Perhatikan juga apakah mereka mencantumkan alamat toko fisik yang jelas, nomor kontak yang aktif, dan estimasi waktu pengiriman yang realistis.'
           ],
-          tip: 'Floragate selalu mengirimkan foto asli rangkaian bunga kepada pelanggan sebelum produk diantarkan ke alamat tujuan.'
+          tip: 'Zaloma Florist selalu mengirimkan foto asli rangkaian bunga kepada pelanggan sebelum produk diantarkan ke alamat tujuan.'
         },
         {
           heading: '2. Pahami Cara Membaca Foto Katalog',
@@ -439,7 +439,7 @@ export const ARTICLES: Article[] = [
           ]
         }
       ],
-      conclusion: 'Memesan bunga online seharusnya menjadi pengalaman yang menyenangkan dan bebas kekhawatiran. Pilih florist yang mengedepankan transparansi, kualitas, dan kepuasan pelanggan seperti Floragate Malang.'
+      conclusion: 'Memesan bunga online seharusnya menjadi pengalaman yang menyenangkan dan bebas kekhawatiran. Pilih florist yang mengedepankan transparansi, kualitas, dan kepuasan pelanggan seperti Zaloma Florist Malang.'
     },
     tags: ['Tips Beli Bunga Online', 'Florist Terpercaya', 'Panduan Konsumen', 'Florist Malang']
   },
@@ -453,7 +453,7 @@ export const ARTICLES: Article[] = [
     date: '22 September 2026',
     isoDate: '2026-09-22',
     image: '/images/produk/wedding-luxury.webp',
-    author: 'Florist Floragate',
+    author: 'Zaloma Florist',
     authorRole: 'Konsultan Estetika Bunga',
     content: {
       lead: 'Di balik keindahan visualnya, bunga dalam tradisi Jawa menyimpan makna filosofis yang sangat dalam. Setiap jenis bunga yang dipilih untuk ritual adat memiliki fungsi simbolis, doa, dan harapan yang disampaikan kepada Yang Maha Kuasa.',
@@ -481,7 +481,7 @@ export const ARTICLES: Article[] = [
           ]
         }
       ],
-      conclusion: 'Mengenal tradisi bunga dalam budaya lokal kita adalah cara untuk menghargai kekayaan warisan leluhur. Floragate hadir menjadi bagian dari setiap momen bermakna dalam kehidupan Anda.'
+      conclusion: 'Mengenal tradisi bunga dalam budaya lokal kita adalah cara untuk menghargai kekayaan warisan leluhur. Zaloma Florist hadir menjadi bagian dari setiap momen bermakna dalam kehidupan Anda.'
     },
     tags: ['Tradisi Bunga', 'Budaya Jawa', 'Upacara Adat', 'Bunga Indonesia']
   },
@@ -506,7 +506,7 @@ export const ARTICLES: Article[] = [
             'Langkah pertama yang sering terlewat adalah menyelaraskan pilihan warna bunga dengan warna identitas perusahaan (brand color).',
             'Misalnya, perusahaan dengan logo biru dan emas dapat menggunakan kombinasi bunga biru iris, mawar putih, dan sentuhan aksesoris emas untuk menciptakan dekorasi yang kohesif dan berkesan profesional.'
           ],
-          tip: 'Sampaikan logo dan palette warna perusahaan Anda kepada tim Floragate untuk mendapatkan rekomendasi kombinasi bunga yang paling tepat.'
+          tip: 'Sampaikan logo dan palette warna perusahaan Anda kepada tim Zaloma Florist untuk mendapatkan rekomendasi kombinasi bunga yang paling tepat.'
         },
         {
           heading: '2. Jenis Dekorasi yang Paling Efektif',
@@ -537,7 +537,7 @@ export const ARTICLES: Article[] = [
     date: '16 September 2026',
     isoDate: '2026-09-16',
     image: '/images/produk/standing-flower/1500 kombinasi bunga mawar dan lily.webp',
-    author: 'Florist Floragate',
+    author: 'Zaloma Florist',
     authorRole: 'Konsultan Estetika Bunga',
     content: {
       lead: 'Mawar adalah ratu bunga yang telah memesona manusia selama ribuan tahun. Di pasar floristry Indonesia, tersedia berbagai varietas mawar dari sumber yang berbeda, masing-masing dengan karakteristik unik yang menentukan kegunaannya dalam dunia rangkaian bunga.',
@@ -607,7 +607,7 @@ export const ARTICLES: Article[] = [
           ]
         }
       ],
-      conclusion: 'Investasi pada dekorasi bunga grand opening adalah investasi pada citra bisnis Anda. Hubungi tim Floragate untuk konsultasi paket grand opening yang sesuai dengan kebutuhan dan anggaran Anda.'
+      conclusion: 'Investasi pada dekorasi bunga grand opening adalah investasi pada citra bisnis Anda. Hubungi tim Zaloma Florist untuk konsultasi paket grand opening yang sesuai dengan kebutuhan dan anggaran Anda.'
     },
     tags: ['Grand Opening', 'Dekorasi Bisnis', 'Bunga Papan', 'Florist Malang']
   }

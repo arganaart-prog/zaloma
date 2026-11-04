@@ -42,7 +42,7 @@ export const TESTIMONIALS: Testimonial[] = [
     location: 'Sukun, Malang',
     product: 'Bunga Papan Congratulations',
     rating: 5,
-    quote: 'Order bunga papan ucapan selamat untuk rekan kantor. Tulisan jelas, rangkaian segar, dan ongkir gratis ke area Malang. Pasti order lagi ke Floragate.',
+    quote: 'Order bunga papan ucapan selamat untuk rekan kantor. Tulisan jelas, rangkaian segar, dan ongkir gratis ke area Malang. Pasti order lagi ke Zaloma Florist.',
     initials: 'DL',
   },
   {
@@ -60,7 +60,7 @@ export const TESTIMONIALS: Testimonial[] = [
     location: 'Blimbing, Malang',
     product: 'Bunga Papan Wedding',
     rating: 5,
-    quote: 'Bunga papan pernikahan adik saya cantik dan sesuai tema acara. Tim Floragate bantu revisi tulisan ucapan sampai pas. Keluarga puas semua!',
+    quote: 'Bunga papan pernikahan adik saya cantik dan sesuai tema acara. Tim Zaloma Florist bantu revisi tulisan ucapan sampai pas. Keluarga puas semua!',
     initials: 'NA',
   },
   {
@@ -96,7 +96,7 @@ export const TESTIMONIALS: Testimonial[] = [
     location: 'Tlogomas, Malang',
     product: 'Bunga Papan Duka Cita',
     rating: 5,
-    quote: 'Pesan mendadak pagi hari, Floragate tetap bisa bantu dengan pengerjaan cepat. Bunga papan rapi dan sampai on time ke pemakaman. Terima kasih banyak.',
+    quote: 'Pesan mendadak pagi hari, Zaloma Florist tetap bisa bantu dengan pengerjaan cepat. Bunga papan rapi dan sampai on time ke pemakaman. Terima kasih banyak.',
     initials: 'MS',
   },
 ];

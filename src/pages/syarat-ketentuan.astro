@@ -5,14 +5,14 @@ import WhatsAppButton from '../components/WhatsAppButton.astro';
 import { WHATSAPP_LABEL } from '../data/constants';
 import { withBase } from '../utils/paths';
 
-const title = 'Syarat dan Ketentuan Floragate';
-const description = 'Syarat dan Ketentuan Floragate berisi aturan pemesanan, pembayaran, pengiriman, revisi, pembatalan, komplain, dan tanggung jawab pelanggan.';
+const title = 'Syarat dan Ketentuan Zaloma Florist';
+const description = 'Syarat dan Ketentuan Zaloma Florist berisi aturan pemesanan, pembayaran, pengiriman, revisi, pembatalan, komplain, dan tanggung jawab pelanggan.';
 const lastUpdated = '1 Juli 2026';
 
 const terms = [
   {
     title: 'Ruang Lingkup Layanan',
-    body: 'Floragate menyediakan layanan pemesanan karangan bunga, bunga papan, standing flower, hand bouquet, paper flower, dan bunga meja untuk wilayah Malang Raya dan sekitarnya. Setiap pesanan diproses berdasarkan detail yang dikirimkan pelanggan melalui WhatsApp resmi Floragate.',
+    body: 'Zaloma Florist menyediakan layanan pemesanan karangan bunga, bunga papan, standing flower, hand bouquet, paper flower, dan bunga meja untuk wilayah Malang Raya dan sekitarnya. Setiap pesanan diproses berdasarkan detail yang dikirimkan pelanggan melalui WhatsApp resmi Zaloma Florist.',
   },
   {
     title: 'Konfirmasi Pesanan',
@@ -32,11 +32,11 @@ const terms = [
   },
   {
     title: 'Pengiriman',
-    body: 'Pengiriman dilakukan sesuai jadwal yang disepakati. Keterlambatan dapat terjadi karena cuaca, kepadatan lalu lintas, akses lokasi, antrean acara, atau kondisi di luar kendali Floragate. Admin akan membantu memberi pembaruan jika terjadi kendala.',
+    body: 'Pengiriman dilakukan sesuai jadwal yang disepakati. Keterlambatan dapat terjadi karena cuaca, kepadatan lalu lintas, akses lokasi, antrean acara, atau kondisi di luar kendali Zaloma Florist. Admin akan membantu memberi pembaruan jika terjadi kendala.',
   },
   {
     title: 'Dokumentasi dan Bukti Pengiriman',
-    body: 'Floragate dapat mengirimkan foto hasil rangkaian sebelum pengiriman dan foto bukti ketika bunga tiba di lokasi. Foto dapat digunakan sebagai dokumentasi layanan internal atau portofolio, kecuali pelanggan meminta untuk tidak dipublikasikan.',
+    body: 'Zaloma Florist dapat mengirimkan foto hasil rangkaian sebelum pengiriman dan foto bukti ketika bunga tiba di lokasi. Foto dapat digunakan sebagai dokumentasi layanan internal atau portofolio, kecuali pelanggan meminta untuk tidak dipublikasikan.',
   },
   {
     title: 'Komplain dan Penanganan',
@@ -48,7 +48,7 @@ const terms = [
   },
   {
     title: 'Perubahan Ketentuan',
-    body: 'Floragate dapat memperbarui Syarat dan Ketentuan ini untuk menyesuaikan kebutuhan operasional. Versi terbaru akan ditampilkan pada halaman ini.',
+    body: 'Zaloma Florist dapat memperbarui Syarat dan Ketentuan ini untuk menyesuaikan kebutuhan operasional. Versi terbaru akan ditampilkan pada halaman ini.',
   },
 ];
 ---
@@ -65,16 +65,16 @@ const terms = [
           <span class="inline-flex rounded-full border border-secondary/45 bg-white/8 px-4 py-2 text-[11px] font-bold uppercase tracking-[0.18em] text-secondary-light">
             Aturan Layanan
           </span>
-          <h1 class="mt-5 max-w-3xl font-serif text-3xl sm:text-5xl font-bold leading-tight">Syarat dan Ketentuan Floragate</h1>
+          <h1 class="mt-5 max-w-3xl font-serif text-3xl sm:text-5xl font-bold leading-tight">Syarat dan Ketentuan Zaloma Florist</h1>
           <p class="mt-4 max-w-3xl text-sm sm:text-base leading-relaxed text-white/78">
-            Halaman ini membantu pelanggan memahami alur transaksi, pembayaran, revisi, pengiriman, dan penanganan komplain sebelum memesan bunga di Floragate.
+            Halaman ini membantu pelanggan memahami alur transaksi, pembayaran, revisi, pengiriman, dan penanganan komplain sebelum memesan bunga di Zaloma Florist.
           </p>
         </div>
 
         <div class="rounded-lg border border-white/15 bg-white/10 p-5 backdrop-blur-sm">
           <p class="text-xs font-bold uppercase tracking-[0.16em] text-secondary-light">Terakhir diperbarui</p>
           <p class="mt-2 font-serif text-2xl font-bold">{lastUpdated}</p>
-          <p class="mt-3 text-sm leading-relaxed text-white/72">Dengan melakukan pemesanan, pelanggan dianggap memahami ketentuan dasar layanan Floragate.</p>
+          <p class="mt-3 text-sm leading-relaxed text-white/72">Dengan melakukan pemesanan, pelanggan dianggap memahami ketentuan dasar layanan Zaloma Florist.</p>
         </div>
       </div>
     </div>
@@ -107,14 +107,14 @@ const terms = [
             </p>
             <p class="mt-4 text-sm font-semibold text-slate-700">WhatsApp: {WHATSAPP_LABEL}</p>
             <div class="mt-5">
-              <WhatsAppButton whatsappText="Halo Floragate, saya ingin bertanya tentang syarat dan ketentuan pemesanan." text="Tanya Admin" className="w-full justify-center" />
+              <WhatsAppButton whatsappText="Halo Zaloma Florist, saya ingin bertanya tentang syarat dan ketentuan pemesanan." text="Tanya Admin" className="w-full justify-center" />
             </div>
           </div>
 
           <div class="rounded-lg border border-soft-cream/70 bg-primary p-6 text-white">
             <p class="font-serif text-xl font-bold">Halaman terkait</p>
             <div class="mt-4 grid gap-3 text-sm">
-              <a href={withBase('/faq/')} class="rounded-md bg-white/10 px-4 py-3 text-white/86 transition-colors hover:bg-white/18">FAQ Floragate</a>
+              <a href={withBase('/faq/')} class="rounded-md bg-white/10 px-4 py-3 text-white/86 transition-colors hover:bg-white/18">FAQ Zaloma Florist</a>
               <a href={withBase('/kebijakan-privasi/')} class="rounded-md bg-white/10 px-4 py-3 text-white/86 transition-colors hover:bg-white/18">Kebijakan Privasi</a>
               <a href={withBase('/cara-pesan/')} class="rounded-md bg-white/10 px-4 py-3 text-white/86 transition-colors hover:bg-white/18">Cara Pesan</a>
             </div>

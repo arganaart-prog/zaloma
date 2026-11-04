@@ -19,7 +19,7 @@ interface Props {
 const { article } = Astro.props;
 const relatedArticles = getRelatedArticles(article.slug, 3);
 
-const title = `${article.title} | Floragate Malang`;
+const title = `${article.title} | Zaloma Florist Malang`;
 const description = article.excerpt;
 ---
 
@@ -97,7 +97,7 @@ const description = article.excerpt;
                   </svg>
                 </span>
                 <div class="text-xs sm:text-sm text-slate-700 font-medium leading-relaxed">
-                  <strong class="text-primary font-bold">Tips Floragate:</strong> {section.tip}
+                  <strong class="text-primary font-bold">Tips Zaloma Florist:</strong> {section.tip}
                 </div>
               </div>
             )}
@@ -124,7 +124,7 @@ const description = article.excerpt;
         </div>
 
         <a
-          href={`https://wa.me/?text=${encodeURIComponent(`Baca artikel bermanfaat dari Floragate: "${article.title}"`)}`}
+          href={`https://wa.me/?text=${encodeURIComponent(`Baca artikel bermanfaat dari Zaloma Florist: "${article.title}"`)}`}
           target="_blank"
           rel="noopener noreferrer"
           class="inline-flex items-center gap-1.5 text-xs font-bold text-primary hover:text-secondary transition-colors"
@@ -150,7 +150,7 @@ const description = article.excerpt;
             Lihat Katalog
           </a>
           <a
-            href={`https://wa.me/${WHATSAPP_NUMBER}?text=Halo%20Floragate,%20saya%20tertarik%20dengan%20artikel%20"${encodeURIComponent(article.title)}"%20dan%20ingin%20tanya%20pemesanan%20bunga.`}
+            href={`https://wa.me/${WHATSAPP_NUMBER}?text=Halo%20Zaloma Florist,%20saya%20tertarik%20dengan%20artikel%20"${encodeURIComponent(article.title)}"%20dan%20ingin%20tanya%20pemesanan%20bunga.`}
             target="_blank"
             rel="noopener noreferrer"
             class="flex-1 sm:flex-initial text-center px-5 py-2.5 rounded-full bg-secondary text-white text-xs font-bold hover:bg-secondary-dark transition-all"

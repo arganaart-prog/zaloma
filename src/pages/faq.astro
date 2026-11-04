@@ -4,12 +4,12 @@ import Breadcrumb from '../components/Breadcrumb.astro';
 import WhatsAppButton from '../components/WhatsAppButton.astro';
 import { WHATSAPP_LABEL } from '../data/constants';
 
-const title = 'FAQ Floragate - Pertanyaan Seputar Pemesanan Bunga';
-const description = 'Temukan jawaban tentang cara pesan, pembayaran, pengiriman, pengerjaan, revisi ucapan, dan layanan karangan bunga Floragate di Malang Raya.';
+const title = 'FAQ Zaloma Florist - Pertanyaan Seputar Pemesanan Bunga';
+const description = 'Temukan jawaban tentang cara pesan, pembayaran, pengiriman, pengerjaan, revisi ucapan, dan layanan karangan bunga Zaloma Florist di Malang Raya.';
 
 const faqItems = [
   {
-    question: 'Bagaimana cara memesan bunga di Floragate?',
+    question: 'Bagaimana cara memesan bunga di Zaloma Florist?',
     answer: 'Pilih produk di katalog, klik tombol Pesan via WhatsApp, lalu kirim detail ucapan, nama pengirim, alamat tujuan, tanggal kirim, dan jam pengiriman yang diinginkan. Admin akan membantu konfirmasi harga dan ketersediaan slot pengerjaan.',
   },
   {
@@ -21,16 +21,16 @@ const faqItems = [
     answer: 'Bisa. Anda dapat mengirimkan draft tulisan, nama penerima, nama pengirim, warna dominan, dan referensi desain. Admin akan memberi saran jika ada bagian yang perlu disesuaikan agar hasil tetap rapi dan terbaca jelas.',
   },
   {
-    question: 'Area pengiriman Floragate mencakup mana saja?',
-    answer: 'Floragate melayani Kota Malang, Kabupaten Malang, dan Kota Batu. Beberapa area seperti Singosari, Lawang, Kepanjen, Bululawang, dan sekitarnya dapat dilayani dengan konfirmasi ongkos kirim terlebih dahulu.',
+    question: 'Area pengiriman Zaloma Florist mencakup mana saja?',
+    answer: 'Zaloma Florist melayani Kota Malang, Kabupaten Malang, dan Kota Batu. Beberapa area seperti Singosari, Lawang, Kepanjen, Bululawang, dan sekitarnya dapat dilayani dengan konfirmasi ongkos kirim terlebih dahulu.',
   },
   {
     question: 'Apakah tersedia gratis ongkir?',
     answer: 'Gratis ongkir dapat berlaku untuk area tertentu di Kota Malang sesuai jarak dan kondisi pengiriman. Untuk alamat di luar area gratis ongkir, admin akan menginformasikan biaya kirim sebelum pesanan diproses.',
   },
   {
-    question: 'Bagaimana sistem pembayaran di Floragate?',
-    answer: 'Pesanan diproses setelah pembayaran awal atau DP terkonfirmasi. Sisa pembayaran dapat dilunasi sebelum pengiriman. Nominal DP dan metode pembayaran akan dikonfirmasi oleh admin melalui WhatsApp resmi Floragate.',
+    question: 'Bagaimana sistem pembayaran di Zaloma Florist?',
+    answer: 'Pesanan diproses setelah pembayaran awal atau DP terkonfirmasi. Sisa pembayaran dapat dilunasi sebelum pengiriman. Nominal DP dan metode pembayaran akan dikonfirmasi oleh admin melalui WhatsApp resmi Zaloma Florist.',
   },
   {
     question: 'Apakah saya mendapat foto hasil sebelum dikirim?',
@@ -41,7 +41,7 @@ const faqItems = [
     answer: 'Revisi tulisan dapat dilakukan selama papan belum masuk tahap finishing. Pembatalan hanya dapat diproses jika pesanan belum mulai dikerjakan. Jika bahan sudah dibeli atau rangkaian sudah diproses, biaya yang sudah berjalan dapat diperhitungkan.',
   },
   {
-    question: 'Jam kerja admin Floragate kapan?',
+    question: 'Jam kerja admin Zaloma Florist kapan?',
     answer: 'Admin aktif setiap hari pukul 09.00 sampai 23.00 WIB. Di luar jam tersebut pesan tetap bisa dikirim, tetapi respon dapat lebih lambat.',
   },
 ];
@@ -68,13 +68,13 @@ const faqSchema = {
       <div class="grid grid-cols-1 lg:grid-cols-[1fr_360px] gap-8 lg:gap-12 items-end mt-8">
         <div>
           <span class="inline-flex items-center rounded-full border border-secondary/35 bg-white/75 px-4 py-2 text-[11px] font-bold uppercase tracking-[0.18em] text-secondary-dark shadow-xs">
-            Pusat Bantuan Floragate
+            Pusat Bantuan Zaloma Florist
           </span>
           <h1 class="mt-5 max-w-3xl font-serif text-3xl sm:text-5xl font-bold leading-tight text-slate-800">
             Pertanyaan yang Sering Ditanyakan
           </h1>
           <p class="mt-4 max-w-2xl text-sm sm:text-base leading-relaxed text-slate-600">
-            Jawaban untuk pertanyaan yang paling sering masuk ke WhatsApp Floragate.
+            Jawaban untuk pertanyaan yang paling sering masuk ke WhatsApp Zaloma Florist.
           </p>
         </div>
 
@@ -84,7 +84,7 @@ const faqSchema = {
             Hubungi admin melalui WhatsApp {WHATSAPP_LABEL}. Admin aktif 09.00 sampai 23.00 WIB.
           </p>
           <div class="mt-5">
-            <WhatsAppButton whatsappText="Halo Floragate, saya ingin bertanya tentang pemesanan bunga." text="Tanya Admin" className="w-full justify-center" />
+            <WhatsAppButton whatsappText="Halo Zaloma Florist, saya ingin bertanya tentang pemesanan bunga." text="Tanya Admin" className="w-full justify-center" />
           </div>
         </div>
       </div>

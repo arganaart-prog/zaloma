@@ -33,7 +33,7 @@ const RAW_CATEGORIES: Category[] = [
     name: "Bunga Papan Duka Cita",
     description: "Karangan bunga papan duka cita dengan tata huruf rapi dan nuansa teduh untuk ungkapan belasungkawa.",
     seoTitle: "Bunga Papan Duka Cita Malang Murah & Berkualitas",
-    seoDescription: "Pesan bunga papan duka cita Malang murah dan berkualitas di Floragate. Rangkaian elegan, bunga segar, proses cepat 3 jam, dan gratis ongkir area Kota Malang.",
+    seoDescription: "Pesan bunga papan duka cita Malang murah dan berkualitas di Zaloma Florist. Rangkaian elegan, bunga segar, proses cepat 3 jam, dan gratis ongkir area Kota Malang.",
     image: "/images/kategori/duka-cita.webp"
   },
   {
@@ -111,7 +111,7 @@ export const PRODUCTS: Product[] = [
     imageHeight: 1230,
     description: "Karangan bunga papan duka cita dengan desain elegan dan rangkaian bunga yang tertata rapi untuk menyampaikan belasungkawa secara hangat, sopan, dan penuh penghormatan.",
     featured: true,
-    whatsappText: "Halo Floragate, saya ingin pesan karangan Bunga Papan Duka Cita Malang 001 (BP-DC-03). Mohon info harga detail dan format pemesanannya.",
+    whatsappText: "Halo Zaloma Florist, saya ingin pesan karangan Bunga Papan Duka Cita Malang 001 (BP-DC-03). Mohon info harga detail dan format pemesanannya.",
     processingTime: "3 - 4 Jam",
     serviceArea: ["Kota Malang", "Kabupaten Malang", "Kota Batu"]
   },
@@ -129,7 +129,7 @@ export const PRODUCTS: Product[] = [
     imageHeight: 1313,
     description: "Bunga papan duka cita paket 935 ribu dengan desain bernuansa teduh dan rangkaian bunga segar yang rapi untuk menyampaikan ungkapan belasungkawa di area Malang Raya.",
     featured: false,
-    whatsappText: "Halo Floragate, saya ingin pesan karangan Bunga Papan Duka Cita Malang 002 (BP-DC-04). Mohon info harga detail dan format pemesanannya.",
+    whatsappText: "Halo Zaloma Florist, saya ingin pesan karangan Bunga Papan Duka Cita Malang 002 (BP-DC-04). Mohon info harga detail dan format pemesanannya.",
     processingTime: "3 - 4 Jam",
     serviceArea: ["Kota Malang", "Kabupaten Malang", "Kota Batu"]
   },
@@ -147,7 +147,7 @@ export const PRODUCTS: Product[] = [
     imageHeight: 1198,
     description: "Bunga papan duka cita paket 1,155 juta dengan tampilan megah, susunan bunga melimpah, dan nuansa terhormat untuk ungkapan belasungkawa mendalam di area Malang Raya.",
     featured: false,
-    whatsappText: "Halo Floragate, saya ingin pesan karangan Bunga Papan Duka Cita Malang 003 (BP-DC-05). Mohon info harga detail dan format pemesanannya.",
+    whatsappText: "Halo Zaloma Florist, saya ingin pesan karangan Bunga Papan Duka Cita Malang 003 (BP-DC-05). Mohon info harga detail dan format pemesanannya.",
     processingTime: "3 - 4 Jam",
     serviceArea: ["Kota Malang", "Kabupaten Malang", "Kota Batu"]
   },
@@ -165,7 +165,7 @@ export const PRODUCTS: Product[] = [
     imageHeight: 1448,
     description: "Bunga papan duka cita paket 735 ribu dengan desain bernuansa teduh, tenang, dan susunan bunga segar yang rapi untuk menyampaikan ungkapan belasungkawa di area Malang Raya.",
     featured: false,
-    whatsappText: "Halo Floragate, saya ingin pesan karangan Bunga Papan Duka Cita Malang 004 (BP-DC-06). Mohon info harga detail dan format pemesanannya.",
+    whatsappText: "Halo Zaloma Florist, saya ingin pesan karangan Bunga Papan Duka Cita Malang 004 (BP-DC-06). Mohon info harga detail dan format pemesanannya.",
     processingTime: "3 - 4 Jam",
     serviceArea: ["Kota Malang", "Kabupaten Malang", "Kota Batu"]
   },
@@ -183,7 +183,7 @@ export const PRODUCTS: Product[] = [
     imageHeight: 1313,
     description: "Bunga papan duka cita paket 1,35 juta dengan tampilan megah, susunan bunga melimpah, dan nuansa terhormat untuk ungkapan belasungkawa mendalam di area Malang Raya.",
     featured: false,
-    whatsappText: "Halo Floragate, saya ingin pesan karangan Bunga Papan Duka Cita Malang 005 (BP-DC-07). Mohon info harga detail dan format pemesanannya.",
+    whatsappText: "Halo Zaloma Florist, saya ingin pesan karangan Bunga Papan Duka Cita Malang 005 (BP-DC-07). Mohon info harga detail dan format pemesanannya.",
     processingTime: "3 - 4 Jam",
     serviceArea: ["Kota Malang", "Kabupaten Malang", "Kota Batu"]
   },
@@ -201,7 +201,7 @@ export const PRODUCTS: Product[] = [
     imageHeight: 1254,
     description: "Bunga papan duka cita paket 975 ribu dengan susunan bunga segar elegan dan nuansa terhormat untuk menyampaikan belasungkawa di area Malang Raya.",
     featured: false,
-    whatsappText: "Halo Floragate, saya ingin pesan karangan Bunga Papan Duka Cita Malang 006 (BP-DC-08). Mohon info harga detail dan format pemesanannya.",
+    whatsappText: "Halo Zaloma Florist, saya ingin pesan karangan Bunga Papan Duka Cita Malang 006 (BP-DC-08). Mohon info harga detail dan format pemesanannya.",
     processingTime: "3 - 4 Jam",
     serviceArea: ["Kota Malang", "Kabupaten Malang", "Kota Batu"]
   },
@@ -219,7 +219,7 @@ export const PRODUCTS: Product[] = [
     imageHeight: 1254,
     description: "Bunga papan duka cita paket 1,475 juta dengan desain premium megah, susunan bunga melimpah ruah, dan nuansa terhormat untuk belasungkawa mendalam.",
     featured: false,
-    whatsappText: "Halo Floragate, saya ingin pesan karangan Bunga Papan Duka Cita Malang 007 (BP-DC-09). Mohon info harga detail dan format pemesanannya.",
+    whatsappText: "Halo Zaloma Florist, saya ingin pesan karangan Bunga Papan Duka Cita Malang 007 (BP-DC-09). Mohon info harga detail dan format pemesanannya.",
     processingTime: "3 - 4 Jam",
     serviceArea: ["Kota Malang", "Kabupaten Malang", "Kota Batu"]
   },
@@ -237,7 +237,7 @@ export const PRODUCTS: Product[] = [
     imageHeight: 1314,
     description: "Bunga papan duka cita paket 1,375 juta dengan susunan bunga melimpah, warna elegan, dan tampilan penuh penghormatan untuk belasungkawa mendalam.",
     featured: false,
-    whatsappText: "Halo Floragate, saya ingin pesan karangan Bunga Papan Duka Cita Malang 008 (BP-DC-10). Mohon info harga detail dan format pemesanannya.",
+    whatsappText: "Halo Zaloma Florist, saya ingin pesan karangan Bunga Papan Duka Cita Malang 008 (BP-DC-10). Mohon info harga detail dan format pemesanannya.",
     processingTime: "3 - 4 Jam",
     serviceArea: ["Kota Malang", "Kabupaten Malang", "Kota Batu"]
   },
@@ -255,7 +255,7 @@ export const PRODUCTS: Product[] = [
     imageHeight: 1254,
     description: "Bunga papan duka cita paket 1,5 juta dengan ukuran megah, desain eksklusif, dan susunan bunga melimpah ruah untuk menyampaikan belasungkawa mendalam.",
     featured: false,
-    whatsappText: "Halo Floragate, saya ingin pesan karangan Bunga Papan Duka Cita Malang 009 (BP-DC-11). Mohon info harga detail dan format pemesanannya.",
+    whatsappText: "Halo Zaloma Florist, saya ingin pesan karangan Bunga Papan Duka Cita Malang 009 (BP-DC-11). Mohon info harga detail dan format pemesanannya.",
     processingTime: "3 - 4 Jam",
     serviceArea: ["Kota Malang", "Kabupaten Malang", "Kota Batu"]
   },
@@ -273,7 +273,7 @@ export const PRODUCTS: Product[] = [
     imageHeight: 1254,
     description: "Bunga papan duka cita paket 1,55 juta dengan tampilan megah, susunan bunga segar melimpah ruah, dan nuansa terhormat untuk belasungkawa mendalam di area Malang Raya.",
     featured: false,
-    whatsappText: "Halo Floragate, saya ingin pesan karangan Bunga Papan Duka Cita Malang 010 (BP-DC-12). Mohon info harga detail dan format pemesanannya.",
+    whatsappText: "Halo Zaloma Florist, saya ingin pesan karangan Bunga Papan Duka Cita Malang 010 (BP-DC-12). Mohon info harga detail dan format pemesanannya.",
     processingTime: "3 - 4 Jam",
     serviceArea: ["Kota Malang", "Kabupaten Malang", "Kota Batu"]
   },
@@ -291,7 +291,7 @@ export const PRODUCTS: Product[] = [
     imageHeight: 1254,
     description: "Bunga papan duka cita super premium paket 2,25 juta dengan ukuran megah, desain eksklusif, dan susunan bunga segar berlimpah untuk ucapan belasungkawa paling prestisius.",
     featured: false,
-    whatsappText: "Halo Floragate, saya ingin pesan karangan Bunga Papan Duka Cita Malang 011 (BP-DC-13). Mohon info harga detail dan format pemesanannya.",
+    whatsappText: "Halo Zaloma Florist, saya ingin pesan karangan Bunga Papan Duka Cita Malang 011 (BP-DC-13). Mohon info harga detail dan format pemesanannya.",
     processingTime: "3 - 4 Jam",
     serviceArea: ["Kota Malang", "Kabupaten Malang", "Kota Batu"]
   },
@@ -311,7 +311,7 @@ export const PRODUCTS: Product[] = [
     imageHeight: 1297,
     description: "Bunga papan wedding dengan tampilan meriah dan rangkaian bunga yang cantik untuk menyampaikan ucapan selamat atas momen pernikahan keluarga, sahabat, atau rekan kerja.",
     featured: true,
-    whatsappText: "Halo Floragate, saya ingin pesan karangan Bunga Papan Wedding Malang 001 (BP-WD-03). Mohon info harga detail dan format pemesanannya.",
+    whatsappText: "Halo Zaloma Florist, saya ingin pesan karangan Bunga Papan Wedding Malang 001 (BP-WD-03). Mohon info harga detail dan format pemesanannya.",
     processingTime: "3 - 4 Jam",
     serviceArea: ["Kota Malang", "Kabupaten Malang", "Kota Batu"]
   },
@@ -329,7 +329,7 @@ export const PRODUCTS: Product[] = [
     imageHeight: 1402,
     description: "Bunga papan wedding paket 700 ribu dengan desain ceria dan rangkaian bunga segar yang rapi untuk ucapan selamat pernikahan di area Malang Raya.",
     featured: false,
-    whatsappText: "Halo Floragate, saya ingin pesan karangan Bunga Papan Wedding Malang 002 (BP-WD-04). Mohon info harga detail dan format pemesanannya.",
+    whatsappText: "Halo Zaloma Florist, saya ingin pesan karangan Bunga Papan Wedding Malang 002 (BP-WD-04). Mohon info harga detail dan format pemesanannya.",
     processingTime: "3 - 4 Jam",
     serviceArea: ["Kota Malang", "Kabupaten Malang", "Kota Batu"]
   },
@@ -347,7 +347,7 @@ export const PRODUCTS: Product[] = [
     imageHeight: 1402,
     description: "Bunga papan wedding paket 675 ribu dengan tampilan meriah, warna menarik, dan komposisi bunga yang cantik untuk mengirimkan ucapan selamat pernikahan.",
     featured: false,
-    whatsappText: "Halo Floragate, saya ingin pesan karangan Bunga Papan Wedding Malang 003 (BP-WD-05). Mohon info harga detail dan format pemesanannya.",
+    whatsappText: "Halo Zaloma Florist, saya ingin pesan karangan Bunga Papan Wedding Malang 003 (BP-WD-05). Mohon info harga detail dan format pemesanannya.",
     processingTime: "3 - 4 Jam",
     serviceArea: ["Kota Malang", "Kabupaten Malang", "Kota Batu"]
   },
@@ -365,7 +365,7 @@ export const PRODUCTS: Product[] = [
     imageHeight: 1402,
     description: "Bunga papan wedding paket 775 ribu dengan susunan bunga yang lebih penuh dan elegan untuk melengkapi momen pernikahan keluarga, sahabat, atau rekan kerja.",
     featured: false,
-    whatsappText: "Halo Floragate, saya ingin pesan karangan Bunga Papan Wedding Malang 004 (BP-WD-06). Mohon info harga detail dan format pemesanannya.",
+    whatsappText: "Halo Zaloma Florist, saya ingin pesan karangan Bunga Papan Wedding Malang 004 (BP-WD-06). Mohon info harga detail dan format pemesanannya.",
     processingTime: "3 - 4 Jam",
     serviceArea: ["Kota Malang", "Kabupaten Malang", "Kota Batu"]
   },
@@ -383,7 +383,7 @@ export const PRODUCTS: Product[] = [
     imageHeight: 1402,
     description: "Bunga papan wedding paket 1,35 juta dengan desain premium, ukuran tampilan yang megah, dan rangkaian bunga lebih melimpah untuk ucapan pernikahan yang berkesan.",
     featured: false,
-    whatsappText: "Halo Floragate, saya ingin pesan karangan Bunga Papan Wedding Malang 005 (BP-WD-07). Mohon info harga detail dan format pemesanannya.",
+    whatsappText: "Halo Zaloma Florist, saya ingin pesan karangan Bunga Papan Wedding Malang 005 (BP-WD-07). Mohon info harga detail dan format pemesanannya.",
     processingTime: "4 - 5 Jam",
     serviceArea: ["Kota Malang", "Kabupaten Malang", "Kota Batu"]
   },
@@ -401,7 +401,7 @@ export const PRODUCTS: Product[] = [
     imageHeight: 1402,
     description: "Bunga papan wedding paket 750 ribu varian Product3 dengan tampilan meriah dan rangkaian bunga segar yang cantik untuk ucapan selamat pernikahan.",
     featured: false,
-    whatsappText: "Halo Floragate, saya ingin pesan karangan Bunga Papan Wedding Malang 006 (BP-WD-08). Mohon info harga detail dan format pemesanannya.",
+    whatsappText: "Halo Zaloma Florist, saya ingin pesan karangan Bunga Papan Wedding Malang 006 (BP-WD-08). Mohon info harga detail dan format pemesanannya.",
     processingTime: "3 - 4 Jam",
     serviceArea: ["Kota Malang", "Kabupaten Malang", "Kota Batu"]
   },
@@ -419,7 +419,7 @@ export const PRODUCTS: Product[] = [
     imageHeight: 1349,
     description: "Bunga papan wedding paket 475 ribu dengan desain elegan dan rangkaian bunga segar yang rapi untuk ucapan selamat pernikahan di area Malang Raya.",
     featured: false,
-    whatsappText: "Halo Floragate, saya ingin pesan karangan Bunga Papan Wedding Malang 007 (BP-WD-09). Mohon info harga detail dan format pemesanannya.",
+    whatsappText: "Halo Zaloma Florist, saya ingin pesan karangan Bunga Papan Wedding Malang 007 (BP-WD-09). Mohon info harga detail dan format pemesanannya.",
     processingTime: "3 - 4 Jam",
     serviceArea: ["Kota Malang", "Kabupaten Malang", "Kota Batu"]
   },
@@ -437,7 +437,7 @@ export const PRODUCTS: Product[] = [
     imageHeight: 1348,
     description: "Bunga papan wedding paket 1,175 juta dengan desain mewah dan rangkaian bunga melimpah untuk ucapan selamat pernikahan yang berkesan di area Malang Raya.",
     featured: false,
-    whatsappText: "Halo Floragate, saya ingin pesan karangan Bunga Papan Wedding Malang 008 (BP-WD-10). Mohon info harga detail dan format pemesanannya.",
+    whatsappText: "Halo Zaloma Florist, saya ingin pesan karangan Bunga Papan Wedding Malang 008 (BP-WD-10). Mohon info harga detail dan format pemesanannya.",
     processingTime: "3 - 4 Jam",
     serviceArea: ["Kota Malang", "Kabupaten Malang", "Kota Batu"]
   },
@@ -455,7 +455,7 @@ export const PRODUCTS: Product[] = [
     imageHeight: 1349,
     description: "Bunga papan wedding paket 1,165 juta dengan desain mewah dan susunan bunga melimpah untuk ucapan selamat pernikahan yang berkesan di area Malang Raya.",
     featured: false,
-    whatsappText: "Halo Floragate, saya ingin pesan karangan Bunga Papan Wedding Malang 009 (BP-WD-11). Mohon info harga detail dan format pemesanannya.",
+    whatsappText: "Halo Zaloma Florist, saya ingin pesan karangan Bunga Papan Wedding Malang 009 (BP-WD-11). Mohon info harga detail dan format pemesanannya.",
     processingTime: "3 - 4 Jam",
     serviceArea: ["Kota Malang", "Kabupaten Malang", "Kota Batu"]
   },
@@ -473,7 +473,7 @@ export const PRODUCTS: Product[] = [
     imageHeight: 1349,
     description: "Bunga papan wedding paket 900 ribu dengan susunan bunga segar cantik dan nuansa romantis untuk menyampaikan ucapan selamat atas pernikahan keluarga atau sahabat di Malang.",
     featured: false,
-    whatsappText: "Halo Floragate, saya ingin pesan karangan Bunga Papan Wedding Malang 010 (BP-WD-12). Mohon info harga detail dan format pemesanannya.",
+    whatsappText: "Halo Zaloma Florist, saya ingin pesan karangan Bunga Papan Wedding Malang 010 (BP-WD-12). Mohon info harga detail dan format pemesanannya.",
     processingTime: "3 - 4 Jam",
     serviceArea: ["Kota Malang", "Kabupaten Malang", "Kota Batu"]
   },
@@ -491,7 +491,7 @@ export const PRODUCTS: Product[] = [
     imageHeight: 1349,
     description: "Bunga papan wedding paket 975 ribu dengan paduan warna elegan dan bunga segar melimpah untuk melengkapi momen bahagia di hari pernikahan di area Malang Raya.",
     featured: false,
-    whatsappText: "Halo Floragate, saya ingin pesan karangan Bunga Papan Wedding Malang 011 (BP-WD-13). Mohon info harga detail dan format pemesanannya.",
+    whatsappText: "Halo Zaloma Florist, saya ingin pesan karangan Bunga Papan Wedding Malang 011 (BP-WD-13). Mohon info harga detail dan format pemesanannya.",
     processingTime: "3 - 4 Jam",
     serviceArea: ["Kota Malang", "Kabupaten Malang", "Kota Batu"]
   },
@@ -509,7 +509,7 @@ export const PRODUCTS: Product[] = [
     imageHeight: 1348,
     description: "Bunga papan wedding paket 1,175 juta varian eksklusif dengan tampilan mewah, warna menawan, dan susunan bunga segar melimpah untuk pernikahan di Malang Raya.",
     featured: false,
-    whatsappText: "Halo Floragate, saya ingin pesan karangan Bunga Papan Wedding Malang 012 (BP-WD-14). Mohon info harga detail dan format pemesanannya.",
+    whatsappText: "Halo Zaloma Florist, saya ingin pesan karangan Bunga Papan Wedding Malang 012 (BP-WD-14). Mohon info harga detail dan format pemesanannya.",
     processingTime: "3 - 4 Jam",
     serviceArea: ["Kota Malang", "Kabupaten Malang", "Kota Batu"]
   },
@@ -527,7 +527,7 @@ export const PRODUCTS: Product[] = [
     imageHeight: 1348,
     description: "Bunga papan wedding premium paket 1,35 juta varian eksklusif dengan susunan bunga segar melimpah ruah dan desain megah untuk ucapan selamat pernikahan berkelas.",
     featured: false,
-    whatsappText: "Halo Floragate, saya ingin pesan karangan Bunga Papan Wedding Malang 013 (BP-WD-15). Mohon info harga detail dan format pemesanannya.",
+    whatsappText: "Halo Zaloma Florist, saya ingin pesan karangan Bunga Papan Wedding Malang 013 (BP-WD-15). Mohon info harga detail dan format pemesanannya.",
     processingTime: "4 - 5 Jam",
     serviceArea: ["Kota Malang", "Kabupaten Malang", "Kota Batu"]
   },
@@ -547,7 +547,7 @@ export const PRODUCTS: Product[] = [
     imageHeight: 1272,
     description: "Bunga papan ucapan 'Selamat & Sukses' atau 'Congratulations' dengan nuansa warna kuning cerah, merah meriah, dan aksen emas (gold) yang melambangkan kemakmuran dan kesuksesan. Sangat cocok diletakkan di depan toko baru, kantor baru, atau kafe saat peresmian / grand opening di area Malang.",
     featured: true,
-    whatsappText: "Halo Floragate, saya ingin pesan karangan Bunga Papan Congratulations Malang 001 (BP-CG-01). Mohon info harga detail dan format pemesanannya.",
+    whatsappText: "Halo Zaloma Florist, saya ingin pesan karangan Bunga Papan Congratulations Malang 001 (BP-CG-01). Mohon info harga detail dan format pemesanannya.",
     processingTime: "3 - 4 Jam",
     serviceArea: ["Kota Malang", "Kabupaten Malang", "Kota Batu"]
   },
@@ -565,7 +565,7 @@ export const PRODUCTS: Product[] = [
     imageHeight: 1359,
     description: "Karangan bunga papan selamat grand opening dengan desain penuh energi, paduan warna jingga, merah menyala, dan biru navy yang modern. Dirangkai menggunakan spon tebal anti badai dengan hiasan bunga segar melimpah ruah di bagian mahkota atas dan kaki bawah papan bunga.",
     featured: false,
-    whatsappText: "Halo Floragate, saya ingin pesan karangan Bunga Papan Congratulations Malang 002 (BP-CG-02). Mohon info harga detail dan format pemesanannya.",
+    whatsappText: "Halo Zaloma Florist, saya ingin pesan karangan Bunga Papan Congratulations Malang 002 (BP-CG-02). Mohon info harga detail dan format pemesanannya.",
     processingTime: "3 - 4 Jam",
     serviceArea: ["Kota Malang", "Kabupaten Malang", "Kota Batu"]
   },
@@ -583,7 +583,7 @@ export const PRODUCTS: Product[] = [
     imageHeight: 1311,
     description: "Karangan bunga papan congratulations premium dengan tampilan megah dan rangkaian bunga melimpah untuk pembukaan usaha, pencapaian penting, atau ucapan selamat eksklusif di area Malang.",
     featured: false,
-    whatsappText: "Halo Floragate, saya ingin pesan karangan Bunga Papan Congratulations Malang 003 (BP-CG-04). Mohon info harga detail dan format pemesanannya.",
+    whatsappText: "Halo Zaloma Florist, saya ingin pesan karangan Bunga Papan Congratulations Malang 003 (BP-CG-04). Mohon info harga detail dan format pemesanannya.",
     processingTime: "3 - 4 Jam",
     serviceArea: ["Kota Malang", "Kabupaten Malang", "Kota Batu"]
   },
@@ -601,7 +601,7 @@ export const PRODUCTS: Product[] = [
     imageHeight: 1322,
     description: "Karangan bunga papan ucapan selamat & sukses paket 1,135 juta dengan susunan bunga segar elegan dan desain menarik untuk pembukaan usaha, grand opening, atau momen perayaan penting di area Malang.",
     featured: false,
-    whatsappText: "Halo Floragate, saya ingin pesan karangan Bunga Papan Congratulations Malang 004 (BP-CG-05). Mohon info harga detail dan format pemesanannya.",
+    whatsappText: "Halo Zaloma Florist, saya ingin pesan karangan Bunga Papan Congratulations Malang 004 (BP-CG-05). Mohon info harga detail dan format pemesanannya.",
     processingTime: "3 - 4 Jam",
     serviceArea: ["Kota Malang", "Kabupaten Malang", "Kota Batu"]
   },
@@ -619,7 +619,7 @@ export const PRODUCTS: Product[] = [
     imageHeight: 1385,
     description: "Karangan bunga papan ucapan selamat & sukses paket 850 ribu dengan susunan bunga segar yang rapi dan kombinasi warna cerah untuk pembukaan usaha, grand opening, atau perayaan di Malang Raya.",
     featured: false,
-    whatsappText: "Halo Floragate, saya ingin pesan karangan Bunga Papan Congratulations Malang 005 (BP-CG-06). Mohon info harga detail dan format pemesanannya.",
+    whatsappText: "Halo Zaloma Florist, saya ingin pesan karangan Bunga Papan Congratulations Malang 005 (BP-CG-06). Mohon info harga detail dan format pemesanannya.",
     processingTime: "3 - 4 Jam",
     serviceArea: ["Kota Malang", "Kabupaten Malang", "Kota Batu"]
   },
@@ -637,7 +637,7 @@ export const PRODUCTS: Product[] = [
     imageHeight: 1385,
     description: "Karangan bunga papan ucapan selamat & sukses paket 985 ribu dengan susunan bunga segar meriah dan desain menarik untuk peresmian toko, kantor baru, atau ucapan selamat di area Malang.",
     featured: false,
-    whatsappText: "Halo Floragate, saya ingin pesan karangan Bunga Papan Congratulations Malang 006 (BP-CG-07). Mohon info harga detail dan format pemesanannya.",
+    whatsappText: "Halo Zaloma Florist, saya ingin pesan karangan Bunga Papan Congratulations Malang 006 (BP-CG-07). Mohon info harga detail dan format pemesanannya.",
     processingTime: "3 - 4 Jam",
     serviceArea: ["Kota Malang", "Kabupaten Malang", "Kota Batu"]
   },
@@ -655,7 +655,7 @@ export const PRODUCTS: Product[] = [
     imageHeight: 1385,
     description: "Karangan bunga papan ucapan selamat & sukses paket 1,175 juta dengan desain mewah, susunan bunga melimpah, dan tampilan elegan untuk grand opening atau perayaan prestisius di area Malang.",
     featured: false,
-    whatsappText: "Halo Floragate, saya ingin pesan karangan Bunga Papan Congratulations Malang 007 (BP-CG-08). Mohon info harga detail dan format pemesanannya.",
+    whatsappText: "Halo Zaloma Florist, saya ingin pesan karangan Bunga Papan Congratulations Malang 007 (BP-CG-08). Mohon info harga detail dan format pemesanannya.",
     processingTime: "3 - 4 Jam",
     serviceArea: ["Kota Malang", "Kabupaten Malang", "Kota Batu"]
   },
@@ -673,7 +673,7 @@ export const PRODUCTS: Product[] = [
     imageHeight: 1385,
     description: "Karangan bunga papan ucapan selamat & sukses paket 1,3 juta dengan desain mewah, rangkaian bunga segar melimpah ruah, dan tampilan elegan untuk grand opening atau perayaan di Malang Raya.",
     featured: false,
-    whatsappText: "Halo Floragate, saya ingin pesan karangan Bunga Papan Congratulations Malang 008 (BP-CG-09). Mohon info harga detail dan format pemesanannya.",
+    whatsappText: "Halo Zaloma Florist, saya ingin pesan karangan Bunga Papan Congratulations Malang 008 (BP-CG-09). Mohon info harga detail dan format pemesanannya.",
     processingTime: "3 - 4 Jam",
     serviceArea: ["Kota Malang", "Kabupaten Malang", "Kota Batu"]
   },
@@ -694,7 +694,7 @@ export const PRODUCTS: Product[] = [
     imageHeight: 1200,
     description: "Standing flower paket 675 ribu dengan rangkaian bunga berdiri yang rapi, elegan, dan cocok untuk acara formal, pernikahan, grand opening, maupun ungkapan simpati di area Malang Raya.",
     featured: true,
-    whatsappText: "Halo Floragate, saya ingin pesan Standing Flower - Paket 725 (SF-01). Mohon info harga detail dan format pemesanannya.",
+    whatsappText: "Halo Zaloma Florist, saya ingin pesan Standing Flower - Paket 725 (SF-01). Mohon info harga detail dan format pemesanannya.",
     processingTime: "2 - 3 Jam",
     serviceArea: ["Kota Malang", "Kabupaten Malang", "Kota Batu"]
   },
@@ -712,7 +712,7 @@ export const PRODUCTS: Product[] = [
     imageHeight: 1200,
     description: "Standing flower paket 935 ribu dengan tampilan lebih penuh dan premium. Rangkaian ini cocok untuk kebutuhan acara penting, ucapan selamat, maupun dekorasi formal yang membutuhkan kesan mewah.",
     featured: false,
-    whatsappText: "Halo Floragate, saya ingin pesan Standing Flower - Paket 1150 (SF-02). Mohon info harga detail dan format pemesanannya.",
+    whatsappText: "Halo Zaloma Florist, saya ingin pesan Standing Flower - Paket 1150 (SF-02). Mohon info harga detail dan format pemesanannya.",
     processingTime: "3 Jam",
     serviceArea: ["Kota Malang", "Kabupaten Malang", "Kota Batu"]
   },
@@ -730,7 +730,7 @@ export const PRODUCTS: Product[] = [
     imageHeight: 1402,
     description: "Standing flower paket 835 ribu dengan susunan bunga berdiri segar dan elegan, sangat pas untuk ungkapan ucapan selamat, grand opening, acara formal, maupun belasungkawa di Malang Raya.",
     featured: false,
-    whatsappText: "Halo Floragate, saya ingin pesan Standing Flower - Paket 835 (SF-03). Mohon info harga detail dan format pemesanannya.",
+    whatsappText: "Halo Zaloma Florist, saya ingin pesan Standing Flower - Paket 835 (SF-03). Mohon info harga detail dan format pemesanannya.",
     processingTime: "2 - 3 Jam",
     serviceArea: ["Kota Malang", "Kabupaten Malang", "Kota Batu"]
   },
@@ -748,7 +748,7 @@ export const PRODUCTS: Product[] = [
     imageHeight: 1402,
     description: "Standing flower paket 1,175 juta dengan tampilan mewah, rangkaian bunga segar berkualitas tinggi yang menonjol untuk dekorasi acara penting dan ucapan selamat bergengsi.",
     featured: false,
-    whatsappText: "Halo Floragate, saya ingin pesan Standing Flower - Paket 1175 (SF-04). Mohon info harga detail dan format pemesanannya.",
+    whatsappText: "Halo Zaloma Florist, saya ingin pesan Standing Flower - Paket 1175 (SF-04). Mohon info harga detail dan format pemesanannya.",
     processingTime: "2 - 3 Jam",
     serviceArea: ["Kota Malang", "Kabupaten Malang", "Kota Batu"]
   },
@@ -766,7 +766,7 @@ export const PRODUCTS: Product[] = [
     imageHeight: 1402,
     description: "Standing flower paket 1,25 juta dengan komposisi bunga berlimpah dan paduan warna harmonis, menciptakan kesan megah untuk ucapan peresmian atau resepsi di Malang.",
     featured: false,
-    whatsappText: "Halo Floragate, saya ingin pesan Standing Flower - Paket 1250 (SF-05). Mohon info harga detail dan format pemesanannya.",
+    whatsappText: "Halo Zaloma Florist, saya ingin pesan Standing Flower - Paket 1250 (SF-05). Mohon info harga detail dan format pemesanannya.",
     processingTime: "2 - 3 Jam",
     serviceArea: ["Kota Malang", "Kabupaten Malang", "Kota Batu"]
   },
@@ -784,7 +784,7 @@ export const PRODUCTS: Product[] = [
     imageHeight: 1402,
     description: "Standing flower premium paket 1,5 juta dengan kombinasi eksklusif bunga mawar dan lily segar pilihan. Tampilan mewah dan harum semerbak, sangat istimewa untuk momen spesial Anda.",
     featured: false,
-    whatsappText: "Halo Floragate, saya ingin pesan Standing Flower - Paket 1500 Kombinasi Mawar & Lily (SF-06). Mohon info harga detail dan format pemesanannya.",
+    whatsappText: "Halo Zaloma Florist, saya ingin pesan Standing Flower - Paket 1500 Kombinasi Mawar & Lily (SF-06). Mohon info harga detail dan format pemesanannya.",
     processingTime: "2 - 3 Jam",
     serviceArea: ["Kota Malang", "Kabupaten Malang", "Kota Batu"]
   },
@@ -802,7 +802,7 @@ export const PRODUCTS: Product[] = [
     imageHeight: 1448,
     description: "Standing flower eksklusif paket 1,755 juta dengan desain megah susunan bunga segar melimpah ruah dan berkelas tinggi untuk ucapan prestisius di area Malang Raya.",
     featured: false,
-    whatsappText: "Halo Floragate, saya ingin pesan Standing Flower - Paket 1755 (SF-07). Mohon info harga detail dan format pemesanannya.",
+    whatsappText: "Halo Zaloma Florist, saya ingin pesan Standing Flower - Paket 1755 (SF-07). Mohon info harga detail dan format pemesanannya.",
     processingTime: "3 - 4 Jam",
     serviceArea: ["Kota Malang", "Kabupaten Malang", "Kota Batu"]
   },
@@ -822,7 +822,7 @@ export const PRODUCTS: Product[] = [
     imageHeight: 1402,
     description: "Buket snack dan bunga segar kombinasi Oreo Soft Cake, wafer cokelat, bunga mawar peach, serta filler bunga aster cantik. Pilihan kado manis dan terjangkau untuk wisuda, ulang tahun, atau perayaan spesial di Malang.",
     featured: true,
-    whatsappText: "Halo Floragate, saya ingin pesan Hand Bouquet Snack Oreo & Beng-Beng - Paket 125 (HB-01). Mohon info ketersediaan bunga dan format pemesanannya.",
+    whatsappText: "Halo Zaloma Florist, saya ingin pesan Hand Bouquet Snack Oreo & Beng-Beng - Paket 125 (HB-01). Mohon info ketersediaan bunga dan format pemesanannya.",
     processingTime: "2 - 3 Jam",
     serviceArea: ["Kota Malang", "Kabupaten Malang", "Kota Batu"]
   },
@@ -840,7 +840,7 @@ export const PRODUCTS: Product[] = [
     imageHeight: 1402,
     description: "Buket snack dan bunga perpaduan Lemonilo Brownies Crispy, mawar merah segar, krisan putih, dan sentuhan wrapping ungu anggun dengan pita satin. Cocok untuk hadiah wisuda dan kado sahabat di Malang.",
     featured: false,
-    whatsappText: "Halo Floragate, saya ingin pesan Hand Bouquet Snack Lemonilo Crispy - Paket 130 (HB-02). Mohon info ketersediaan bunga dan format pemesanannya.",
+    whatsappText: "Halo Zaloma Florist, saya ingin pesan Hand Bouquet Snack Lemonilo Crispy - Paket 130 (HB-02). Mohon info ketersediaan bunga dan format pemesanannya.",
     processingTime: "2 - 3 Jam",
     serviceArea: ["Kota Malang", "Kabupaten Malang", "Kota Batu"]
   },
@@ -858,7 +858,7 @@ export const PRODUCTS: Product[] = [
     imageHeight: 1402,
     description: "Buket snack Choki-Choki dan Oreo dipadukan dengan bunga mawar putih segar serta aster ungu dalam balutan kertas wrapping merah hitam yang tegas dan elegan untuk momen kelulusan dan hari spesial.",
     featured: false,
-    whatsappText: "Halo Floragate, saya ingin pesan Hand Bouquet Snack Choki Choki - Paket 145 (HB-03). Mohon info ketersediaan bunga dan format pemesanannya.",
+    whatsappText: "Halo Zaloma Florist, saya ingin pesan Hand Bouquet Snack Choki Choki - Paket 145 (HB-03). Mohon info ketersediaan bunga dan format pemesanannya.",
     processingTime: "2 - 3 Jam",
     serviceArea: ["Kota Malang", "Kabupaten Malang", "Kota Batu"]
   },
@@ -876,7 +876,7 @@ export const PRODUCTS: Product[] = [
     imageHeight: 1402,
     description: "Buket bunga mawar merah segar berpadu dengan limpahan bunga aster pink cantik dan wrapping putih aksen emas. Pilihan klasik nan romantis untuk kado anniversary, ulang tahun, atau wisuda di Malang.",
     featured: true,
-    whatsappText: "Halo Floragate, saya ingin pesan Hand Bouquet Mawar Merah & Aster Pink - Paket 150 (HB-04). Mohon info ketersediaan bunga dan format pemesanannya.",
+    whatsappText: "Halo Zaloma Florist, saya ingin pesan Hand Bouquet Mawar Merah & Aster Pink - Paket 150 (HB-04). Mohon info ketersediaan bunga dan format pemesanannya.",
     processingTime: "2 - 3 Jam",
     serviceArea: ["Kota Malang", "Kabupaten Malang", "Kota Batu"]
   },
@@ -894,7 +894,7 @@ export const PRODUCTS: Product[] = [
     imageHeight: 1402,
     description: "Buket snack Nabati cokelat, Oreo, dan wafer berpadu dengan mawar putih segar dan aster ungu dalam balutan wrapping soft pink manis berpita lavender. Hadiah wisuda favorit yang meriah dan lezat.",
     featured: false,
-    whatsappText: "Halo Floragate, saya ingin pesan Hand Bouquet Snack Nabati & Mawar Putih - Paket 150 (HB-05). Mohon info ketersediaan bunga dan format pemesanannya.",
+    whatsappText: "Halo Zaloma Florist, saya ingin pesan Hand Bouquet Snack Nabati & Mawar Putih - Paket 150 (HB-05). Mohon info ketersediaan bunga dan format pemesanannya.",
     processingTime: "2 - 3 Jam",
     serviceArea: ["Kota Malang", "Kabupaten Malang", "Kota Batu"]
   },
@@ -912,7 +912,7 @@ export const PRODUCTS: Product[] = [
     imageHeight: 1402,
     description: "Buket bunga segar mawar soft pink premium berpadu bunga chamomile manis dalam balutan wrapping putih bertekstur elegan dan pita satin pink. Desain estetik dan feminin untuk kado istimewa.",
     featured: false,
-    whatsappText: "Halo Floragate, saya ingin pesan Hand Bouquet Mawar Pink Pastel - Paket 155 (HB-06). Mohon info ketersediaan bunga dan format pemesanannya.",
+    whatsappText: "Halo Zaloma Florist, saya ingin pesan Hand Bouquet Mawar Pink Pastel - Paket 155 (HB-06). Mohon info ketersediaan bunga dan format pemesanannya.",
     processingTime: "2 - 3 Jam",
     serviceArea: ["Kota Malang", "Kabupaten Malang", "Kota Batu"]
   },
@@ -930,7 +930,7 @@ export const PRODUCTS: Product[] = [
     imageHeight: 1402,
     description: "Rangkaian mawar tiga warna (merah, putih, dan soft pink) dikelilingi bunga aster ungu segar dengan wrapping kuning lembut berbingkai emas. Tampil cerah, anggun, dan penuh kehangatan.",
     featured: false,
-    whatsappText: "Halo Floragate, saya ingin pesan Hand Bouquet Mawar Tiga Warna - Paket 175 (HB-07). Mohon info ketersediaan bunga dan format pemesanannya.",
+    whatsappText: "Halo Zaloma Florist, saya ingin pesan Hand Bouquet Mawar Tiga Warna - Paket 175 (HB-07). Mohon info ketersediaan bunga dan format pemesanannya.",
     processingTime: "2 - 3 Jam",
     serviceArea: ["Kota Malang", "Kabupaten Malang", "Kota Batu"]
   },
@@ -948,7 +948,7 @@ export const PRODUCTS: Product[] = [
     imageHeight: 1402,
     description: "Buket bunga mawar pastel rimbun perpaduan warna peach, pink, dan putih dengan hamparan aster ungu segar serta wrapping bertekstur mewah berpita kuning cerah. Rangkaian eksklusif untuk momen paling berharga.",
     featured: true,
-    whatsappText: "Halo Floragate, saya ingin pesan Hand Bouquet Mawar Pastel Mewah - Paket 200 (HB-08). Mohon info ketersediaan bunga dan format pemesanannya.",
+    whatsappText: "Halo Zaloma Florist, saya ingin pesan Hand Bouquet Mawar Pastel Mewah - Paket 200 (HB-08). Mohon info ketersediaan bunga dan format pemesanannya.",
     processingTime: "2 - 3 Jam",
     serviceArea: ["Kota Malang", "Kabupaten Malang", "Kota Batu"]
   },
@@ -968,7 +968,7 @@ export const PRODUCTS: Product[] = [
     imageHeight: 1200,
     description: "Paper flower paket 575 ribu dengan detail handmade yang rapi and tahan lama. Cocok untuk dekorasi acara, kado spesial, wisuda, lamaran, atau pajangan cantik di rumah.",
     featured: true,
-    whatsappText: "Halo Floragate, saya ingin pesan Paper Flower - Paket 600 (PF-01). Mohon info harga detail dan format pemesanannya.",
+    whatsappText: "Halo Zaloma Florist, saya ingin pesan Paper Flower - Paket 600 (PF-01). Mohon info harga detail dan format pemesanannya.",
     processingTime: "1 - 2 Hari",
     serviceArea: ["Kota Malang", "Kabupaten Malang", "Kota Batu"]
   },
@@ -986,7 +986,7 @@ export const PRODUCTS: Product[] = [
     imageHeight: 1200,
     description: "Paper flower paket 645 ribu dengan komposisi lebih berisi untuk dekorasi, kado spesial, backdrop mini, atau pajangan yang ingin terlihat lebih menonjol dan elegan.",
     featured: false,
-    whatsappText: "Halo Floragate, saya ingin pesan Paper Flower - Paket 700 (PF-02). Mohon info harga detail dan format pemesanannya.",
+    whatsappText: "Halo Zaloma Florist, saya ingin pesan Paper Flower - Paket 700 (PF-02). Mohon info harga detail dan format pemesanannya.",
     processingTime: "2 - 3 Hari",
     serviceArea: ["Kota Malang", "Kabupaten Malang", "Kota Batu"]
   },
@@ -1006,7 +1006,7 @@ export const PRODUCTS: Product[] = [
     imageHeight: 1200,
     description: "Bunga meja paket 700 ribu dengan rangkaian segar yang cocok untuk meja tamu, lobby, meja resepsionis, rapat, atau dekorasi acara formal di area Malang.",
     featured: true,
-    whatsappText: "Halo Floragate, saya ingin pesan Bunga Meja - Paket 700 (BM-01). Mohon info harga detail dan format pemesanannya.",
+    whatsappText: "Halo Zaloma Florist, saya ingin pesan Bunga Meja - Paket 700 (BM-01). Mohon info harga detail dan format pemesanannya.",
     processingTime: "2 - 3 Jam",
     serviceArea: ["Kota Malang", "Kabupaten Malang", "Kota Batu"]
   },
@@ -1024,7 +1024,7 @@ export const PRODUCTS: Product[] = [
     imageHeight: 1200,
     description: "Bunga meja paket 950 ribu dengan susunan bunga lebih penuh dan premium. Pilihan pas untuk dekorasi meja VIP, lobby, ruang meeting, resepsi, atau acara spesial.",
     featured: false,
-    whatsappText: "Halo Floragate, saya ingin pesan Bunga Meja - Paket 950 (BM-02). Mohon info harga detail dan format pemesanannya.",
+    whatsappText: "Halo Zaloma Florist, saya ingin pesan Bunga Meja - Paket 950 (BM-02). Mohon info harga detail dan format pemesanannya.",
     processingTime: "2 - 3 Jam",
     serviceArea: ["Kota Malang", "Kabupaten Malang", "Kota Batu"]
   },
@@ -1042,7 +1042,7 @@ export const PRODUCTS: Product[] = [
     imageHeight: 1448,
     description: "Bunga meja paket 725 ribu dengan rangkaian bunga segar cantik dan vas rapi, cocok untuk dekorasi meja kantor, meja resepsionis, maupun ruang tamu di Malang.",
     featured: false,
-    whatsappText: "Halo Floragate, saya ingin pesan Bunga Meja - Paket 725 (BM-03). Mohon info harga detail dan format pemesanannya.",
+    whatsappText: "Halo Zaloma Florist, saya ingin pesan Bunga Meja - Paket 725 (BM-03). Mohon info harga detail dan format pemesanannya.",
     processingTime: "2 - 3 Jam",
     serviceArea: ["Kota Malang", "Kabupaten Malang", "Kota Batu"]
   },
@@ -1060,7 +1060,7 @@ export const PRODUCTS: Product[] = [
     imageHeight: 1402,
     description: "Bunga meja paket 865 ribu dengan tata susunan bunga segar elegan dan anggun, ideal untuk dekorasi meja ruang meeting, meja VIP, atau ucapan selamat di Malang.",
     featured: false,
-    whatsappText: "Halo Floragate, saya ingin pesan Bunga Meja - Paket 865 (BM-04). Mohon info harga detail dan format pemesanannya.",
+    whatsappText: "Halo Zaloma Florist, saya ingin pesan Bunga Meja - Paket 865 (BM-04). Mohon info harga detail dan format pemesanannya.",
     processingTime: "2 - 3 Jam",
     serviceArea: ["Kota Malang", "Kabupaten Malang", "Kota Batu"]
   },
@@ -1078,7 +1078,7 @@ export const PRODUCTS: Product[] = [
     imageHeight: 1448,
     description: "Bunga meja premium paket 875 ribu dengan paduan bunga pilihan yang segar, penuh warna, dan bernuansa mewah untuk memperindah ruangan atau acara spesial di Malang.",
     featured: false,
-    whatsappText: "Halo Floragate, saya ingin pesan Bunga Meja - Paket 875 (BM-05). Mohon info harga detail dan format pemesanannya.",
+    whatsappText: "Halo Zaloma Florist, saya ingin pesan Bunga Meja - Paket 875 (BM-05). Mohon info harga detail dan format pemesanannya.",
     processingTime: "2 - 3 Jam",
     serviceArea: ["Kota Malang", "Kabupaten Malang", "Kota Batu"]
   },
@@ -1098,7 +1098,7 @@ export const PRODUCTS: Product[] = [
     imageHeight: 1402,
     description: "Bunga ucapan tanaman hidup paket 875 ribu berupa pohon ucapan bibit buah dalam pot cantik berhias pita perayaan dan kartu ucapan kustom. Alternatif karangan bibit tanaman yang ramah lingkungan, indah, dan tahan lama untuk ucapan selamat & sukses di Malang Raya.",
     featured: true,
-    whatsappText: "Halo Floragate, saya ingin pesan Pohon Ucapan Tanbulampot - Paket 875 (TBL-01). Mohon info ketersediaan dan format pemesanannya.",
+    whatsappText: "Halo Zaloma Florist, saya ingin pesan Pohon Ucapan Tanbulampot - Paket 875 (TBL-01). Mohon info ketersediaan dan format pemesanannya.",
     processingTime: "1 - 2 Hari",
     serviceArea: ["Kota Malang", "Kabupaten Malang", "Kota Batu"]
   },
@@ -1116,7 +1116,7 @@ export const PRODUCTS: Product[] = [
     imageHeight: 1402,
     description: "Pohon ucapan tanaman hidup paket 1,25 juta dengan pohon buah yang sudah berbuah lebat dalam pot eksklusif lengkap dengan pita satin mewah dan standing greeting card. Hadiah karangan bibit tanaman istimewa yang melambangkan kemakmuran dan kesuksesan untuk peresmian kantor, grand opening, atau momen prestisius di Malang.",
     featured: false,
-    whatsappText: "Halo Floragate, saya ingin pesan Pohon Ucapan Tanbulampot Berbuah - Paket 1250 (TBL-02). Mohon info ketersediaan dan format pemesanannya.",
+    whatsappText: "Halo Zaloma Florist, saya ingin pesan Pohon Ucapan Tanbulampot Berbuah - Paket 1250 (TBL-02). Mohon info ketersediaan dan format pemesanannya.",
     processingTime: "1 - 2 Hari",
     serviceArea: ["Kota Malang", "Kabupaten Malang", "Kota Batu"]
   },
@@ -1134,7 +1134,7 @@ export const PRODUCTS: Product[] = [
     imageHeight: 1402,
     description: "Bunga ucapan tanaman hidup paket 835 ribu berupa pohon ucapan bibit buah dalam pot cantik berhias pita perayaan dan kartu ucapan kustom. Alternatif karangan bibit tanaman yang ramah lingkungan, indah, dan tahan lama untuk ucapan selamat & sukses di Malang.",
     featured: false,
-    whatsappText: "Halo Floragate, saya ingin pesan Pohon Ucapan Tanbulampot - Paket 835 (TBL-03). Mohon info ketersediaan dan format pemesanannya.",
+    whatsappText: "Halo Zaloma Florist, saya ingin pesan Pohon Ucapan Tanbulampot - Paket 835 (TBL-03). Mohon info ketersediaan dan format pemesanannya.",
     processingTime: "1 - 2 Hari",
     serviceArea: ["Kota Malang", "Kabupaten Malang", "Kota Batu"]
   },
@@ -1152,7 +1152,7 @@ export const PRODUCTS: Product[] = [
     imageHeight: 1402,
     description: "Bunga ucapan tanaman hidup paket 845 ribu berupa pohon ucapan bibit buah dalam pot eksklusif berhias pita satin perayaan dan greeting card kustom. Karangan bibit tanaman ramah lingkungan dan elegan untuk peresmian kantor atau kado spesial di Malang.",
     featured: false,
-    whatsappText: "Halo Floragate, saya ingin pesan Pohon Ucapan Tanbulampot - Paket 845 (TBL-04). Mohon info ketersediaan dan format pemesanannya.",
+    whatsappText: "Halo Zaloma Florist, saya ingin pesan Pohon Ucapan Tanbulampot - Paket 845 (TBL-04). Mohon info ketersediaan dan format pemesanannya.",
     processingTime: "1 - 2 Hari",
     serviceArea: ["Kota Malang", "Kabupaten Malang", "Kota Batu"]
   },
@@ -1170,7 +1170,7 @@ export const PRODUCTS: Product[] = [
     imageHeight: 1448,
     description: "Pohon ucapan tanaman hidup premium paket 1,165 juta dengan bibit tanaman buah kualitas tinggi dalam pot eksklusif lengkap dengan pita perayaan dan kartu ucapan kustom. Pilihan karangan bunga tanaman hidup mewah dan tahan lama untuk acara prestisius di Malang.",
     featured: false,
-    whatsappText: "Halo Floragate, saya ingin pesan Pohon Ucapan Tanbulampot - Paket 1165 (TBL-05). Mohon info ketersediaan dan format pemesanannya.",
+    whatsappText: "Halo Zaloma Florist, saya ingin pesan Pohon Ucapan Tanbulampot - Paket 1165 (TBL-05). Mohon info ketersediaan dan format pemesanannya.",
     processingTime: "1 - 2 Hari",
     serviceArea: ["Kota Malang", "Kabupaten Malang", "Kota Batu"]
   }
