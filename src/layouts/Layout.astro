@@ -6,6 +6,7 @@ import Footer from '../components/Footer.astro';
 import Testimonials from '../components/Testimonials.astro';
 import CustomerGallery from '../components/CustomerGallery.astro';
 import FloatingWhatsApp from '../components/FloatingWhatsApp.astro';
+import SeoInfoStrip from '../components/SeoInfoStrip.astro';
 import { withBase } from '../utils/paths';
 import { SITE_DOMAIN, WHATSAPP_NUMBER, INSTAGRAM_URL } from '../data/constants';
 
@@ -159,6 +160,7 @@ const finalSchema = schema || defaultSchema;
     </main>
     {showTestimonials && <Testimonials />}
     {showTestimonials && <CustomerGallery />}
+    <SeoInfoStrip />
     <Footer />
     <FloatingWhatsApp />
     <script>
