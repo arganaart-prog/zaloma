@@ -8,13 +8,13 @@ import { WHATSAPP_NUMBER } from '../data/constants';
 const promoSlides = [
   {
     id: 'promo-gratis-ongkir',
-    badge: 'Gratis Ongkir Â· Malang Kota',
+    badge: 'Gratis Ongkir - Malang Kota',
     headline: 'Pesan Bunga Sekarang, Sampai Hari Ini Juga',
     description: 'Bunga papan, hand bouquet, standing flower. Dikirim gratis ke seluruh Malang Kota. Bisa pesan dadakan.',
 
     mobileImage: withBase('/images/banner/promo%20banner/1.webp'),
     desktopImage: withBase('/images/banner/promo%20banner/2.webp'),
-    alt: 'Promo Spesial Gratis Ongkir ke Malang Kota â€“ Zaloma Florist',
+    alt: 'Promo Spesial Gratis Ongkir ke Malang Kota - Zaloma Florist',
     ctaPrimary: {
       label: 'Pesan Sekarang',
       href: `https://wa.me/${WHATSAPP_NUMBER}?text=${encodeURIComponent('Halo Zaloma Florist, saya ingin pesan bunga dengan Promo Spesial Gratis Ongkir Malang Kota.')}`,
@@ -28,13 +28,13 @@ const promoSlides = [
   },
   {
     id: 'promo-7-bunga-papan',
-    badge: 'Paket Hemat Â· Acara Besar',
+    badge: 'Paket Hemat - Acara Besar',
     headline: 'Pesan 7 Bunga Papan, Gratis Ongkir se-Malang Raya',
     description: 'Cocok buat pernikahan, wisuda, dan grand opening. Makin banyak pesanan, harga makin hemat.',
 
     mobileImage: withBase('/images/banner/promo%20banner/3.webp'),
     desktopImage: withBase('/images/banner/promo%20banner/3.webp'),
-    alt: 'Promo Spesial Pesan 7 Bunga Papan Gratis Ongkir Seluruh Malang Raya â€“ Zaloma Florist',
+    alt: 'Promo Spesial Pesan 7 Bunga Papan Gratis Ongkir Seluruh Malang Raya - Zaloma Florist',
     ctaPrimary: {
       label: 'Tanya via WhatsApp',
       href: `https://wa.me/${WHATSAPP_NUMBER}?text=${encodeURIComponent('Halo Zaloma Florist, saya ingin info Promo Pesan 7 Bunga Papan Gratis Ongkir ke Seluruh Malang Raya.')}`,
@@ -48,13 +48,13 @@ const promoSlides = [
   },
   {
     id: 'promo-bunga-papan-400rb',
-    badge: 'Mulai 400 Rb Â· 3 Jam Selesai',
+    badge: 'Mulai 400 Ribu - Siap 3 Jam',
     headline: 'Bunga Papan Mulai 400 Ribu, Selesai 3 Jam',
     description: 'Pernikahan, duka cita, wisuda, hingga grand opening. Pengerjaan cepat, difoto sebelum dikirim.',
 
     mobileImage: withBase('/images/banner/promo%20banner/4.webp'),
     desktopImage: withBase('/images/banner/promo%20banner/4.webp'),
-    alt: 'Bunga Papan Mulai 400 Ribuan â€“ Zaloma Florist Malang',
+    alt: 'Bunga Papan Mulai 400 Ribuan - Zaloma Florist Malang',
     ctaPrimary: {
       label: 'Lihat Desain Papan',
       href: withBase('/katalog/?search=bunga%20papan'),
@@ -455,36 +455,36 @@ const displaySlides = promoSlides.map((slide, idx) => ({
   .hb-m-badge {
     display: inline-flex;
     align-items: center;
-    font-size: 0.66rem;
+    font-size: 0.74rem;
     font-weight: 700;
-    letter-spacing: 0.04em;
+    letter-spacing: 0.02em;
     color: #893144;
-    background: rgba(155, 27, 48, 0.07);
-    border: 1px solid rgba(155, 27, 48, 0.15);
+    background: #FAF0F1;
+    border: 1px solid rgba(137, 49, 68, 0.28);
     border-radius: 999px;
-    padding: 0.18rem 0.6rem;
-    margin-bottom: 0.5rem;
+    padding: 0.24rem 0.72rem;
+    margin-bottom: 0.55rem;
     width: fit-content;
   }
 
   .hb-m-title {
     font-family: var(--font-serif, "Playfair Display", Georgia, serif);
-    font-size: clamp(1.1rem, 5vw, 1.45rem);
+    font-size: clamp(1.15rem, 5.2vw, 1.45rem);
     font-weight: 800;
-    color: #18211b;
-    line-height: 1.2;
-    margin: 0 0 0.4rem;
-    letter-spacing: -0.01em;
+    color: #1E1014;
+    line-height: 1.25;
+    margin: 0 0 0.45rem;
+    letter-spacing: -0.015em;
   }
 
   .hb-m-desc {
-    font-size: 0.81rem;
-    color: #556056;
-    line-height: 1.5;
-    margin: 0 0 0.8rem;
+    font-size: 0.86rem;
+    color: #334155;
+    line-height: 1.55;
+    margin: 0 0 0.95rem;
     display: -webkit-box;
     -webkit-box-orient: vertical;
-    -webkit-line-clamp: 2;
+    -webkit-line-clamp: 3;
     overflow: hidden;
   }
 

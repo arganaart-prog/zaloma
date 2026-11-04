@@ -32,6 +32,7 @@ const defaultSchema = {
   "description": "Zaloma Florist adalah toko bunga Malang murah dan berkualitas untuk bunga papan, standing flower, hand bouquet, dan rangkaian bunga segar dengan layanan cepat.",
   "slogan": "Florist Terbaik di Malang, 11 Tahun Pengalaman",
   "image": `${SITE_DOMAIN}/images/logo/zaloma-logo.webp`,
+  "logo": `${SITE_DOMAIN}/favicon-192.png`,
   "@id": `${SITE_DOMAIN}/#florist`,
   "url": SITE_DOMAIN,
   "telephone": `+${WHATSAPP_NUMBER}`,
@@ -97,8 +98,12 @@ const finalSchema = schema || defaultSchema;
 
     <meta charset="UTF-8" />
     <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-    <link rel="icon" type="image/png" href={withBase('/favicon-transparent.png')} />
-    <link rel="apple-touch-icon" href={withBase('/favicon-transparent.png')} />
+    <link rel="icon" type="image/x-icon" href={withBase('/favicon.ico')} />
+    <link rel="icon" type="image/png" sizes="48x48" href={withBase('/favicon-48.png')} />
+    <link rel="icon" type="image/png" sizes="96x96" href={withBase('/favicon-96.png')} />
+    <link rel="icon" type="image/png" sizes="192x192" href={withBase('/favicon-192.png')} />
+    <link rel="apple-touch-icon" sizes="180x180" href={withBase('/apple-touch-icon.png')} />
+    <link rel="manifest" href={withBase('/site.webmanifest')} />
     <meta name="generator" content={Astro.generator} />
 
     <SEOHead
