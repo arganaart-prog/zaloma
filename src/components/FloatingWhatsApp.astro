@@ -1,0 +1,42 @@
+---
+import { WHATSAPP_NUMBER } from '../data/constants';
+
+interface Props {
+  message?: string;
+  label?: string;
+}
+
+const {
+  message = "Halo Zaloma Florist, saya ingin konsultasi dan pemesanan karangan bunga.",
+  label = "Chat WhatsApp"
+} = Astro.props;
+
+const waUrl = `https://wa.me/${WHATSAPP_NUMBER}?text=${encodeURIComponent(message)}`;
+---
+
+<aside aria-label="Tombol WhatsApp Melayang">
+  <a
+    href={waUrl}
+    target="_blank"
+    rel="noopener noreferrer"
+    class="fixed bottom-5 right-5 sm:bottom-6 sm:right-6 z-50 flex items-center gap-2.5 bg-[#25D366] hover:bg-[#20ba59] text-white p-3.5 sm:px-4 sm:py-3 rounded-full shadow-lg hover:shadow-2xl transition-all duration-300 hover:scale-105 active:scale-95 group focus:outline-hidden focus:ring-4 focus:ring-emerald-300/60"
+    aria-label="Hubungi Zaloma Florist via WhatsApp"
+    title="Hubungi Zaloma Florist via WhatsApp"
+  >
+    <!-- Pulse Indicator -->
+    <span class="relative flex h-2.5 w-2.5 shrink-0">
+      <span class="animate-ping absolute inline-flex h-full w-full rounded-full bg-white opacity-75"></span>
+      <span class="relative inline-flex rounded-full h-2.5 w-2.5 bg-white"></span>
+    </span>
+
+    <!-- WhatsApp Icon -->
+    <svg width="24" height="24" class="w-6 h-6 shrink-0 fill-current" viewBox="0 0 24 24" aria-hidden="true">
+      <path d="M.057 24l1.687-6.163c-1.041-1.804-1.588-3.849-1.587-5.946C.06 5.348 5.397.01 12.008.01c3.202.001 6.212 1.246 8.477 3.514 2.266 2.268 3.507 5.28 3.505 8.484-.004 6.657-5.34 11.997-11.953 11.997-2.005-.001-3.973-.502-5.724-1.455L0 24zm6.59-4.846c1.6.95 3.188 1.449 4.825 1.451 5.436 0 9.86-4.37 9.864-9.799.002-2.63-1.023-5.101-2.885-6.965C16.588 2.02 14.12 1.022 11.5 1.022c-5.438 0-9.863 4.372-9.867 9.802-.001 1.73.473 3.42 1.37 4.947l-.994 3.63 3.734-.967c1.554.84 3.123 1.282 4.304 1.282zm11.304-6.858c-.31-.155-1.838-.895-2.122-.997-.284-.102-.49-.153-.696.155-.205.308-.796.997-.975 1.199-.179.203-.359.227-.669.073-.31-.155-1.31-.476-2.494-1.516-.922-.811-1.545-1.812-1.725-2.12-.179-.31-.018-.478.137-.631.14-.139.31-.359.464-.539.155-.179.206-.308.31-.513.102-.206.051-.385-.026-.539-.077-.154-.696-1.649-.953-2.263-.25-.596-.503-.515-.69-.525l-.59-.01c-.206 0-.54.077-.822.385-.282.308-1.079 1.052-1.079 2.565 0 1.513 1.103 2.977 1.257 3.182.155.206 2.17 3.267 5.257 4.569.735.31 1.307.495 1.753.634.739.231 1.412.197 1.944.119.593-.087 1.838-.739 2.095-1.453.258-.713.258-1.325.18-1.453-.077-.128-.283-.205-.593-.36z" />
+    </svg>
+
+    <!-- Text Label -->
+    <span class="text-sm font-bold tracking-tight pr-1 hidden sm:inline-block">
+      {label}
+    </span>
+  </a>
+</aside>

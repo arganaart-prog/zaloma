@@ -5,6 +5,7 @@ import Navbar from '../components/Navbar.astro';
 import Footer from '../components/Footer.astro';
 import Testimonials from '../components/Testimonials.astro';
 import CustomerGallery from '../components/CustomerGallery.astro';
+import FloatingWhatsApp from '../components/FloatingWhatsApp.astro';
 import { withBase } from '../utils/paths';
 import { SITE_DOMAIN, WHATSAPP_NUMBER, INSTAGRAM_URL } from '../data/constants';
 
@@ -159,6 +160,7 @@ const finalSchema = schema || defaultSchema;
     {showTestimonials && <Testimonials />}
     {showTestimonials && <CustomerGallery />}
     <Footer />
+    <FloatingWhatsApp />
     <script>
       function initImageLoaders() {
         document.querySelectorAll('[data-image-loader]').forEach(function(image) {
