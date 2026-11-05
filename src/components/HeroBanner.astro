@@ -7,24 +7,16 @@ import { WHATSAPP_NUMBER } from '../data/constants';
 // Mobile: 1.webp (1080x776), 3.webp, 4.webp â€” Each slide is an independent rounded card (Image on top + text/buttons on bottom)
 const promoSlides = [
   {
-    id: 'promo-gratis-ongkir',
-    badge: 'Gratis Ongkir - Malang Kota',
-    headline: 'Pesan Bunga Sekarang, Sampai Hari Ini Juga',
-    description: 'Bunga papan, hand bouquet, standing flower. Dikirim gratis ke seluruh Malang Kota. Bisa pesan dadakan.',
+    id: 'promo-buka-24-jam',
+    badge: 'Buka 24 Jam Nonstop',
+    headline: 'Toko Bunga Malang Buka 24 Jam Nonstop',
+    description: 'Melayani pemesanan karangan bunga 24 jam sehari, 7 hari seminggu. Respon cepat, bunga segar berkualitas, dan siap kirim ke seluruh Malang.',
 
-    mobileImage: withBase('/images/banner/promo%20banner/1.webp?v=2'),
-    desktopImage: withBase('/images/banner/promo%20banner/2.webp?v=2'),
-    alt: 'Promo Spesial Gratis Ongkir ke Malang Kota - Zaloma Florist',
-    ctaPrimary: {
-      label: 'Pesan Sekarang',
-      href: `https://wa.me/${WHATSAPP_NUMBER}?text=${encodeURIComponent('Halo Zaloma Florist, saya ingin pesan bunga dengan Promo Spesial Gratis Ongkir Malang Kota.')}`,
-      external: true,
-    },
-    ctaSecondary: {
-      label: 'Lihat Katalog',
-      href: withBase('/katalog/'),
-      external: false,
-    },
+    mobileImage: withBase('/images/banner/promo%20banner/1.webp?v=3'),
+    desktopImage: withBase('/images/banner/promo%20banner/2.webp?v=3'),
+    alt: 'Toko Bunga Malang Buka 24 Jam Nonstop - Zaloma Florist',
+    ctaPrimary: null,
+    ctaSecondary: null,
   },
   {
     id: 'promo-7-bunga-papan',
@@ -101,11 +93,11 @@ const displaySlides = promoSlides.map((slide, idx) => ({
                 />
               )}
               <a
-                href={slide.ctaPrimary.href}
-                target={slide.ctaPrimary.external ? '_blank' : undefined}
-                rel={slide.ctaPrimary.external ? 'noopener noreferrer' : undefined}
-                class="hb-media-link"
-                tabindex={trackIndex === 0 ? '0' : '-1'}
+                href={slide.ctaPrimary ? slide.ctaPrimary.href : undefined}
+                target={slide.ctaPrimary?.external ? '_blank' : undefined}
+                rel={slide.ctaPrimary?.external ? 'noopener noreferrer' : undefined}
+                class={`hb-media-link${!slide.ctaPrimary ? ' is-static' : ''}`}
+                tabindex={trackIndex === 0 && slide.ctaPrimary ? '0' : '-1'}
                 aria-label={slide.headline}
               >
                 <picture class="hb-picture">
@@ -130,24 +122,26 @@ const displaySlides = promoSlides.map((slide, idx) => ({
               </a>
 
               <!-- Desktop CTA Buttons in Empty Space (Desktop only) -->
-              <div class="hb-desktop-cta" aria-hidden={trackIndex === 0 ? 'false' : 'true'}>
-                <div class="hb-btn-row">
-                  <a
-                    href={slide.ctaPrimary.href}
-                    target={slide.ctaPrimary.external ? '_blank' : undefined}
-                    rel={slide.ctaPrimary.external ? 'noopener noreferrer' : undefined}
-                    class="hb-btn hb-btn--primary"
-                    tabindex={trackIndex === 0 ? '0' : '-1'}
-                  >{slide.ctaPrimary.label}</a>
-                  <a
-                    href={slide.ctaSecondary.href}
-                    target={slide.ctaSecondary.external ? '_blank' : undefined}
-                    rel={slide.ctaSecondary.external ? 'noopener noreferrer' : undefined}
-                    class="hb-btn hb-btn--secondary"
-                    tabindex={trackIndex === 0 ? '0' : '-1'}
-                  >{slide.ctaSecondary.label}</a>
+              {slide.ctaPrimary && slide.ctaSecondary && (
+                <div class="hb-desktop-cta" aria-hidden={trackIndex === 0 ? 'false' : 'true'}>
+                  <div class="hb-btn-row">
+                    <a
+                      href={slide.ctaPrimary.href}
+                      target={slide.ctaPrimary.external ? '_blank' : undefined}
+                      rel={slide.ctaPrimary.external ? 'noopener noreferrer' : undefined}
+                      class="hb-btn hb-btn--primary"
+                      tabindex={trackIndex === 0 ? '0' : '-1'}
+                    >{slide.ctaPrimary.label}</a>
+                    <a
+                      href={slide.ctaSecondary.href}
+                      target={slide.ctaSecondary.external ? '_blank' : undefined}
+                      rel={slide.ctaSecondary.external ? 'noopener noreferrer' : undefined}
+                      class="hb-btn hb-btn--secondary"
+                      tabindex={trackIndex === 0 ? '0' : '-1'}
+                    >{slide.ctaSecondary.label}</a>
+                  </div>
                 </div>
-              </div>
+              )}
             </div>
 
             <!-- Mobile Card Body (Text & Buttons inside the card, slides WITH the card!) -->
@@ -155,22 +149,24 @@ const displaySlides = promoSlides.map((slide, idx) => ({
               <span class="hb-m-badge">{slide.badge}</span>
               <h2 class="hb-m-title">{slide.headline}</h2>
               <p class="hb-m-desc">{slide.description}</p>
-              <div class="hb-m-btns">
-                <a
-                  href={slide.ctaPrimary.href}
-                  target={slide.ctaPrimary.external ? '_blank' : undefined}
-                  rel={slide.ctaPrimary.external ? 'noopener noreferrer' : undefined}
-                  class="hb-m-btn hb-m-btn--primary"
-                  tabindex={trackIndex === 0 ? '0' : '-1'}
-                >{slide.ctaPrimary.label}</a>
-                <a
-                  href={slide.ctaSecondary.href}
-                  target={slide.ctaSecondary.external ? '_blank' : undefined}
-                  rel={slide.ctaSecondary.external ? 'noopener noreferrer' : undefined}
-                  class="hb-m-btn hb-m-btn--ghost"
-                  tabindex={trackIndex === 0 ? '0' : '-1'}
-                >{slide.ctaSecondary.label}</a>
-              </div>
+              {slide.ctaPrimary && slide.ctaSecondary && (
+                <div class="hb-m-btns">
+                  <a
+                    href={slide.ctaPrimary.href}
+                    target={slide.ctaPrimary.external ? '_blank' : undefined}
+                    rel={slide.ctaPrimary.external ? 'noopener noreferrer' : undefined}
+                    class="hb-m-btn hb-m-btn--primary"
+                    tabindex={trackIndex === 0 ? '0' : '-1'}
+                  >{slide.ctaPrimary.label}</a>
+                  <a
+                    href={slide.ctaSecondary.href}
+                    target={slide.ctaSecondary.external ? '_blank' : undefined}
+                    rel={slide.ctaSecondary.external ? 'noopener noreferrer' : undefined}
+                    class="hb-m-btn hb-m-btn--ghost"
+                    tabindex={trackIndex === 0 ? '0' : '-1'}
+                  >{slide.ctaSecondary.label}</a>
+                </div>
+              )}
             </div>
           </article>
         </div>
@@ -336,6 +332,10 @@ const displaySlides = promoSlides.map((slide, idx) => ({
     cursor: pointer;
   }
 
+  .hb-media-link.is-static {
+    cursor: default;
+  }
+
   .hb-picture {
     display: block;
     width: 100%;
@@ -486,6 +486,10 @@ const displaySlides = promoSlides.map((slide, idx) => ({
     -webkit-box-orient: vertical;
     -webkit-line-clamp: 3;
     overflow: hidden;
+  }
+
+  .hb-m-desc:last-child {
+    margin-bottom: 0.25rem;
   }
 
   .hb-m-btns {
