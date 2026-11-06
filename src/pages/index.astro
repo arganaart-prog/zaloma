@@ -1,4 +1,4 @@
-﻿---
+---
 import Layout from '../layouts/Layout.astro';
 import ProductCard from '../components/ProductCard.astro';
 import HeroBanner from '../components/HeroBanner.astro';
@@ -12,9 +12,12 @@ import BungaMejaSection from '../components/BungaMejaSection.astro';
 import TanbulampotSection from '../components/TanbulampotSection.astro';
 import { PRODUCTS } from '../data/products';
 import { WHATSAPP_NUMBER } from '../data/constants';
+import { SUPABASE_URL, SUPABASE_ANON_KEY } from '../data/supabaseConfig';
 import { withBase } from '../utils/paths';
 import { getRotatingHomeProducts } from '../utils/rotatingProducts';
 import { getHomeDisplayProducts } from '../utils/productHelpers';
+
+const INITIAL_SLUGS = PRODUCTS.map(p => p.slug);
 
 // Batasi 8 produk unggulan; rotasi setiap 3 hari
 const { activeProducts } = getRotatingHomeProducts(getHomeDisplayProducts(PRODUCTS), 8);
@@ -25,6 +28,8 @@ const description = "Zaloma Florist menyediakan bunga papan, hand bouquet, stand
 ---
 
 <Layout title={title} description={description}>
+  <!-- Supabase JS SDK for live home sync -->
+  <script is:inline src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
   <link
     slot="head"
     rel="preload"
@@ -959,6 +964,113 @@ const description = "Zaloma Florist menyediakan bunga papan, hand bouquet, stand
   </section>
 
 </Layout>
+
+<script define:vars={{ SUPABASE_URL, SUPABASE_ANON_KEY, WHATSAPP_NUMBER, INITIAL_SLUGS }}>
+  async function syncHomeProducts() {
+    try {
+      if (!window.supabase) return;
+      const client = window.supabase.createClient(SUPABASE_URL, SUPABASE_ANON_KEY);
+      const { data: allProducts, error } = await client
+        .from('products')
+        .select('*')
+        .order('created_at', { ascending: false });
+
+      if (error || !allProducts || allProducts.length === 0) return;
+
+      const cloudSlugMap = new Map(allProducts.map(p => [p.slug, p]));
+      const initialSlugs = new Set(INITIAL_SLUGS || []);
+
+      // 1. Sinkronisasi seluruh kartu produk di beranda (hapus yang dihapus, update harga & nama yang diedit)
+      document.querySelectorAll('a[href*="/produk/"]').forEach(link => {
+        const match = link.getAttribute('href').match(/\/produk\/([^\/]+)/);
+        if (!match || !match[1]) return;
+        const slug = match[1];
+
+        const card = link.closest('.product-card-shell, .category-product-card, .classic-product-card, article');
+        if (!card) return;
+
+        if (!cloudSlugMap.has(slug)) {
+          // Produk sudah dihapus di Supabase -> langsung buang dari layar!
+          card.remove();
+        } else {
+          // Produk masih aktif -> sinkronkan harga dan nama terkini
+          const p = cloudSlugMap.get(slug);
+          const priceEl = card.querySelector('.text-primary.font-extrabold, .font-extrabold.text-primary, [class*="font-extrabold"]');
+          if (priceEl && p.price_label) priceEl.textContent = p.price_label;
+
+          const titleEl = card.querySelector('h3');
+          if (titleEl && p.name && titleEl.textContent.trim() !== p.name) {
+            const linkInTitle = titleEl.querySelector('a');
+            if (linkInTitle) {
+              linkInTitle.textContent = p.name;
+            } else {
+              titleEl.textContent = p.name;
+            }
+          }
+
+          const imgEl = card.querySelector('img');
+          if (imgEl && p.image && !imgEl.src.includes(p.image)) {
+            imgEl.src = p.image;
+          }
+        }
+      });
+
+      // 2. Sinkronisasi Featured Products Slider di beranda
+      const featuredSlider = document.getElementById('featured-products-slider');
+      const featuredCloud = allProducts.filter(p => p.featured);
+      if (featuredSlider && featuredCloud.length > 0) {
+        featuredSlider.innerHTML = featuredCloud.slice(0, 8).map((p, index) => {
+          const isStatic = initialSlugs.has(p.slug);
+          const prodUrl = isStatic 
+            ? `/produk/${p.slug}/` 
+            : `https://wa.me/${WHATSAPP_NUMBER}?text=${encodeURIComponent(`Halo Zaloma Florist, saya ingin pesan ${p.name} (${p.price_label}).`)}`;
+          const detailLabel = isStatic ? 'Detail' : 'Pesan WA';
+          return `
+            <div class="classic-product-card product-card-shell group bg-white rounded-[14px] border border-soft-cream/70 overflow-hidden shadow-[0_1px_4px_rgba(15,23,42,0.03)]">
+              <a href="${prodUrl}" class="classic-product-image image-load-shell block relative aspect-[20/22] bg-slate-100 overflow-hidden">
+                <img
+                  src="${p.image}"
+                  alt="Foto ${p.name} Florist Malang"
+                  loading="${index < 2 ? 'eager' : 'lazy'}"
+                  class="relative z-0 object-cover object-top w-full h-full transition-transform duration-700 ease-out group-hover:scale-[1.012]"
+                />
+                <div class="classic-product-badges absolute top-3 left-3 z-10 flex gap-2">
+                  <span class="bg-secondary text-primary-dark text-[10px] tracking-wider uppercase font-semibold px-2.5 py-1 rounded-xs shadow-xs">
+                    Terpopuler
+                  </span>
+                </div>
+              </a>
+              <div class="classic-product-info p-4.5 sm:p-5 flex flex-col justify-between min-h-[190px] sm:min-h-[200px]">
+                <div>
+                  <p class="classic-product-category text-[11px] font-semibold tracking-wider text-slate-500 uppercase mb-1">${p.category_name || ''}</p>
+                  <h3 class="classic-product-title font-serif font-bold text-slate-800 line-clamp-2 leading-snug group-hover:text-primary transition-colors duration-200 text-base sm:text-lg">
+                    <a href="${prodUrl}">${p.name}</a>
+                  </h3>
+                </div>
+                <div class="classic-product-price-wrap pt-3.5 sm:pt-4">
+                  <div class="classic-product-price-box rounded-md border border-soft-cream/70 bg-accent-bg/70 p-2.5 sm:p-3">
+                    <p class="classic-product-price-label text-[10px] font-bold uppercase tracking-[0.18em] text-secondary-dark">Harga</p>
+                    <div class="classic-product-price-row mt-1.5 flex items-center justify-between gap-2.5 sm:gap-3">
+                      <p class="classic-product-price font-sans text-lg sm:text-xl font-extrabold leading-none text-primary">${p.price_label}</p>
+                      <a href="${prodUrl}" class="classic-product-detail inline-flex shrink-0 items-center justify-center rounded-full bg-primary px-3.5 py-2 text-[11px] font-bold text-white shadow-xs transition-colors duration-200 group-hover:bg-primary-dark">
+                        ${detailLabel}
+                      </a>
+                    </div>
+                  </div>
+                </div>
+              </div>
+            </div>
+          `;
+        }).join('');
+      }
+
+    } catch (err) {
+      console.warn('Gagal memuat produk beranda live:', err);
+    }
+  }
+
+  syncHomeProducts();
+</script>
 
 <style>
   /* â”€â”€ Hero Promo Section Wrapper â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€ */
