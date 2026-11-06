@@ -62,6 +62,16 @@ const description = "Bunga papan, hand bouquet, standing flower, dan tanaman uca
         </div>
       ))}
     </div>
+
+    <!-- Pagination Container -->
+    <div id="pagination-container" class="mt-14 flex flex-col sm:flex-row items-center justify-between gap-4 border-t border-soft-cream/80 pt-6">
+      <p id="pagination-info" class="text-xs text-slate-500 font-medium">
+        Menampilkan <span id="pag-start" class="font-bold text-slate-700">0</span> - <span id="pag-end" class="font-bold text-slate-700">0</span> dari <span id="pag-total" class="font-bold text-slate-700">0</span> produk
+      </p>
+      <div class="flex items-center gap-1.5" id="pagination-controls">
+        <!-- Rendered by JS -->
+      </div>
+    </div>
     
     <!-- Empty State -->
     <div id="empty-state" class="hidden text-center py-20 space-y-4">
@@ -87,6 +97,16 @@ const description = "Bunga papan, hand bouquet, standing flower, dan tanaman uca
   // Store active filters state
   let currentCategory = 'all';
   let currentSearch = searchParam;
+
+  // Pagination Settings
+  const ITEMS_PER_PAGE = 12;
+  let currentPage = 1;
+
+  const paginationContainer = document.getElementById('pagination-container');
+  const pagStartEl = document.getElementById('pag-start');
+  const pagEndEl = document.getElementById('pag-end');
+  const pagTotalEl = document.getElementById('pag-total');
+  const pagControls = document.getElementById('pagination-controls');
 
   // Sync navbar search fields and listen for live input
   const searchInputs = document.querySelectorAll('.search-input-field');
@@ -114,7 +134,7 @@ const description = "Bunga papan, hand bouquet, standing flower, dan tanaman uca
         }
         window.history.replaceState({}, '', newUrl.toString());
 
-        applyFilters();
+        applyFilters(true);
       });
     }
   });
@@ -124,14 +144,15 @@ const description = "Bunga papan, hand bouquet, standing flower, dan tanaman uca
   searchForms.forEach(form => {
     form.addEventListener('submit', (e) => {
       e.preventDefault();
-      applyFilters();
+      applyFilters(true);
     });
   });
 
-  function applyFilters() {
-    let visibleCount = 0;
-    // Query dynamically so both static and newly injected cloud products are filtered
+  function applyFilters(resetPage = false) {
+    if (resetPage) currentPage = 1;
+
     const currentItems = document.querySelectorAll('.product-item-wrapper');
+    const matchedItems = [];
 
     currentItems.forEach(item => {
       if (!(item instanceof HTMLElement)) return;
@@ -146,21 +167,120 @@ const description = "Bunga papan, hand bouquet, standing flower, dan tanaman uca
                             itemDesc.includes(currentSearch);
 
       if (matchesCategory && matchesSearch) {
-        item.classList.remove('hidden');
-        visibleCount++;
+        matchedItems.push(item);
       } else {
         item.classList.add('hidden');
       }
     });
 
-    // Show empty state if no matching products
-    if (emptyState) {
-      if (visibleCount === 0) {
-        emptyState.classList.remove('hidden');
+    const totalMatched = matchedItems.length;
+    const totalPages = Math.ceil(totalMatched / ITEMS_PER_PAGE) || 1;
+    if (currentPage > totalPages) currentPage = totalPages;
+
+    // Show only the slice of products for the active page
+    matchedItems.forEach((item, idx) => {
+      const pageIndex = Math.floor(idx / ITEMS_PER_PAGE) + 1;
+      if (pageIndex === currentPage) {
+        item.classList.remove('hidden');
       } else {
-        emptyState.classList.add('hidden');
+        item.classList.add('hidden');
+      }
+    });
+
+    // Handle Empty State & Pagination controls
+    if (totalMatched === 0) {
+      if (emptyState) emptyState.classList.remove('hidden');
+      if (paginationContainer) paginationContainer.classList.add('hidden');
+    } else {
+      if (emptyState) emptyState.classList.add('hidden');
+      if (paginationContainer) paginationContainer.classList.remove('hidden');
+
+      const startIdx = (currentPage - 1) * ITEMS_PER_PAGE + 1;
+      const endIdx = Math.min(currentPage * ITEMS_PER_PAGE, totalMatched);
+      if (pagStartEl) pagStartEl.textContent = startIdx;
+      if (pagEndEl) pagEndEl.textContent = endIdx;
+      if (pagTotalEl) pagTotalEl.textContent = totalMatched;
+
+      renderPaginationControls(totalPages);
+    }
+  }
+
+  function renderPaginationControls(totalPages) {
+    if (!pagControls) return;
+
+    if (totalPages <= 1) {
+      pagControls.innerHTML = '';
+      return;
+    }
+
+    let html = `
+      <button 
+        type="button" 
+        class="pag-nav-btn prev-btn inline-flex items-center justify-center w-8 h-8 rounded-lg border border-slate-200 text-xs font-bold transition-all ${currentPage === 1 ? 'opacity-40 cursor-not-allowed bg-slate-50 text-slate-300' : 'cursor-pointer hover:border-primary hover:text-primary text-slate-700 bg-white shadow-2xs'}"
+        ${currentPage === 1 ? 'disabled' : ''}
+        aria-label="Halaman Sebelumnya"
+      >
+        ‹
+      </button>
+    `;
+
+    for (let p = 1; p <= totalPages; p++) {
+      if (p === 1 || p === totalPages || (p >= currentPage - 1 && p <= currentPage + 1)) {
+        const isActive = p === currentPage;
+        html += `
+          <button 
+            type="button" 
+            data-page="${p}" 
+            class="pag-num-btn inline-flex items-center justify-center w-8 h-8 rounded-lg text-xs font-bold transition-all cursor-pointer ${isActive ? 'bg-primary text-white shadow-xs' : 'border border-slate-200 text-slate-700 bg-white hover:border-primary hover:text-primary shadow-2xs'}"
+          >
+            ${p}
+          </button>
+        `;
+      } else if (p === currentPage - 2 || p === currentPage + 2) {
+        html += `<span class="px-1 text-slate-400 text-xs font-bold">...</span>`;
       }
     }
+
+    html += `
+      <button 
+        type="button" 
+        class="pag-nav-btn next-btn inline-flex items-center justify-center w-8 h-8 rounded-lg border border-slate-200 text-xs font-bold transition-all ${currentPage === totalPages ? 'opacity-40 cursor-not-allowed bg-slate-50 text-slate-300' : 'cursor-pointer hover:border-primary hover:text-primary text-slate-700 bg-white shadow-2xs'}"
+        ${currentPage === totalPages ? 'disabled' : ''}
+        aria-label="Halaman Selanjutnya"
+      >
+        ›
+      </button>
+    `;
+
+    pagControls.innerHTML = html;
+
+    // Attach pagination button handlers
+    pagControls.querySelectorAll('.pag-num-btn').forEach(btn => {
+      btn.addEventListener('click', () => {
+        const targetPage = Number(btn.getAttribute('data-page'));
+        if (targetPage && targetPage !== currentPage) {
+          currentPage = targetPage;
+          applyFilters(false);
+          document.getElementById('products-grid')?.scrollIntoView({ behavior: 'smooth', block: 'start' });
+        }
+      });
+    });
+
+    pagControls.querySelector('.prev-btn')?.addEventListener('click', () => {
+      if (currentPage > 1) {
+        currentPage--;
+        applyFilters(false);
+        document.getElementById('products-grid')?.scrollIntoView({ behavior: 'smooth', block: 'start' });
+      }
+    });
+
+    pagControls.querySelector('.next-btn')?.addEventListener('click', () => {
+      if (currentPage < totalPages) {
+        currentPage++;
+        applyFilters(false);
+        document.getElementById('products-grid')?.scrollIntoView({ behavior: 'smooth', block: 'start' });
+      }
+    });
   }
 
   // Initial Run
@@ -180,8 +300,8 @@ const description = "Bunga papan, hand bouquet, standing flower, dan tanaman uca
       // 2. Set new category filter
       currentCategory = button.getAttribute('data-filter') || 'all';
 
-      // 3. Apply changes
-      applyFilters();
+      // 3. Apply changes and reset to page 1
+      applyFilters(true);
     });
   });
 

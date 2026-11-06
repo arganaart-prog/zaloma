@@ -236,6 +236,16 @@ const INITIAL_PRODUCTS = PRODUCTS.map(p => ({
               Memuat data produk...
             </div>
           </div>
+
+          <!-- Admin Pagination Container -->
+          <div id="admin-pagination-container" class="bg-white p-4 rounded-xl border border-slate-200/80 shadow-2xs flex flex-col sm:flex-row items-center justify-between gap-3">
+            <p id="admin-pag-info" class="text-xs text-slate-500 font-medium">
+              Menampilkan <span id="admin-pag-start" class="font-bold text-slate-700">0</span> - <span id="admin-pag-end" class="font-bold text-slate-700">0</span> dari <span id="admin-pag-total" class="font-bold text-slate-700">0</span> produk
+            </p>
+            <div class="flex items-center gap-1.5" id="admin-pag-controls">
+              <!-- Rendered by JS -->
+            </div>
+          </div>
         </section>
 
         <!-- ================= TAB 2: TAMBAH PRODUK BARU ================= -->
@@ -657,17 +667,28 @@ const INITIAL_PRODUCTS = PRODUCTS.map(p => ({
     }
   }
 
+  // Admin Pagination Settings
+  const ADMIN_PER_PAGE = 12;
+  let adminCurrentPage = 1;
+
   // Filter & Render Catalog Cards
   const searchInput = document.getElementById('search-filter-input');
   const categorySelect = document.getElementById('category-filter-select');
   const sortSelect = document.getElementById('sort-select');
 
-  searchInput.addEventListener('input', renderFilteredCatalog);
-  categorySelect.addEventListener('change', renderFilteredCatalog);
-  sortSelect.addEventListener('change', renderFilteredCatalog);
+  searchInput.addEventListener('input', () => renderFilteredCatalog(true));
+  categorySelect.addEventListener('change', () => renderFilteredCatalog(true));
+  sortSelect.addEventListener('change', () => renderFilteredCatalog(true));
 
-  function renderFilteredCatalog() {
+  function renderFilteredCatalog(resetPage = false) {
+    if (resetPage) adminCurrentPage = 1;
+
     const grid = document.getElementById('catalog-products-grid');
+    const pagContainer = document.getElementById('admin-pagination-container');
+    const pagStartEl = document.getElementById('admin-pag-start');
+    const pagEndEl = document.getElementById('admin-pag-end');
+    const pagTotalEl = document.getElementById('admin-pag-total');
+
     const query = searchInput.value.toLowerCase().trim();
     const cat = categorySelect.value;
     const sort = sortSelect.value;
@@ -686,17 +707,32 @@ const INITIAL_PRODUCTS = PRODUCTS.map(p => ({
       return new Date(b.created_at).getTime() - new Date(a.created_at).getTime();
     });
 
-    if (filtered.length === 0) {
+    const totalFiltered = filtered.length;
+    const totalPages = Math.ceil(totalFiltered / ADMIN_PER_PAGE) || 1;
+    if (adminCurrentPage > totalPages) adminCurrentPage = totalPages;
+
+    if (totalFiltered === 0) {
       grid.innerHTML = `
         <div class="col-span-full py-16 text-center text-slate-400 bg-white rounded-xl border border-dashed border-slate-200">
           <p class="font-serif font-bold text-base text-slate-700">Tidak ada produk yang cocok</p>
           <p class="text-xs text-slate-500 mt-1">Coba ubah kata kunci pencarian atau ganti pilihan kategori.</p>
         </div>
       `;
+      if (pagContainer) pagContainer.classList.add('hidden');
       return;
     }
 
-    grid.innerHTML = filtered.map(p => `
+    if (pagContainer) pagContainer.classList.remove('hidden');
+
+    const startIdx = (adminCurrentPage - 1) * ADMIN_PER_PAGE;
+    const endIdx = Math.min(startIdx + ADMIN_PER_PAGE, totalFiltered);
+    const paginated = filtered.slice(startIdx, endIdx);
+
+    if (pagStartEl) pagStartEl.textContent = startIdx + 1;
+    if (pagEndEl) pagEndEl.textContent = endIdx;
+    if (pagTotalEl) pagTotalEl.textContent = totalFiltered;
+
+    grid.innerHTML = paginated.map(p => `
       <div class="bg-white border border-slate-200/90 rounded-2xl overflow-hidden shadow-2xs hover:shadow-md hover:border-primary/40 transition-all flex flex-col justify-between group">
         <div class="relative aspect-4/3 bg-slate-100 overflow-hidden">
           <img src="${p.image}" alt="${p.name}" loading="lazy" class="w-full h-full object-cover group-hover:scale-102 transition-transform duration-300" />
@@ -744,8 +780,86 @@ const INITIAL_PRODUCTS = PRODUCTS.map(p => ({
       </div>
     `).join('');
 
-    // Attach Event Listeners
+    renderAdminPaginationControls(totalPages);
     attachActionListeners();
+  }
+
+  function renderAdminPaginationControls(totalPages) {
+    const pagControls = document.getElementById('admin-pag-controls');
+    if (!pagControls) return;
+
+    if (totalPages <= 1) {
+      pagControls.innerHTML = '';
+      return;
+    }
+
+    let html = `
+      <button 
+        type="button" 
+        class="admin-prev-btn inline-flex items-center justify-center w-8 h-8 rounded-lg border border-slate-200 text-xs font-bold transition-all ${adminCurrentPage === 1 ? 'opacity-40 cursor-not-allowed bg-slate-50 text-slate-300' : 'cursor-pointer hover:border-primary hover:text-primary text-slate-700 bg-white shadow-2xs'}"
+        ${adminCurrentPage === 1 ? 'disabled' : ''}
+        aria-label="Halaman Sebelumnya"
+      >
+        ‹
+      </button>
+    `;
+
+    for (let p = 1; p <= totalPages; p++) {
+      if (p === 1 || p === totalPages || (p >= adminCurrentPage - 1 && p <= adminCurrentPage + 1)) {
+        const isActive = p === adminCurrentPage;
+        html += `
+          <button 
+            type="button" 
+            data-page="${p}" 
+            class="admin-page-btn inline-flex items-center justify-center w-8 h-8 rounded-lg text-xs font-bold transition-all cursor-pointer ${isActive ? 'bg-primary text-white shadow-xs' : 'border border-slate-200 text-slate-700 bg-white hover:border-primary hover:text-primary shadow-2xs'}"
+          >
+            ${p}
+          </button>
+        `;
+      } else if (p === adminCurrentPage - 2 || p === adminCurrentPage + 2) {
+        html += `<span class="px-1 text-slate-400 text-xs font-bold">...</span>`;
+      }
+    }
+
+    html += `
+      <button 
+        type="button" 
+        class="admin-next-btn inline-flex items-center justify-center w-8 h-8 rounded-lg border border-slate-200 text-xs font-bold transition-all ${adminCurrentPage === totalPages ? 'opacity-40 cursor-not-allowed bg-slate-50 text-slate-300' : 'cursor-pointer hover:border-primary hover:text-primary text-slate-700 bg-white shadow-2xs'}"
+        ${adminCurrentPage === totalPages ? 'disabled' : ''}
+        aria-label="Halaman Selanjutnya"
+      >
+        ›
+      </button>
+    `;
+
+    pagControls.innerHTML = html;
+
+    pagControls.querySelectorAll('.admin-page-btn').forEach(btn => {
+      btn.addEventListener('click', () => {
+        const p = Number(btn.getAttribute('data-page'));
+        if (p && p !== adminCurrentPage) {
+          adminCurrentPage = p;
+          renderFilteredCatalog(false);
+          document.getElementById('catalog-products-grid')?.scrollIntoView({ behavior: 'smooth', block: 'start' });
+        }
+      });
+    });
+
+    pagControls.querySelector('.admin-prev-btn')?.addEventListener('click', () => {
+      if (adminCurrentPage > 1) {
+        adminCurrentPage--;
+        renderFilteredCatalog(false);
+        document.getElementById('catalog-products-grid')?.scrollIntoView({ behavior: 'smooth', block: 'start' });
+      }
+    });
+
+    pagControls.querySelector('.admin-next-btn')?.addEventListener('click', () => {
+      if (adminCurrentPage < totalPages) {
+        adminCurrentPage++;
+        renderFilteredCatalog(false);
+        document.getElementById('catalog-products-grid')?.scrollIntoView({ behavior: 'smooth', block: 'start' });
+      }
+    });
   }
 
   function attachActionListeners() {
