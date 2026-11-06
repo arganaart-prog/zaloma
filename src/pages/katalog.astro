@@ -201,11 +201,44 @@ const description = "Bunga papan, hand bouquet, standing flower, dan tanaman uca
       const grid = document.getElementById('products-grid');
       if (!grid) return;
 
-      // Insert cloud products at the top of the grid
+      // Index existing static cards by slug
+      const staticCardMap = new Map();
+      document.querySelectorAll('.product-item-wrapper').forEach(wrapper => {
+        const link = wrapper.querySelector('a[href*="/produk/"]');
+        if (link) {
+          const match = link.getAttribute('href').match(/\/produk\/([^\/]+)/);
+          if (match && match[1]) {
+            staticCardMap.set(match[1], wrapper);
+          }
+        }
+      });
+
+      // Synchronize: update existing static cards or prepend newly created ones
       cloudProducts.forEach((p) => {
         const waMsg = `Halo Zaloma Florist, saya ingin pesan ${p.name} (${p.price_label}).`;
         const waUrl = `https://wa.me/${WHATSAPP_NUMBER}?text=${encodeURIComponent(waMsg)}`;
 
+        // If card already exists statically, update its price & details in-place
+        if (staticCardMap.has(p.slug)) {
+          const existingWrapper = staticCardMap.get(p.slug);
+          
+          // Update price label
+          const priceEl = existingWrapper.querySelector('.text-primary.font-extrabold');
+          if (priceEl) priceEl.textContent = p.price_label;
+
+          // Update title if changed
+          const titleEl = existingWrapper.querySelector('h3');
+          if (titleEl && titleEl.textContent !== p.name) titleEl.textContent = p.name;
+
+          // Update data attributes for search/filter
+          existingWrapper.setAttribute('data-category', p.category_slug);
+          existingWrapper.setAttribute('data-name', (p.name || '').toLowerCase());
+          existingWrapper.setAttribute('data-description', (p.description || '').toLowerCase());
+
+          return;
+        }
+
+        // Otherwise it is a brand new cloud product: prepend as a fresh card
         const wrapper = document.createElement('div');
         wrapper.className = 'product-item-wrapper';
         wrapper.setAttribute('data-category', p.category_slug);
@@ -262,7 +295,7 @@ const description = "Bunga papan, hand bouquet, standing flower, dan tanaman uca
         grid.prepend(wrapper);
       });
 
-      // Update filtering to account for new cards
+      // Update filtering to account for synced cards
       applyFilters();
 
     } catch (err) {
