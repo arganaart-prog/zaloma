@@ -1,0 +1,597 @@
+---
+import Layout from '../../layouts/Layout.astro';
+import { CATEGORIES } from '../../data/products';
+import { SUPABASE_URL, SUPABASE_ANON_KEY, SUPABASE_BUCKET, ADMIN_PIN } from '../../data/supabaseConfig';
+import { WHATSAPP_NUMBER } from '../../data/constants';
+
+const title = "Panel Admin Zaloma Florist";
+const description = "Dashboard kelola produk toko bunga Zaloma Florist Malang.";
+---
+
+<Layout title={title} description={description} robots="noindex, nofollow" showTestimonials={false}>
+  <!-- External Supabase JS SDK via CDN for reliable client-side execution on GitHub Pages -->
+  <script is:inline src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
+
+  <div class="min-h-screen bg-clean-ivory py-8 px-4 sm:px-6 lg:px-8">
+    <div class="max-w-4xl mx-auto">
+
+      <!-- Login Gate (Screen PIN) -->
+      <div id="login-gate" class="bg-white rounded-2xl shadow-lg border border-soft-cream p-6 sm:p-10 max-w-md mx-auto text-center my-12">
+        <div class="w-16 h-16 rounded-full bg-accent-bg text-primary flex items-center justify-center mx-auto mb-4 border border-soft-cream">
+          <svg class="w-8 h-8" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2">
+            <path stroke-linecap="round" stroke-linejoin="round" d="M12 15v2m-6 4h12a2 2 0 002-2v-6a2 2 0 00-2-2H6a2 2 0 00-2 2v6a2 2 0 002 2zm10-10V7a4 4 0 00-8 0v4h8z" />
+          </svg>
+        </div>
+        <h1 class="font-serif text-2xl font-bold text-slate-800">Admin Zaloma Florist</h1>
+        <p class="text-sm text-slate-500 mt-1 mb-6">Masukkan PIN Admin untuk menambah dan mengelola produk toko bunga.</p>
+
+        <form id="login-form" class="space-y-4">
+          <div>
+            <input 
+              type="password" 
+              id="admin-pin-input" 
+              placeholder="Masukkan PIN Admin" 
+              class="w-full text-center text-lg tracking-widest px-4 py-3 rounded-xl border border-slate-300 focus:outline-none focus:border-primary focus:ring-2 focus:ring-primary/20 transition-all font-mono"
+              required
+              autocomplete="current-password"
+            />
+            <p id="login-error" class="text-xs text-rose-600 mt-2 font-medium hidden">PIN salah, silakan coba lagi.</p>
+          </div>
+          <button 
+            type="submit" 
+            class="w-full bg-primary hover:bg-primary-dark text-white font-bold py-3.5 px-6 rounded-xl shadow-md hover:shadow-lg transition-all duration-200 cursor-pointer text-sm"
+          >
+            Masuk ke Dashboard
+          </button>
+        </form>
+        <p class="text-[11px] text-slate-400 mt-6">PIN Default: <code class="bg-slate-100 px-2 py-0.5 rounded text-slate-600 font-mono">zaloma88</code> (bisa diubah di file konfigurasi)</p>
+      </div>
+
+      <!-- Admin Dashboard (Hidden initially) -->
+      <div id="admin-dashboard" class="hidden space-y-8">
+        
+        <!-- Header Dashboard -->
+        <div class="bg-white rounded-2xl p-6 sm:p-8 border border-soft-cream shadow-xs flex flex-col sm:flex-row justify-between items-start sm:items-center gap-4">
+          <div>
+            <div class="flex items-center gap-2">
+              <span class="inline-block w-2.5 h-2.5 rounded-full bg-emerald-500 animate-pulse"></span>
+              <span class="text-xs font-bold uppercase tracking-wider text-emerald-700 bg-emerald-50 px-2.5 py-0.5 rounded-full">Supabase Cloud Connected</span>
+            </div>
+            <h1 class="font-serif text-2xl sm:text-3xl font-bold text-slate-800 mt-1">Kelola Produk Zaloma Florist</h1>
+            <p class="text-xs sm:text-sm text-slate-500 mt-0.5">Tambah produk baru langsung dari HP atau laptop tanpa perlu ngoding.</p>
+          </div>
+          <div class="flex items-center gap-2 w-full sm:w-auto">
+            <a 
+              href="/katalog/" 
+              target="_blank" 
+              class="flex-1 sm:flex-initial inline-flex items-center justify-center gap-1.5 px-4 py-2.5 text-xs font-semibold rounded-xl border border-slate-200 text-slate-700 hover:bg-slate-50 transition-colors"
+            >
+              Lihat Katalog ↗
+            </a>
+            <button 
+              id="logout-btn" 
+              type="button" 
+              class="px-4 py-2.5 text-xs font-semibold rounded-xl bg-slate-100 text-slate-600 hover:bg-rose-50 hover:text-rose-600 transition-colors cursor-pointer"
+            >
+              Keluar
+            </button>
+          </div>
+        </div>
+
+        <!-- Form Tambah Produk Baru -->
+        <div class="bg-white rounded-2xl p-6 sm:p-8 border border-soft-cream shadow-xs">
+          <div class="flex items-center gap-2 mb-6 pb-4 border-b border-slate-100">
+            <div class="w-8 h-8 rounded-lg bg-primary/10 text-primary flex items-center justify-center font-bold text-base">
+              +
+            </div>
+            <div>
+              <h2 class="font-serif text-lg sm:text-xl font-bold text-slate-800">Tambah Produk Baru</h2>
+              <p class="text-xs text-slate-500">Produk akan langsung tampil di website dan katalog secara realtime.</p>
+            </div>
+          </div>
+
+          <form id="add-product-form" class="space-y-6">
+            <div class="grid grid-cols-1 md:grid-cols-2 gap-6">
+              
+              <!-- Nama Produk -->
+              <div class="space-y-1.5">
+                <label for="prod-name" class="block text-xs font-bold uppercase tracking-wider text-slate-700">
+                  Nama Produk <span class="text-rose-500">*</span>
+                </label>
+                <input 
+                  type="text" 
+                  id="prod-name" 
+                  required 
+                  placeholder="Contoh: Bunga Papan Duka Cita Mewah 2x1.5m"
+                  class="w-full px-4 py-3 rounded-xl border border-slate-200 text-sm focus:outline-none focus:border-primary focus:ring-2 focus:ring-primary/20 transition-all"
+                />
+              </div>
+
+              <!-- Kategori -->
+              <div class="space-y-1.5">
+                <label for="prod-category" class="block text-xs font-bold uppercase tracking-wider text-slate-700">
+                  Kategori <span class="text-rose-500">*</span>
+                </label>
+                <select 
+                  id="prod-category" 
+                  required
+                  class="w-full px-4 py-3 rounded-xl border border-slate-200 text-sm focus:outline-none focus:border-primary focus:ring-2 focus:ring-primary/20 transition-all bg-white"
+                >
+                  <option value="" disabled selected>Pilih Kategori Produk...</option>
+                  {CATEGORIES.map(cat => (
+                    <option value={cat.slug} data-name={cat.name}>{cat.name}</option>
+                  ))}
+                </select>
+              </div>
+
+              <!-- Harga -->
+              <div class="space-y-1.5">
+                <label for="prod-price" class="block text-xs font-bold uppercase tracking-wider text-slate-700">
+                  Harga (Rupiah) <span class="text-rose-500">*</span>
+                </label>
+                <div class="relative">
+                  <span class="absolute left-4 top-1/2 -translate-y-1/2 text-sm font-bold text-slate-400">Rp</span>
+                  <input 
+                    type="number" 
+                    id="prod-price" 
+                    required 
+                    min="10000" 
+                    step="5000"
+                    placeholder="500000"
+                    class="w-full pl-12 pr-4 py-3 rounded-xl border border-slate-200 text-sm font-semibold focus:outline-none focus:border-primary focus:ring-2 focus:ring-primary/20 transition-all font-mono"
+                  />
+                </div>
+                <p id="price-preview" class="text-[11px] font-bold text-primary mt-1">Format: Rp 0</p>
+              </div>
+
+              <!-- Waktu Pengerjaan -->
+              <div class="space-y-1.5">
+                <label for="prod-time" class="block text-xs font-bold uppercase tracking-wider text-slate-700">
+                  Estimasi Pengerjaan
+                </label>
+                <input 
+                  type="text" 
+                  id="prod-time" 
+                  value="3 - 5 Jam" 
+                  placeholder="Contoh: 3 - 5 Jam / Siap 2 Jam"
+                  class="w-full px-4 py-3 rounded-xl border border-slate-200 text-sm focus:outline-none focus:border-primary focus:ring-2 focus:ring-primary/20 transition-all"
+                />
+              </div>
+
+            </div>
+
+            <!-- Upload Foto dengan Kamera / Galeri HP -->
+            <div class="space-y-2">
+              <label class="block text-xs font-bold uppercase tracking-wider text-slate-700">
+                Foto Produk <span class="text-rose-500">*</span>
+              </label>
+              
+              <div class="border-2 border-dashed border-slate-300 hover:border-primary rounded-2xl p-6 text-center bg-slate-50/60 transition-colors relative cursor-pointer" id="dropzone">
+                <input 
+                  type="file" 
+                  id="prod-image-file" 
+                  accept="image/*" 
+                  required
+                  class="absolute inset-0 w-full h-full opacity-0 cursor-pointer z-10"
+                />
+                
+                <div id="upload-prompt" class="space-y-2">
+                  <div class="w-12 h-12 rounded-full bg-accent-bg text-primary flex items-center justify-center mx-auto border border-soft-cream">
+                    <svg class="w-6 h-6" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2">
+                      <path stroke-linecap="round" stroke-linejoin="round" d="M3 9a2 2 0 012-2h.93a2 2 0 001.664-.89l.812-1.22A2 2 0 0110.07 4h3.86a2 2 0 011.664.89l.812 1.22A2 2 0 0018.07 7H19a2 2 0 012 2v9a2 2 0 01-2 2H5a2 2 0 01-2-2V9z" />
+                      <path stroke-linecap="round" stroke-linejoin="round" d="M15 13a3 3 0 11-6 0 3 3 0 016 0z" />
+                    </svg>
+                  </div>
+                  <p class="text-sm font-bold text-slate-700">Ketuk untuk Pilih Foto atau Jepret Kamera HP</p>
+                  <p class="text-xs text-slate-400">Foto otomatis dikompres ke WebP ringan (~150 KB) sebelum diupload.</p>
+                </div>
+
+                <!-- Preview Gambar -->
+                <div id="image-preview-container" class="hidden space-y-3">
+                  <img id="image-preview" src="" alt="Preview Foto" class="max-h-64 mx-auto rounded-xl object-contain shadow-sm border border-slate-200" />
+                  <div class="flex items-center justify-center gap-3 text-xs">
+                    <span id="orig-size-label" class="text-slate-400">Asli: 0 KB</span>
+                    <span class="text-slate-300">→</span>
+                    <span id="comp-size-label" class="font-bold text-emerald-600 bg-emerald-50 px-2 py-0.5 rounded-full">Kompres: 0 KB</span>
+                  </div>
+                  <p class="text-[11px] text-slate-400">Ketuk gambar untuk mengganti foto</p>
+                </div>
+
+              </div>
+            </div>
+
+            <!-- Deskripsi Produk -->
+            <div class="space-y-1.5">
+              <label for="prod-desc" class="block text-xs font-bold uppercase tracking-wider text-slate-700">
+                Deskripsi Singkat (Opsional)
+              </label>
+              <textarea 
+                id="prod-desc" 
+                rows="2" 
+                placeholder="Rangkaian bunga segar berkualitas tinggi. Difoto sebelum dikirim ke lokasi, gratis ongkir untuk area Kota Malang."
+                class="w-full px-4 py-3 rounded-xl border border-slate-200 text-sm focus:outline-none focus:border-primary focus:ring-2 focus:ring-primary/20 transition-all resize-y"
+              ></textarea>
+            </div>
+
+            <!-- Featured / Produk Unggulan -->
+            <div class="flex items-center gap-2 pt-1">
+              <input 
+                type="checkbox" 
+                id="prod-featured" 
+                class="w-4 h-4 rounded text-primary focus:ring-primary border-slate-300 cursor-pointer"
+              />
+              <label for="prod-featured" class="text-xs font-semibold text-slate-700 cursor-pointer">
+                Tandai sebagai Produk Terpopuler / Unggulan
+              </label>
+            </div>
+
+            <!-- Tombol Submit -->
+            <div class="pt-4 border-t border-slate-100 flex items-center justify-end gap-3">
+              <button 
+                type="submit" 
+                id="submit-btn" 
+                class="w-full sm:w-auto inline-flex items-center justify-center gap-2 bg-primary hover:bg-primary-dark text-white font-bold py-3.5 px-8 rounded-xl shadow-md hover:shadow-lg transition-all duration-200 cursor-pointer text-sm"
+              >
+                <span id="btn-text">Simpan & Publikasikan Produk</span>
+                <svg id="btn-spinner" class="w-4 h-4 animate-spin hidden" fill="none" viewBox="0 0 24 24">
+                  <circle class="opacity-25" cx="12" cy="12" r="10" stroke="currentColor" stroke-width="4"></circle>
+                  <path class="opacity-75" fill="currentColor" d="M4 12a8 8 0 018-8v8H4z"></path>
+                </svg>
+              </button>
+            </div>
+
+            <!-- Notifikasi Alert Status -->
+            <div id="form-alert" class="hidden p-4 rounded-xl text-sm font-medium"></div>
+
+          </form>
+        </div>
+
+        <!-- Daftar Produk yang Tersimpan di Cloud -->
+        <div class="bg-white rounded-2xl p-6 sm:p-8 border border-soft-cream shadow-xs">
+          <div class="flex flex-col sm:flex-row justify-between items-start sm:items-center gap-2 mb-6 pb-4 border-b border-slate-100">
+            <div>
+              <h2 class="font-serif text-lg sm:text-xl font-bold text-slate-800">Daftar Produk Cloud</h2>
+              <p class="text-xs text-slate-500">Semua produk yang tersimpan di Supabase dan aktif di website.</p>
+            </div>
+            <span id="cloud-count-badge" class="text-xs font-bold px-3 py-1 bg-slate-100 text-slate-700 rounded-full">
+              Memuat data...
+            </span>
+          </div>
+
+          <!-- Grid Produk Cloud -->
+          <div id="cloud-products-grid" class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-4">
+            <div class="col-span-full py-12 text-center text-slate-400 text-sm">
+              Memuat daftar produk dari database...
+            </div>
+          </div>
+        </div>
+
+      </div>
+
+    </div>
+  </div>
+</Layout>
+
+<script define:vars={{ SUPABASE_URL, SUPABASE_ANON_KEY, SUPABASE_BUCKET, ADMIN_PIN, WHATSAPP_NUMBER }}>
+  // Initialize Supabase Client
+  const supabase = window.supabase.createClient(SUPABASE_URL, SUPABASE_ANON_KEY);
+
+  // Authentication State via LocalStorage
+  const AUTH_KEY = 'zaloma_admin_auth';
+  const loginGate = document.getElementById('login-gate');
+  const adminDashboard = document.getElementById('admin-dashboard');
+  const loginForm = document.getElementById('login-form');
+  const pinInput = document.getElementById('admin-pin-input');
+  const loginError = document.getElementById('login-error');
+  const logoutBtn = document.getElementById('logout-btn');
+
+  function checkAuth() {
+    if (localStorage.getItem(AUTH_KEY) === 'true') {
+      loginGate.classList.add('hidden');
+      adminDashboard.classList.remove('hidden');
+      loadCloudProducts();
+    } else {
+      loginGate.classList.remove('hidden');
+      adminDashboard.classList.add('hidden');
+    }
+  }
+
+  loginForm.addEventListener('submit', (e) => {
+    e.preventDefault();
+    if (pinInput.value === ADMIN_PIN) {
+      localStorage.setItem(AUTH_KEY, 'true');
+      loginError.classList.add('hidden');
+      checkAuth();
+    } else {
+      loginError.classList.remove('hidden');
+      pinInput.value = '';
+      pinInput.focus();
+    }
+  });
+
+  logoutBtn.addEventListener('click', () => {
+    localStorage.removeItem(AUTH_KEY);
+    checkAuth();
+  });
+
+  // Price formatting helper
+  const priceInput = document.getElementById('prod-price');
+  const pricePreview = document.getElementById('price-preview');
+  priceInput.addEventListener('input', () => {
+    const val = Number(priceInput.value) || 0;
+    pricePreview.textContent = 'Format: ' + new Intl.NumberFormat('id-ID', { style: 'currency', currency: 'IDR', maximumFractionDigits: 0 }).format(val);
+  });
+
+  // Client-side Image Compression with Canvas (WebP max 1200px ~150KB)
+  const imageFileInput = document.getElementById('prod-image-file');
+  const imagePreview = document.getElementById('image-preview');
+  const previewContainer = document.getElementById('image-preview-container');
+  const uploadPrompt = document.getElementById('upload-prompt');
+  const origSizeLabel = document.getElementById('orig-size-label');
+  const compSizeLabel = document.getElementById('comp-size-label');
+
+  let processedImageBlob = null;
+
+  imageFileInput.addEventListener('change', async (e) => {
+    const file = e.target.files[0];
+    if (!file) return;
+
+    origSizeLabel.textContent = `Asli: ${(file.size / 1024).toFixed(0)} KB`;
+
+    // Process & compress image via canvas
+    const img = new Image();
+    const reader = new FileReader();
+
+    reader.onload = (re) => {
+      img.src = re.target.result;
+    };
+
+    img.onload = () => {
+      const maxDim = 1200;
+      let width = img.width;
+      let height = img.height;
+
+      if (width > height && width > maxDim) {
+        height = Math.round((height * maxDim) / width);
+        width = maxDim;
+      } else if (height > maxDim) {
+        width = Math.round((width * maxDim) / height);
+        height = maxDim;
+      }
+
+      const canvas = document.createElement('canvas');
+      canvas.width = width;
+      canvas.height = height;
+      const ctx = canvas.getContext('2d');
+      ctx.drawImage(img, 0, 0, width, height);
+
+      // Export as WebP quality 0.82
+      canvas.toBlob((blob) => {
+        processedImageBlob = blob;
+        compSizeLabel.textContent = `Kompres: ${(blob.size / 1024).toFixed(0)} KB`;
+        imagePreview.src = URL.createObjectURL(blob);
+        uploadPrompt.classList.add('hidden');
+        previewContainer.classList.remove('hidden');
+      }, 'image/webp', 0.82);
+    };
+
+    reader.readAsDataURL(file);
+  });
+
+  // Form Submission
+  const addForm = document.getElementById('add-product-form');
+  const submitBtn = document.getElementById('submit-btn');
+  const btnText = document.getElementById('btn-text');
+  const btnSpinner = document.getElementById('btn-spinner');
+  const formAlert = document.getElementById('form-alert');
+
+  function showAlert(msg, isSuccess = true) {
+    formAlert.textContent = msg;
+    formAlert.className = isSuccess 
+      ? 'p-4 rounded-xl text-sm font-semibold bg-emerald-50 text-emerald-800 border border-emerald-200'
+      : 'p-4 rounded-xl text-sm font-semibold bg-rose-50 text-rose-800 border border-rose-200';
+    formAlert.classList.remove('hidden');
+    formAlert.scrollIntoView({ behavior: 'smooth', block: 'center' });
+  }
+
+  addForm.addEventListener('submit', async (e) => {
+    e.preventDefault();
+
+    if (!processedImageBlob) {
+      alert('Silakan pilih foto produk terlebih dahulu.');
+      return;
+    }
+
+    const name = document.getElementById('prod-name').value.trim();
+    const categorySelect = document.getElementById('prod-category');
+    const categorySlug = categorySelect.value;
+    const categoryName = categorySelect.options[categorySelect.selectedIndex].getAttribute('data-name');
+    const priceFrom = Number(document.getElementById('prod-price').value);
+    const priceLabel = new Intl.NumberFormat('id-ID', { style: 'currency', currency: 'IDR', maximumFractionDigits: 0 }).format(priceFrom);
+    const processingTime = document.getElementById('prod-time').value.trim() || '3 - 5 Jam';
+    const description = document.getElementById('prod-desc').value.trim();
+    const featured = document.getElementById('prod-featured').checked;
+    
+    // Slug generator
+    const slugBase = name.toLowerCase().replace(/[^a-z0-9]+/g, '-').replace(/^-+|-+$/g, '');
+    const slug = `${slugBase}-${Date.now().toString().slice(-4)}`;
+
+    // Set loading state
+    submitBtn.disabled = true;
+    btnText.textContent = 'Mengunggah Foto & Menyimpan...';
+    btnSpinner.classList.remove('hidden');
+    formAlert.classList.add('hidden');
+
+    try {
+      // 1. Upload compressed image to Supabase Storage Bucket
+      const fileExt = 'webp';
+      const fileName = `${slug}-${Date.now()}.${fileExt}`;
+      const filePath = `${fileName}`;
+
+      const { data: uploadData, error: uploadError } = await supabase.storage
+        .from(SUPABASE_BUCKET)
+        .upload(filePath, processedImageBlob, {
+          contentType: 'image/webp',
+          upsert: true
+        });
+
+      if (uploadError) throw new Error('Gagal upload foto: ' + uploadError.message);
+
+      // 2. Get Public URL for the image
+      const { data: publicUrlData } = supabase.storage
+        .from(SUPABASE_BUCKET)
+        .getPublicUrl(filePath);
+
+      const imageUrl = publicUrlData.publicUrl;
+
+      // 3. Insert Product into 'products' table
+      const { data: insertData, error: insertError } = await supabase
+        .from('products')
+        .insert([
+          {
+            name,
+            slug,
+            category_slug: categorySlug,
+            category_name: categoryName,
+            price_from: priceFrom,
+            price_label: priceLabel,
+            image: imageUrl,
+            description,
+            featured,
+            processing_time: processingTime,
+            city: 'Malang'
+          }
+        ]);
+
+      if (insertError) throw new Error('Gagal simpan ke database: ' + insertError.message);
+
+      showAlert(`Berhasil! Produk "${name}" berhasil ditambahkan dan langsung aktif di katalog website.`);
+
+      // Reset form
+      addForm.reset();
+      processedImageBlob = null;
+      pricePreview.textContent = 'Format: Rp 0';
+      uploadPrompt.classList.remove('hidden');
+      previewContainer.classList.add('hidden');
+
+      // Reload products list
+      loadCloudProducts();
+
+    } catch (err) {
+      console.error(err);
+      showAlert(err.message || 'Terjadi kesalahan sistem.', false);
+    } finally {
+      submitBtn.disabled = false;
+      btnText.textContent = 'Simpan & Publikasikan Produk';
+      btnSpinner.classList.add('hidden');
+    }
+  });
+
+  // Load and Render Cloud Products in Admin
+  async function loadCloudProducts() {
+    const grid = document.getElementById('cloud-products-grid');
+    const badge = document.getElementById('cloud-count-badge');
+
+    try {
+      const { data: products, error } = await supabase
+        .from('products')
+        .select('*')
+        .order('created_at', { ascending: false });
+
+      if (error) throw error;
+
+      badge.textContent = `Total Produk Cloud: ${products ? products.length : 0}`;
+
+      if (!products || products.length === 0) {
+        grid.innerHTML = `
+          <div class="col-span-full py-12 text-center text-slate-400 text-sm bg-slate-50 rounded-xl border border-dashed border-slate-200">
+            Belum ada produk cloud yang ditambahkan. Gunakan formulir di atas untuk menambah produk baru!
+          </div>
+        `;
+        return;
+      }
+
+      grid.innerHTML = products.map((p) => `
+        <div class="bg-white border border-slate-200 rounded-xl overflow-hidden shadow-xs flex flex-col justify-between group hover:border-primary/50 transition-colors">
+          <div class="relative aspect-4/3 bg-slate-100 overflow-hidden">
+            <img src="${p.image}" alt="${p.name}" class="w-full h-full object-cover group-hover:scale-102 transition-transform duration-300" />
+            <span class="absolute top-2 left-2 bg-black/60 text-white text-[10px] font-bold px-2 py-0.5 rounded backdrop-blur-xs">
+              ${p.category_name}
+            </span>
+            ${p.featured ? '<span class="absolute top-2 right-2 bg-amber-500 text-white text-[10px] font-bold px-2 py-0.5 rounded shadow-xs">Unggulan</span>' : ''}
+          </div>
+          <div class="p-4 flex-1 flex flex-col justify-between">
+            <div>
+              <h3 class="font-serif font-bold text-slate-800 text-sm line-clamp-2">${p.name}</h3>
+              <p class="font-sans font-bold text-primary text-base mt-1.5">${p.price_label}</p>
+              ${p.description ? `<p class="text-xs text-slate-500 line-clamp-2 mt-1">${p.description}</p>` : ''}
+            </div>
+            <div class="pt-3 mt-3 border-t border-slate-100 flex items-center justify-between gap-2">
+              <a 
+                href="https://wa.me/${WHATSAPP_NUMBER}?text=Halo%20Zaloma%20Florist,%20saya%20tertarik%20dengan%20${encodeURIComponent(p.name)}" 
+                target="_blank" 
+                class="text-[11px] font-bold text-emerald-700 hover:text-emerald-800"
+              >
+                Tes WhatsApp ↗
+              </a>
+              <button 
+                type="button" 
+                data-id="${p.id}" 
+                data-image="${p.image}" 
+                data-name="${p.name}" 
+                class="delete-prod-btn text-[11px] font-bold text-rose-600 hover:text-rose-800 bg-rose-50 hover:bg-rose-100 px-3 py-1.5 rounded-lg transition-colors cursor-pointer"
+              >
+                Hapus
+              </button>
+            </div>
+          </div>
+        </div>
+      `).join('');
+
+      // Attach Delete Listeners
+      document.querySelectorAll('.delete-prod-btn').forEach((btn) => {
+        btn.addEventListener('click', async (e) => {
+          const id = btn.getAttribute('data-id');
+          const name = btn.getAttribute('data-name');
+          const imgUrl = btn.getAttribute('data-image');
+
+          if (!confirm(`Apakah Anda yakin ingin menghapus produk "${name}"?`)) return;
+
+          btn.textContent = 'Menghapus...';
+          btn.disabled = true;
+
+          try {
+            // 1. Delete from database
+            const { error: delDbErr } = await supabase
+              .from('products')
+              .delete()
+              .eq('id', id);
+
+            if (delDbErr) throw delDbErr;
+
+            // 2. Try delete image from storage
+            if (imgUrl && imgUrl.includes(SUPABASE_BUCKET)) {
+              const fileName = imgUrl.split('/').pop();
+              if (fileName) {
+                await supabase.storage.from(SUPABASE_BUCKET).remove([fileName]);
+              }
+            }
+
+            loadCloudProducts();
+          } catch (err) {
+            alert('Gagal menghapus produk: ' + err.message);
+            btn.textContent = 'Hapus';
+            btn.disabled = false;
+          }
+        });
+      });
+
+    } catch (err) {
+      grid.innerHTML = `<div class="col-span-full py-6 text-center text-rose-500 text-xs">Gagal memuat produk: ${err.message}</div>`;
+      badge.textContent = 'Error';
+    }
+  }
+
+  // Check auth on load
+  checkAuth();
+</script>

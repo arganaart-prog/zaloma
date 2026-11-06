@@ -4,6 +4,8 @@ import ProductCard from '../components/ProductCard.astro';
 import Breadcrumb from '../components/Breadcrumb.astro';
 import { CATEGORIES, PRODUCTS } from '../data/products';
 import { getProductDisplayName } from '../utils/productHelpers';
+import { SUPABASE_URL, SUPABASE_ANON_KEY } from '../data/supabaseConfig';
+import { WHATSAPP_NUMBER } from '../data/constants';
 
 // SEO Meta
 const title = "Katalog Karangan Bunga Zaloma Florist — Toko Bunga Malang";
@@ -11,6 +13,8 @@ const description = "Bunga papan, hand bouquet, standing flower, dan tanaman uca
 ---
 
 <Layout title={title} description={description}>
+  <!-- Supabase SDK for loading live cloud products -->
+  <script is:inline src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
   <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-8">
     
     <!-- Breadcrumb -->
@@ -71,10 +75,9 @@ const description = "Bunga papan, hand bouquet, standing flower, dan tanaman uca
   </div>
 </Layout>
 
-<script>
+<script define:vars={{ SUPABASE_URL, SUPABASE_ANON_KEY, WHATSAPP_NUMBER }}>
   // Filter & Search Logic
   const buttons = document.querySelectorAll('.filter-btn');
-  const items = document.querySelectorAll('.product-item-wrapper');
   const emptyState = document.getElementById('empty-state');
 
   // Read URL query parameters
@@ -92,7 +95,7 @@ const description = "Bunga papan, hand bouquet, standing flower, dan tanaman uca
       input.value = currentSearch;
 
       input.addEventListener('input', (e) => {
-        const target = e.target as HTMLInputElement;
+        const target = e.target;
         currentSearch = target.value.toLowerCase().slice(0, 80);
         
         // Sync all other search inputs
@@ -127,8 +130,10 @@ const description = "Bunga papan, hand bouquet, standing flower, dan tanaman uca
 
   function applyFilters() {
     let visibleCount = 0;
+    // Query dynamically so both static and newly injected cloud products are filtered
+    const currentItems = document.querySelectorAll('.product-item-wrapper');
 
-    items.forEach(item => {
+    currentItems.forEach(item => {
       if (!(item instanceof HTMLElement)) return;
 
       const itemCategory = item.getAttribute('data-category') || '';
@@ -179,6 +184,93 @@ const description = "Bunga papan, hand bouquet, standing flower, dan tanaman uca
       applyFilters();
     });
   });
+
+  // Fetch live products from Supabase Cloud
+  async function loadCloudProducts() {
+    try {
+      if (!window.supabase) return;
+      const client = window.supabase.createClient(SUPABASE_URL, SUPABASE_ANON_KEY);
+
+      const { data: cloudProducts, error } = await client
+        .from('products')
+        .select('*')
+        .order('created_at', { ascending: false });
+
+      if (error || !cloudProducts || cloudProducts.length === 0) return;
+
+      const grid = document.getElementById('products-grid');
+      if (!grid) return;
+
+      // Insert cloud products at the top of the grid
+      cloudProducts.forEach((p) => {
+        const waMsg = `Halo Zaloma Florist, saya ingin pesan ${p.name} (${p.price_label}).`;
+        const waUrl = `https://wa.me/${WHATSAPP_NUMBER}?text=${encodeURIComponent(waMsg)}`;
+
+        const wrapper = document.createElement('div');
+        wrapper.className = 'product-item-wrapper';
+        wrapper.setAttribute('data-category', p.category_slug);
+        wrapper.setAttribute('data-name', (p.name || '').toLowerCase());
+        wrapper.setAttribute('data-description', (p.description || '').toLowerCase());
+
+        wrapper.innerHTML = `
+          <article class="product-card-shell group relative h-full overflow-hidden rounded-[14px] border border-soft-cream/70 bg-white shadow-[0_1px_4px_rgba(15,23,42,0.03)] hover-gold-grow">
+            <a href="${waUrl}" target="_blank" rel="noopener noreferrer" class="flex h-full flex-col no-underline">
+              <div class="image-load-shell relative -mx-px -mt-px aspect-[20/19] overflow-hidden bg-clean-ivory">
+                <img
+                  src="${p.image}"
+                  alt="Foto ${p.name} Florist Malang"
+                  loading="lazy"
+                  decoding="async"
+                  class="relative z-0 block h-full w-full object-cover object-top transition-transform duration-700 ease-out group-hover:scale-[1.012]"
+                />
+                ${p.featured ? '<span class="absolute top-2.5 left-2.5 z-10 rounded-sm bg-secondary px-2 py-0.5 text-[9px] font-bold uppercase tracking-wider text-primary-dark shadow-xs">Populer</span>' : ''}
+                <div class="pointer-events-none absolute inset-x-0 bottom-0 z-10 h-20 bg-gradient-to-t from-primary-dark/35 via-primary-dark/5 to-transparent"></div>
+                <span class="absolute bottom-3 right-3 z-10 inline-flex h-9 w-9 items-center justify-center rounded-full bg-white/95 text-primary shadow-[0_2px_8px_rgba(15,23,42,0.08)] transition-all duration-200 group-hover:bg-primary group-hover:text-white" aria-hidden="true">
+                  <svg width="16" height="16" class="h-4 w-4 shrink-0" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2.4">
+                    <path stroke-linecap="round" stroke-linejoin="round" d="M7 17L17 7M9 7h8v8" />
+                  </svg>
+                </span>
+              </div>
+
+              <div class="flex min-h-[190px] sm:min-h-[200px] flex-col justify-between p-4.5 sm:p-5">
+                <div>
+                  <p class="line-clamp-1 text-[10px] font-bold uppercase tracking-[0.18em] text-secondary-dark">${p.category_name}</p>
+                  <h3 class="mt-1.5 font-serif font-bold leading-snug text-slate-800 line-clamp-2 transition-colors duration-200 group-hover:text-primary text-base sm:text-lg">
+                    ${p.name}
+                  </h3>
+                </div>
+
+                <div class="pt-3 sm:pt-4">
+                  <div class="rounded-md border border-soft-cream/70 bg-accent-bg/70 p-2.5 sm:p-3">
+                    <p class="text-[10px] font-bold uppercase tracking-[0.18em] text-secondary-dark">Harga</p>
+                    <div class="mt-1.5 flex items-end justify-between gap-2.5 sm:gap-3">
+                      <p class="font-sans text-lg sm:text-xl font-extrabold leading-none text-primary">${p.price_label}</p>
+                      <span class="inline-flex shrink-0 items-center gap-1.5 rounded-full bg-primary px-3 py-1.5 sm:px-3.5 sm:py-2 text-[11px] font-bold text-white shadow-xs transition-colors duration-200 group-hover:bg-primary-dark">
+                        Pesan WA
+                        <svg width="14" height="14" class="h-3.5 w-3.5 shrink-0 transition-transform duration-200 group-hover:translate-x-0.5" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2.6" aria-hidden="true">
+                          <path stroke-linecap="round" stroke-linejoin="round" d="M9 5l7 7-7 7" />
+                        </svg>
+                      </span>
+                    </div>
+                  </div>
+                </div>
+              </div>
+            </a>
+          </article>
+        `;
+
+        grid.prepend(wrapper);
+      });
+
+      // Update filtering to account for new cards
+      applyFilters();
+
+    } catch (err) {
+      console.warn('Gagal memuat produk cloud:', err);
+    }
+  }
+
+  loadCloudProducts();
 </script>
 
 
