@@ -51,18 +51,15 @@ const INITIAL_SLUGS = PRODUCTS.map(p => p.slug);
       ))}
     </div>
 
-    <!-- Products Grid -->
+    <!-- Products Grid (100% Live dari Supabase) -->
     <div class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-8" id="products-grid">
-      {PRODUCTS.map((product, index) => (
-        <div 
-          class="product-item-wrapper" 
-          data-category={product.categorySlug}
-          data-name={getProductDisplayName(product).toLowerCase()}
-          data-description={product.description.toLowerCase()}
-        >
-          <ProductCard product={product} priority={index < 3} />
-        </div>
-      ))}
+      <div class="col-span-full py-24 text-center" id="catalog-loading">
+        <svg class="w-10 h-10 animate-spin text-primary mx-auto mb-3" fill="none" viewBox="0 0 24 24">
+          <circle class="opacity-25" cx="12" cy="12" r="10" stroke="currentColor" stroke-width="4"></circle>
+          <path class="opacity-75" fill="currentColor" d="M4 12a8 8 0 018-8v8H4z"></path>
+        </svg>
+        <p class="text-sm font-semibold text-slate-500">Memuat seluruh katalog produk...</p>
+      </div>
     </div>
 
     <!-- Pagination Container -->

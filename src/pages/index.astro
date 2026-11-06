@@ -156,16 +156,15 @@ const description = "Zaloma Florist menyediakan bunga papan, hand bouquet, stand
         <!-- Fade hint di kanan â€“ mobile only -->
         <div class="featured-products-fade-hint" aria-hidden="true"></div>
 
-        <!-- 8 Featured Products (Rotasi Setiap 3 Hari) -->
+        <!-- 8 Featured Products (100% Live dari Supabase) -->
         <div id="featured-products-slider" data-featured-products-slider class="featured-products-slider grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-6 lg:gap-8 px-4 sm:px-6 lg:px-8">
-          {activeProducts.map((product, index) => (
-            <ProductCard
-              product={product}
-              variant="classic"
-              priority={index < 2}
-              data-featured-product-index={index}
-            />
-          ))}
+          <div class="col-span-full py-12 text-center text-slate-400 text-xs">
+            <svg class="w-7 h-7 animate-spin mx-auto text-primary mb-2 opacity-80" fill="none" viewBox="0 0 24 24">
+              <circle class="opacity-25" cx="12" cy="12" r="10" stroke="currentColor" stroke-width="4"></circle>
+              <path class="opacity-75" fill="currentColor" d="M4 12a8 8 0 018-8v8H4z"></path>
+            </svg>
+            Memuat produk unggulan...
+          </div>
         </div>
       </div>
 
@@ -1063,6 +1062,82 @@ const description = "Zaloma Florist menyediakan bunga papan, hand bouquet, stand
           `;
         }).join('');
       }
+
+      // Helper untuk kartu produk kategori di beranda
+      function makeHomeCard(p) {
+        const prodUrl = `/produk/${p.slug}/`;
+        return `
+          <div class="product-item-wrapper h-full">
+            <article class="category-product-card product-card-shell group flex h-full flex-col overflow-hidden rounded-[14px] border border-soft-cream/70 bg-white text-left no-underline shadow-[0_1px_4px_rgba(15,23,42,0.03)] hover-gold-grow">
+              <a href="${prodUrl}" class="flex h-full flex-col no-underline">
+                <div class="image-load-shell relative aspect-[4/5] overflow-hidden bg-clean-ivory">
+                  <img
+                    src="${p.image}"
+                    alt="Foto ${p.name} Zaloma Florist Malang"
+                    loading="lazy"
+                    decoding="async"
+                    class="relative z-0 block h-full w-full object-cover object-top transition-transform duration-700 ease-out group-hover:scale-[1.012]"
+                  />
+                  <div class="absolute inset-x-0 bottom-0 z-10 h-24 bg-gradient-to-t from-primary-dark/45 via-primary-dark/10 to-transparent"></div>
+                </div>
+                <div class="flex min-h-[150px] flex-1 flex-col px-3.5 py-4 sm:min-h-[168px] sm:px-4 sm:py-4.5 justify-between">
+                  <h3 class="font-serif font-bold leading-snug text-slate-800 line-clamp-2 transition-colors duration-200 group-hover:text-primary text-sm sm:text-base">
+                    ${p.name}
+                  </h3>
+                  <div class="mt-auto pt-4">
+                    <div class="rounded-md border border-soft-cream/70 bg-accent-bg/70 px-3 py-2.5">
+                      <p class="text-[9px] font-bold uppercase tracking-[0.18em] text-secondary-dark sm:text-[10px]">Harga</p>
+                      <div class="mt-1 flex items-end justify-between gap-2">
+                        <p class="font-sans text-[1.05rem] font-extrabold leading-none text-primary sm:text-xl">${p.price_label}</p>
+                        <span class="inline-flex h-7 w-7 shrink-0 items-center justify-center rounded-full bg-primary text-white shadow-xs transition-colors duration-200 group-hover:bg-primary-dark" aria-hidden="true">
+                          <svg class="h-3.5 w-3.5" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2.6">
+                            <path stroke-linecap="round" stroke-linejoin="round" d="M9 5l7 7-7 7" />
+                          </svg>
+                        </span>
+                      </div>
+                    </div>
+                  </div>
+                </div>
+              </a>
+            </article>
+          </div>
+        `;
+      }
+
+      // 3. Sinkronisasi Hand Bouquet section
+      const hbGrid = document.querySelector('#hand-bouquet-malang .grid');
+      const hbProducts = allProducts.filter(p => p.category_slug === 'hand-bouquet-malang');
+      if (hbGrid && hbProducts.length > 0) {
+        hbGrid.innerHTML = hbProducts.slice(0, 8).map(p => makeHomeCard(p)).join('');
+      }
+
+      // 4. Sinkronisasi Bunga Papan panels
+      const dukaGrid = document.querySelector('[data-panel="duka-cita"] .grid');
+      const dukaProducts = allProducts.filter(p => p.category_slug === 'bunga-papan-duka-cita-malang');
+      if (dukaGrid && dukaProducts.length > 0) {
+        dukaGrid.innerHTML = dukaProducts.slice(0, 8).map(p => makeHomeCard(p)).join('');
+      }
+
+      const wedGrid = document.querySelector('[data-panel="wedding"] .grid');
+      const wedProducts = allProducts.filter(p => p.category_slug === 'bunga-papan-wedding-malang');
+      if (wedGrid && wedProducts.length > 0) {
+        wedGrid.innerHTML = wedProducts.slice(0, 8).map(p => makeHomeCard(p)).join('');
+      }
+
+      const congGrid = document.querySelector('[data-panel="congratulations"] .grid');
+      const congProducts = allProducts.filter(p => p.category_slug === 'bunga-papan-congratulations-malang');
+      if (congGrid && congProducts.length > 0) {
+        congGrid.innerHTML = congProducts.slice(0, 8).map(p => makeHomeCard(p)).join('');
+      }
+
+      // 5. Sinkronisasi sections with data-daily-rotate-category
+      document.querySelectorAll('[data-daily-rotate-category]').forEach(gridEl => {
+        const cat = gridEl.getAttribute('data-daily-rotate-category');
+        const prods = allProducts.filter(p => p.category_slug === cat);
+        if (prods.length > 0) {
+          gridEl.innerHTML = prods.slice(0, 8).map(p => makeHomeCard(p)).join('');
+        }
+      });
 
     } catch (err) {
       console.warn('Gagal memuat produk beranda live:', err);

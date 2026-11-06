@@ -3,11 +3,9 @@ import { CATEGORIES, PRODUCTS } from '../data/products';
 import { withBase } from '../utils/paths';
 
 const categories = CATEGORIES.map((category) => {
-  const itemCount = PRODUCTS.filter((p) => p.categorySlug === category.slug).length;
   return {
     ...category,
-    itemCount,
-    itemLabel: `${itemCount} produk`,
+    itemLabel: 'Pilihan Model',
   };
 });
 ---

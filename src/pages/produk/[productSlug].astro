@@ -9,12 +9,69 @@ import { getProductDisplayName } from '../../utils/productHelpers';
 import { SUPABASE_URL, SUPABASE_ANON_KEY } from '../../data/supabaseConfig';
 
 export async function getStaticPaths() {
-  return PRODUCTS.map(product => {
-    return {
-      params: { productSlug: product.slug },
-      props: { product }
-    };
-  });
+  try {
+    const res = await fetch(`${SUPABASE_URL}/rest/v1/products?select=*`, {
+      headers: {
+        apikey: SUPABASE_ANON_KEY,
+        Authorization: `Bearer ${SUPABASE_ANON_KEY}`
+      }
+    });
+    if (res.ok) {
+      const liveProducts = await res.json();
+      if (Array.isArray(liveProducts) && liveProducts.length > 0) {
+        return liveProducts.map(p => ({
+          params: { productSlug: p.slug },
+          props: {
+            product: {
+              id: p.id,
+              slug: p.slug,
+              name: p.name,
+              categorySlug: p.category_slug,
+              categoryName: p.category_name,
+              city: p.city || 'Malang',
+              priceFrom: Number(p.price_from) || 0,
+              priceLabel: p.price_label,
+              image: p.image,
+              imageWidth: 800,
+              imageHeight: 800,
+              description: p.description || '',
+              featured: Boolean(p.featured),
+              whatsappText: `Halo Zaloma Florist, saya ingin pesan ${p.name} (${p.price_label}). Mohon info ketersediaan dan format pemesanannya.`,
+              processingTime: p.processing_time || '3 - 5 Jam',
+              serviceArea: ['Kota Malang', 'Kabupaten Malang', 'Kota Batu']
+            }
+          }
+        }));
+      }
+    }
+  } catch (err) {
+    console.warn('[Zaloma Build] Warning fetching products for getStaticPaths:', err);
+  }
+
+  // Fallback placeholder agar build tidak error jika sedang offline
+  return [{
+    params: { productSlug: 'detail' },
+    props: {
+      product: {
+        id: 'default',
+        slug: 'detail',
+        name: 'Produk Zaloma Florist',
+        categorySlug: 'bunga-papan-malang',
+        categoryName: 'Bunga Papan',
+        city: 'Malang',
+        priceFrom: 0,
+        priceLabel: 'Hubungi Kami',
+        image: '/images/hero/hero-1.webp',
+        imageWidth: 800,
+        imageHeight: 800,
+        description: 'Pilihan karangan bunga segar dari Zaloma Florist Malang.',
+        featured: false,
+        whatsappText: 'Halo Zaloma Florist, saya ingin pesan bunga.',
+        processingTime: '3 - 5 Jam',
+        serviceArea: ['Malang']
+      }
+    }
+  }];
 }
 
 const { product } = Astro.props;
