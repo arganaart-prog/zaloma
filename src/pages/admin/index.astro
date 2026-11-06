@@ -971,7 +971,7 @@ const INITIAL_PRODUCTS = PRODUCTS.map(p => ({
     importSpinner.classList.remove('hidden');
 
     try {
-      const { error } = await supabase.from('products').insert(INITIAL_PRODUCTS);
+      const { error } = await supabase.from('products').upsert(INITIAL_PRODUCTS, { onConflict: 'slug' });
       if (error) throw error;
       alert(`Sukses! ${INITIAL_PRODUCTS.length} produk berhasil diimpor ke database Supabase.`);
       loadAllProducts();

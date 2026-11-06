@@ -10,6 +10,8 @@ import { WHATSAPP_NUMBER } from '../data/constants';
 // SEO Meta
 const title = "Katalog Karangan Bunga Zaloma Florist — Toko Bunga Malang";
 const description = "Bunga papan, hand bouquet, standing flower, dan tanaman ucapan di Malang. Pengerjaan 3 jam, difoto sebelum dikirim. Pilih model dan pesan via WhatsApp.";
+
+const INITIAL_SLUGS = PRODUCTS.map(p => p.slug);
 ---
 
 <Layout title={title} description={description}>
@@ -85,10 +87,11 @@ const description = "Bunga papan, hand bouquet, standing flower, dan tanaman uca
   </div>
 </Layout>
 
-<script define:vars={{ SUPABASE_URL, SUPABASE_ANON_KEY, WHATSAPP_NUMBER }}>
+<script define:vars={{ SUPABASE_URL, SUPABASE_ANON_KEY, WHATSAPP_NUMBER, INITIAL_SLUGS }}>
   // Filter & Search Logic
   const buttons = document.querySelectorAll('.filter-btn');
   const emptyState = document.getElementById('empty-state');
+  const initialSlugs = new Set(INITIAL_SLUGS || []);
 
   // Read URL query parameters
   const urlParams = new URLSearchParams(window.location.search);
@@ -308,7 +311,10 @@ const description = "Bunga papan, hand bouquet, standing flower, dan tanaman uca
   // Fetch live products from Supabase Cloud
   async function loadCloudProducts() {
     try {
-      if (!window.supabase) return;
+      if (!window.supabase) {
+        console.warn('[Zaloma Florist] Supabase JS SDK belum siap.');
+        return;
+      }
       const client = window.supabase.createClient(SUPABASE_URL, SUPABASE_ANON_KEY);
 
       const { data: cloudProducts, error } = await client
@@ -316,63 +322,48 @@ const description = "Bunga papan, hand bouquet, standing flower, dan tanaman uca
         .select('*')
         .order('created_at', { ascending: false });
 
-      if (error || !cloudProducts || cloudProducts.length === 0) return;
+      if (error) {
+        console.error('[Zaloma Supabase Error]:', error.message || error);
+        console.warn('[Zaloma Info] Pastikan RLS (Row Level Security) tabel "products" di Supabase mengizinkan SELECT untuk publik (anon).');
+        return;
+      }
+
+      // Jika di Supabase belum ada data (0 produk), tetap tampilkan katalog default bawaan
+      if (!cloudProducts || cloudProducts.length === 0) {
+        console.info('[Zaloma] Tabel Supabase masih kosong. Menampilkan katalog lokal bawaan.');
+        return;
+      }
 
       const grid = document.getElementById('products-grid');
       if (!grid) return;
 
-      // Index existing static cards by slug
-      const staticCardMap = new Map();
-      document.querySelectorAll('.product-item-wrapper').forEach(wrapper => {
-        const link = wrapper.querySelector('a[href*="/produk/"]');
-        if (link) {
-          const match = link.getAttribute('href').match(/\/produk\/([^\/]+)/);
-          if (match && match[1]) {
-            staticCardMap.set(match[1], wrapper);
-          }
-        }
-      });
+      // Bersihkan kartu bawaan dan jadikan data Supabase sebagai Single Source of Truth
+      // Setiap produk yang dihapus di Supabase otomatis HILANG dari website,
+      // produk baru seketika MUNCUL, dan editan harga/nama langsung TERUPDATE.
+      grid.innerHTML = '';
 
-      // Synchronize: update existing static cards or prepend newly created ones
-      cloudProducts.forEach((p) => {
-        const waMsg = `Halo Zaloma Florist, saya ingin pesan ${p.name} (${p.price_label}).`;
-        const waUrl = `https://wa.me/${WHATSAPP_NUMBER}?text=${encodeURIComponent(waMsg)}`;
+      cloudProducts.forEach((p, index) => {
+        const isStatic = initialSlugs.has(p.slug);
+        const productUrl = isStatic 
+          ? `/produk/${p.slug}/` 
+          : `https://wa.me/${WHATSAPP_NUMBER}?text=${encodeURIComponent(`Halo Zaloma Florist, saya ingin pesan ${p.name} (${p.price_label}).`)}`;
+        const buttonLabel = isStatic ? 'Detail' : 'Pesan WA';
+        const targetAttr = isStatic ? '' : 'target="_blank" rel="noopener noreferrer"';
 
-        // If card already exists statically, update its price & details in-place
-        if (staticCardMap.has(p.slug)) {
-          const existingWrapper = staticCardMap.get(p.slug);
-          
-          // Update price label
-          const priceEl = existingWrapper.querySelector('.text-primary.font-extrabold');
-          if (priceEl) priceEl.textContent = p.price_label;
-
-          // Update title if changed
-          const titleEl = existingWrapper.querySelector('h3');
-          if (titleEl && titleEl.textContent !== p.name) titleEl.textContent = p.name;
-
-          // Update data attributes for search/filter
-          existingWrapper.setAttribute('data-category', p.category_slug);
-          existingWrapper.setAttribute('data-name', (p.name || '').toLowerCase());
-          existingWrapper.setAttribute('data-description', (p.description || '').toLowerCase());
-
-          return;
-        }
-
-        // Otherwise it is a brand new cloud product: prepend as a fresh card
         const wrapper = document.createElement('div');
         wrapper.className = 'product-item-wrapper';
-        wrapper.setAttribute('data-category', p.category_slug);
+        wrapper.setAttribute('data-category', p.category_slug || '');
         wrapper.setAttribute('data-name', (p.name || '').toLowerCase());
         wrapper.setAttribute('data-description', (p.description || '').toLowerCase());
 
         wrapper.innerHTML = `
           <article class="product-card-shell group relative h-full overflow-hidden rounded-[14px] border border-soft-cream/70 bg-white shadow-[0_1px_4px_rgba(15,23,42,0.03)] hover-gold-grow">
-            <a href="${waUrl}" target="_blank" rel="noopener noreferrer" class="flex h-full flex-col no-underline">
+            <a href="${productUrl}" ${targetAttr} class="flex h-full flex-col no-underline">
               <div class="image-load-shell relative -mx-px -mt-px aspect-[20/19] overflow-hidden bg-clean-ivory">
                 <img
                   src="${p.image}"
                   alt="Foto ${p.name} Florist Malang"
-                  loading="lazy"
+                  loading="${index < 3 ? 'eager' : 'lazy'}"
                   decoding="async"
                   class="relative z-0 block h-full w-full object-cover object-top transition-transform duration-700 ease-out group-hover:scale-[1.012]"
                 />
@@ -387,7 +378,7 @@ const description = "Bunga papan, hand bouquet, standing flower, dan tanaman uca
 
               <div class="flex min-h-[190px] sm:min-h-[200px] flex-col justify-between p-4.5 sm:p-5">
                 <div>
-                  <p class="line-clamp-1 text-[10px] font-bold uppercase tracking-[0.18em] text-secondary-dark">${p.category_name}</p>
+                  <p class="line-clamp-1 text-[10px] font-bold uppercase tracking-[0.18em] text-secondary-dark">${p.category_name || ''}</p>
                   <h3 class="mt-1.5 font-serif font-bold leading-snug text-slate-800 line-clamp-2 transition-colors duration-200 group-hover:text-primary text-base sm:text-lg">
                     ${p.name}
                   </h3>
@@ -399,7 +390,7 @@ const description = "Bunga papan, hand bouquet, standing flower, dan tanaman uca
                     <div class="mt-1.5 flex items-end justify-between gap-2.5 sm:gap-3">
                       <p class="font-sans text-lg sm:text-xl font-extrabold leading-none text-primary">${p.price_label}</p>
                       <span class="inline-flex shrink-0 items-center gap-1.5 rounded-full bg-primary px-3 py-1.5 sm:px-3.5 sm:py-2 text-[11px] font-bold text-white shadow-xs transition-colors duration-200 group-hover:bg-primary-dark">
-                        Pesan WA
+                        ${buttonLabel}
                         <svg width="14" height="14" class="h-3.5 w-3.5 shrink-0 transition-transform duration-200 group-hover:translate-x-0.5" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2.6" aria-hidden="true">
                           <path stroke-linecap="round" stroke-linejoin="round" d="M9 5l7 7-7 7" />
                         </svg>
@@ -412,11 +403,11 @@ const description = "Bunga papan, hand bouquet, standing flower, dan tanaman uca
           </article>
         `;
 
-        grid.prepend(wrapper);
+        grid.appendChild(wrapper);
       });
 
-      // Update filtering to account for synced cards
-      applyFilters();
+      // Terapkan ulang filter & paginasi untuk produk live
+      applyFilters(true);
 
     } catch (err) {
       console.warn('Gagal memuat produk cloud:', err);
