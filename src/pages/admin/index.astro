@@ -1,7 +1,7 @@
 ---
 import Layout from '../../layouts/Layout.astro';
 import { CATEGORIES, PRODUCTS } from '../../data/products';
-import { SUPABASE_URL, SUPABASE_ANON_KEY, SUPABASE_BUCKET, ADMIN_PIN } from '../../data/supabaseConfig';
+import { SUPABASE_URL, SUPABASE_ANON_KEY, SUPABASE_BUCKET } from '../../data/supabaseConfig';
 import { WHATSAPP_NUMBER } from '../../data/constants';
 
 const title = "Pusat Kontrol & Dashboard Produk — Zaloma Florist";
@@ -40,26 +40,46 @@ const INITIAL_PRODUCTS = PRODUCTS.map(p => ({
         <h1 class="font-serif text-2xl font-bold text-slate-800">Admin Zaloma Florist</h1>
         <p class="text-xs sm:text-sm text-slate-500 mt-1 mb-6">Pusat kontrol dan manajemen seluruh produk toko bunga.</p>
 
-        <form id="login-form" class="space-y-4">
+        <form id="login-form" class="space-y-4 text-left">
           <div>
+            <label for="admin-email-input" class="block text-xs font-bold uppercase tracking-wider text-slate-700 mb-1">Email Admin</label>
+            <input 
+              type="email" 
+              id="admin-email-input" 
+              placeholder="nama@gmail.com" 
+              class="w-full px-4 py-3 rounded-xl border border-slate-300 focus:outline-none focus:border-primary focus:ring-2 focus:ring-primary/20 transition-all text-sm"
+              required
+              autocomplete="email"
+            />
+          </div>
+          <div>
+            <label for="admin-password-input" class="block text-xs font-bold uppercase tracking-wider text-slate-700 mb-1">Password</label>
             <input 
               type="password" 
-              id="admin-pin-input" 
-              placeholder="Masukkan PIN Admin" 
-              class="w-full text-center text-xl tracking-widest px-4 py-3.5 rounded-xl border border-slate-300 focus:outline-none focus:border-primary focus:ring-2 focus:ring-primary/20 transition-all font-mono"
+              id="admin-password-input" 
+              placeholder="••••••••" 
+              class="w-full px-4 py-3 rounded-xl border border-slate-300 focus:outline-none focus:border-primary focus:ring-2 focus:ring-primary/20 transition-all text-sm"
               required
               autocomplete="current-password"
             />
-            <p id="login-error" class="text-xs text-rose-600 mt-2 font-semibold hidden">PIN salah. Silakan periksa kembali.</p>
+            <p id="login-error" class="text-xs text-rose-600 mt-2 font-semibold hidden"></p>
           </div>
           <button 
             type="submit" 
-            class="w-full bg-primary hover:bg-primary-dark text-white font-bold py-3.5 px-6 rounded-xl shadow-md hover:shadow-lg transition-all duration-200 cursor-pointer text-sm"
+            id="login-btn"
+            class="w-full bg-primary hover:bg-primary-dark text-white font-bold py-3.5 px-6 rounded-xl shadow-md hover:shadow-lg transition-all duration-200 cursor-pointer text-sm flex items-center justify-center gap-2"
           >
-            Buka Dashboard
+            <span id="login-btn-text">Masuk ke Dashboard</span>
+            <svg id="login-spinner" class="w-4 h-4 animate-spin hidden" fill="none" viewBox="0 0 24 24">
+              <circle class="opacity-25" cx="12" cy="12" r="10" stroke="currentColor" stroke-width="4"></circle>
+              <path class="opacity-75" fill="currentColor" d="M4 12a8 8 0 018-8v8H4z"></path>
+            </svg>
           </button>
         </form>
-        <p class="text-[11px] text-slate-400 mt-6">PIN Standar: <code class="bg-slate-100 px-2 py-0.5 rounded text-slate-600 font-mono">zaloma88</code></p>
+        <p class="text-[11px] text-slate-400 mt-6 flex items-center justify-center gap-1.5">
+          <svg class="w-3.5 h-3.5 text-emerald-600 shrink-0" fill="currentColor" viewBox="0 0 20 20"><path fill-rule="evenodd" d="M2.166 4.999A11.954 11.954 0 0010 1.944 11.954 11.954 0 0017.834 5c.11.65.166 1.32.166 2.001 0 5.225-3.34 9.67-8 11.317C5.34 16.67 2 12.225 2 7c0-.682.057-1.35.166-2.001zm11.541 3.708a1 1 0 00-1.414-1.414L9 10.586 7.707 9.293a1 1 0 00-1.414 1.414l2 2a1 1 0 001.414 0l4-4z" clip-rule="evenodd" /></svg>
+          Diproteksi Supabase Enterprise Authentication
+        </p>
       </div>
 
       <!-- ================= MAIN DASHBOARD ================= -->
@@ -83,6 +103,7 @@ const INITIAL_PRODUCTS = PRODUCTS.map(p => ({
           </div>
 
           <div class="flex items-center gap-2 w-full md:w-auto">
+            <span id="user-email-display" class="text-xs font-semibold text-slate-600 bg-slate-100 px-3 py-2 rounded-xl hidden sm:inline-block"></span>
             <a 
               href="/katalog/" 
               target="_blank" 
@@ -441,48 +462,79 @@ const INITIAL_PRODUCTS = PRODUCTS.map(p => ({
 
 </Layout>
 
-<script define:vars={{ SUPABASE_URL, SUPABASE_ANON_KEY, SUPABASE_BUCKET, ADMIN_PIN, WHATSAPP_NUMBER, INITIAL_PRODUCTS }}>
+<script define:vars={{ SUPABASE_URL, SUPABASE_ANON_KEY, SUPABASE_BUCKET, WHATSAPP_NUMBER, INITIAL_PRODUCTS }}>
   // Initialize Supabase Client
   const supabase = window.supabase.createClient(SUPABASE_URL, SUPABASE_ANON_KEY);
 
-  // Auth State
-  const AUTH_KEY = 'zaloma_admin_auth';
+  // Auth UI Elements
   const loginGate = document.getElementById('login-gate');
   const adminDashboard = document.getElementById('admin-dashboard');
   const loginForm = document.getElementById('login-form');
-  const pinInput = document.getElementById('admin-pin-input');
+  const emailInput = document.getElementById('admin-email-input');
+  const passwordInput = document.getElementById('admin-password-input');
   const loginError = document.getElementById('login-error');
+  const loginBtn = document.getElementById('login-btn');
+  const loginBtnText = document.getElementById('login-btn-text');
+  const loginSpinner = document.getElementById('login-spinner');
   const logoutBtn = document.getElementById('logout-btn');
+  const userEmailDisplay = document.getElementById('user-email-display');
 
   let allProductsList = [];
 
-  function checkAuth() {
-    if (localStorage.getItem(AUTH_KEY) === 'true') {
+  // Listen to Supabase Auth State (Auto-login & persistent session)
+  supabase.auth.onAuthStateChange((event, session) => {
+    if (session && session.user) {
       loginGate.classList.add('hidden');
       adminDashboard.classList.remove('hidden');
+      if (userEmailDisplay) {
+        userEmailDisplay.textContent = `👤 ${session.user.email}`;
+      }
       loadAllProducts();
     } else {
       loginGate.classList.remove('hidden');
       adminDashboard.classList.add('hidden');
     }
-  }
+  });
 
-  loginForm.addEventListener('submit', (e) => {
+  // Login with Supabase Auth
+  loginForm.addEventListener('submit', async (e) => {
     e.preventDefault();
-    if (pinInput.value === ADMIN_PIN) {
-      localStorage.setItem(AUTH_KEY, 'true');
-      loginError.classList.add('hidden');
-      checkAuth();
-    } else {
+    const email = emailInput.value.trim();
+    const password = passwordInput.value;
+
+    loginBtn.disabled = true;
+    loginBtnText.textContent = 'Memverifikasi...';
+    loginSpinner.classList.remove('hidden');
+    loginError.classList.add('hidden');
+
+    try {
+      const { data, error } = await supabase.auth.signInWithPassword({
+        email,
+        password
+      });
+
+      if (error) throw error;
+      // onAuthStateChange handles UI switch automatically
+    } catch (err) {
+      console.error(err);
+      loginError.textContent = err.message === 'Invalid login credentials'
+        ? 'Email atau password salah. Pastikan password sudah benar.'
+        : `Gagal login: ${err.message}`;
       loginError.classList.remove('hidden');
-      pinInput.value = '';
-      pinInput.focus();
+    } finally {
+      loginBtn.disabled = false;
+      loginBtnText.textContent = 'Masuk ke Dashboard';
+      loginSpinner.classList.add('hidden');
     }
   });
 
-  logoutBtn.addEventListener('click', () => {
-    localStorage.removeItem(AUTH_KEY);
-    checkAuth();
+  // Logout
+  logoutBtn.addEventListener('click', async () => {
+    logoutBtn.disabled = true;
+    logoutBtn.textContent = 'Keluar...';
+    await supabase.auth.signOut();
+    logoutBtn.disabled = false;
+    logoutBtn.textContent = 'Keluar';
   });
 
   // Tab Switching
