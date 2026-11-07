@@ -1,6 +1,7 @@
 export interface CityItem {
   name: string;
   slug: string;
+  image?: string;
   description?: string;
   isMainArea?: boolean;
   seoTitle?: string;
@@ -12,24 +13,27 @@ export const DEFAULT_CITIES: CityItem[] = [
   {
     name: "Malang Raya (Kota Malang, Kab. Malang, Kota Batu)",
     slug: "malang-raya",
+    image: "/images/galeri/gallery-1.webp",
     description: "Pusat Workshop & Galeri Utama Zaloma Florist — Gratis ongkir area Malang Kota",
     isMainArea: true,
-    tagline: "Area Pusat Toko & Galeri Bunga",
+    tagline: "Area Pusat Workshop Florist",
     seoTitle: "Toko Bunga Malang Raya & Batu Murah Berkualitas — Zaloma Florist",
     seoDescription: "Pesan karangan bunga papan, buket bunga, standing flower di Malang Raya & Batu. Pengerjaan cepat 3 jam, bunga segar berkualitas & gratis ongkir Malang Kota."
   },
   {
     name: "Kota Malang",
     slug: "kota-malang",
+    image: "/images/galeri/gallery-2.webp",
     description: "Wilayah Kota Malang (Klojen, Lowokwaru, Blimbing, Sukun, Kedungkandang) — Pengiriman Kilat",
     isMainArea: true,
-    tagline: "Kirim Cepat Area Kota Malang",
+    tagline: "Pengiriman Kilat Kota Malang",
     seoTitle: "Toko Bunga Kota Malang — Karangan Bunga & Buket Terdekat Cepat",
     seoDescription: "Florist terpercaya di Kota Malang. Melayani bunga papan duka cita, pernikahan, grand opening & hand bouquet segar dengan garansi foto sebelum dikirim."
   },
   {
     name: "Kota Batu",
     slug: "kota-batu",
+    image: "/images/galeri/gallery-10.webp",
     description: "Wilayah Kota Wisata Batu, Bumiaji, Junrejo — Pengiriman Langsung dari Workshop",
     isMainArea: true,
     tagline: "Kota Wisata Batu & Sekitarnya",
@@ -39,7 +43,8 @@ export const DEFAULT_CITIES: CityItem[] = [
   {
     name: "Kabupaten Malang",
     slug: "kabupaten-malang",
-    description: "Kepanjen, Singosari, Lawang, Pakis, Turen, Gondanglegi, dampit & seluruh Kab. Malang",
+    image: "/images/galeri/gallery-5.webp",
+    description: "Kepanjen, Singosari, Lawang, Pakis, Turen, Gondanglegi, Dampit & seluruh Kab. Malang",
     isMainArea: true,
     tagline: "Seluruh Wilayah Kab. Malang",
     seoTitle: "Toko Bunga Kabupaten Malang — Kirim Karangan Bunga Kepanjen & Sekitarnya",
@@ -48,6 +53,7 @@ export const DEFAULT_CITIES: CityItem[] = [
   {
     name: "Surabaya",
     slug: "surabaya",
+    image: "/images/galeri/gallery-3.webp",
     description: "Seluruh area Kota Surabaya (Pusat, Timur, Barat, Selatan, Utara)",
     tagline: "Kota Surabaya & Sekitarnya",
     seoTitle: "Toko Bunga Surabaya Terpercaya — Kirim Bunga Papan & Buket Cepat",
@@ -56,6 +62,7 @@ export const DEFAULT_CITIES: CityItem[] = [
   {
     name: "Sidoarjo",
     slug: "sidoarjo",
+    image: "/images/galeri/gallery-6.webp",
     description: "Kota Sidoarjo, Waru, Gedangan, Candi, Porong, Krian & sekitarnya",
     tagline: "Wilayah Sidoarjo & Sekitarnya",
     seoTitle: "Toko Bunga Sidoarjo — Florist Bunga Papan & Buket Hadiah",
@@ -64,6 +71,7 @@ export const DEFAULT_CITIES: CityItem[] = [
   {
     name: "Gresik",
     slug: "gresik",
+    image: "/images/galeri/gallery-7.webp",
     description: "Gresik Kota, Kebomas, Manyar, Driyorejo & kawasan industri sekitarnya",
     tagline: "Wilayah Gresik & Kawasan Industri",
     seoTitle: "Toko Bunga Gresik — Karangan Bunga Papan Peresmian & Duka Cita",
@@ -72,6 +80,7 @@ export const DEFAULT_CITIES: CityItem[] = [
   {
     name: "Pasuruan",
     slug: "pasuruan",
+    image: "/images/galeri/gallery-8.webp",
     description: "Kota & Kabupaten Pasuruan, Pandaan, Bangil, Gempol & sekitarnya",
     tagline: "Kota & Kabupaten Pasuruan",
     seoTitle: "Toko Bunga Pasuruan & Pandaan — Florist Karangan Bunga Terbaik",
@@ -80,6 +89,7 @@ export const DEFAULT_CITIES: CityItem[] = [
   {
     name: "Mojokerto",
     slug: "mojokerto",
+    image: "/images/galeri/gallery-12.webp",
     description: "Kota Mojokerto, Kranggan, Magersari, Puri, Trowulan & Kab. Mojokerto",
     tagline: "Kota & Kabupaten Mojokerto",
     seoTitle: "Toko Bunga Mojokerto — Florist Cepat & Karangan Bunga Lengkap",
@@ -88,6 +98,7 @@ export const DEFAULT_CITIES: CityItem[] = [
   {
     name: "Jombang",
     slug: "jombang",
+    image: "/images/galeri/gallery-13.webp",
     description: "Pusat Kota Jombang, Peterongan, Diwek, Ploso & sekitarnya",
     tagline: "Wilayah Jombang & Sekitarnya",
     seoTitle: "Toko Bunga Jombang — Florist Bunga Papan & Buket Segar",
@@ -96,6 +107,7 @@ export const DEFAULT_CITIES: CityItem[] = [
   {
     name: "Kediri",
     slug: "kediri",
+    image: "/images/galeri/gallery-15.webp",
     description: "Kota Kediri, Pare, Gampengrejo & Kabupaten Kediri",
     tagline: "Kota & Kabupaten Kediri",
     seoTitle: "Toko Bunga Kediri — Bunga Papan & Florist Lengkap Cepat",
@@ -104,6 +116,7 @@ export const DEFAULT_CITIES: CityItem[] = [
   {
     name: "Blitar",
     slug: "blitar",
+    image: "/images/galeri/gallery-16.webp",
     description: "Kota Blitar, Kepanjenkidul, Sukorejo, Sananwetan, Wlingi & sekitarnya",
     tagline: "Kota & Kabupaten Blitar",
     seoTitle: "Toko Bunga Blitar — Kirim Bunga Papan & Buket Amanah",
@@ -112,6 +125,7 @@ export const DEFAULT_CITIES: CityItem[] = [
   {
     name: "Bisa Dikirim ke Mana Saja",
     slug: "bisa-dikirim-ke-mana-saja",
+    image: "/images/galeri/gallery-20.webp",
     description: "Pengiriman produk buket bunga kering, paper flower, atau ekspedisi ke seluruh Indonesia",
     tagline: "Jangkauan Seluruh Indonesia",
     seoTitle: "Pengiriman Bunga ke Seluruh Indonesia — Zaloma Florist",
@@ -187,4 +201,3 @@ export function productMatchesCity(productCity: string | undefined | null, targe
 
   return false;
 }
-
