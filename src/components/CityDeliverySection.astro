@@ -1,0 +1,214 @@
+---
+import { DEFAULT_CITIES, cityToSlug } from '../data/cities';
+import { withBase } from '../utils/paths';
+
+interface Props {
+  currentCitySlug?: string;
+  allCities?: any[];
+}
+
+const { currentCitySlug = 'malang-raya', allCities = [] } = Astro.props;
+
+// Merge provided cities with DEFAULT_CITIES
+const mergedCities = [];
+const seenSlugs = new Set();
+
+(allCities || []).forEach(c => {
+  const name = typeof c === 'string' ? c : c.name;
+  const slug = typeof c === 'string' ? cityToSlug(c) : (c.slug || cityToSlug(c.name));
+  if (slug && !seenSlugs.has(slug)) {
+    seenSlugs.add(slug);
+    mergedCities.push({
+      name,
+      slug,
+      description: c.description || `Pengiriman karangan bunga & buket area ${name}`,
+      tagline: c.tagline || `Area ${name} & Sekitarnya`
+    });
+  }
+});
+
+DEFAULT_CITIES.forEach(dc => {
+  if (!seenSlugs.has(dc.slug)) {
+    seenSlugs.add(dc.slug);
+    mergedCities.push(dc);
+  }
+});
+---
+
+<!-- Section: Pilih Pengiriman Luar Kota -->
+<section class="py-20 bg-primary text-white relative overflow-hidden" id="pilih-pengiriman-luar-kota">
+  <!-- Subtle Background Radial Glow -->
+  <div class="absolute inset-0 bg-[radial-gradient(circle_at_top_right,rgba(191,167,122,0.18),transparent_50%)] pointer-events-none"></div>
+
+  <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 relative z-10">
+    
+    <!-- Section Header -->
+    <div class="max-w-3xl mb-12">
+      <span class="inline-flex items-center gap-1.5 px-3 py-1 rounded-full text-xs font-bold uppercase tracking-widest bg-white/10 text-secondary-light border border-secondary/30 mb-3 shadow-2xs">
+        <svg class="w-3.5 h-3.5 text-secondary-light flex-shrink-0" fill="currentColor" viewBox="0 0 20 20">
+          <path fill-rule="evenodd" d="M5.05 4.05a7 7 0 119.9 9.9L10 18.9l-4.95-4.95a7 7 0 010-9.9zM10 11a2 2 0 100-4 2 2 0 000 4z" clip-rule="evenodd" />
+        </svg>
+        PILIH PENGIRIMAN LUAR KOTA
+      </span>
+      <h2 class="font-serif text-3xl sm:text-4xl lg:text-5xl font-bold leading-tight">
+        Melayani Pengiriman Bunga Malang Raya &amp; Berbagai Kota
+      </h2>
+      <p class="text-white/85 text-base sm:text-lg mt-4 leading-relaxed">
+        Pilih kota tujuan pengiriman Anda di bawah ini. Klik nama kota untuk membuka halaman katalog khusus produk yang siap diproses dan dikirim langsung ke lokasi penerima.
+      </p>
+    </div>
+
+    <!-- Grid of Cities -->
+    <div class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 gap-4" id="cities-delivery-grid">
+      {mergedCities.map((city) => {
+        const isCurrent = city.slug === currentCitySlug;
+        const href = isCurrent 
+          ? '#' 
+          : (city.slug === 'malang-raya' ? withBase('/') : withBase(`/kota/${city.slug}/`));
+        const isWorldwide = city.slug === 'bisa-dikirim-ke-mana-saja';
+
+        return (
+          <a
+            href={href}
+            class={`group relative p-4 rounded-2xl border transition-all duration-300 flex flex-col justify-between ${
+              isCurrent
+                ? 'bg-secondary/20 border-secondary shadow-lg ring-2 ring-secondary/40'
+                : 'bg-primary-dark/60 hover:bg-primary-dark/90 border-white/10 hover:border-secondary/60 hover:shadow-xl hover:-translate-y-0.5'
+            }`}
+            data-city-slug={city.slug}
+          >
+            <div>
+              <div class="flex items-center justify-between mb-2">
+                <span class="text-2xl">
+                  {isWorldwide ? '🌍' : (city.name.includes('Batu') ? '🍎' : '📍')}
+                </span>
+                {isCurrent && (
+                  <span class="text-[10px] font-bold uppercase tracking-wider px-2 py-0.5 rounded-full bg-secondary text-primary-dark shadow-2xs">
+                    Kota Aktif
+                  </span>
+                )}
+                {!isCurrent && (
+                  <span class="text-[10px] font-semibold text-white/50 group-hover:text-secondary transition-colors">
+                    Lihat Produk →
+                  </span>
+                )}
+              </div>
+              <h3 class="font-serif font-bold text-base text-white group-hover:text-secondary-light transition-colors line-clamp-1">
+                {city.name}
+              </h3>
+              <p class="text-xs text-white/70 mt-1 line-clamp-2 leading-relaxed">
+                {city.description || `Pesan karangan bunga papan & buket bunga pengiriman area ${city.name}.`}
+              </p>
+            </div>
+
+            <div class="mt-4 pt-3 border-t border-white/10 flex items-center justify-between text-xs font-semibold text-secondary-light group-hover:text-white transition-colors">
+              <span>Buka Halaman Kota</span>
+              <svg class="w-4 h-4 transform group-hover:translate-x-1 transition-transform" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M14 5l7 7m0 0l-7 7m7-7H3"/>
+              </svg>
+            </div>
+          </a>
+        );
+      })}
+    </div>
+
+    <!-- Quick Note -->
+    <div class="mt-10 p-5 rounded-2xl bg-white/5 border border-white/10 flex flex-col sm:flex-row items-start sm:items-center justify-between gap-4">
+      <div class="flex items-center gap-3">
+        <span class="w-10 h-10 rounded-xl bg-secondary/20 text-secondary flex items-center justify-center font-bold text-lg shrink-0">
+          💬
+        </span>
+        <div>
+          <h4 class="font-bold text-sm text-white">Kota tujuan Anda belum tercantum di daftar?</h4>
+          <p class="text-xs text-white/70">Zaloma Florist tetap melayani pengiriman ke seluruh kota di Indonesia melalui jaringan mitra kurir terpercaya kami.</p>
+        </div>
+      </div>
+      <a 
+        href="https://wa.me/6282245224880?text=Halo%20Zaloma%20Florist,%20saya%20mau%20tanya%20pengiriman%20bunga%20ke%20kota%20saya"
+        target="_blank"
+        rel="noopener noreferrer"
+        class="inline-flex items-center gap-2 px-4 py-2.5 rounded-xl bg-secondary hover:bg-secondary-dark text-primary-dark font-bold text-xs transition-all shadow-md shrink-0 hover:scale-105 active:scale-95"
+      >
+        <span>Konsultasi Kota Pengiriman</span>
+        <svg class="w-4 h-4" fill="currentColor" viewBox="0 0 24 24">
+          <path d="M.057 24l1.687-6.163c-1.041-1.804-1.588-3.849-1.587-5.946.003-6.556 5.338-11.891 11.893-11.891 3.181.001 6.167 1.24 8.413 3.488 2.245 2.248 3.481 5.236 3.48 8.414-.003 6.557-5.338 11.892-11.893 11.892-1.99-.001-3.951-.5-5.688-1.448l-6.305 1.654zm6.597-3.807c1.676.995 3.276 1.591 5.392 1.592 5.448 0 9.886-4.434 9.889-9.885.002-5.462-4.415-9.89-9.881-9.892-5.452 0-9.887 4.434-9.889 9.884-.001 2.225.651 3.891 1.746 5.634l-.999 3.648 3.742-.981z"/>
+        </svg>
+      </a>
+    </div>
+
+  </div>
+</section>
+
+<!-- Client script to dynamically fetch live cities from Supabase _cities_config_ so newly added cities appear immediately -->
+<script is:inline>
+  (async function syncDynamicCities() {
+    try {
+      const grid = document.getElementById('cities-delivery-grid');
+      if (!grid) return;
+
+      const cached = localStorage.getItem('zaloma_admin_cities_v2');
+      let cities = [];
+      if (cached) {
+        try { cities = JSON.parse(cached); } catch(e) {}
+      }
+
+      if (window.supabase) {
+        const client = window.supabase.createClient(
+          'https://hpsqfefgflqndtzmgyut.supabase.co',
+          'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6Imhwc3FmZWZnZmxxbmR0em1neXV0Iiwicm9sZSI6ImFub24iLCJpYXQiOjE3NjIyMzEwMjUsImV4cCI6MjA3NzgwNzAyNX0.d0hT_Zq6qGq2nJq-Jm6J1N8G1A4C7L0'
+        );
+        const { data } = await client.from('products').select('*').eq('slug', '_cities_config_').maybeSingle();
+        if (data && data.description) {
+          try {
+            const parsed = JSON.parse(data.description);
+            if (Array.isArray(parsed) && parsed.length > 0) cities = parsed;
+          } catch(e) {}
+        }
+      }
+
+      if (cities.length === 0) return;
+
+      const existingSlugs = new Set();
+      document.querySelectorAll('#cities-delivery-grid [data-city-slug]').forEach(el => {
+        existingSlugs.add(el.getAttribute('data-city-slug'));
+      });
+
+      cities.forEach(c => {
+        const name = typeof c === 'string' ? c : c.name;
+        const slug = name.toLowerCase().replace(/[^\w\s-]/g, '').replace(/\s+/g, '-').replace(/--+/g, '-').trim();
+        if (!existingSlugs.has(slug)) {
+          existingSlugs.add(slug);
+          const a = document.createElement('a');
+          a.href = `/kota/${slug}/`;
+          a.className = 'group relative p-4 rounded-2xl border transition-all duration-300 flex flex-col justify-between bg-primary-dark/60 hover:bg-primary-dark/90 border-white/10 hover:border-secondary/60 hover:shadow-xl hover:-translate-y-0.5';
+          a.setAttribute('data-city-slug', slug);
+          a.innerHTML = `
+            <div>
+              <div class="flex items-center justify-between mb-2">
+                <span class="text-2xl">📍</span>
+                <span class="text-[10px] font-semibold text-white/50 group-hover:text-secondary transition-colors">
+                  Lihat Produk →
+                </span>
+              </div>
+              <h3 class="font-serif font-bold text-base text-white group-hover:text-secondary-light transition-colors line-clamp-1">
+                ${name}
+              </h3>
+              <p class="text-xs text-white/70 mt-1 line-clamp-2 leading-relaxed">
+                ${c.description || `Pengiriman karangan bunga & buket area ${name}.`}
+              </p>
+            </div>
+            <div class="mt-4 pt-3 border-t border-white/10 flex items-center justify-between text-xs font-semibold text-secondary-light group-hover:text-white transition-colors">
+              <span>Buka Halaman Kota</span>
+              <svg class="w-4 h-4 transform group-hover:translate-x-1 transition-transform" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M14 5l7 7m0 0l-7 7m7-7H3"/>
+              </svg>
+            </div>
+          `;
+          grid.appendChild(a);
+        }
+      });
+    } catch (e) {
+      console.warn('Cities sync notice:', e);
+    }
+  })();
+</script>

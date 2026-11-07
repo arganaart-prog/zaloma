@@ -1,0 +1,312 @@
+---
+import Layout from '../../layouts/Layout.astro';
+import ProductCard from '../../components/ProductCard.astro';
+import CategoryCarousel from '../../components/CategoryCarousel.astro';
+import BungaPapanSection from '../../components/BungaPapanSection.astro';
+import HandBouquetSection from '../../components/HandBouquetSection.astro';
+import StandingFlowerSection from '../../components/StandingFlowerSection.astro';
+import PaperFlowerSection from '../../components/PaperFlowerSection.astro';
+import BungaMejaSection from '../../components/BungaMejaSection.astro';
+import TanbulampotSection from '../../components/TanbulampotSection.astro';
+import CityDeliverySection from '../../components/CityDeliverySection.astro';
+import Breadcrumb from '../../components/Breadcrumb.astro';
+import { WHATSAPP_NUMBER, SITE_DOMAIN } from '../../data/constants';
+import { SUPABASE_URL, SUPABASE_ANON_KEY } from '../../data/supabaseConfig';
+import { DEFAULT_CITIES, cityToSlug, productMatchesCity } from '../../data/cities';
+import { withBase } from '../../utils/paths';
+import { getRotatingHomeProducts } from '../../utils/rotatingProducts';
+import { getHomeDisplayProducts } from '../../utils/productHelpers';
+
+export async function getStaticPaths() {
+  let allLiveProducts: any[] = [];
+  let dynamicCities: any[] = [];
+
+  try {
+    const res = await fetch(`${SUPABASE_URL}/rest/v1/products?select=*&order=created_at.desc`, {
+      headers: {
+        apikey: SUPABASE_ANON_KEY,
+        Authorization: `Bearer ${SUPABASE_ANON_KEY}`
+      }
+    });
+    if (res.ok) {
+      const data = await res.json();
+      if (Array.isArray(data)) {
+        allLiveProducts = data.filter(p => !p.slug.startsWith('_'));
+        const citiesConfig = data.find(p => p.slug === '_cities_config_');
+        if (citiesConfig && citiesConfig.description) {
+          try {
+            const parsed = JSON.parse(citiesConfig.description);
+            if (Array.isArray(parsed)) dynamicCities = parsed;
+          } catch (e) {}
+        }
+      }
+    }
+  } catch (err) {
+    console.warn('[Zaloma Build] Warning fetching products for city paths:', err);
+  }
+
+  // Combine default cities and dynamic cities
+  const combinedCities: any[] = [];
+  const seenSlugs = new Set();
+
+  dynamicCities.forEach(c => {
+    const name = typeof c === 'string' ? c : c.name;
+    const slug = typeof c === 'string' ? cityToSlug(c) : (c.slug || cityToSlug(c.name));
+    if (slug && !seenSlugs.has(slug)) {
+      seenSlugs.add(slug);
+      combinedCities.push({
+        name,
+        slug,
+        description: c.description || `Pengiriman karangan bunga area ${name}`,
+        tagline: c.tagline || `Area ${name} & Sekitarnya`
+      });
+    }
+  });
+
+  DEFAULT_CITIES.forEach(dc => {
+    if (!seenSlugs.has(dc.slug)) {
+      seenSlugs.add(dc.slug);
+      combinedCities.push(dc);
+    }
+  });
+
+  return combinedCities.map(city => {
+    const filteredProducts = allLiveProducts
+      .filter(p => productMatchesCity(p.city, city.name))
+      .map(p => ({
+        id: p.id,
+        slug: p.slug,
+        name: p.name,
+        categorySlug: p.category_slug,
+        categoryName: p.category_name,
+        city: p.city || 'Malang',
+        priceFrom: Number(p.price_from) || 0,
+        priceLabel: p.price_label,
+        image: p.image,
+        imageWidth: 800,
+        imageHeight: 800,
+        description: p.description || '',
+        featured: Boolean(p.featured),
+        whatsappText: `Halo Zaloma Florist, saya ingin pesan ${p.name} (${p.price_label}) untuk pengiriman ke ${city.name}.`,
+        processingTime: p.processing_time || '3 - 5 Jam',
+        serviceArea: [city.name, 'Bisa Dikirim ke Mana Saja']
+      }));
+
+    return {
+      params: { citySlug: city.slug },
+      props: { 
+        city, 
+        products: filteredProducts,
+        allCities: combinedCities
+      }
+    };
+  });
+}
+
+const { city, products = [], allCities = [] } = Astro.props;
+
+// Rotating Featured Products for this city
+const { activeProducts } = getRotatingHomeProducts(getHomeDisplayProducts(products), 8);
+
+const title = city.seoTitle || `Toko Bunga ${city.name} — Florist Murah, Cepat & Terpercaya`;
+const description = city.seoDescription || `Zaloma Florist melayani karangan bunga papan, hand bouquet, standing flower & ucapan di ${city.name}. Pengerjaan cepat 3 jam, foto sebelum kirim.`;
+
+const waGeneralUrl = `https://wa.me/${WHATSAPP_NUMBER}?text=${encodeURIComponent(`Halo Zaloma Florist, saya ingin konsultasi pemesanan bunga untuk pengiriman ke ${city.name}.`)}`;
+---
+
+<Layout title={title} description={description} activeNav="produk">
+  <script is:inline src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
+
+  <!-- Breadcrumb -->
+  <div class="bg-clean-ivory border-b border-soft-cream/60">
+    <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-3">
+      <Breadcrumb items={[
+        { label: 'Beranda', href: withBase('/') },
+        { label: 'Pengiriman Luar Kota', href: withBase('/#pilih-pengiriman-luar-kota') },
+        { label: city.name }
+      ]} />
+    </div>
+  </div>
+
+  <!-- City Specific Hero Banner -->
+  <section class="relative bg-gradient-to-b from-clean-ivory via-white to-clean-ivory py-12 sm:py-16 overflow-hidden border-b border-soft-cream/60">
+    <!-- Background Botanical Accents -->
+    <div class="absolute -top-24 -right-24 w-96 h-96 rounded-full bg-accent-bg/40 blur-3xl pointer-events-none"></div>
+    <div class="absolute -bottom-24 -left-24 w-96 h-96 rounded-full bg-secondary/10 blur-3xl pointer-events-none"></div>
+
+    <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 relative z-10">
+      <div class="max-w-3xl">
+        
+        <!-- City Location Pill -->
+        <div class="inline-flex items-center gap-2 px-3 py-1.5 rounded-full text-xs font-bold uppercase tracking-wider bg-primary/10 text-primary border border-primary/20 mb-4 shadow-2xs">
+          <span class="w-2 h-2 rounded-full bg-primary animate-pulse"></span>
+          <span>WILAYAH PENGIRIMAN: {city.name}</span>
+        </div>
+
+        <h1 class="font-serif text-3xl sm:text-4xl lg:text-5xl font-bold text-slate-900 leading-tight">
+          Toko Bunga &amp; Florist {city.name}
+        </h1>
+        <p class="text-sm sm:text-base text-slate-600 mt-4 leading-relaxed">
+          {city.description || `Layanan karangan bunga papan pernikahan, duka cita, peresmian, standing flower, dan buket bunga segar terbaik untuk area ${city.name} dan sekitarnya.`}
+        </p>
+
+        <!-- Guarantee Highlights -->
+        <div class="grid grid-cols-2 sm:grid-cols-3 gap-3 my-6 pt-2">
+          <div class="flex items-center gap-2 p-2.5 rounded-xl bg-white border border-slate-200 shadow-2xs">
+            <span class="text-lg">⚡</span>
+            <span class="text-xs font-semibold text-slate-700">Kirim Cepat 3-5 Jam</span>
+          </div>
+          <div class="flex items-center gap-2 p-2.5 rounded-xl bg-white border border-slate-200 shadow-2xs">
+            <span class="text-lg">📸</span>
+            <span class="text-xs font-semibold text-slate-700">Foto Sebelum Kirim</span>
+          </div>
+          <div class="flex items-center gap-2 p-2.5 rounded-xl bg-white border border-slate-200 shadow-2xs col-span-2 sm:col-span-1">
+            <span class="text-lg">🌸</span>
+            <span class="text-xs font-semibold text-slate-700">100% Bunga Segar</span>
+          </div>
+        </div>
+
+        <!-- CTA Buttons -->
+        <div class="flex flex-wrap items-center gap-3 pt-2">
+          <a 
+            href="#produk-unggulan" 
+            class="px-5 py-2.5 rounded-xl bg-primary hover:bg-primary-dark text-white font-semibold text-xs sm:text-sm transition-all shadow-sm hover:shadow-md hover:-translate-y-0.5 active:translate-y-0"
+          >
+            Lihat Produk {city.name}
+          </a>
+          <a 
+            href={waGeneralUrl}
+            target="_blank"
+            rel="noopener noreferrer"
+            class="px-5 py-2.5 rounded-xl bg-secondary hover:bg-secondary-dark text-primary-dark font-bold text-xs sm:text-sm transition-all shadow-sm hover:shadow-md hover:-translate-y-0.5 active:translate-y-0 flex items-center gap-2"
+          >
+            <span>Pesan via WhatsApp</span>
+            <svg class="w-4 h-4" fill="currentColor" viewBox="0 0 24 24">
+              <path d="M.057 24l1.687-6.163c-1.041-1.804-1.588-3.849-1.587-5.946.003-6.556 5.338-11.891 11.893-11.891 3.181.001 6.167 1.24 8.413 3.488 2.245 2.248 3.481 5.236 3.48 8.414-.003 6.557-5.338 11.892-11.893 11.892-1.99-.001-3.951-.5-5.688-1.448l-6.305 1.654zm6.597-3.807c1.676.995 3.276 1.591 5.392 1.592 5.448 0 9.886-4.434 9.889-9.885.002-5.462-4.415-9.89-9.881-9.892-5.452 0-9.887 4.434-9.889 9.884-.001 2.225.651 3.891 1.746 5.634l-.999 3.648 3.742-.981z"/>
+            </svg>
+          </a>
+        </div>
+
+      </div>
+    </div>
+  </section>
+
+  <!-- Category Browser Carousel -->
+  <CategoryCarousel />
+
+  <!-- Featured Products for this city -->
+  <section class="py-16 sm:py-20 bg-white" id="produk-unggulan">
+    <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
+      <div class="flex flex-col sm:flex-row sm:items-end justify-between mb-10 pb-4 border-b border-slate-100 gap-4">
+        <div>
+          <span class="text-xs font-bold uppercase tracking-wider text-secondary flex items-center gap-1.5 mb-1.5">
+            <span class="w-1.5 h-1.5 rounded-full bg-secondary"></span>
+            PRODUK PILIHAN AREA {city.name.toUpperCase()}
+          </span>
+          <h2 class="font-serif text-2xl sm:text-3xl font-bold text-slate-900">
+            Karangan Bunga Favorit di {city.name}
+          </h2>
+          <p class="text-xs sm:text-sm text-slate-500 mt-1">
+            Produk terlaris siap antar ke seluruh alamat penerima di wilayah {city.name}.
+          </p>
+        </div>
+        <a 
+          href={withBase('/katalog/')}
+          class="inline-flex items-center gap-1.5 text-xs font-bold text-primary hover:text-primary-dark transition-colors shrink-0"
+        >
+          <span>Lihat Semua Katalog</span>
+          <span>→</span>
+        </a>
+      </div>
+
+      {activeProducts.length > 0 ? (
+        <div class="grid grid-cols-2 md:grid-cols-3 lg:grid-cols-4 gap-4 sm:gap-6">
+          {activeProducts.map((p) => (
+            <ProductCard product={p} />
+          ))}
+        </div>
+      ) : (
+        <div class="py-12 text-center bg-slate-50 rounded-2xl border border-dashed border-slate-200 p-8 space-y-3">
+          <span class="text-4xl block">🌸</span>
+          <h3 class="font-bold text-base text-slate-800">
+            Katalog Khusus {city.name} Siap Dipesan Langsung
+          </h3>
+          <p class="text-xs text-slate-500 max-w-md mx-auto">
+            Seluruh model bunga papan, buket bunga, dan standing flower kami dapat disesuaikan untuk pengiriman ke {city.name}.
+          </p>
+          <div class="pt-2">
+            <a 
+              href={waGeneralUrl}
+              target="_blank"
+              rel="noopener noreferrer"
+              class="inline-flex items-center gap-2 px-4 py-2 rounded-xl bg-primary hover:bg-primary-dark text-white font-semibold text-xs shadow-sm transition-all"
+            >
+              <span>Hubungi Florist via WhatsApp</span>
+              <span>→</span>
+            </a>
+          </div>
+        </div>
+      )}
+    </div>
+  </section>
+
+  <!-- Detailed Category Sections with City Products -->
+  <BungaPapanSection allProducts={products} />
+  <HandBouquetSection allProducts={products} />
+  <StandingFlowerSection allProducts={products} />
+  <BungaMejaSection allProducts={products} />
+  <TanbulampotSection allProducts={products} />
+  <PaperFlowerSection allProducts={products} />
+
+  <!-- Switch City Delivery Section -->
+  <CityDeliverySection currentCitySlug={city.slug} allCities={allCities} />
+
+</Layout>
+
+<!-- Client side sync script for live Supabase products & city fallback -->
+<script define:vars={{ SUPABASE_URL, SUPABASE_ANON_KEY, citySlug: city.slug, cityName: city.name }}>
+  (async function syncCityView() {
+    try {
+      if (!window.supabase) return;
+      const client = window.supabase.createClient(SUPABASE_URL, SUPABASE_ANON_KEY);
+      const { data: allProducts, error } = await client
+        .from('products')
+        .select('*')
+        .order('created_at', { ascending: false });
+
+      if (error || !allProducts || allProducts.length === 0) return;
+
+      const cloudSlugMap = new Map(allProducts.map(p => [p.slug, p]));
+
+      // Clean deleted products
+      document.querySelectorAll('a[href*="/produk/"]').forEach(link => {
+        const match = link.getAttribute('href').match(/\/produk\/([^\/]+)/);
+        if (!match || !match[1]) return;
+        const slug = match[1];
+
+        const card = link.closest('.product-card-shell, .category-product-card, .classic-product-card, article');
+        if (!card) return;
+
+        if (!cloudSlugMap.has(slug)) {
+          card.remove();
+        } else {
+          const p = cloudSlugMap.get(slug);
+          const priceEl = card.querySelector('.text-primary.font-extrabold, .font-extrabold.text-primary, [class*="font-extrabold"]');
+          if (priceEl && p.price_label) priceEl.textContent = p.price_label;
+
+          const titleEl = card.querySelector('h3');
+          if (titleEl && p.name && titleEl.textContent.trim() !== p.name) {
+            const linkInTitle = titleEl.querySelector('a');
+            if (linkInTitle) {
+              linkInTitle.textContent = p.name;
+            } else {
+              titleEl.textContent = p.name;
+            }
+          }
+        }
+      });
+    } catch (e) {
+      console.warn('City view sync notice:', e);
+    }
+  })();
+</script>

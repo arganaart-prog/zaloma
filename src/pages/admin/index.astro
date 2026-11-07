@@ -1181,6 +1181,189 @@ const title = "Admin — Zaloma Florist";
       // Initialize Supabase Client
       const supabase = window.supabase.createClient(SUPABASE_URL, SUPABASE_ANON_KEY);
 
+      // ==========================================
+      // BULLETPROOF CUSTOM DROPDOWN COMPONENT
+      // Replaces native OS popups with in-page floating dropdown menus
+      // ==========================================
+      function initCustomDropdown(selectId) {
+        const select = document.getElementById(selectId);
+        if (!select) return;
+
+        let root = select.nextElementSibling;
+        if (root && root.classList && root.classList.contains('custom-dropdown-root')) {
+          syncCustomDropdown(selectId);
+          return;
+        }
+
+        // Hide native select visually, keep in DOM for forms/validation
+        select.style.position = 'absolute';
+        select.style.opacity = '0';
+        select.style.pointerEvents = 'none';
+        select.style.width = '1px';
+        select.style.height = '1px';
+        select.tabIndex = -1;
+
+        root = document.createElement('div');
+        root.className = 'custom-dropdown-root relative w-full';
+        root.setAttribute('data-target-id', selectId);
+
+        const btn = document.createElement('button');
+        btn.type = 'button';
+        btn.className = 'custom-dropdown-btn w-full flex items-center justify-between px-3 py-2 rounded-lg border border-slate-300 text-xs bg-white text-slate-800 text-left hover:border-primary/60 focus:outline-none focus:ring-1 focus:ring-primary/20 transition-all cursor-pointer shadow-2xs select-none';
+
+        const label = document.createElement('span');
+        label.className = 'custom-dropdown-label truncate font-medium text-slate-800';
+
+        const arrow = document.createElement('span');
+        arrow.className = 'dropdown-arrow ml-2 text-slate-400 shrink-0 text-[10px] transition-transform duration-200';
+        arrow.textContent = '▼';
+
+        btn.appendChild(label);
+        btn.appendChild(arrow);
+
+        const menu = document.createElement('div');
+        menu.className = 'custom-dropdown-menu hidden absolute top-[calc(100%+4px)] left-0 right-0 bg-white border border-slate-200 rounded-xl shadow-xl z-50 max-h-60 overflow-y-auto p-1.5 space-y-0.5 animate-modal-pop';
+        menu.style.boxShadow = '0 10px 25px -5px rgba(0, 0, 0, 0.15), 0 8px 10px -6px rgba(0, 0, 0, 0.1)';
+
+        root.appendChild(btn);
+        root.appendChild(menu);
+
+        select.parentNode.insertBefore(root, select.nextSibling);
+
+        btn.addEventListener('click', (e) => {
+          e.preventDefault();
+          e.stopPropagation();
+          const isHidden = menu.classList.contains('hidden');
+          document.querySelectorAll('.custom-dropdown-menu').forEach(m => m.classList.add('hidden'));
+          document.querySelectorAll('.dropdown-arrow').forEach(a => a.style.transform = 'rotate(0deg)');
+          document.querySelectorAll('.custom-dropdown-btn').forEach(b => b.classList.remove('border-primary', 'ring-1', 'ring-primary/20'));
+
+          if (isHidden) {
+            renderItems();
+            menu.classList.remove('hidden');
+            arrow.style.transform = 'rotate(180deg)';
+            btn.classList.add('border-primary', 'ring-1', 'ring-primary/20');
+          }
+        });
+
+        function renderItems() {
+          menu.innerHTML = '';
+          const children = Array.from(select.children);
+          if (children.length === 0) {
+            menu.innerHTML = '<div class="px-3 py-2 text-xs text-slate-400 text-center">Tidak ada pilihan</div>';
+            return;
+          }
+
+          children.forEach(child => {
+            if (child.tagName === 'OPTGROUP') {
+              const grp = document.createElement('div');
+              grp.className = 'px-2.5 py-1 text-[11px] font-bold text-slate-500 bg-slate-50 rounded-md mt-1 flex items-center gap-1.5 border-l-2 border-primary';
+              grp.textContent = child.label;
+              menu.appendChild(grp);
+              Array.from(child.children).forEach(opt => {
+                menu.appendChild(buildOptionBtn(opt));
+              });
+            } else if (child.tagName === 'OPTION') {
+              menu.appendChild(buildOptionBtn(child));
+            }
+          });
+        }
+
+        function buildOptionBtn(opt) {
+          const b = document.createElement('button');
+          b.type = 'button';
+          const isAction = opt.value.startsWith('__ADD_NEW_');
+          const isSelected = select.value === opt.value;
+
+          let cls = 'w-full text-left px-3 py-2 rounded-lg text-xs transition-colors flex items-center justify-between cursor-pointer select-none ';
+          if (isAction) {
+            cls += 'font-semibold text-primary bg-primary/5 hover:bg-primary/10 border border-primary/20 my-1 ';
+          } else if (isSelected) {
+            cls += 'font-bold text-primary bg-primary/10 ';
+          } else {
+            cls += 'text-slate-700 hover:bg-slate-100 hover:text-slate-900 ';
+          }
+          b.className = cls;
+
+          const t = document.createElement('span');
+          t.className = 'truncate';
+          t.textContent = opt.textContent;
+          b.appendChild(t);
+
+          if (isSelected && !isAction && opt.value) {
+            const c = document.createElement('span');
+            c.className = 'text-primary font-bold ml-2 shrink-0 text-xs';
+            c.textContent = '✓';
+            b.appendChild(c);
+          }
+
+          b.addEventListener('click', (e) => {
+            e.preventDefault();
+            e.stopPropagation();
+            select.value = opt.value;
+            select.dispatchEvent(new Event('change', { bubbles: true }));
+            select.dispatchEvent(new Event('input', { bubbles: true }));
+            syncTriggerLabel();
+            menu.classList.add('hidden');
+            arrow.style.transform = 'rotate(0deg)';
+            btn.classList.remove('border-primary', 'ring-1', 'ring-primary/20');
+          });
+
+          return b;
+        }
+
+        function syncTriggerLabel() {
+          const selectedOpt = select.options[select.selectedIndex];
+          if (selectedOpt && selectedOpt.value) {
+            label.textContent = selectedOpt.textContent;
+            label.className = 'custom-dropdown-label truncate font-medium text-slate-800';
+          } else if (selectedOpt) {
+            label.textContent = selectedOpt.textContent;
+            label.className = 'custom-dropdown-label truncate font-normal text-slate-400';
+          } else {
+            label.textContent = 'Pilih...';
+            label.className = 'custom-dropdown-label truncate font-normal text-slate-400';
+          }
+        }
+
+        syncTriggerLabel();
+        select.addEventListener('change', syncTriggerLabel);
+      }
+
+      function syncCustomDropdown(selectId) {
+        const select = document.getElementById(selectId);
+        if (!select) return;
+        let root = select.nextElementSibling;
+        if (!root || !root.classList || !root.classList.contains('custom-dropdown-root')) {
+          initCustomDropdown(selectId);
+          return;
+        }
+        const label = root.querySelector('.custom-dropdown-label');
+        const selectedOpt = select.options[select.selectedIndex];
+        if (label) {
+          if (selectedOpt && selectedOpt.value) {
+            label.textContent = selectedOpt.textContent;
+            label.className = 'custom-dropdown-label truncate font-medium text-slate-800';
+          } else if (selectedOpt) {
+            label.textContent = selectedOpt.textContent;
+            label.className = 'custom-dropdown-label truncate font-normal text-slate-400';
+          } else {
+            label.textContent = 'Pilih...';
+            label.className = 'custom-dropdown-label truncate font-normal text-slate-400';
+          }
+        }
+      }
+
+      // Close all custom dropdown menus on click outside
+      document.addEventListener('click', (e) => {
+        if (!e.target.closest('.custom-dropdown-root')) {
+          document.querySelectorAll('.custom-dropdown-menu').forEach(m => m.classList.add('hidden'));
+          document.querySelectorAll('.dropdown-arrow').forEach(a => a.style.transform = 'rotate(0deg)');
+          document.querySelectorAll('.custom-dropdown-btn').forEach(b => b.classList.remove('border-primary', 'ring-1', 'ring-primary/20'));
+        }
+      });
+
+
       // Auth UI Elements
       const loginGate = document.getElementById('login-gate');
       const adminDashboard = document.getElementById('admin-dashboard');
@@ -1305,6 +1488,9 @@ const title = "Admin — Zaloma Florist";
         if (activeTab === tabBtnAdd) {
           if (typeof updateCityDropdowns === 'function') updateCityDropdowns();
           if (typeof updateSizeDropdowns === 'function') updateSizeDropdowns();
+          syncCustomDropdown('prod-category');
+          syncCustomDropdown('prod-city');
+          syncCustomDropdown('prod-size');
         }
       }
 
@@ -1452,6 +1638,8 @@ const title = "Admin — Zaloma Florist";
         }
 
         updateCategoryBadges();
+        syncCustomDropdown('prod-category');
+        syncCustomDropdown('edit-prod-category');
       }
 
       // Dynamic Subcategory Select for Add Form
@@ -1962,6 +2150,8 @@ const title = "Admin — Zaloma Florist";
         }
 
         updateCityBadges();
+        syncCustomDropdown('prod-city');
+        syncCustomDropdown('edit-prod-city');
       }
 
       function renderCitiesCards() {
@@ -2117,6 +2307,16 @@ const title = "Admin — Zaloma Florist";
       // Initial cities setup
       updateCityDropdowns();
       renderCitiesCards();
+
+      // Initialize Custom Dropdowns for all forms
+      initCustomDropdown('prod-category');
+      initCustomDropdown('prod-city');
+      initCustomDropdown('prod-size');
+      initCustomDropdown('edit-prod-category');
+      initCustomDropdown('edit-prod-city');
+      initCustomDropdown('edit-prod-size');
+      initCustomDropdown('size-category-select');
+
 
       // Quick manage city shortcuts
       document.getElementById('quick-manage-city-btn')?.addEventListener('click', () => {
@@ -2282,6 +2482,7 @@ const title = "Admin — Zaloma Florist";
         if (prevVal && prevVal !== '__ADD_NEW_SIZE__') {
           select.value = prevVal;
         }
+        syncCustomDropdown(selectId);
       }
 
       function updateSizeDropdowns() {
@@ -2581,6 +2782,7 @@ const title = "Admin — Zaloma Florist";
         } else if (combinedCats.length > 0) {
           sizeCategorySelect.value = combinedCats[0].slug;
         }
+        syncCustomDropdown('size-category-select');
       }
 
       function updatePapanPreview() {
@@ -3623,6 +3825,27 @@ const title = "Admin — Zaloma Florist";
       .animate-toast-in {
         animation: toastIn 0.18s ease-out forwards;
       }
+    
+      /* Custom Dropdown Polish */
+      .custom-dropdown-root {
+        position: relative;
+        width: 100%;
+      }
+      .custom-dropdown-menu {
+        scrollbar-width: thin;
+        scrollbar-color: #cbd5e1 transparent;
+      }
+      .custom-dropdown-menu::-webkit-scrollbar {
+        width: 6px;
+      }
+      .custom-dropdown-menu::-webkit-scrollbar-track {
+        background: transparent;
+      }
+      .custom-dropdown-menu::-webkit-scrollbar-thumb {
+        background: #cbd5e1;
+        border-radius: 9999px;
+      }
+
     </style>
   </body>
 </html>

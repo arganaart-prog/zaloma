@@ -134,6 +134,18 @@ const whatsappUrl = `https://wa.me/${WHATSAPP_NUMBER}?text=${encodeURIComponent(
   </div>
 
   <script define:vars={{ SUPABASE_URL, SUPABASE_ANON_KEY, WHATSAPP_NUMBER }}>
+    
+    // Check if visiting a city route
+    function checkDynamicCityRoute() {
+      const pathname = window.location.pathname;
+      const match = pathname.match(/\/kota\/([^\/]+)/);
+      if (!match || !match[1]) return false;
+      const citySlug = match[1];
+      // Redirect to homepage with city anchor or scroll to city section
+      window.location.replace('/#' + citySlug);
+      return true;
+    }
+
     async function checkDynamicProductRoute() {
       const pathname = window.location.pathname;
       const match = pathname.match(/\/produk\/([^\/]+)/);
@@ -251,7 +263,9 @@ const whatsappUrl = `https://wa.me/${WHATSAPP_NUMBER}?text=${encodeURIComponent(
       }
     }
 
-    checkDynamicProductRoute();
+    if (!checkDynamicCityRoute()) {
+      checkDynamicProductRoute();
+    }
   </script>
 
 </Layout>
