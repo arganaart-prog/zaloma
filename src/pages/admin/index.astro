@@ -512,7 +512,7 @@ const title = "Admin — Zaloma Florist";
 
     <!-- ================= ADD / EDIT CATEGORY MODAL ================= -->
     <div id="category-modal" class="hidden fixed inset-0 z-50 bg-black/40 backdrop-blur-xs flex items-center justify-center p-4 animate-fade-in">
-      <div class="bg-white rounded-2xl max-w-sm w-full p-5 shadow-xl border border-slate-200 space-y-3.5 animate-modal-pop">
+      <div class="bg-white rounded-2xl max-w-md w-full p-5 sm:p-6 shadow-xl border border-slate-200 space-y-3.5 animate-modal-pop">
         <div class="flex items-center justify-between pb-2.5 border-b border-slate-100">
           <h3 id="category-modal-title" class="text-sm font-bold text-slate-900 flex items-center gap-2">
             <span class="w-2 h-2 rounded-full bg-primary"></span>
@@ -532,7 +532,7 @@ const title = "Admin — Zaloma Florist";
               type="text" 
               id="category-name-input" 
               required 
-              placeholder="Contoh: Hampers & Parcel"
+              placeholder="Contoh: Bunga Papan, Hand Bouquet, Standing Flower..."
               class="w-full px-3 py-1.5 rounded-lg border border-slate-300 text-xs focus:outline-none focus:border-primary focus:ring-1 focus:ring-primary/20 transition-all"
             />
           </div>
@@ -545,7 +545,7 @@ const title = "Admin — Zaloma Florist";
               type="text" 
               id="category-slug-input" 
               required 
-              placeholder="hampers-parcel"
+              placeholder="bunga-papan"
               class="w-full px-3 py-1.5 rounded-lg border border-slate-300 text-xs font-mono focus:outline-none focus:border-primary focus:ring-1 focus:ring-primary/20 transition-all bg-slate-50"
             />
           </div>
@@ -562,7 +562,29 @@ const title = "Admin — Zaloma Florist";
             ></textarea>
           </div>
 
-          <div class="pt-2 border-t border-slate-100 flex items-center justify-end gap-2">
+          <!-- Section: Tambah Subkategori Langsung -->
+          <div class="pt-2 border-t border-slate-100 space-y-2">
+            <div class="flex items-center justify-between">
+              <div>
+                <label class="block text-xs font-semibold text-slate-700">Subkategori (Opsional)</label>
+                <p class="text-[10px] text-slate-400">Tambahkan subkategori langsung untuk kategori ini.</p>
+              </div>
+              <button 
+                type="button" 
+                id="modal-add-subcat-row-btn" 
+                class="text-xs font-semibold text-primary hover:text-primary-dark hover:bg-accent-bg px-2.5 py-1 rounded-md transition-colors cursor-pointer flex items-center gap-1 border border-primary/20"
+              >
+                + Tambah Sub Kategori
+              </button>
+            </div>
+
+            <!-- List of dynamic subcategory inputs -->
+            <div id="modal-subcategories-list" class="space-y-1.5 max-h-44 overflow-y-auto pr-0.5">
+              <!-- Dynamically appended subcategory rows -->
+            </div>
+          </div>
+
+          <div class="pt-3 border-t border-slate-100 flex items-center justify-end gap-2">
             <button type="button" id="cancel-category-btn" class="px-3 py-1.5 rounded-lg text-xs font-semibold text-slate-500 hover:bg-slate-100 cursor-pointer">Batal</button>
             <button type="submit" id="save-category-btn" class="bg-primary hover:bg-primary-dark text-white font-semibold py-1.5 px-4 rounded-lg text-xs transition-all active:scale-95 flex items-center gap-1.5 cursor-pointer shadow-sm">
               Simpan Kategori
@@ -769,15 +791,20 @@ const title = "Admin — Zaloma Florist";
         renderCategoriesCards();
       });
 
-      // Categories State Management
+      // Categories State Management (Clean initial state as requested)
       let categoriesList = [];
       try {
-        const cached = localStorage.getItem('zaloma_admin_categories');
-        if (cached) categoriesList = JSON.parse(cached);
-      } catch (e) {}
-
-      if (!categoriesList || !Array.isArray(categoriesList) || categoriesList.length === 0) {
-        categoriesList = JSON.parse(JSON.stringify(DEFAULT_CATEGORIES || []));
+        const cached = localStorage.getItem('zaloma_admin_categories_v2');
+        if (cached !== null) {
+          categoriesList = JSON.parse(cached);
+        } else {
+          // Clear legacy cache to remove all initial categories
+          localStorage.removeItem('zaloma_admin_categories');
+          localStorage.setItem('zaloma_admin_categories_v2', JSON.stringify([]));
+          categoriesList = [];
+        }
+      } catch (e) {
+        categoriesList = [];
       }
 
       function updateCategoryBadges() {
@@ -795,6 +822,7 @@ const title = "Admin — Zaloma Florist";
       // Persist categories to localStorage and Supabase Cloud
       async function persistCategories() {
         try {
+          localStorage.setItem('zaloma_admin_categories_v2', JSON.stringify(categoriesList));
           localStorage.setItem('zaloma_admin_categories', JSON.stringify(categoriesList));
           updateCategoryDropdowns();
           renderCategoriesCards();
@@ -832,6 +860,8 @@ const title = "Admin — Zaloma Florist";
             categoriesList.map(c => `<option value="${c.slug}">${c.name}</option>`).join('');
           if (categoriesList.some(c => c.slug === prevFilterVal)) {
             catFilter.value = prevFilterVal;
+          } else {
+            catFilter.value = 'all';
           }
         }
 
@@ -922,10 +952,24 @@ const title = "Admin — Zaloma Florist";
 
         if (categoriesList.length === 0) {
           container.innerHTML = `
-            <div class="col-span-full py-12 text-center text-slate-400 bg-white rounded-xl border border-dashed border-slate-200 p-6 text-xs">
-              Belum ada kategori yang ditambahkan. Klik "+ Tambah Kategori" di atas.
+            <div class="col-span-full py-14 text-center bg-white rounded-2xl border border-dashed border-slate-200 p-8 space-y-3">
+              <div class="w-12 h-12 rounded-2xl bg-accent-bg text-primary font-serif font-bold text-xl flex items-center justify-center mx-auto shadow-xs">
+                +
+              </div>
+              <h3 class="text-sm font-bold text-slate-800">Belum Ada Kategori</h3>
+              <p class="text-xs text-slate-500 max-w-sm mx-auto">Seluruh kategori telah dikosongkan. Klik tombol di bawah untuk menambah kategori baru dan subkategorinya.</p>
+              <button 
+                type="button" 
+                id="open-add-category-empty-btn" 
+                class="bg-primary hover:bg-primary-dark text-white font-semibold py-2 px-4 rounded-lg text-xs transition-all active:scale-95 shadow-sm cursor-pointer inline-flex items-center gap-1.5"
+              >
+                + Tambah Kategori Baru
+              </button>
             </div>
           `;
+          document.getElementById('open-add-category-empty-btn')?.addEventListener('click', () => {
+            openAddCategoryBtn?.click();
+          });
           return;
         }
 
@@ -1007,10 +1051,65 @@ const title = "Admin — Zaloma Florist";
       const categoryNameInput = document.getElementById('category-name-input');
       const categorySlugInput = document.getElementById('category-slug-input');
       const categoryDescInput = document.getElementById('category-desc-input');
+      const modalAddSubcatRowBtn = document.getElementById('modal-add-subcat-row-btn');
+      const modalSubcategoriesList = document.getElementById('modal-subcategories-list');
+
+      // Helper to append a dynamic subcategory row inside category modal
+      function appendSubcatRow(initialName = '', initialSlug = '') {
+        if (!modalSubcategoriesList) return;
+        const row = document.createElement('div');
+        row.className = 'modal-subcat-row flex items-center gap-2 animate-fade-in bg-slate-50 p-2 rounded-lg border border-slate-200';
+        row.innerHTML = `
+          <div class="flex-1">
+            <input 
+              type="text" 
+              class="modal-subcat-name-input w-full px-2.5 py-1.5 rounded-md border border-slate-300 text-xs focus:outline-none focus:border-primary focus:ring-1 focus:ring-primary/20 transition-all bg-white" 
+              placeholder="Nama Subkategori (misal: Duka Cita)" 
+              value="${initialName}"
+              required 
+            />
+          </div>
+          <div class="w-28">
+            <input 
+              type="text" 
+              class="modal-subcat-slug-input w-full px-2 py-1.5 rounded-md border border-slate-300 text-[11px] font-mono focus:outline-none focus:border-primary focus:ring-1 focus:ring-primary/20 transition-all bg-white" 
+              placeholder="slug" 
+              value="${initialSlug}"
+            />
+          </div>
+          <button 
+            type="button" 
+            class="modal-subcat-remove-btn text-slate-400 hover:text-rose-600 p-1 text-sm font-bold cursor-pointer transition-colors"
+            title="Hapus baris subkategori"
+          >
+            ✕
+          </button>
+        `;
+
+        const nameInp = row.querySelector('.modal-subcat-name-input');
+        const slugInp = row.querySelector('.modal-subcat-slug-input');
+        const removeBtn = row.querySelector('.modal-subcat-remove-btn');
+
+        nameInp?.addEventListener('input', () => {
+          slugInp.value = toSlug(nameInp.value);
+        });
+
+        removeBtn?.addEventListener('click', () => {
+          row.remove();
+        });
+
+        modalSubcategoriesList.appendChild(row);
+        nameInp?.focus();
+      }
+
+      modalAddSubcatRowBtn?.addEventListener('click', () => {
+        appendSubcatRow();
+      });
 
       openAddCategoryBtn?.addEventListener('click', () => {
         categoryForm.reset();
         document.getElementById('category-edit-id').value = '';
+        if (modalSubcategoriesList) modalSubcategoriesList.innerHTML = '';
         categoryModal.classList.remove('hidden');
         categoryNameInput.focus();
       });
@@ -1036,18 +1135,37 @@ const title = "Admin — Zaloma Florist";
           slug = `${slug}-${Date.now().toString().slice(-4)}`;
         }
 
+        // Collect all subcategories from dynamic input rows
+        const subcategories = [];
+        const rows = modalSubcategoriesList?.querySelectorAll('.modal-subcat-row') || [];
+        rows.forEach(row => {
+          const nameInput = row.querySelector('.modal-subcat-name-input');
+          const slugInput = row.querySelector('.modal-subcat-slug-input');
+          const sName = nameInput ? nameInput.value.trim() : '';
+          let sSlug = slugInput ? slugInput.value.trim() : '';
+          if (!sSlug) sSlug = toSlug(sName);
+
+          if (sName) {
+            subcategories.push({
+              id: sSlug,
+              name: sName,
+              slug: sSlug
+            });
+          }
+        });
+
         const newCat = {
           id: slug,
           name,
           slug,
           description: desc,
-          subcategories: []
+          subcategories: subcategories
         };
 
         categoriesList.push(newCat);
         await persistCategories();
         categoryModal.classList.add('hidden');
-        showToast(`Kategori "${name}" berhasil ditambahkan.`);
+        showToast(`Kategori "${name}" berhasil ditambahkan${subcategories.length > 0 ? ` dengan ${subcategories.length} subkategori` : ''}.`);
       });
 
       // Subcategory Modal & Handlers
@@ -1296,8 +1414,9 @@ const title = "Admin — Zaloma Florist";
           if (configRow && configRow.description) {
             try {
               const cloudCats = JSON.parse(configRow.description);
-              if (Array.isArray(cloudCats) && cloudCats.length > 0) {
+              if (Array.isArray(cloudCats)) {
                 categoriesList = cloudCats;
+                localStorage.setItem('zaloma_admin_categories_v2', JSON.stringify(categoriesList));
                 localStorage.setItem('zaloma_admin_categories', JSON.stringify(categoriesList));
                 updateCategoryDropdowns();
                 renderCategoriesCards();
