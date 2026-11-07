@@ -27,6 +27,18 @@ const whatsappUrl = `https://wa.me/${WHATSAPP_NUMBER}?text=${encodeURIComponent(
     <div id="dynamic-product-content" class="hidden"></div>
   </div>
 
+  <!-- Container jika URL ternyata adalah rute kota dinamis -->
+  <div id="dynamic-city-view" class="hidden min-h-[60vh] bg-white">
+    <div id="dynamic-city-spinner" class="py-24 text-center">
+      <svg class="w-10 h-10 animate-spin text-primary mx-auto mb-3" fill="none" viewBox="0 0 24 24">
+        <circle class="opacity-25" cx="12" cy="12" r="10" stroke="currentColor" stroke-width="4"></circle>
+        <path class="opacity-75" fill="currentColor" d="M4 12a8 8 0 018-8v8H4z"></path>
+      </svg>
+      <p class="text-sm font-semibold text-slate-500">Memuat katalog bunga kota tujuan...</p>
+    </div>
+    <div id="dynamic-city-content" class="hidden"></div>
+  </div>
+
   <div class="e404-root" id="e404-container">
 
     <!-- Left column: editorial content -->
@@ -136,13 +148,213 @@ const whatsappUrl = `https://wa.me/${WHATSAPP_NUMBER}?text=${encodeURIComponent(
   <script define:vars={{ SUPABASE_URL, SUPABASE_ANON_KEY, WHATSAPP_NUMBER }}>
     
     // Check if visiting a city route
-    function checkDynamicCityRoute() {
+    async function checkDynamicCityRoute() {
       const pathname = window.location.pathname;
       const match = pathname.match(/\/kota\/([^\/]+)/);
       if (!match || !match[1]) return false;
       const citySlug = match[1];
-      // Redirect to homepage with city anchor or scroll to city section
-      window.location.replace('/#' + citySlug);
+
+      const e404Container = document.getElementById('e404-container');
+      const dynamicCityView = document.getElementById('dynamic-city-view');
+      const spinner = document.getElementById('dynamic-city-spinner');
+      const content = document.getElementById('dynamic-city-content');
+
+      if (e404Container) e404Container.classList.add('hidden');
+      if (dynamicCityView) dynamicCityView.classList.remove('hidden');
+
+      // Helper to title-case slug
+      let cityName = citySlug
+        .split('-')
+        .map(w => w.charAt(0).toUpperCase() + w.slice(1))
+        .join(' ');
+      
+      if (citySlug === 'malang-raya') cityName = 'Malang Raya';
+      if (citySlug === 'bisa-dikirim-ke-mana-saja') cityName = 'Bisa Dikirim ke Mana Saja';
+
+      let cityDesc = `Pengiriman karangan bunga papan & buket bunga terpercaya untuk area ${cityName} dan sekitarnya.`;
+      let liveProducts = [];
+
+      try {
+        if (window.supabase) {
+          const client = window.supabase.createClient(SUPABASE_URL, SUPABASE_ANON_KEY);
+          const { data, error } = await client
+            .from('products')
+            .select('*')
+            .order('created_at', { ascending: false });
+
+          if (!error && Array.isArray(data)) {
+            const cfg = data.find(p => p.slug === '_cities_config_');
+            if (cfg && cfg.description) {
+              try {
+                const parsed = JSON.parse(cfg.description);
+                if (Array.isArray(parsed)) {
+                  const found = parsed.find(c => {
+                    const s = typeof c === 'string' ? c.toLowerCase().replace(/[^\w\s-]/g, '').replace(/\s+/g, '-') : (c.slug || c.name.toLowerCase().replace(/[^\w\s-]/g, '').replace(/\s+/g, '-'));
+                    return s === citySlug;
+                  });
+                  if (found) {
+                    if (typeof found !== 'string' && found.name) cityName = found.name;
+                    if (typeof found !== 'string' && found.description) cityDesc = found.description;
+                  }
+                }
+              } catch (e) {}
+            }
+            liveProducts = data.filter(p => !p.slug.startsWith('_'));
+          }
+        }
+      } catch (err) {
+        console.warn('City dynamic route notice:', err);
+      }
+
+      document.title = `Toko Bunga ${cityName} — Florist Murah & Berkualitas | Zaloma Florist`;
+
+      // Filter products for this city
+      const tNorm = cityName.toLowerCase();
+      const filtered = liveProducts.filter(p => {
+        if (!cityName || tNorm.includes('mana saja')) return true;
+        const pNorm = (p.city || 'Malang Raya').toLowerCase();
+        if (pNorm.includes('mana saja') || pNorm.includes('seluruh indonesia')) return true;
+        if (pNorm === tNorm) return true;
+        if (tNorm.includes('malang raya') && (pNorm.includes('malang') || pNorm.includes('batu'))) return true;
+        if (pNorm.includes('malang raya') && (tNorm.includes('malang') || tNorm.includes('batu'))) return true;
+        return pNorm.includes(tNorm) || tNorm.includes(pNorm);
+      });
+
+      const waGeneral = `https://wa.me/${WHATSAPP_NUMBER}?text=${encodeURIComponent(`Halo Zaloma Florist, saya ingin pesan karangan bunga untuk pengiriman ke ${cityName}.`)}`;
+
+      if (content) {
+        content.innerHTML = `
+          <!-- Breadcrumb -->
+          <div class="bg-[#fbf9f4] border-b border-[#e6decc]/60">
+            <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-3">
+              <nav aria-label="Breadcrumb">
+                <ol class="flex items-center space-x-2 text-xs font-semibold text-slate-500">
+                  <li><a href="/" class="hover:text-primary transition-colors">Beranda</a></li>
+                  <li class="text-slate-300">/</li>
+                  <li><a href="/#pilih-pengiriman-luar-kota" class="hover:text-primary transition-colors">Pengiriman Luar Kota</a></li>
+                  <li class="text-slate-300">/</li>
+                  <li class="text-slate-800 font-bold">${cityName}</li>
+                </ol>
+              </nav>
+            </div>
+          </div>
+
+          <!-- Hero Banner -->
+          <section class="relative bg-gradient-to-b from-[#fbf9f4] via-white to-[#fbf9f4] py-12 sm:py-16 overflow-hidden border-b border-[#e6decc]/60">
+            <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 relative z-10">
+              <div class="max-w-3xl">
+                <div class="inline-flex items-center gap-2 px-3 py-1.5 rounded-full text-xs font-bold uppercase tracking-wider bg-primary/10 text-primary border border-primary/20 mb-4 shadow-2xs">
+                  <span class="w-2 h-2 rounded-full bg-primary animate-pulse"></span>
+                  <span>WILAYAH PENGIRIMAN: ${cityName}</span>
+                </div>
+                <h1 class="font-serif text-3xl sm:text-4xl lg:text-5xl font-bold text-slate-900 leading-tight">
+                  Toko Bunga &amp; Florist ${cityName}
+                </h1>
+                <p class="text-sm sm:text-base text-slate-600 mt-4 leading-relaxed">${cityDesc}</p>
+                
+                <div class="grid grid-cols-2 sm:grid-cols-3 gap-3 my-6 pt-2">
+                  <div class="flex items-center gap-2 p-2.5 rounded-xl bg-white border border-slate-200 shadow-2xs">
+                    <span class="text-lg">⚡</span>
+                    <span class="text-xs font-semibold text-slate-700">Kirim Cepat 3-5 Jam</span>
+                  </div>
+                  <div class="flex items-center gap-2 p-2.5 rounded-xl bg-white border border-slate-200 shadow-2xs">
+                    <span class="text-lg">📸</span>
+                    <span class="text-xs font-semibold text-slate-700">Foto Sebelum Kirim</span>
+                  </div>
+                  <div class="flex items-center gap-2 p-2.5 rounded-xl bg-white border border-slate-200 shadow-2xs col-span-2 sm:col-span-1">
+                    <span class="text-lg">🌸</span>
+                    <span class="text-xs font-semibold text-slate-700">100% Bunga Segar</span>
+                  </div>
+                </div>
+
+                <div class="flex flex-wrap items-center gap-3 pt-2">
+                  <a href="#katalog-kota" class="px-5 py-2.5 rounded-xl bg-primary hover:bg-primary-dark text-white font-semibold text-xs sm:text-sm transition-all shadow-sm">
+                    Lihat Produk ${cityName}
+                  </a>
+                  <a href="${waGeneral}" target="_blank" rel="noopener noreferrer" class="px-5 py-2.5 rounded-xl bg-secondary hover:bg-secondary-dark text-primary-dark font-bold text-xs sm:text-sm transition-all shadow-sm flex items-center gap-2">
+                    <span>Pesan via WhatsApp</span>
+                    <svg class="w-4 h-4" fill="currentColor" viewBox="0 0 24 24"><path d="M.057 24l1.687-6.163c-1.041-1.804-1.588-3.849-1.587-5.946.003-6.556 5.338-11.891 11.893-11.891 3.181.001 6.167 1.24 8.413 3.488 2.245 2.248 3.481 5.236 3.48 8.414-.003 6.557-5.338 11.892-11.893 11.892-1.99-.001-3.951-.5-5.688-1.448l-6.305 1.654zm6.597-3.807c1.676.995 3.276 1.591 5.392 1.592 5.448 0 9.886-4.434 9.889-9.885.002-5.462-4.415-9.89-9.881-9.892-5.452 0-9.887 4.434-9.889 9.884-.001 2.225.651 3.891 1.746 5.634l-.999 3.648 3.742-.981z"/></svg>
+                  </a>
+                </div>
+              </div>
+            </div>
+          </section>
+
+          <!-- Products Section -->
+          <section class="py-16 sm:py-20 bg-white" id="katalog-kota">
+            <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
+              <div class="flex flex-col sm:flex-row sm:items-end justify-between mb-10 pb-4 border-b border-slate-100 gap-4">
+                <div>
+                  <span class="text-xs font-bold uppercase tracking-wider text-secondary flex items-center gap-1.5 mb-1.5">
+                    <span class="w-1.5 h-1.5 rounded-full bg-secondary"></span>
+                    PRODUK SIAP ANTAR ${cityName.toUpperCase()}
+                  </span>
+                  <h2 class="font-serif text-2xl sm:text-3xl font-bold text-slate-900">
+                    Karangan Bunga Favorit di ${cityName}
+                  </h2>
+                </div>
+                <a href="/katalog/" class="text-xs font-bold text-primary hover:text-primary-dark">Lihat Semua Katalog &rarr;</a>
+              </div>
+
+              ${filtered.length > 0 ? `
+                <div class="grid grid-cols-2 md:grid-cols-3 lg:grid-cols-4 gap-4 sm:gap-6">
+                  ${filtered.map(p => `
+                    <div class="bg-white rounded-2xl border border-slate-200 overflow-hidden shadow-xs flex flex-col justify-between group hover:shadow-md transition-shadow">
+                      <div class="aspect-square relative overflow-hidden bg-slate-50">
+                        <img src="${p.image}" alt="${p.name}" class="w-full h-full object-cover group-hover:scale-105 transition-transform duration-500" loading="lazy" />
+                        <span class="absolute top-2.5 left-2.5 px-2 py-0.5 rounded-md text-[10px] font-bold uppercase bg-white/90 text-primary border border-primary/20 backdrop-blur-xs">
+                          ${p.city || cityName}
+                        </span>
+                      </div>
+                      <div class="p-3.5 sm:p-4 flex flex-col flex-1 justify-between gap-3">
+                        <div>
+                          <span class="text-[11px] font-semibold text-secondary uppercase tracking-wider block">${p.category_name || 'Florist'}</span>
+                          <h3 class="font-bold text-sm text-slate-900 mt-0.5 line-clamp-2">${p.name}</h3>
+                          <span class="text-sm sm:text-base font-extrabold text-primary block mt-1">${p.price_label}</span>
+                        </div>
+                        <a href="https://wa.me/${WHATSAPP_NUMBER}?text=${encodeURIComponent(`Halo Zaloma Florist, saya ingin pesan ${p.name} (${p.price_label}) untuk kirim ke ${cityName}.`)}" target="_blank" rel="noopener noreferrer" class="w-full py-2 px-3 rounded-xl bg-primary hover:bg-primary-dark text-white font-bold text-xs text-center flex items-center justify-center gap-1.5 transition-colors">
+                          <span>Pesan Sekarang</span>
+                          <span>&rarr;</span>
+                        </a>
+                      </div>
+                    </div>
+                  `).join('')}
+                </div>
+              ` : `
+                <div class="py-12 text-center bg-slate-50 rounded-2xl border border-dashed border-slate-200 p-8 space-y-3">
+                  <span class="text-4xl block">🌸</span>
+                  <h3 class="font-bold text-base text-slate-800">Katalog Khusus ${cityName} Siap Dipesan Langsung</h3>
+                  <p class="text-xs text-slate-500 max-w-md mx-auto">Seluruh rangkaian bunga papan, hand bouquet, dan standing flower kami dapat dipesan dan dikirim ke alamat tujuan di ${cityName}.</p>
+                  <div class="pt-2">
+                    <a href="${waGeneral}" target="_blank" rel="noopener noreferrer" class="inline-flex items-center gap-2 px-4 py-2 rounded-xl bg-primary text-white font-semibold text-xs shadow-sm">
+                      <span>Hubungi Florist via WhatsApp</span>
+                      <span>&rarr;</span>
+                    </a>
+                  </div>
+                </div>
+              `}
+            </div>
+          </section>
+
+          <!-- Back to other cities -->
+          <section class="py-14 bg-primary text-white text-center">
+            <div class="max-w-4xl mx-auto px-4">
+              <span class="text-xs font-bold uppercase tracking-widest text-secondary-light">JANGKAUAN PENGIRIMAN</span>
+              <h2 class="font-serif text-2xl sm:text-3xl font-bold mt-2">Kirim Karangan Bunga ke Kota Lainnya?</h2>
+              <p class="text-xs sm:text-sm text-white/80 mt-2 max-w-xl mx-auto">Kami siap mengantar karangan bunga papan dan buket bunga ke Malang Raya, Surabaya, Sidoarjo, Gresik, Pasuruan, Kediri, Blitar, dan seluruh Indonesia.</p>
+              <div class="mt-6">
+                <a href="/#pilih-pengiriman-luar-kota" class="inline-flex items-center gap-2 px-5 py-2.5 rounded-xl bg-secondary hover:bg-secondary-dark text-primary-dark font-bold text-xs transition-all shadow-md">
+                  <span>Pilih Pengiriman Luar Kota</span>
+                  <span>&rarr;</span>
+                </a>
+              </div>
+            </div>
+          </section>
+        `;
+        if (spinner) spinner.classList.add('hidden');
+        content.classList.remove('hidden');
+      }
+
       return true;
     }
 
@@ -263,9 +475,11 @@ const whatsappUrl = `https://wa.me/${WHATSAPP_NUMBER}?text=${encodeURIComponent(
       }
     }
 
-    if (!checkDynamicCityRoute()) {
-      checkDynamicProductRoute();
-    }
+    checkDynamicCityRoute().then(isCity => {
+      if (!isCity) {
+        checkDynamicProductRoute();
+      }
+    });
   </script>
 
 </Layout>

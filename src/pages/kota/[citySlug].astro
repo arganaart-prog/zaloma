@@ -47,26 +47,39 @@ export async function getStaticPaths() {
 
   // Combine default cities and dynamic cities
   const combinedCities: any[] = [];
-  const seenSlugs = new Set();
+  const seenSlugs = new Set<string>();
 
+  // 1. Add DEFAULT_CITIES first with rich images and metadata
+  DEFAULT_CITIES.forEach(dc => {
+    if (dc && dc.slug && !seenSlugs.has(dc.slug)) {
+      seenSlugs.add(dc.slug);
+      const dynMatch = dynamicCities.find(c => {
+        const s = typeof c === 'string' ? cityToSlug(c) : (c && (c.slug || cityToSlug(c.name)));
+        return s === dc.slug;
+      });
+      combinedCities.push({
+        ...dc,
+        description: (dynMatch && dynMatch.description) ? dynMatch.description : dc.description
+      });
+    }
+  });
+
+  // 2. Add additional custom dynamic cities from Supabase
   dynamicCities.forEach(c => {
-    const name = typeof c === 'string' ? c : c.name;
+    const name = typeof c === 'string' ? c : (c && c.name);
+    if (!name) return;
     const slug = typeof c === 'string' ? cityToSlug(c) : (c.slug || cityToSlug(c.name));
     if (slug && !seenSlugs.has(slug)) {
       seenSlugs.add(slug);
       combinedCities.push({
         name,
         slug,
-        description: c.description || `Pengiriman karangan bunga area ${name}`,
-        tagline: c.tagline || `Area ${name} & Sekitarnya`
+        image: (c && c.image) || '/images/galeri/gallery-1.webp',
+        description: (c && c.description) || `Pengiriman karangan bunga & buket area ${name}`,
+        tagline: (c && c.tagline) || `Area ${name} & Sekitarnya`,
+        seoTitle: `Toko Bunga ${name} — Florist Murah & Berkualitas | Zaloma Florist`,
+        seoDescription: `Pesan karangan bunga papan, buket bunga, standing flower di ${name}. Pengerjaan cepat 3-5 jam, bunga segar berkualitas & garansi foto sebelum kirim.`
       });
-    }
-  });
-
-  DEFAULT_CITIES.forEach(dc => {
-    if (!seenSlugs.has(dc.slug)) {
-      seenSlugs.add(dc.slug);
-      combinedCities.push(dc);
     }
   });
 
