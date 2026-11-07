@@ -337,9 +337,15 @@ const title = "Admin — Zaloma Florist";
                     <label for="prod-city" class="block text-xs font-semibold text-slate-700">
                       Wilayah / Area Pengiriman <span class="text-rose-500">*</span>
                     </label>
-                    <button type="button" id="quick-manage-city-btn" class="text-[11px] text-primary hover:text-primary-dark hover:underline font-medium cursor-pointer">
-                      ⚙️ Kelola Kota
-                    </button>
+                    <div class="flex items-center gap-1.5">
+                      <button type="button" id="quick-add-city-btn" class="text-[11px] text-primary hover:text-primary-dark font-semibold cursor-pointer">
+                        + Tambah Kota
+                      </button>
+                      <span class="text-slate-300">|</span>
+                      <button type="button" id="quick-manage-city-btn" class="text-[11px] text-slate-500 hover:text-slate-700 font-medium cursor-pointer">
+                        ⚙️ Kelola
+                      </button>
+                    </div>
                   </div>
                   <select 
                     id="prod-city" 
@@ -347,6 +353,7 @@ const title = "Admin — Zaloma Florist";
                     class="w-full px-3 py-2 rounded-lg border border-slate-300 text-xs bg-white focus:outline-none focus:border-primary focus:ring-1 focus:ring-primary/20 transition-all cursor-pointer"
                   >
                     <option value="" disabled>Pilih Wilayah / Kota Pengiriman...</option>
+                    <option value="__ADD_NEW_CITY__" class="font-semibold text-primary">➕ + Tambah Kota Pengiriman Baru...</option>
                     <option value="Malang Raya (Kota Malang, Kab. Malang, Kota Batu)" selected>📍 Malang Raya (Kota Malang, Kab. Malang, Kota Batu)</option>
                     <option value="Bisa Dikirim ke Mana Saja">🌍 Bisa Dikirim ke Mana Saja</option>
                     <option value="Kota Malang">📍 Kota Malang</option>
@@ -359,7 +366,7 @@ const title = "Admin — Zaloma Florist";
                     <option value="Kediri">📍 Kediri</option>
                     <option value="Blitar">📍 Blitar</option>
                   </select>
-                  <p class="text-[10px] text-slate-400 mt-1">Pilih kota pengiriman yang tersedia di sistem.</p>
+                  <p class="text-[10px] text-slate-400 mt-1">Pilih kota pengiriman atau klik "+ Tambah Kota" untuk menambah wilayah baru.</p>
                 </div>
 
                 <div>
@@ -367,15 +374,22 @@ const title = "Admin — Zaloma Florist";
                     <label for="prod-size" class="block text-xs font-semibold text-slate-700">
                       Ukuran Produk <span class="text-slate-400 font-normal">(Opsional)</span>
                     </label>
-                    <button type="button" id="quick-manage-size-btn" class="text-[11px] text-primary hover:text-primary-dark hover:underline font-medium cursor-pointer">
-                      ⚙️ Kelola Ukuran
-                    </button>
+                    <div class="flex items-center gap-1.5">
+                      <button type="button" id="quick-add-size-btn" class="text-[11px] text-primary hover:text-primary-dark font-semibold cursor-pointer">
+                        + Tambah Ukuran
+                      </button>
+                      <span class="text-slate-300">|</span>
+                      <button type="button" id="quick-manage-size-btn" class="text-[11px] text-slate-500 hover:text-slate-700 font-medium cursor-pointer">
+                        ⚙️ Kelola
+                      </button>
+                    </div>
                   </div>
                   <select 
                     id="prod-size" 
                     class="w-full px-3 py-2 rounded-lg border border-slate-300 text-xs bg-white focus:outline-none focus:border-primary focus:ring-1 focus:ring-primary/20 transition-all cursor-pointer"
                   >
                     <option value="">-- Pilih Ukuran (Opsional) --</option>
+                    <option value="__ADD_NEW_SIZE__" class="font-semibold text-primary">➕ + Tambah Ukuran Baru ke Database...</option>
                     <optgroup label="Bunga Papan">
                       <option value="2 x 1.2 m" data-category="bunga-papan">📏 2 x 1.2 m (Ukuran Standar)</option>
                       <option value="2 x 1.5 m" data-category="bunga-papan">📏 2 x 1.5 m (Ukuran Sedang)</option>
@@ -694,12 +708,19 @@ const title = "Admin — Zaloma Florist";
           <div>
             <div class="flex items-center justify-between mb-1">
               <label for="edit-prod-city" class="block text-xs font-semibold text-slate-700">Wilayah / Area Pengiriman</label>
-              <button type="button" id="edit-quick-manage-city-btn" class="text-[10px] text-primary hover:text-primary-dark hover:underline font-medium cursor-pointer">
-                ⚙️ Kelola Kota
-              </button>
+              <div class="flex items-center gap-1.5">
+                <button type="button" id="edit-quick-add-city-btn" class="text-[10px] text-primary hover:text-primary-dark font-semibold cursor-pointer">
+                  + Tambah Kota
+                </button>
+                <span class="text-slate-300">|</span>
+                <button type="button" id="edit-quick-manage-city-btn" class="text-[10px] text-slate-500 hover:text-slate-700 font-medium cursor-pointer">
+                  ⚙️ Kelola
+                </button>
+              </div>
             </div>
             <select id="edit-prod-city" required class="w-full px-3 py-1.5 rounded-lg border border-slate-300 text-xs bg-white focus:outline-none focus:border-primary focus:ring-1 focus:ring-primary/20 transition-all cursor-pointer">
               <option value="" disabled>Pilih Wilayah / Kota Pengiriman...</option>
+              <option value="__ADD_NEW_CITY__" class="font-semibold text-primary">➕ + Tambah Kota Pengiriman Baru...</option>
               <option value="Malang Raya (Kota Malang, Kab. Malang, Kota Batu)" selected>📍 Malang Raya (Kota Malang, Kab. Malang, Kota Batu)</option>
               <option value="Bisa Dikirim ke Mana Saja">🌍 Bisa Dikirim ke Mana Saja</option>
               <option value="Kota Malang">📍 Kota Malang</option>
@@ -717,12 +738,19 @@ const title = "Admin — Zaloma Florist";
           <div>
             <div class="flex items-center justify-between mb-1">
               <label for="edit-prod-size" class="block text-xs font-semibold text-slate-700">Ukuran Produk <span class="text-slate-400 font-normal">(Opsional)</span></label>
-              <button type="button" id="edit-quick-manage-size-btn" class="text-[10px] text-primary hover:text-primary-dark hover:underline font-medium cursor-pointer">
-                ⚙️ Kelola Ukuran
-              </button>
+              <div class="flex items-center gap-1.5">
+                <button type="button" id="edit-quick-add-size-btn" class="text-[10px] text-primary hover:text-primary-dark font-semibold cursor-pointer">
+                  + Tambah Ukuran
+                </button>
+                <span class="text-slate-300">|</span>
+                <button type="button" id="edit-quick-manage-size-btn" class="text-[10px] text-slate-500 hover:text-slate-700 font-medium cursor-pointer">
+                  ⚙️ Kelola
+                </button>
+              </div>
             </div>
             <select id="edit-prod-size" class="w-full px-3 py-1.5 rounded-lg border border-slate-300 text-xs bg-white focus:outline-none focus:border-primary focus:ring-1 focus:ring-primary/20 transition-all cursor-pointer">
               <option value="">-- Pilih Ukuran (Opsional) --</option>
+              <option value="__ADD_NEW_SIZE__" class="font-semibold text-primary">➕ + Tambah Ukuran Baru ke Database...</option>
               <optgroup label="Bunga Papan">
                 <option value="2 x 1.2 m" data-category="bunga-papan">📏 2 x 1.2 m (Ukuran Standar)</option>
                 <option value="2 x 1.5 m" data-category="bunga-papan">📏 2 x 1.5 m (Ukuran Sedang)</option>
@@ -1295,27 +1323,56 @@ const title = "Admin — Zaloma Florist";
         renderSizesCards();
       });
 
-      // Categories State Management (v3 with requested initial categories)
+      // Helper to safely persist system configuration rows without onConflict failure
+      async function saveSystemConfig(slugVal, nameVal, jsonString) {
+        try {
+          const payload = {
+            slug: slugVal,
+            name: nameVal,
+            category_slug: '_system_',
+            category_name: 'System',
+            price_from: 0,
+            price_label: 'Rp 0',
+            image: 'https://zalomaflorist.com/favicon.ico',
+            description: jsonString,
+            featured: false,
+            city: 'Malang'
+          };
+
+          const { data: existing } = await supabase
+            .from('products')
+            .select('id')
+            .eq('slug', slugVal)
+            .maybeSingle();
+
+          if (existing && existing.id) {
+            await supabase.from('products').update(payload).eq('id', existing.id);
+          } else {
+            await supabase.from('products').insert([payload]);
+          }
+        } catch (err) {
+          console.warn(`Sync system config notice (${slugVal}):`, err);
+        }
+      }
+
+      // Categories State Management (v4)
       let categoriesList = [];
       try {
-        const cached = localStorage.getItem('zaloma_admin_categories_v3');
+        const cached = localStorage.getItem('zaloma_admin_categories_v4') || localStorage.getItem('zaloma_admin_categories_v3');
         if (cached !== null) {
           categoriesList = JSON.parse(cached);
-          if (!Array.isArray(categoriesList) || categoriesList.length <= 1) {
-            const existingSlugs = new Set((categoriesList || []).map(c => c.slug));
-            (DEFAULT_CATEGORIES || []).forEach(dc => {
-              if (!existingSlugs.has(dc.slug)) categoriesList.push(dc);
-            });
-            localStorage.setItem('zaloma_admin_categories_v3', JSON.stringify(categoriesList));
-          }
-        } else {
-          // Seed with DEFAULT_CATEGORIES
-          categoriesList = JSON.parse(JSON.stringify(DEFAULT_CATEGORIES || []));
-          localStorage.setItem('zaloma_admin_categories_v3', JSON.stringify(categoriesList));
+          if (!Array.isArray(categoriesList)) categoriesList = [];
         }
       } catch (e) {
-        categoriesList = JSON.parse(JSON.stringify(DEFAULT_CATEGORIES || []));
+        categoriesList = [];
       }
+
+      // Always guarantee all 7 default categories are present
+      const existingCatSlugs = new Set((categoriesList || []).map(c => c && c.slug));
+      (DEFAULT_CATEGORIES || []).forEach(dc => {
+        if (!existingCatSlugs.has(dc.slug)) categoriesList.push(dc);
+      });
+      localStorage.setItem('zaloma_admin_categories_v4', JSON.stringify(categoriesList));
 
       function updateCategoryBadges() {
         const badge = document.getElementById('tab-cat-badge');
@@ -1332,25 +1389,12 @@ const title = "Admin — Zaloma Florist";
       // Persist categories to localStorage and Supabase Cloud
       async function persistCategories() {
         try {
+          localStorage.setItem('zaloma_admin_categories_v4', JSON.stringify(categoriesList));
           localStorage.setItem('zaloma_admin_categories_v3', JSON.stringify(categoriesList));
-          localStorage.setItem('zaloma_admin_categories_v2', JSON.stringify(categoriesList));
-          localStorage.setItem('zaloma_admin_categories', JSON.stringify(categoriesList));
           updateCategoryDropdowns();
           renderCategoriesCards();
           updateCategoryBadges();
-
-          await supabase.from('products').upsert({
-            slug: '_categories_config_',
-            name: 'System Categories Config',
-            category_slug: '_system_',
-            category_name: 'System',
-            price_from: 0,
-            price_label: 'Rp 0',
-            image: 'https://zalomaflorist.com/favicon.ico',
-            description: JSON.stringify(categoriesList),
-            featured: false,
-            city: 'Malang'
-          }, { onConflict: 'slug' });
+          await saveSystemConfig('_categories_config_', 'System Categories Config', JSON.stringify(categoriesList));
         } catch (err) {
           console.warn('Sync categories notice:', err);
         }
@@ -1417,7 +1461,7 @@ const title = "Admin — Zaloma Florist";
 
       prodCategorySelect?.addEventListener('change', () => {
         const selectedSlug = prodCategorySelect.value;
-        const cat = categoriesList.find(c => c.slug === selectedSlug);
+        const cat = (categoriesList || []).find(c => c.slug === selectedSlug) || (DEFAULT_CATEGORIES || []).find(c => c.slug === selectedSlug);
         if (cat && cat.subcategories && cat.subcategories.length > 0) {
           prodSubcatSelect.innerHTML = '<option value="">Pilih Subkategori (Opsional)...</option>' +
             cat.subcategories.map(s => `<option value="${s.slug}" data-name="${s.name}">${s.name}</option>`).join('');
@@ -1438,7 +1482,7 @@ const title = "Admin — Zaloma Florist";
 
       editCategorySelect?.addEventListener('change', () => {
         const selectedSlug = editCategorySelect.value;
-        const cat = categoriesList.find(c => c.slug === selectedSlug);
+        const cat = (categoriesList || []).find(c => c.slug === selectedSlug) || (DEFAULT_CATEGORIES || []).find(c => c.slug === selectedSlug);
         if (cat && cat.subcategories && cat.subcategories.length > 0) {
           editSubcatSelect.innerHTML = '<option value="">Pilih Subkategori (Opsional)...</option>' +
             cat.subcategories.map(s => `<option value="${s.slug}" data-name="${s.name}">${s.name}</option>`).join('');
@@ -1849,16 +1893,21 @@ const title = "Admin — Zaloma Florist";
 
       let citiesList = [];
       try {
-        const cachedCities = localStorage.getItem('zaloma_admin_cities_v1');
+        const cachedCities = localStorage.getItem('zaloma_admin_cities_v2') || localStorage.getItem('zaloma_admin_cities_v1');
         if (cachedCities !== null) {
           citiesList = JSON.parse(cachedCities);
-        } else {
-          citiesList = JSON.parse(JSON.stringify(DEFAULT_CITIES));
-          localStorage.setItem('zaloma_admin_cities_v1', JSON.stringify(citiesList));
+          if (!Array.isArray(citiesList)) citiesList = [];
         }
       } catch (e) {
-        citiesList = JSON.parse(JSON.stringify(DEFAULT_CITIES));
+        citiesList = [];
       }
+
+      // Always guarantee all 11 default cities are included
+      const existingCityNames = new Set((citiesList || []).map(c => typeof c === 'string' ? c : c.name));
+      DEFAULT_CITIES.forEach(dc => {
+        if (!existingCityNames.has(dc.name)) citiesList.push(dc);
+      });
+      localStorage.setItem('zaloma_admin_cities_v2', JSON.stringify(citiesList));
 
       function updateCityBadges() {
         const badge = document.getElementById('tab-city-badge');
@@ -1867,23 +1916,12 @@ const title = "Admin — Zaloma Florist";
 
       async function persistCities() {
         try {
+          localStorage.setItem('zaloma_admin_cities_v2', JSON.stringify(citiesList));
           localStorage.setItem('zaloma_admin_cities_v1', JSON.stringify(citiesList));
           updateCityDropdowns();
           renderCitiesCards();
           updateCityBadges();
-
-          await supabase.from('products').upsert({
-            slug: '_cities_config_',
-            name: 'System Cities Config',
-            category_slug: '_system_',
-            category_name: 'System',
-            price_from: 0,
-            price_label: 'Rp 0',
-            image: 'https://zalomaflorist.com/favicon.ico',
-            description: JSON.stringify(citiesList),
-            featured: false,
-            city: 'Malang'
-          }, { onConflict: 'slug' });
+          await saveSystemConfig('_cities_config_', 'System Cities Config', JSON.stringify(citiesList));
         } catch (err) {
           console.warn('Sync cities notice:', err);
         }
@@ -1903,8 +1941,12 @@ const title = "Admin — Zaloma Florist";
           return `<option value="${val}">${icon}${val}</option>`;
         }).join('');
 
+        const fullOptions = '<option value="" disabled selected>Pilih Wilayah / Kota Pengiriman...</option>' +
+          '<option value="__ADD_NEW_CITY__" class="font-semibold text-primary">➕ + Tambah Kota Pengiriman Baru...</option>' +
+          optionsHtml;
+
         if (prodCity) {
-          prodCity.innerHTML = '<option value="" disabled selected>Pilih Wilayah / Kota Pengiriman...</option>' + optionsHtml;
+          prodCity.innerHTML = fullOptions;
           if (prevProdCity && citiesList.some(c => (typeof c === 'string' ? c : c.name) === prevProdCity)) {
             prodCity.value = prevProdCity;
           } else if (citiesList.length > 0) {
@@ -1913,7 +1955,7 @@ const title = "Admin — Zaloma Florist";
         }
 
         if (editCity) {
-          editCity.innerHTML = '<option value="" disabled selected>Pilih Wilayah / Kota Pengiriman...</option>' + optionsHtml;
+          editCity.innerHTML = fullOptions;
           if (prevEditCity && citiesList.some(c => (typeof c === 'string' ? c : c.name) === prevEditCity)) {
             editCity.value = prevEditCity;
           }
@@ -2007,13 +2049,17 @@ const title = "Admin — Zaloma Florist";
       const cancelCityBtn = document.getElementById('cancel-city-btn');
       const cityForm = document.getElementById('city-form');
 
-      openAddCityBtn?.addEventListener('click', () => {
+      function openAddCityModal() {
         document.getElementById('city-edit-index').value = '-1';
         document.getElementById('city-modal-title').innerHTML = '<span class="w-2 h-2 rounded-full bg-primary"></span> Tambah Wilayah / Kota';
         cityForm.reset();
         cityModal.classList.remove('hidden');
-        document.getElementById('city-name-input')?.focus();
-      });
+        setTimeout(() => document.getElementById('city-name-input')?.focus(), 60);
+      }
+
+      openAddCityBtn?.addEventListener('click', openAddCityModal);
+      document.getElementById('quick-add-city-btn')?.addEventListener('click', openAddCityModal);
+      document.getElementById('edit-quick-add-city-btn')?.addEventListener('click', openAddCityModal);
 
       closeCityModalBtn?.addEventListener('click', () => cityModal.classList.add('hidden'));
       cancelCityBtn?.addEventListener('click', () => cityModal.classList.add('hidden'));
@@ -2041,6 +2087,31 @@ const title = "Admin — Zaloma Florist";
 
         cityModal.classList.add('hidden');
         await persistCities();
+
+        // Automatically select newly created city in active form
+        const prodCitySelectEl = document.getElementById('prod-city');
+        if (prodCitySelectEl) prodCitySelectEl.value = name;
+        const editCitySelectEl = document.getElementById('edit-prod-city');
+        if (editCitySelectEl && !document.getElementById('edit-modal')?.classList.contains('hidden')) {
+          editCitySelectEl.value = name;
+        }
+      });
+
+      // Listen for __ADD_NEW_CITY__ selection in dropdowns
+      const prodCitySelect = document.getElementById('prod-city');
+      prodCitySelect?.addEventListener('change', () => {
+        if (prodCitySelect.value === '__ADD_NEW_CITY__') {
+          prodCitySelect.value = '';
+          openAddCityModal();
+        }
+      });
+
+      const editCitySelect = document.getElementById('edit-prod-city');
+      editCitySelect?.addEventListener('change', () => {
+        if (editCitySelect.value === '__ADD_NEW_CITY__') {
+          editCitySelect.value = '';
+          openAddCityModal();
+        }
       });
 
       // Initial cities setup
@@ -2101,24 +2172,22 @@ const title = "Admin — Zaloma Florist";
 
       let sizesList = [];
       try {
-        const cachedSizes = localStorage.getItem('zaloma_admin_sizes_v1');
+        const cachedSizes = localStorage.getItem('zaloma_admin_sizes_v2') || localStorage.getItem('zaloma_admin_sizes_v1');
         if (cachedSizes !== null) {
           sizesList = JSON.parse(cachedSizes);
-          if (!Array.isArray(sizesList) || sizesList.length < DEFAULT_SIZES.length) {
-            const existingKeys = new Set((sizesList || []).map(s => `${s.category_slug}::${s.name}`));
-            DEFAULT_SIZES.forEach(ds => {
-              const key = `${ds.category_slug}::${ds.name}`;
-              if (!existingKeys.has(key)) sizesList.push(ds);
-            });
-            localStorage.setItem('zaloma_admin_sizes_v1', JSON.stringify(sizesList));
-          }
-        } else {
-          sizesList = JSON.parse(JSON.stringify(DEFAULT_SIZES));
-          localStorage.setItem('zaloma_admin_sizes_v1', JSON.stringify(sizesList));
+          if (!Array.isArray(sizesList)) sizesList = [];
         }
       } catch (e) {
-        sizesList = JSON.parse(JSON.stringify(DEFAULT_SIZES));
+        sizesList = [];
       }
+
+      // Always guarantee all 21 default sizes are included
+      const existingSizeKeys = new Set((sizesList || []).map(s => `${s.category_slug}::${s.name}`));
+      DEFAULT_SIZES.forEach(ds => {
+        const key = `${ds.category_slug}::${ds.name}`;
+        if (!existingSizeKeys.has(key)) sizesList.push(ds);
+      });
+      localStorage.setItem('zaloma_admin_sizes_v2', JSON.stringify(sizesList));
 
       function updateSizeBadges() {
         const badge = document.getElementById('tab-size-badge');
@@ -2127,23 +2196,12 @@ const title = "Admin — Zaloma Florist";
 
       async function persistSizes() {
         try {
+          localStorage.setItem('zaloma_admin_sizes_v2', JSON.stringify(sizesList));
           localStorage.setItem('zaloma_admin_sizes_v1', JSON.stringify(sizesList));
           updateSizeBadges();
           renderSizesCards(currentSizeFilterCat);
           updateSizeDropdowns();
-
-          await supabase.from('products').upsert({
-            slug: '_sizes_config_',
-            name: 'System Sizes Config',
-            category_slug: '_system_',
-            category_name: 'System',
-            price_from: 0,
-            price_label: 'Rp 0',
-            image: 'https://zalomaflorist.com/favicon.ico',
-            description: JSON.stringify(sizesList),
-            featured: false,
-            city: 'Malang'
-          }, { onConflict: 'slug' });
+          await saveSystemConfig('_sizes_config_', 'System Sizes Config', JSON.stringify(sizesList));
         } catch (err) {
           console.warn('Sync sizes notice:', err);
         }
@@ -2173,6 +2231,7 @@ const title = "Admin — Zaloma Florist";
         });
 
         let html = '<option value="">-- Pilih Ukuran (Opsional) --</option>';
+        html += '<option value="__ADD_NEW_SIZE__" class="font-semibold text-primary">➕ + Tambah Ukuran Baru ke Database...</option>';
 
         if (baseSlug) {
           const matchedSizes = sizesList.filter(s => s.category_slug === baseSlug || s.category_slug === categorySlug);
@@ -2220,7 +2279,7 @@ const title = "Admin — Zaloma Florist";
 
         select.innerHTML = html;
 
-        if (prevVal) {
+        if (prevVal && prevVal !== '__ADD_NEW_SIZE__') {
           select.value = prevVal;
         }
       }
@@ -2236,6 +2295,12 @@ const title = "Admin — Zaloma Florist";
 
       const prodSizeSelect = document.getElementById('prod-size');
       prodSizeSelect?.addEventListener('change', () => {
+        if (prodSizeSelect.value === '__ADD_NEW_SIZE__') {
+          prodSizeSelect.value = '';
+          const activeCat = prodCategorySelect ? prodCategorySelect.value : '';
+          openAddSizeModal(activeCat);
+          return;
+        }
         const selectedOpt = prodSizeSelect.options[prodSizeSelect.selectedIndex];
         const catSlug = selectedOpt?.getAttribute('data-category');
         if (catSlug && prodCategorySelect && !prodCategorySelect.value) {
@@ -2246,6 +2311,12 @@ const title = "Admin — Zaloma Florist";
 
       const editProdSizeSelect = document.getElementById('edit-prod-size');
       editProdSizeSelect?.addEventListener('change', () => {
+        if (editProdSizeSelect.value === '__ADD_NEW_SIZE__') {
+          editProdSizeSelect.value = '';
+          const activeCat = editCategorySelect ? editCategorySelect.value : '';
+          openAddSizeModal(activeCat);
+          return;
+        }
         const selectedOpt = editProdSizeSelect.options[editProdSizeSelect.selectedIndex];
         const catSlug = selectedOpt?.getAttribute('data-category');
         if (catSlug && editCategorySelect && !editCategorySelect.value) {
@@ -2254,7 +2325,15 @@ const title = "Admin — Zaloma Florist";
         }
       });
 
-      // Quick manage size shortcuts
+      // Quick add & manage size shortcuts
+      document.getElementById('quick-add-size-btn')?.addEventListener('click', () => {
+        const activeCat = prodCategorySelect ? prodCategorySelect.value : '';
+        openAddSizeModal(activeCat);
+      });
+      document.getElementById('edit-quick-add-size-btn')?.addEventListener('click', () => {
+        const activeCat = editCategorySelect ? editCategorySelect.value : '';
+        openAddSizeModal(activeCat);
+      });
       document.getElementById('quick-manage-size-btn')?.addEventListener('click', () => {
         switchTab(tabBtnSizes);
         renderSizesCards();
@@ -2324,6 +2403,27 @@ const title = "Admin — Zaloma Florist";
                 chipsContainer.scrollLeft += e.deltaY;
               }
             }, { passive: false });
+
+            // Enable desktop mouse drag-to-scroll
+            let isDown = false;
+            let startX = 0;
+            let scrollLeftPos = 0;
+
+            chipsContainer.addEventListener('mousedown', (e) => {
+              isDown = true;
+              startX = e.pageX - chipsContainer.offsetLeft;
+              scrollLeftPos = chipsContainer.scrollLeft;
+            });
+            window.addEventListener('mouseup', () => {
+              isDown = false;
+            });
+            chipsContainer.addEventListener('mousemove', (e) => {
+              if (!isDown) return;
+              e.preventDefault();
+              const x = e.pageX - chipsContainer.offsetLeft;
+              const walk = (x - startX) * 1.5;
+              chipsContainer.scrollLeft = scrollLeftPos - walk;
+            });
           }
         }
 
@@ -2531,14 +2631,15 @@ const title = "Admin — Zaloma Florist";
       }
 
       sizeCategorySelect?.addEventListener('change', handleSizeCategoryChange);
+      sizeCategorySelect?.addEventListener('input', handleSizeCategoryChange);
 
-      openAddSizeBtn?.addEventListener('click', () => {
+      function openAddSizeModal(targetCat = '') {
         document.getElementById('size-edit-id').value = '';
         document.getElementById('size-modal-title').innerHTML = '<span class="w-2 h-2 rounded-full bg-primary"></span> Tambah Ukuran Produk';
         sizeForm.reset();
         if (sizeLabelPapanInput) delete sizeLabelPapanInput.dataset.customized;
 
-        const initialCat = currentSizeFilterCat !== 'all' ? currentSizeFilterCat : (categoriesList[0]?.slug || '');
+        const initialCat = targetCat || (currentSizeFilterCat !== 'all' ? currentSizeFilterCat : (categoriesList[0]?.slug || 'bunga-papan'));
         populateSizeCategoryOptions(initialCat);
         if (initialCat) {
           sizeCategorySelect.value = initialCat;
@@ -2546,6 +2647,10 @@ const title = "Admin — Zaloma Florist";
         }
 
         sizeModal.classList.remove('hidden');
+      }
+
+      openAddSizeBtn?.addEventListener('click', () => {
+        openAddSizeModal();
       });
 
       function openSizeModalForEdit(s) {
@@ -2635,6 +2740,14 @@ const title = "Admin — Zaloma Florist";
 
         sizeModal.classList.add('hidden');
         await persistSizes();
+
+        // Automatically select newly created size in active form
+        const prodSizeSelectEl = document.getElementById('prod-size');
+        if (prodSizeSelectEl) prodSizeSelectEl.value = sizeName;
+        const editSizeSelectEl = document.getElementById('edit-prod-size');
+        if (editSizeSelectEl && !document.getElementById('edit-modal')?.classList.contains('hidden')) {
+          editSizeSelectEl.value = sizeName;
+        }
       });
 
       // Initial sizes setup
@@ -2768,21 +2881,16 @@ const title = "Admin — Zaloma Florist";
             try {
               const cloudCats = JSON.parse(configRow.description);
               if (Array.isArray(cloudCats) && cloudCats.length > 0) {
-                if (cloudCats.length <= 1) {
-                  const existingSlugs = new Set(cloudCats.map(c => c.slug));
-                  (DEFAULT_CATEGORIES || []).forEach(dc => {
-                    if (!existingSlugs.has(dc.slug)) cloudCats.push(dc);
-                  });
-                }
+                const existingSlugs = new Set(cloudCats.map(c => c && c.slug));
+                (DEFAULT_CATEGORIES || []).forEach(dc => {
+                  if (!existingSlugs.has(dc.slug)) cloudCats.push(dc);
+                });
                 categoriesList = cloudCats;
-                localStorage.setItem('zaloma_admin_categories_v3', JSON.stringify(categoriesList));
-                localStorage.setItem('zaloma_admin_categories_v2', JSON.stringify(categoriesList));
-                localStorage.setItem('zaloma_admin_categories', JSON.stringify(categoriesList));
+                localStorage.setItem('zaloma_admin_categories_v4', JSON.stringify(categoriesList));
                 updateCategoryDropdowns();
                 renderCategoriesCards();
                 updateCategoryBadges();
-              } else if (Array.isArray(cloudCats) && cloudCats.length === 0 && categoriesList.length > 0) {
-                // Cloud had empty config from previous reset, sync current requested categories
+              } else if (categoriesList.length > 0) {
                 persistCategories();
               }
             } catch (e) {}
@@ -2796,17 +2904,17 @@ const title = "Admin — Zaloma Florist";
             try {
               const cloudCities = JSON.parse(citiesConfigRow.description);
               if (Array.isArray(cloudCities) && cloudCities.length > 0) {
-                if (cloudCities.length <= 1) {
-                  const existingNames = new Set(cloudCities.map(c => typeof c === 'string' ? c : c.name));
-                  DEFAULT_CITIES.forEach(dc => {
-                    if (!existingNames.has(dc.name)) cloudCities.push(dc);
-                  });
-                }
+                const existingNames = new Set(cloudCities.map(c => typeof c === 'string' ? c : c.name));
+                DEFAULT_CITIES.forEach(dc => {
+                  if (!existingNames.has(dc.name)) cloudCities.push(dc);
+                });
                 citiesList = cloudCities;
-                localStorage.setItem('zaloma_admin_cities_v1', JSON.stringify(citiesList));
+                localStorage.setItem('zaloma_admin_cities_v2', JSON.stringify(citiesList));
                 updateCityDropdowns();
                 renderCitiesCards();
                 updateCityBadges();
+              } else if (citiesList.length > 0) {
+                persistCities();
               }
             } catch (e) {}
           } else if (citiesList.length > 0) {
@@ -2819,18 +2927,18 @@ const title = "Admin — Zaloma Florist";
             try {
               const cloudSizes = JSON.parse(sizesConfigRow.description);
               if (Array.isArray(cloudSizes) && cloudSizes.length > 0) {
-                if (cloudSizes.length < DEFAULT_SIZES.length) {
-                  const existingKeys = new Set(cloudSizes.map(s => `${s.category_slug}::${s.name}`));
-                  DEFAULT_SIZES.forEach(ds => {
-                    const key = `${ds.category_slug}::${ds.name}`;
-                    if (!existingKeys.has(key)) cloudSizes.push(ds);
-                  });
-                }
+                const existingKeys = new Set(cloudSizes.map(s => `${s.category_slug}::${s.name}`));
+                DEFAULT_SIZES.forEach(ds => {
+                  const key = `${ds.category_slug}::${ds.name}`;
+                  if (!existingKeys.has(key)) cloudSizes.push(ds);
+                });
                 sizesList = cloudSizes;
-                localStorage.setItem('zaloma_admin_sizes_v1', JSON.stringify(sizesList));
+                localStorage.setItem('zaloma_admin_sizes_v2', JSON.stringify(sizesList));
                 updateSizeBadges();
                 renderSizesCards(currentSizeFilterCat);
                 updateSizeDropdowns();
+              } else if (sizesList.length > 0) {
+                persistSizes();
               }
             } catch (e) {}
           } else if (sizesList.length > 0) {
@@ -3324,9 +3432,11 @@ const title = "Admin — Zaloma Florist";
         const price_label = new Intl.NumberFormat('id-ID', { style: 'currency', currency: 'IDR', maximumFractionDigits: 0 }).format(price_from);
         const processing_time = document.getElementById('edit-prod-time').value.trim();
         const editCitySelect = document.getElementById('edit-prod-city');
-        const finalCity = editCitySelect?.value || 'Malang Raya (Kota Malang, Kab. Malang, Kota Batu)';
+        let finalCity = editCitySelect?.value || 'Malang Raya (Kota Malang, Kab. Malang, Kota Batu)';
+        if (finalCity === '__ADD_NEW_CITY__') finalCity = 'Malang Raya (Kota Malang, Kab. Malang, Kota Batu)';
         const editSizeSelect = document.getElementById('edit-prod-size');
-        const selectedSize = editSizeSelect ? editSizeSelect.value.trim() : '';
+        let selectedSize = editSizeSelect ? editSizeSelect.value.trim() : '';
+        if (selectedSize === '__ADD_NEW_SIZE__') selectedSize = '';
         let rawDescription = document.getElementById('edit-prod-desc').value.trim();
         rawDescription = rawDescription.replace(/^\[Ukuran:\s*[^\]]+\]\s*\n*/, '').trim();
         const description = selectedSize ? `[Ukuran: ${selectedSize}]\n\n${rawDescription}`.trim() : rawDescription;
@@ -3420,9 +3530,11 @@ const title = "Admin — Zaloma Florist";
         const priceLabel = new Intl.NumberFormat('id-ID', { style: 'currency', currency: 'IDR', maximumFractionDigits: 0 }).format(priceFrom);
         const processingTime = document.getElementById('prod-time').value.trim() || '3 - 5 Jam';
         const citySelect = document.getElementById('prod-city');
-        const finalCity = citySelect?.value || 'Malang Raya (Kota Malang, Kab. Malang, Kota Batu)';
+        let finalCity = citySelect?.value || 'Malang Raya (Kota Malang, Kab. Malang, Kota Batu)';
+        if (finalCity === '__ADD_NEW_CITY__') finalCity = 'Malang Raya (Kota Malang, Kab. Malang, Kota Batu)';
         const addSizeSelect = document.getElementById('prod-size');
-        const selectedSize = addSizeSelect ? addSizeSelect.value.trim() : '';
+        let selectedSize = addSizeSelect ? addSizeSelect.value.trim() : '';
+        if (selectedSize === '__ADD_NEW_SIZE__') selectedSize = '';
         let rawDescription = document.getElementById('prod-desc').value.trim();
         rawDescription = rawDescription.replace(/^\[Ukuran:\s*[^\]]+\]\s*\n*/, '').trim();
         const description = selectedSize ? `[Ukuran: ${selectedSize}]\n\n${rawDescription}`.trim() : rawDescription;
