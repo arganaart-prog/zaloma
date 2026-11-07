@@ -25,7 +25,8 @@ DEFAULT_CITIES.forEach(dc => {
     mergedCities.push({
       ...dc,
       image: (dynMatch && (dynMatch.image || dynMatch.image_url)) ? (dynMatch.image || dynMatch.image_url) : dc.image,
-      description: (dynMatch && dynMatch.description) ? dynMatch.description : dc.description
+      description: (dynMatch && dynMatch.description) ? dynMatch.description : dc.description,
+      province_name: (dynMatch && dynMatch.province_name) ? dynMatch.province_name : (dc.isMainArea ? 'Jawa Timur' : 'Area Pengiriman')
     });
   }
 });
@@ -42,29 +43,26 @@ DEFAULT_CITIES.forEach(dc => {
       slug,
       image: (c && (c.image || c.image_url)) || '/images/galeri/gallery-1.webp',
       description: (c && c.description) || `Pengiriman karangan bunga & buket area ${name}`,
-      tagline: (c && c.tagline) || `Area ${name} & Sekitarnya`
+      tagline: (c && c.tagline) || `Area ${name} & Sekitarnya`,
+      province_name: (c && c.province_name) ? c.province_name : 'Indonesia'
     });
   }
 });
 
-const waMainLink = `https://wa.me/${WHATSAPP_NUMBER}?text=${encodeURIComponent('Halo Zaloma Florist, saya ingin tanya pengiriman karangan bunga ke kota saya...')}`;
+const waMainLink = `https://wa.me/${WHATSAPP_NUMBER}?text=${encodeURIComponent('Halo Zaloma Florist, saya ingin tanya pengiriman bunga ke kota saya...')}`;
 ---
 
 <!-- =====================================================
-     HOME CITY SHOWCASE (100% Sekarsari Architecture + Zaloma Colors)
+     HOME CITY SHOWCASE (Persis 100% Sekarsari Teks, Warna & Layout)
      ===================================================== -->
 <section id="city-section" class="city-showcase">
-  <!-- Subtle Glow Ornaments -->
-  <div class="city-showcase__bg-glow city-showcase__bg-glow--left" aria-hidden="true"></div>
-  <div class="city-showcase__bg-glow city-showcase__bg-glow--right" aria-hidden="true"></div>
-
   <div class="city-showcase__container">
     <div class="city-showcase__header">
       <p class="city-showcase__label">LAYANAN PENGIRIMAN ANTAR KOTA</p>
       
       <div class="city-showcase__ornament" aria-hidden="true">
         <span></span>
-        <svg class="w-4 h-4 text-secondary" viewBox="0 0 24 24" fill="currentColor">
+        <svg class="ornament-icon" viewBox="0 0 24 24" fill="currentColor">
           <path d="M12 2C11.5 4 10 5.5 8 6C10 6.5 11.5 8 12 10C12.5 8 14 6.5 16 6C14 5.5 12.5 4 12 2ZM6 11C5.5 12.5 4.5 13.5 3 14C4.5 14.5 5.5 15.5 6 17C6.5 15.5 7.5 14.5 9 14C7.5 13.5 6.5 12.5 6 11ZM18 11C17.5 12.5 16.5 13.5 15 14C16.5 14.5 17.5 15.5 18 17C18.5 15.5 19.5 14.5 21 14C19.5 13.5 18.5 12.5 18 11ZM12 14C10.9 14 10 14.9 10 16C10 17.1 10.9 18 12 18C13.1 18 14 17.1 14 16C14 14.9 13.1 14 12 14Z" />
         </svg>
         <span></span>
@@ -77,9 +75,9 @@ const waMainLink = `https://wa.me/${WHATSAPP_NUMBER}?text=${encodeURIComponent('
       </p>
     </div>
 
-    <!-- Search input -->
+    <!-- Search Input Persis Sekarsari -->
     <div class="city-showcase__search">
-      <svg class="w-5 h-5 text-slate-400 shrink-0" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+      <svg class="search-icon" fill="none" viewBox="0 0 24 24" stroke="currentColor">
         <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M21 21l-6-6m2-5a7 7 0 11-14 0 7 7 0 0114 0z" />
       </svg>
       <input 
@@ -88,12 +86,9 @@ const waMainLink = `https://wa.me/${WHATSAPP_NUMBER}?text=${encodeURIComponent('
         placeholder="Cari kota tujuan pengiriman Anda..." 
         autocomplete="off"
       />
-      <span id="cityShowcaseCount" class="text-xs font-bold text-secondary shrink-0">
-        {mergedCities.length} Kota
-      </span>
     </div>
 
-    <!-- Actions button -->
+    <!-- Actions Persis Sekarsari -->
     <div class="city-showcase__actions">
       <a href={withBase('/kota/')} class="city-filter-btn city-filter-btn--primary">
         <svg class="w-4 h-4 fill-current" viewBox="0 0 24 24">
@@ -104,26 +99,30 @@ const waMainLink = `https://wa.me/${WHATSAPP_NUMBER}?text=${encodeURIComponent('
       </a>
     </div>
 
-    <!-- Grid of Cities (100% Sekarsari Card Aspect Ratio & Layout) -->
+    <!-- Grid Kartu Kota (Default 6 Kota sesuai Sekarsari, sisanya tampil berdasarkan klik user) -->
     <div class="city-showcase__grid" id="cityShowcaseCardsGrid">
-      {mergedCities.map((city) => {
+      {mergedCities.map((city, idx) => {
         const isCurrent = city.slug === currentCitySlug;
         const href = isCurrent ? '#' : (city.slug === 'malang-raya' ? withBase('/') : withBase(`/kota/${city.slug}/`));
         const imgPath = city.image || '/images/galeri/gallery-1.webp';
+        const isHiddenByDefault = idx >= 6;
 
         return (
           <a
             href={href}
-            class={`city-destination-card group ${isCurrent ? 'is-current-city' : ''}`}
+            class={`city-destination-card ${isHiddenByDefault ? 'city-extra-card is-collapsed' : ''}`}
             data-city-name={city.name.toLowerCase()}
-            data-city-slug={city.slug}
+            data-province-name={(city.province_name || '').toLowerCase()}
+            data-city-index={idx}
           >
             <img
               src={withBase(imgPath)}
-              alt={`Toko Bunga ${city.name}`}
+              alt={city.name}
               class="city-destination-card__image"
-              loading="lazy"
+              loading={idx < 6 ? 'eager' : 'lazy'}
               decoding="async"
+              width="800"
+              height="600"
             />
 
             <div class="city-destination-card__shade"></div>
@@ -139,30 +138,36 @@ const waMainLink = `https://wa.me/${WHATSAPP_NUMBER}?text=${encodeURIComponent('
                   </span>
                 </div>
                 <p>
-                  <svg class="w-3.5 h-3.5 shrink-0 fill-current opacity-90" viewBox="0 0 24 24">
+                  <svg class="w-3.5 h-3.5 shrink-0 fill-current" viewBox="0 0 24 24">
                     <path d="M12 2C8.13 2 5 5.13 5 9c0 5.25 7 13 7 13s7-7.75 7-13c0-3.87-3.13-7-7-7zm0 9.5c-1.38 0-2.5-1.12-2.5-2.5s1.12-2.5 2.5-2.5 2.5 1.12 2.5 2.5-1.12 2.5-2.5 2.5z"/>
                   </svg>
-                  <span>{city.description || `Area ${city.name} & Sekitarnya`}</span>
+                  <span>{city.province_name || city.description || 'Indonesia'}</span>
                 </p>
               </div>
             </div>
-
-            {isCurrent && (
-              <div class="current-city-badge">
-                Kota Ini
-              </div>
-            )}
           </a>
         );
       })}
     </div>
 
-    <!-- Empty State -->
+    <!-- Tombol Muat Lebih Banyak Berdasarkan Klik User -->
+    {mergedCities.length > 6 && (
+      <div class="city-showcase__load-more" id="cityLoadMoreWrap">
+        <button type="button" id="cityLoadMoreBtn" class="city-load-more-btn">
+          <span id="cityLoadMoreText">Tampilkan Lebih Banyak ({mergedCities.length - 6} Kota Lainnya)</span>
+          <svg id="cityLoadMoreIcon" class="w-4 h-4 transition-transform duration-200" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2.5" d="M19 9l-7 7-7-7" />
+          </svg>
+        </button>
+      </div>
+    )}
+
+    <!-- Empty State Persis Sekarsari -->
     <div id="cityShowcaseEmpty" class="city-showcase__empty hidden">
-      Kota yang Anda cari belum tersedia di daftar instan. Silakan hubungi kami untuk pengiriman khusus.
+      Kota yang kamu cari belum tersedia.
     </div>
 
-    <!-- CTA WhatsApp -->
+    <!-- CTA Box Persis Sekarsari -->
     <div class="city-showcase__cta">
       <div class="city-showcase__cta-icon">
         <svg class="w-6 h-6 fill-current" viewBox="0 0 24 24">
@@ -171,9 +176,12 @@ const waMainLink = `https://wa.me/${WHATSAPP_NUMBER}?text=${encodeURIComponent('
       </div>
       <div class="city-showcase__cta-text">
         <h3>Tidak menemukan kota tujuan Anda?</h3>
-        <p>Hubungi tim kami untuk layanan pengiriman khusus ke kota lainnya di Indonesia.</p>
+        <p>Hubungi tim kami untuk layanan pengiriman khusus ke kota lainnya.</p>
       </div>
-      <a href={waMainLink} target="_blank" rel="noopener noreferrer" class="city-showcase__cta-button">
+      <a :href={waMainLink} href={waMainLink} target="_blank" rel="noopener noreferrer" class="city-showcase__cta-button">
+        <svg class="w-4 h-4 fill-current mr-1 inline-block" viewBox="0 0 24 24">
+          <path d="M12.031 6.172c-3.181 0-5.767 2.586-5.768 5.766-.001 1.298.38 2.27 1.019 3.287l-.711 2.598 2.669-.699c.969.54 1.838.847 2.791.848 3.18 0 5.767-2.587 5.768-5.766.001-3.18-2.585-5.834-5.768-5.834zm3.377 8.243c-.147.411-.75.76-1.042.812-.292.052-.663.097-2.072-.49-1.409-.587-2.327-2.016-2.398-2.112-.07-.095-.572-.76-.572-1.45 0-.69.362-1.029.49-1.173.129-.144.281-.18.375-.18.094 0 .188.001.27.006.086.005.201-.033.315.241.114.275.39 1.025.424 1.107.034.082.057.178.002.288-.055.11-.082.179-.164.275-.082.096-.173.214-.247.288-.082.083-.168.172-.072.337.096.165.427.705.916 1.141.63.562 1.161.736 1.326.818.165.082.261.069.358-.041.096-.11.413-.48.523-.645.11-.165.22-.138.371-.082.151.055.955.45 1.12.533.165.082.275.124.316.192.041.069.041.399-.106.81zM12.012 2.002C6.488 2.002 2 6.49 2 12.014c0 1.942.553 3.755 1.517 5.289L2 22l4.821-1.488A9.97 9.97 0 0 0 12.012 22C17.535 22 22 17.51 22 12.014c0-5.524-4.465-10.012-9.988-10.012z"/>
+        </svg>
         <span>Chat WhatsApp</span>
       </a>
     </div>
@@ -182,7 +190,7 @@ const waMainLink = `https://wa.me/${WHATSAPP_NUMBER}?text=${encodeURIComponent('
 
 <style>
 /* =========================================================
-   HOME CITY SHOWCASE (100% Sekarsari CSS + Zaloma Colorway)
+   HOME CITY SHOWCASE (Persis 100% Sekarsari CSS & Colorway)
    ========================================================= */
 
 .city-showcase {
@@ -190,9 +198,8 @@ const waMainLink = `https://wa.me/${WHATSAPP_NUMBER}?text=${encodeURIComponent('
   overflow: hidden;
   padding: 72px 20px 86px;
   background:
-    linear-gradient(180deg, #FAF7F0 0%, #FFFFFF 100%),
-    radial-gradient(circle at 50% 0%, rgba(197, 162, 93, 0.12), transparent 38%);
-  border-top: 1px solid #EFE8DA;
+    linear-gradient(180deg, #fffafa 0%, #ffffff 100%),
+    radial-gradient(circle at 50% 0%, rgba(180, 90, 114, 0.08), transparent 34%);
 }
 
 .city-showcase__container {
@@ -200,30 +207,6 @@ const waMainLink = `https://wa.me/${WHATSAPP_NUMBER}?text=${encodeURIComponent('
   z-index: 1;
   max-width: 1160px;
   margin: 0 auto;
-}
-
-.city-showcase__bg-glow {
-  position: absolute;
-  border-radius: 50%;
-  filter: blur(80px);
-  pointer-events: none;
-  opacity: 0.4;
-}
-
-.city-showcase__bg-glow--left {
-  left: -80px;
-  top: 100px;
-  width: 380px;
-  height: 380px;
-  background: radial-gradient(circle, rgba(197, 162, 93, 0.22) 0%, transparent 70%);
-}
-
-.city-showcase__bg-glow--right {
-  right: -80px;
-  top: 200px;
-  width: 380px;
-  height: 380px;
-  background: radial-gradient(circle, rgba(63, 75, 55, 0.15) 0%, transparent 70%);
 }
 
 .city-showcase__header {
@@ -234,7 +217,7 @@ const waMainLink = `https://wa.me/${WHATSAPP_NUMBER}?text=${encodeURIComponent('
 
 .city-showcase__label {
   margin: 0 0 8px;
-  color: #B8934A;
+  color: #34383b;
   font-size: 13px;
   font-weight: 800;
   text-transform: uppercase;
@@ -246,30 +229,35 @@ const waMainLink = `https://wa.me/${WHATSAPP_NUMBER}?text=${encodeURIComponent('
   align-items: center;
   gap: 12px;
   margin-bottom: 8px;
-  color: #B8934A;
+  color: #9b3752;
 }
 
 .city-showcase__ornament span {
   display: block;
   width: 52px;
   height: 1px;
-  background: #DFC397;
+  background: #bb7387;
+}
+
+.ornament-icon {
+  width: 16px;
+  height: 16px;
 }
 
 .city-showcase__header h2 {
   margin: 0;
-  color: #1C2E24;
-  font-family: var(--font-serif), Georgia, 'Times New Roman', serif;
+  color: #812940;
+  font-family: Georgia, 'Times New Roman', serif;
   font-size: clamp(32px, 4vw, 48px);
   font-weight: 800;
-  line-height: 1.15;
+  line-height: 1.1;
 }
 
 .city-showcase__header > p:last-child {
   max-width: 650px;
   margin: 12px auto 0;
-  color: #556052;
-  font-size: 15.5px;
+  color: #55585c;
+  font-size: 16px;
   line-height: 1.6;
 }
 
@@ -278,18 +266,19 @@ const waMainLink = `https://wa.me/${WHATSAPP_NUMBER}?text=${encodeURIComponent('
   align-items: center;
   gap: 12px;
   width: min(100%, 540px);
-  margin: 24px auto 20px;
+  margin: 20px auto 20px;
   padding: 0 20px;
-  border: 1.5px solid #E5DDC8;
+  border: 1px solid #ead9d9;
   border-radius: 28px;
-  background: rgba(255, 255, 255, 0.95);
-  box-shadow: 0 6px 16px rgba(63, 75, 55, 0.05);
-  transition: border-color 0.25s ease, box-shadow 0.25s ease;
+  background: rgba(255, 255, 255, 0.88);
+  box-shadow: 0 6px 16px rgba(129, 41, 64, 0.04);
 }
 
-.city-showcase__search:focus-within {
-  border-color: #B8934A;
-  box-shadow: 0 6px 20px rgba(184, 147, 74, 0.15);
+.search-icon {
+  width: 20px;
+  height: 20px;
+  color: #777c82;
+  flex-shrink: 0;
 }
 
 .city-showcase__search input {
@@ -298,12 +287,12 @@ const waMainLink = `https://wa.me/${WHATSAPP_NUMBER}?text=${encodeURIComponent('
   border: 0;
   outline: 0;
   background: transparent;
-  color: #1C2E24;
-  font-size: 15px;
+  color: #41464b;
+  font-size: 16px;
 }
 
 .city-showcase__search input::placeholder {
-  color: #94a3b8;
+  color: #a0a0a3;
 }
 
 .city-showcase__actions {
@@ -321,56 +310,62 @@ const waMainLink = `https://wa.me/${WHATSAPP_NUMBER}?text=${encodeURIComponent('
   gap: 8px;
   min-width: 140px;
   min-height: 42px;
-  padding: 8px 22px;
-  border: 1px solid #E5DDC8;
+  padding: 8px 20px;
+  border: 1px solid #ead9d9;
   border-radius: 999px;
-  background: rgba(255, 255, 255, 0.9);
-  color: #475569;
-  font-size: 14.5px;
+  background: rgba(255, 255, 255, 0.88);
+  color: #575b60;
+  font-size: 15px;
   font-weight: 700;
   text-decoration: none;
   transition: transform 0.25s ease, box-shadow 0.25s ease, background 0.25s ease;
 }
 
+/* Tanpa hover lebay - hanya translateY(-2px) halus persis Sekarsari */
+.city-filter-btn:hover {
+  transform: translateY(-2px);
+  box-shadow: 0 8px 16px rgba(129, 41, 64, 0.08);
+}
+
 .city-filter-btn--primary {
   min-width: 230px;
-  border-color: #3F4B37;
-  background: #3F4B37;
+  border-color: #812940;
+  background: #812940;
   color: #fff;
-  box-shadow: 0 10px 24px rgba(63, 75, 55, 0.2);
+  box-shadow: 0 14px 30px rgba(129, 41, 64, 0.18);
 }
 
 .city-filter-btn--primary:hover {
-  background: #2D3A26;
-  transform: translateY(-2px);
-  box-shadow: 0 14px 28px rgba(63, 75, 55, 0.28);
+  background: #6f2338;
+  box-shadow: 0 16px 34px rgba(129, 41, 64, 0.22);
 }
 
-/* 3-Column City Cards Grid */
 .city-showcase__grid {
   display: grid;
   grid-template-columns: repeat(3, minmax(0, 1fr));
   gap: 20px;
 }
 
+/* Kartu Kota Sekarsari */
 .city-destination-card {
   position: relative;
   display: block;
   aspect-ratio: 372 / 232;
   overflow: hidden;
-  border-radius: 16px;
+  border-radius: 12px;
   color: #fff;
   text-decoration: none;
   background:
     radial-gradient(circle at 35% 26%, rgba(255, 255, 255, 0.38), transparent 34%),
-    linear-gradient(135deg, #FAF5E6, #3F4B37);
+    linear-gradient(135deg, #f7dce4, #b96b81);
   box-shadow: 0 6px 14px rgba(24, 22, 23, 0.12);
   transition: transform 0.3s ease, box-shadow 0.3s ease;
 }
 
+/* Hover persis Sekarsari: TANPA scale zoom gambar, TANPA rotate panah */
 .city-destination-card:hover {
-  transform: translateY(-3px);
-  box-shadow: 0 12px 24px rgba(45, 56, 46, 0.22);
+  transform: translateY(-2px);
+  box-shadow: 0 8px 18px rgba(24, 22, 23, 0.18);
 }
 
 .city-destination-card__image {
@@ -379,17 +374,13 @@ const waMainLink = `https://wa.me/${WHATSAPP_NUMBER}?text=${encodeURIComponent('
   width: 100%;
   height: 100%;
   object-fit: cover;
-  transition: transform 0.6s ease;
-}
-
-.city-destination-card:hover .city-destination-card__image {
-  transform: scale(1.06);
+  transition: opacity 0.28s ease;
 }
 
 .city-destination-card__shade {
   position: absolute;
   inset: 0;
-  background: linear-gradient(180deg, rgba(0,0,0,0.02) 25%, rgba(15, 25, 20, 0.88) 100%);
+  background: linear-gradient(180deg, rgba(0,0,0,0.01) 30%, rgba(0,0,0,0.85) 100%);
 }
 
 .city-destination-card__content {
@@ -407,11 +398,11 @@ const waMainLink = `https://wa.me/${WHATSAPP_NUMBER}?text=${encodeURIComponent('
 
 .city-destination-card h3 {
   margin: 0;
-  font-family: var(--font-serif), Georgia, 'Times New Roman', serif;
+  font-family: Georgia, 'Times New Roman', serif;
   font-size: clamp(20px, 2.2vw, 26px);
   font-weight: 800;
-  line-height: 1.1;
-  text-shadow: 0 2px 8px rgba(0,0,0,0.4);
+  line-height: 1;
+  text-shadow: 0 2px 8px rgba(0,0,0,0.3);
 }
 
 .city-destination-card__arrow {
@@ -421,17 +412,16 @@ const waMainLink = `https://wa.me/${WHATSAPP_NUMBER}?text=${encodeURIComponent('
   width: 28px;
   height: 28px;
   flex: 0 0 28px;
-  border: 1px solid rgba(255, 255, 255, 0.8);
+  border: 1px solid #fff;
   border-radius: 50%;
-  background: rgba(255, 255, 255, 0.15);
+  background: transparent;
   color: #fff;
-  transition: background 0.25s ease, border-color 0.25s ease;
+  font-size: 16px;
+  transition: background 0.2s ease;
 }
 
 .city-destination-card:hover .city-destination-card__arrow {
-  background: var(--color-secondary, #C5A25D);
-  border-color: var(--color-secondary, #C5A25D);
-  color: #1C2E24;
+  background: rgba(255, 255, 255, 0.2);
 }
 
 .city-destination-card p {
@@ -440,48 +430,61 @@ const waMainLink = `https://wa.me/${WHATSAPP_NUMBER}?text=${encodeURIComponent('
   gap: 6px;
   margin: 6px 0 0;
   color: rgba(255, 255, 255, 0.95);
-  font-size: 13.5px;
+  font-size: 14px;
   font-weight: 600;
-  text-shadow: 0 1px 4px rgba(0,0,0,0.4);
 }
 
-.current-city-badge {
-  position: absolute;
-  top: 12px;
-  right: 12px;
-  z-index: 2;
-  padding: 4px 12px;
+/* State collapsed untuk kota extra di atas 6 */
+.city-extra-card.is-collapsed {
+  display: none !important;
+}
+
+/* Tombol Load More Berdasarkan Klik User */
+.city-showcase__load-more {
+  text-align: center;
+  margin-top: 24px;
+}
+
+.city-load-more-btn {
+  display: inline-flex;
+  align-items: center;
+  gap: 8px;
+  padding: 10px 24px;
   border-radius: 999px;
-  font-size: 10.5px;
-  font-weight: 800;
-  text-transform: uppercase;
-  letter-spacing: 1px;
-  background: var(--color-secondary, #C5A25D);
-  color: #1C2E24;
-  box-shadow: 0 3px 8px rgba(0, 0, 0, 0.25);
+  border: 1.5px solid #ead9d9;
+  background: #ffffff;
+  color: #812940;
+  font-size: 14px;
+  font-weight: 700;
+  cursor: pointer;
+  box-shadow: 0 4px 12px rgba(129, 41, 64, 0.05);
+  transition: background 0.2s ease, border-color 0.2s ease, transform 0.2s ease;
+}
+
+.city-load-more-btn:hover {
+  background: #FDF4F5;
+  border-color: #812940;
+  transform: translateY(-1px);
 }
 
 .city-showcase__empty {
-  padding: 32px;
-  color: #64748b;
+  padding: 24px;
+  color: #7b5260;
   text-align: center;
   font-weight: 700;
-  font-size: 15px;
 }
 
-/* CTA WhatsApp Box (Sesuai Sekarsari) */
+/* CTA WhatsApp Box Persis Sekarsari */
 .city-showcase__cta {
   display: flex;
   align-items: center;
   justify-content: space-between;
   gap: 16px;
   width: min(100%, 720px);
-  margin: 40px auto 0;
-  padding: 18px 26px;
-  border-radius: 16px;
-  background: #FAF7F0;
-  border: 1px solid #E5DDC8;
-  box-shadow: 0 8px 20px rgba(63, 75, 55, 0.05);
+  margin: 32px auto 0;
+  padding: 16px 24px;
+  border-radius: 12px;
+  background: #FDF4F5;
 }
 
 .city-showcase__cta-icon {
@@ -491,10 +494,10 @@ const waMainLink = `https://wa.me/${WHATSAPP_NUMBER}?text=${encodeURIComponent('
   width: 48px;
   height: 48px;
   border-radius: 50%;
-  background: #25D366;
+  background: #812940;
   color: #fff;
+  font-size: 24px;
   flex-shrink: 0;
-  box-shadow: 0 4px 12px rgba(37, 211, 102, 0.3);
 }
 
 .city-showcase__cta-text {
@@ -503,16 +506,16 @@ const waMainLink = `https://wa.me/${WHATSAPP_NUMBER}?text=${encodeURIComponent('
 
 .city-showcase__cta-text h3 {
   margin: 0;
-  color: #1C2E24;
-  font-family: var(--font-serif), Georgia, 'Times New Roman', serif;
+  color: #8b3049;
+  font-family: Georgia, 'Times New Roman', serif;
   font-size: 18px;
   font-weight: 800;
 }
 
 .city-showcase__cta-text p {
   margin: 4px 0 0;
-  color: #64748b;
-  font-size: 13.5px;
+  color: #54585d;
+  font-size: 14px;
 }
 
 .city-showcase__cta-button {
@@ -521,43 +524,79 @@ const waMainLink = `https://wa.me/${WHATSAPP_NUMBER}?text=${encodeURIComponent('
   justify-content: center;
   gap: 8px;
   min-height: 42px;
-  padding: 8px 22px;
-  border-radius: 10px;
-  background: #25D366;
+  padding: 8px 18px;
+  border-radius: 8px;
+  background: #812940;
   color: #fff;
-  font-size: 13.5px;
+  font-size: 14px;
   font-weight: 700;
   text-decoration: none;
   transition: transform 0.25s ease, background 0.25s ease;
   flex-shrink: 0;
-  box-shadow: 0 4px 12px rgba(37, 211, 102, 0.25);
 }
 
 .city-showcase__cta-button:hover {
-  background: #20BD5A;
   transform: translateY(-2px);
+  background: #6a1f33;
 }
 
-/* Responsive adjustments */
-@media (max-width: 900px) {
+/* Responsive adjustments persis Sekarsari */
+@media (min-width: 1024px) and (max-width: 1279px) {
+  .city-showcase__container {
+    padding-left: 20px;
+    padding-right: 20px;
+  }
+  .city-showcase__grid {
+    gap: 16px;
+  }
+  .city-destination-card__content {
+    inset: auto 12px 12px;
+  }
+  .city-destination-card__content h3 {
+    font-size: 18px;
+  }
+  .city-destination-card p {
+    font-size: 12.5px;
+  }
+  .city-showcase__cta {
+    padding: 12px 20px;
+    max-width: 640px;
+  }
+}
+
+@media (max-width: 1023px) {
   .city-showcase__grid {
     grid-template-columns: repeat(2, minmax(0, 1fr));
-    gap: 16px;
   }
 }
 
 @media (max-width: 640px) {
   .city-showcase {
-    padding: 50px 16px 60px;
+    padding: 48px 16px;
+  }
+  .city-showcase__header h2 {
+    font-size: 32px;
+  }
+  .city-showcase__header > p:last-child {
+    font-size: 15px;
+  }
+  .city-showcase__search input {
+    font-size: 15px;
+  }
+  .city-filter-btn {
+    width: 100%;
+    max-width: 240px;
   }
   .city-showcase__grid {
     grid-template-columns: 1fr;
-    gap: 14px;
+  }
+  .city-destination-card {
+    aspect-ratio: 16 / 9;
+    height: auto;
   }
   .city-showcase__cta {
     flex-direction: column;
     text-align: center;
-    padding: 20px 16px;
   }
   .city-showcase__cta-button {
     width: 100%;
@@ -566,40 +605,88 @@ const waMainLink = `https://wa.me/${WHATSAPP_NUMBER}?text=${encodeURIComponent('
 </style>
 
 <script is:inline>
-  (function initCityShowcaseSearch() {
+  (function initCityShowcaseInteractive() {
     const searchInput = document.getElementById('cityShowcaseSearchInput');
     const cardsGrid = document.getElementById('cityShowcaseCardsGrid');
     const emptyState = document.getElementById('cityShowcaseEmpty');
-    const countLabel = document.getElementById('cityShowcaseCount');
-    if (!searchInput || !cardsGrid) return;
+    const loadMoreBtn = document.getElementById('cityLoadMoreBtn');
+    const loadMoreWrap = document.getElementById('cityLoadMoreWrap');
+    const loadMoreText = document.getElementById('cityLoadMoreText');
+    const loadMoreIcon = document.getElementById('cityLoadMoreIcon');
+    if (!cardsGrid) return;
 
-    searchInput.addEventListener('input', () => {
-      const query = searchInput.value.trim().toLowerCase();
-      const cards = cardsGrid.querySelectorAll('.city-destination-card');
-      let visibleCount = 0;
+    let isExpanded = false;
 
-      cards.forEach(card => {
-        const cityName = card.getAttribute('data-city-name') || '';
-        const isMatch = !query || cityName.includes(query);
-        if (isMatch) {
-          card.style.display = '';
-          visibleCount++;
-        } else {
-          card.style.display = 'none';
+    // Toggle Tampilkan Lebih Banyak berdasarkan klik user
+    if (loadMoreBtn) {
+      loadMoreBtn.addEventListener('click', () => {
+        isExpanded = !isExpanded;
+        const extraCards = cardsGrid.querySelectorAll('.city-extra-card');
+        
+        extraCards.forEach(card => {
+          if (isExpanded) {
+            card.classList.remove('is-collapsed');
+          } else {
+            card.classList.add('is-collapsed');
+          }
+        });
+
+        if (loadMoreText) {
+          loadMoreText.textContent = isExpanded ? 'Sembunyikan Sebagian Kota' : 'Tampilkan Lebih Banyak';
+        }
+        if (loadMoreIcon) {
+          loadMoreIcon.style.transform = isExpanded ? 'rotate(180deg)' : '';
         }
       });
+    }
 
-      if (emptyState) {
-        if (visibleCount === 0) {
-          emptyState.classList.remove('hidden');
-        } else {
-          emptyState.classList.add('hidden');
+    // Realtime Search persis Sekarsari
+    if (searchInput) {
+      searchInput.addEventListener('input', () => {
+        const query = searchInput.value.trim().toLowerCase();
+        const cards = cardsGrid.querySelectorAll('.city-destination-card');
+        let visibleCount = 0;
+
+        cards.forEach(card => {
+          const cityName = card.getAttribute('data-city-name') || '';
+          const provName = card.getAttribute('data-province-name') || '';
+          const idx = parseInt(card.getAttribute('data-city-index') || '0', 10);
+          
+          if (query) {
+            // Ketika user mencari, tampilkan semua kartu yang cocok
+            const isMatch = cityName.includes(query) || provName.includes(query);
+            if (isMatch) {
+              card.style.display = '';
+              card.classList.remove('is-collapsed');
+              visibleCount++;
+            } else {
+              card.style.display = 'none';
+            }
+          } else {
+            // Ketika search kosong, kembalikan ke state awal (maksimal 6 kota atau expanded)
+            card.style.display = '';
+            if (idx >= 6 && !isExpanded) {
+              card.classList.add('is-collapsed');
+            } else {
+              card.classList.remove('is-collapsed');
+            }
+            visibleCount++;
+          }
+        });
+
+        if (emptyState) {
+          if (visibleCount === 0 && query) {
+            emptyState.classList.remove('hidden');
+          } else {
+            emptyState.classList.add('hidden');
+          }
         }
-      }
 
-      if (countLabel) {
-        countLabel.textContent = `${visibleCount} Kota`;
-      }
-    });
+        // Sembunyikan tombol load more jika user sedang mencari
+        if (loadMoreWrap) {
+          loadMoreWrap.style.display = query ? 'none' : '';
+        }
+      });
+    }
   })();
 </script>
