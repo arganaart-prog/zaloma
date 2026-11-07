@@ -7,6 +7,48 @@ import { WHATSAPP_NUMBER, SITE_DOMAIN } from '../../data/constants';
 import { SUPABASE_URL, SUPABASE_ANON_KEY } from '../../data/supabaseConfig';
 import { withBase } from '../../utils/paths';
 
+function matchCategory(prodCatSlug: string, prodCatName: string, targetSlug: string): boolean {
+  if (!prodCatSlug && !prodCatName) return false;
+  const pSlug = (prodCatSlug || '').toLowerCase();
+  const pName = (prodCatName || '').toLowerCase();
+  const tSlug = (targetSlug || '').toLowerCase();
+
+  if (pSlug === tSlug) return true;
+
+  const normTarget = tSlug.replace(/-malang$/, '');
+  const normProd = pSlug.replace(/-malang$/, '');
+  if (normProd === normTarget) return true;
+
+  if (normProd.startsWith(normTarget + '--') || normProd.endsWith('--' + normTarget)) return true;
+
+  // Bunga papan subcategories
+  if (tSlug.includes('duka-cita') && (pSlug.includes('duka-cita') || pName.includes('duka cita'))) return true;
+  if (tSlug.includes('wedding') && (pSlug.includes('wedding') || pName.includes('wedding') || pName.includes('pernikahan'))) return true;
+  if (tSlug.includes('congratulations') && (pSlug.includes('congratulations') || pName.includes('congratulations') || pName.includes('selamat'))) return true;
+  if ((tSlug === 'bunga-papan' || tSlug === 'bunga-papan-malang') && (pSlug.startsWith('bunga-papan') || pName.includes('bunga papan'))) return true;
+
+  // Bouquet
+  if ((tSlug.includes('bouquet') || tSlug.includes('buket')) && (pSlug.includes('bouquet') || pName.includes('bouquet') || pName.includes('buket'))) return true;
+
+  // Tabulampot
+  if ((tSlug.includes('tanbulampot') || tSlug.includes('tabulampot')) &&
+      (pSlug.includes('tanbulampot') || pSlug.includes('tabulampot') || pName.includes('tanbulampot') || pName.includes('tabulampot') || pName.includes('pohon ucapan'))) return true;
+
+  // Standing flower
+  if (tSlug.includes('standing-flower') && (pSlug.includes('standing-flower') || pName.includes('standing flower') || pName.includes('standing'))) return true;
+
+  // Bunga meja
+  if (tSlug.includes('bunga-meja') && (pSlug.includes('bunga-meja') || pName.includes('bunga meja') || pName.includes('table flower'))) return true;
+
+  // Paper flower
+  if (tSlug.includes('paper-flower') && (pSlug.includes('paper-flower') || pName.includes('paper flower') || pName.includes('bunga kertas'))) return true;
+
+  // Semi styrofoam
+  if (tSlug.includes('semi-styrofoam') && (pSlug.includes('semi-styrofoam') || pName.includes('semi styrofoam') || pName.includes('semi strefoam'))) return true;
+
+  return false;
+}
+
 export async function getStaticPaths() {
   let allLiveProducts: any[] = [];
   try {
@@ -25,7 +67,7 @@ export async function getStaticPaths() {
 
   return CATEGORIES.map(category => {
     const filteredProducts = allLiveProducts
-      .filter(p => p.category_slug === category.slug)
+      .filter(p => matchCategory(p.category_slug, p.category_name, category.slug))
       .map(p => ({
         id: p.id,
         slug: p.slug,
@@ -53,8 +95,8 @@ export async function getStaticPaths() {
 }
 
 const { category, products = [] } = Astro.props;
-const isTanbulampot = category.slug === 'tanbulampot-malang';
-const isHandBouquet = category.slug === 'hand-bouquet-malang';
+const isTanbulampot = category.slug === 'tanbulampot-malang' || category.slug === 'tabulampot';
+const isHandBouquet = category.slug === 'hand-bouquet-malang' || category.slug === 'bouquet';
 const categorySlug = category.slug;
 
 // Structured Schema untuk Kategori & FAQ
@@ -269,14 +311,51 @@ const customCategorySchema = {
 
       if (error || !cloudProducts || cloudProducts.length === 0) return;
 
-      const subcatKeyword = categorySlug.replace('bunga-papan-', '').replace('-malang', '');
+      function isMatchingCat(pCatSlug, pCatName, tSlug) {
+        if (!pCatSlug && !pCatName) return false;
+        const pS = (pCatSlug || '').toLowerCase();
+        const pN = (pCatName || '').toLowerCase();
+        const tS = (tSlug || '').toLowerCase();
+
+        if (pS === tS) return true;
+
+        const normTarget = tS.replace(/-malang$/, '');
+        const normProd = pS.replace(/-malang$/, '');
+        if (normProd === normTarget) return true;
+
+        if (normProd.startsWith(normTarget + '--') || normProd.endsWith('--' + normTarget)) return true;
+
+        // Bunga papan subcategories
+        if (tS.includes('duka-cita') && (pS.includes('duka-cita') || pN.includes('duka cita'))) return true;
+        if (tS.includes('wedding') && (pS.includes('wedding') || pN.includes('wedding') || pN.includes('pernikahan'))) return true;
+        if (tS.includes('congratulations') && (pS.includes('congratulations') || pN.includes('congratulations') || pN.includes('selamat'))) return true;
+        if ((tS === 'bunga-papan' || tS === 'bunga-papan-malang') && (pS.startsWith('bunga-papan') || pN.includes('bunga papan'))) return true;
+
+        // Bouquet
+        if ((tS.includes('bouquet') || tS.includes('buket')) && (pS.includes('bouquet') || pS.includes('buket') || pN.includes('bouquet') || pN.includes('buket'))) return true;
+
+        // Tabulampot
+        if ((tS.includes('tanbulampot') || tS.includes('tabulampot')) &&
+            (pS.includes('tanbulampot') || pS.includes('tabulampot') || pN.includes('tanbulampot') || pN.includes('tabulampot') || pN.includes('pohon ucapan'))) return true;
+
+        // Standing flower
+        if (tS.includes('standing-flower') && (pS.includes('standing-flower') || pN.includes('standing flower') || pN.includes('standing'))) return true;
+
+        // Bunga meja
+        if (tS.includes('bunga-meja') && (pS.includes('bunga-meja') || pN.includes('bunga meja') || pN.includes('table flower'))) return true;
+
+        // Paper flower
+        if (tS.includes('paper-flower') && (pS.includes('paper-flower') || pN.includes('paper flower') || pN.includes('bunga kertas'))) return true;
+
+        // Semi styrofoam
+        if (tS.includes('semi-styrofoam') && (pS.includes('semi-styrofoam') || pN.includes('semi styrofoam') || pN.includes('semi strefoam'))) return true;
+
+        return false;
+      }
+
       const liveCategoryProducts = cloudProducts.filter(p => {
         if (p.slug.startsWith('_')) return false;
-        if (p.category_slug === categorySlug) return true;
-        if (p.category_slug && p.category_slug.startsWith(categorySlug + '--')) return true;
-        if (categorySlug.startsWith('bunga-papan-') && p.category_slug && p.category_slug.includes(subcatKeyword)) return true;
-        if (categorySlug.startsWith('bunga-papan-') && p.category_name && p.category_name.toLowerCase().includes(subcatKeyword.replace('-', ' '))) return true;
-        return false;
+        return isMatchingCat(p.category_slug, p.category_name, categorySlug);
       });
 
       if (liveCategoryProducts.length === 0) return;
