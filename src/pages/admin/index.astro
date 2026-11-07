@@ -119,6 +119,14 @@ const title = "Admin — Zaloma Florist";
                 <span>Kota</span>
                 <span id="tab-city-badge" class="px-1.5 py-0.2 rounded-full text-[10px] font-bold bg-slate-200 text-slate-700">0</span>
               </button>
+              <button 
+                type="button" 
+                id="tab-btn-sizes" 
+                class="tab-btn px-3 py-1.5 rounded-md text-xs font-semibold text-slate-600 hover:text-primary hover:bg-accent-bg/50 transition-all cursor-pointer flex items-center gap-1.5"
+              >
+                <span>Ukuran</span>
+                <span id="tab-size-badge" class="px-1.5 py-0.2 rounded-full text-[10px] font-bold bg-slate-200 text-slate-700">0</span>
+              </button>
             </div>
           </div>
 
@@ -310,7 +318,7 @@ const title = "Admin — Zaloma Florist";
                   />
                 </div>
 
-                <div class="sm:col-span-2">
+                <div>
                   <div class="flex items-center justify-between mb-1">
                     <label for="prod-city" class="block text-xs font-semibold text-slate-700">
                       Wilayah / Area Pengiriman <span class="text-rose-500">*</span>
@@ -324,9 +332,38 @@ const title = "Admin — Zaloma Florist";
                     required
                     class="w-full px-3 py-2 rounded-lg border border-slate-300 text-xs bg-white focus:outline-none focus:border-primary focus:ring-1 focus:ring-primary/20 transition-all cursor-pointer"
                   >
-                    <option value="" disabled selected>Pilih Wilayah / Kota Pengiriman...</option>
+                    <option value="" disabled>Pilih Wilayah / Kota Pengiriman...</option>
+                    <option value="Malang Raya (Kota Malang, Kab. Malang, Kota Batu)" selected>📍 Malang Raya (Kota Malang, Kab. Malang, Kota Batu)</option>
+                    <option value="Bisa Dikirim ke Mana Saja">🌍 Bisa Dikirim ke Mana Saja</option>
+                    <option value="Kota Malang">📍 Kota Malang</option>
+                    <option value="Kota Batu">📍 Kota Batu</option>
+                    <option value="Kabupaten Malang">📍 Kabupaten Malang</option>
+                    <option value="Surabaya">📍 Surabaya</option>
+                    <option value="Sidoarjo">📍 Sidoarjo</option>
+                    <option value="Gresik">📍 Gresik</option>
+                    <option value="Pasuruan">📍 Pasuruan</option>
+                    <option value="Kediri">📍 Kediri</option>
+                    <option value="Blitar">📍 Blitar</option>
                   </select>
-                  <p class="text-[10px] text-slate-400 mt-1">Pilih kota pengiriman yang tersedia di sistem untuk produk ini.</p>
+                  <p class="text-[10px] text-slate-400 mt-1">Pilih kota pengiriman yang tersedia di sistem.</p>
+                </div>
+
+                <div>
+                  <div class="flex items-center justify-between mb-1">
+                    <label for="prod-size" class="block text-xs font-semibold text-slate-700">
+                      Ukuran Produk <span class="text-slate-400 font-normal">(Opsional)</span>
+                    </label>
+                    <button type="button" id="quick-manage-size-btn" class="text-[11px] text-primary hover:text-primary-dark hover:underline font-medium cursor-pointer">
+                      ⚙️ Kelola Ukuran
+                    </button>
+                  </div>
+                  <select 
+                    id="prod-size" 
+                    class="w-full px-3 py-2 rounded-lg border border-slate-300 text-xs bg-white focus:outline-none focus:border-primary focus:ring-1 focus:ring-primary/20 transition-all cursor-pointer"
+                  >
+                    <option value="">Pilih Ukuran (Pilih kategori dulu)...</option>
+                  </select>
+                  <p class="text-[10px] text-slate-400 mt-1">Pilihan ukuran otomatis menyesuaikan kategori yang dipilih.</p>
                 </div>
 
               </div>
@@ -454,6 +491,36 @@ const title = "Admin — Zaloma Florist";
           </div>
         </section>
 
+        <!-- ================= TAB 5: KELOLA UKURAN PRODUK ================= -->
+        <section id="tab-sizes" class="hidden animate-fade-in space-y-4 max-w-5xl mx-auto">
+          <div class="bg-white rounded-2xl p-4 sm:p-5 border border-slate-200 shadow-xs flex flex-col sm:flex-row items-start sm:items-center justify-between gap-3">
+            <div>
+              <h2 class="text-base font-bold text-slate-900 flex items-center gap-2">
+                <span class="w-2 h-2 rounded-full bg-primary"></span>
+                Kelola Ukuran Produk per Kategori
+              </h2>
+              <p class="text-xs text-slate-500 mt-0.5">Atur pilihan ukuran untuk setiap kategori (Lebar x Tinggi untuk Bunga Papan, atau dimensi/spesifikasi untuk kategori lain).</p>
+            </div>
+            <button 
+              type="button" 
+              id="open-add-size-btn" 
+              class="bg-primary hover:bg-primary-dark text-white font-semibold py-2 px-4 rounded-lg text-xs transition-all active:scale-95 flex items-center gap-1.5 shadow-sm cursor-pointer shrink-0"
+            >
+              + Tambah Ukuran
+            </button>
+          </div>
+
+          <!-- Category Filter for Sizes -->
+          <div class="flex items-center gap-2 overflow-x-auto pb-1 text-xs" id="sizes-category-filter-chips">
+            <!-- Populated dynamically: "Semua", "Bunga Papan", "Bouquet", etc. -->
+          </div>
+
+          <!-- Sizes Grid -->
+          <div id="sizes-cards-grid" class="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 gap-3">
+            <!-- Populated by JS -->
+          </div>
+        </section>
+
       </main>
 
     </div>
@@ -526,7 +593,30 @@ const title = "Admin — Zaloma Florist";
               </button>
             </div>
             <select id="edit-prod-city" required class="w-full px-3 py-1.5 rounded-lg border border-slate-300 text-xs bg-white focus:outline-none focus:border-primary focus:ring-1 focus:ring-primary/20 transition-all cursor-pointer">
-              <option value="" disabled selected>Pilih Wilayah / Kota Pengiriman...</option>
+              <option value="" disabled>Pilih Wilayah / Kota Pengiriman...</option>
+              <option value="Malang Raya (Kota Malang, Kab. Malang, Kota Batu)" selected>📍 Malang Raya (Kota Malang, Kab. Malang, Kota Batu)</option>
+              <option value="Bisa Dikirim ke Mana Saja">🌍 Bisa Dikirim ke Mana Saja</option>
+              <option value="Kota Malang">📍 Kota Malang</option>
+              <option value="Kota Batu">📍 Kota Batu</option>
+              <option value="Kabupaten Malang">📍 Kabupaten Malang</option>
+              <option value="Surabaya">📍 Surabaya</option>
+              <option value="Sidoarjo">📍 Sidoarjo</option>
+              <option value="Gresik">📍 Gresik</option>
+              <option value="Pasuruan">📍 Pasuruan</option>
+              <option value="Kediri">📍 Kediri</option>
+              <option value="Blitar">📍 Blitar</option>
+            </select>
+          </div>
+
+          <div>
+            <div class="flex items-center justify-between mb-1">
+              <label for="edit-prod-size" class="block text-xs font-semibold text-slate-700">Ukuran Produk <span class="text-slate-400 font-normal">(Opsional)</span></label>
+              <button type="button" id="edit-quick-manage-size-btn" class="text-[10px] text-primary hover:text-primary-dark hover:underline font-medium cursor-pointer">
+                ⚙️ Kelola Ukuran
+              </button>
+            </div>
+            <select id="edit-prod-size" class="w-full px-3 py-1.5 rounded-lg border border-slate-300 text-xs bg-white focus:outline-none focus:border-primary focus:ring-1 focus:ring-primary/20 transition-all cursor-pointer">
+              <option value="">Pilih Ukuran (Pilih kategori dulu)...</option>
             </select>
           </div>
 
@@ -779,6 +869,135 @@ const title = "Admin — Zaloma Florist";
       </div>
     </div>
 
+    <!-- ================= ADD / EDIT SIZE MODAL ================= -->
+    <div id="size-modal" class="hidden fixed inset-0 z-50 bg-black/40 backdrop-blur-xs flex items-center justify-center p-4 animate-fade-in">
+      <div class="bg-white rounded-2xl max-w-md w-full p-5 sm:p-6 shadow-xl border border-slate-200 space-y-4 animate-modal-pop">
+        <div class="flex items-center justify-between pb-2.5 border-b border-slate-100">
+          <h3 id="size-modal-title" class="text-sm font-bold text-slate-900 flex items-center gap-2">
+            <span class="w-2 h-2 rounded-full bg-primary"></span>
+            Tambah Ukuran Produk
+          </h3>
+          <button id="close-size-modal-btn" type="button" class="text-slate-400 hover:text-slate-600 text-sm font-bold cursor-pointer">✕</button>
+        </div>
+
+        <form id="size-form" class="space-y-3.5">
+          <input type="hidden" id="size-edit-id" value="" />
+
+          <!-- Step 1: Pilih Kategori Terlebih Dahulu -->
+          <div>
+            <label for="size-category-select" class="block text-xs font-semibold text-slate-700 mb-1">
+              Pilih Kategori Terlebih Dahulu <span class="text-rose-500">*</span>
+            </label>
+            <select 
+              id="size-category-select" 
+              required 
+              class="w-full px-3 py-2 rounded-lg border border-slate-300 text-xs bg-white focus:outline-none focus:border-primary focus:ring-1 focus:ring-primary/20 transition-all cursor-pointer"
+            >
+              <option value="" disabled selected>-- Pilih Kategori Produk --</option>
+            </select>
+            <p class="text-[10px] text-slate-400 mt-1">Form input ukuran di bawah otomatis menyesuaikan tipe kategori.</p>
+          </div>
+
+          <!-- Dynamic Container A: Untuk Bunga Papan (Lebar x Tinggi) -->
+          <div id="size-papan-fields" class="space-y-3 p-3.5 bg-rose-50/50 rounded-xl border border-rose-100">
+            <div class="flex items-center justify-between">
+              <span class="text-[11px] font-bold text-primary flex items-center gap-1.5">
+                📐 Dimensi Bunga Papan (Meter)
+              </span>
+              <span id="size-papan-preview" class="text-xs font-mono font-bold text-slate-800 bg-white px-2 py-0.5 rounded border border-rose-200">
+                2 x 1.2 m
+              </span>
+            </div>
+
+            <div class="grid grid-cols-2 gap-2.5">
+              <div>
+                <label for="size-width-input" class="block text-xs font-semibold text-slate-700 mb-1">
+                  Lebar (Meter) <span class="text-rose-500">*</span>
+                </label>
+                <input 
+                  type="number" 
+                  id="size-width-input" 
+                  step="0.1" 
+                  min="0.5" 
+                  max="20"
+                  value="2" 
+                  placeholder="2" 
+                  class="w-full px-3 py-2 rounded-lg border border-slate-300 text-xs font-mono bg-white focus:outline-none focus:border-primary focus:ring-1 focus:ring-primary/20 transition-all"
+                />
+              </div>
+
+              <div>
+                <label for="size-height-input" class="block text-xs font-semibold text-slate-700 mb-1">
+                  Tinggi (Meter) <span class="text-rose-500">*</span>
+                </label>
+                <input 
+                  type="number" 
+                  id="size-height-input" 
+                  step="0.1" 
+                  min="0.5" 
+                  max="20"
+                  value="1.2" 
+                  placeholder="1.2" 
+                  class="w-full px-3 py-2 rounded-lg border border-slate-300 text-xs font-mono bg-white focus:outline-none focus:border-primary focus:ring-1 focus:ring-primary/20 transition-all"
+                />
+              </div>
+            </div>
+
+            <div>
+              <label for="size-label-papan-input" class="block text-xs font-semibold text-slate-700 mb-1">
+                Label / Nama Ukuran <span class="text-slate-400 font-normal">(Otomatis atau Sesuaikan)</span>
+              </label>
+              <input 
+                type="text" 
+                id="size-label-papan-input" 
+                value="2 x 1.2 m" 
+                placeholder="2 x 1.2 m"
+                class="w-full px-3 py-2 rounded-lg border border-slate-300 text-xs bg-white focus:outline-none focus:border-primary focus:ring-1 focus:ring-primary/20 transition-all"
+              />
+            </div>
+          </div>
+
+          <!-- Dynamic Container B: Untuk Kategori Lainnya (Bouquet, Standing Flower, dll) -->
+          <div id="size-general-fields" class="hidden space-y-3 p-3.5 bg-slate-50 rounded-xl border border-slate-200">
+            <div>
+              <label for="size-name-input" class="block text-xs font-semibold text-slate-700 mb-1">
+                Nama / Spesifikasi Ukuran <span class="text-rose-500">*</span>
+              </label>
+              <input 
+                type="text" 
+                id="size-name-input" 
+                placeholder="Contoh: Medium (10 - 15 Tangkai)"
+                class="w-full px-3 py-2 rounded-lg border border-slate-300 text-xs bg-white focus:outline-none focus:border-primary focus:ring-1 focus:ring-primary/20 transition-all"
+              />
+              <p id="size-hint-text" class="text-[10px] text-slate-400 mt-1">Masukkan dimensi atau isi rangkaian bunga.</p>
+            </div>
+          </div>
+
+          <!-- Deskripsi / Catatan Ukuran -->
+          <div>
+            <label for="size-desc-input" class="block text-xs font-semibold text-slate-700 mb-1">
+              Keterangan / Catatan Ukuran <span class="text-slate-400 font-normal">(Opsional)</span>
+            </label>
+            <input 
+              type="text" 
+              id="size-desc-input" 
+              placeholder="Contoh: Ukuran Standar Favorit / 2 Tingkat Megah"
+              class="w-full px-3 py-2 rounded-lg border border-slate-300 text-xs focus:outline-none focus:border-primary focus:ring-1 focus:ring-primary/20 transition-all"
+            />
+          </div>
+
+          <div class="pt-3 border-t border-slate-100 flex items-center justify-end gap-2">
+            <button type="button" id="cancel-size-btn" class="px-3 py-1.5 rounded-lg text-xs font-semibold text-slate-500 hover:bg-slate-100 cursor-pointer">
+              Batal
+            </button>
+            <button type="submit" id="save-size-btn" class="bg-primary hover:bg-primary-dark text-white font-semibold py-1.5 px-4 rounded-lg text-xs transition-all active:scale-95 cursor-pointer shadow-sm">
+              Simpan Ukuran
+            </button>
+          </div>
+        </form>
+      </div>
+    </div>
+
     <script define:vars={{ SUPABASE_URL, SUPABASE_ANON_KEY, SUPABASE_BUCKET, DEFAULT_CATEGORIES }}>
       // Initialize Supabase Client
       const supabase = window.supabase.createClient(SUPABASE_URL, SUPABASE_ANON_KEY);
@@ -877,17 +1096,20 @@ const title = "Admin — Zaloma Florist";
       const tabBtnAdd = document.getElementById('tab-btn-add');
       const tabBtnCategories = document.getElementById('tab-btn-categories');
       const tabBtnCities = document.getElementById('tab-btn-cities');
+      const tabBtnSizes = document.getElementById('tab-btn-sizes');
       const tabCatalog = document.getElementById('tab-catalog');
       const tabAdd = document.getElementById('tab-add');
       const tabCategories = document.getElementById('tab-categories');
       const tabCities = document.getElementById('tab-cities');
+      const tabSizes = document.getElementById('tab-sizes');
 
       function switchTab(activeTab) {
         const tabs = [
           { btn: tabBtnCatalog, pane: tabCatalog, isCatalog: true },
           { btn: tabBtnAdd, pane: tabAdd },
           { btn: tabBtnCategories, pane: tabCategories },
-          { btn: tabBtnCities, pane: tabCities }
+          { btn: tabBtnCities, pane: tabCities },
+          { btn: tabBtnSizes, pane: tabSizes }
         ];
 
         tabs.forEach(t => {
@@ -900,6 +1122,11 @@ const title = "Admin — Zaloma Florist";
             t.pane.classList.add('hidden');
           }
         });
+
+        if (activeTab === tabBtnAdd) {
+          if (typeof updateCityDropdowns === 'function') updateCityDropdowns();
+          if (typeof updateSizeDropdowns === 'function') updateSizeDropdowns();
+        }
       }
 
       tabBtnCatalog?.addEventListener('click', () => switchTab(tabBtnCatalog));
@@ -911,6 +1138,10 @@ const title = "Admin — Zaloma Florist";
       tabBtnCities?.addEventListener('click', () => {
         switchTab(tabBtnCities);
         renderCitiesCards();
+      });
+      tabBtnSizes?.addEventListener('click', () => {
+        switchTab(tabBtnSizes);
+        renderSizesCards();
       });
 
       // Categories State Management (v3 with requested initial categories)
@@ -1022,6 +1253,9 @@ const title = "Admin — Zaloma Florist";
           prodSubcatSelect.innerHTML = '<option value="">Pilih Subkategori...</option>';
           prodSubcatWrapper.classList.add('hidden');
         }
+        if (typeof updateSizeDropdownForCategory === 'function') {
+          updateSizeDropdownForCategory(selectedSlug, 'prod-size');
+        }
       });
 
       // Dynamic Subcategory Select for Edit Modal
@@ -1039,6 +1273,9 @@ const title = "Admin — Zaloma Florist";
         } else {
           editSubcatSelect.innerHTML = '<option value="">Pilih Subkategori...</option>';
           editSubcatWrapper.classList.add('hidden');
+        }
+        if (typeof updateSizeDropdownForCategory === 'function') {
+          updateSizeDropdownForCategory(selectedSlug, 'edit-prod-size');
         }
       });
 
@@ -1637,6 +1874,466 @@ const title = "Admin — Zaloma Florist";
       updateCityDropdowns();
       renderCitiesCards();
 
+      // Quick manage city shortcuts
+      document.getElementById('quick-manage-city-btn')?.addEventListener('click', () => {
+        switchTab(tabBtnCities);
+        renderCitiesCards();
+      });
+      document.getElementById('edit-quick-manage-city-btn')?.addEventListener('click', () => {
+        editModal.classList.add('hidden');
+        switchTab(tabBtnCities);
+        renderCitiesCards();
+      });
+
+      // ================= SIZES STATE MANAGEMENT =================
+      const DEFAULT_SIZES = [
+        // Bunga Papan
+        { id: 'bp-2x1.2', category_slug: 'bunga-papan', name: '2 x 1.2 m', width: '2', height: '1.2', description: 'Ukuran Standar' },
+        { id: 'bp-2x1.5', category_slug: 'bunga-papan', name: '2 x 1.5 m', width: '2', height: '1.5', description: 'Ukuran Sedang' },
+        { id: 'bp-2x1.8', category_slug: 'bunga-papan', name: '2 x 1.8 m', width: '2', height: '1.8', description: 'Ukuran Besar' },
+        { id: 'bp-2x2', category_slug: 'bunga-papan', name: '2 x 2 m', width: '2', height: '2', description: 'Ukuran Jumbo' },
+        { id: 'bp-4x2', category_slug: 'bunga-papan', name: '4 x 2 m', width: '4', height: '2', description: 'Ukuran Gandeng (Double)' },
+
+        // Bunga Papan Semi Styrofoam
+        { id: 'bps-2x1.2', category_slug: 'bunga-papan-semi-styrofoam', name: '2 x 1.2 m', width: '2', height: '1.2', description: 'Standar Semi 3D' },
+        { id: 'bps-2x1.5', category_slug: 'bunga-papan-semi-styrofoam', name: '2 x 1.5 m', width: '2', height: '1.5', description: 'Sedang Semi 3D' },
+        { id: 'bps-2x2', category_slug: 'bunga-papan-semi-styrofoam', name: '2 x 2 m', width: '2', height: '2', description: 'Jumbo Semi 3D' },
+
+        // Bouquet
+        { id: 'bq-s', category_slug: 'bouquet', name: 'Small (5 - 7 Tangkai)', description: 'Buket Mini / Wisuda' },
+        { id: 'bq-m', category_slug: 'bouquet', name: 'Medium (10 - 15 Tangkai)', description: 'Buket Reguler Favorit' },
+        { id: 'bq-l', category_slug: 'bouquet', name: 'Large (20 - 30 Tangkai)', description: 'Buket Eksklusif Mewah' },
+        { id: 'bq-xl', category_slug: 'bouquet', name: 'Jumbo (50+ Tangkai)', description: 'Buket Raksasa Spesial' },
+
+        // Standing Flower
+        { id: 'sf-1', category_slug: 'standing-flower', name: '1 Tingkat (Tinggi ± 1.2 m)', description: 'Desain Elegan Minimalis' },
+        { id: 'sf-2', category_slug: 'standing-flower', name: '2 Tingkat (Tinggi ± 1.5 - 1.7 m)', description: 'Paling Populer & Megah' },
+        { id: 'sf-3', category_slug: 'standing-flower', name: '3 Tingkat / Luxury (Tinggi ± 2 m)', description: 'Super Megah Eksklusif' },
+
+        // Bunga Meja
+        { id: 'bm-s', category_slug: 'bunga-meja', name: 'Compact / Mini (Vas 15 - 20 cm)', description: 'Cocok untuk Meja Kerja / Nakas' },
+        { id: 'bm-m', category_slug: 'bunga-meja', name: 'Medium (Vas 25 - 30 cm)', description: 'Cocok untuk Meja Tamu / Resepsionis' },
+        { id: 'bm-l', category_slug: 'bunga-meja', name: 'Large / Mewah (Vas > 35 cm)', description: 'Rangkaian Megah Sudut Ruang' },
+
+        // Tabulampot
+        { id: 'tb-s', category_slug: 'tabulampot', name: 'Pot Kecil (Diameter 25 - 30 cm)', description: 'Tinggi Tanaman 50 - 70 cm' },
+        { id: 'tb-m', category_slug: 'tabulampot', name: 'Pot Sedang (Diameter 35 - 45 cm)', description: 'Tinggi Tanaman 80 - 120 cm' },
+        { id: 'tb-l', category_slug: 'tabulampot', name: 'Pot Besar (Diameter > 50 cm)', description: 'Tinggi Tanaman 130 - 180 cm (Siap Buah)' },
+
+        // Paper Flower
+        { id: 'pf-standar', category_slug: 'paper-flower', name: '2 x 1.2 m (Papan Kertas Standar)', width: '2', height: '1.2', description: 'Awet & Tahan Cuaca' },
+        { id: 'pf-sedang', category_slug: 'paper-flower', name: '2 x 1.5 m (Papan Kertas Sedang)', width: '2', height: '1.5', description: 'Desain Paper Craft 3D' },
+        { id: 'pf-box', category_slug: 'paper-flower', name: 'Frame / Box (20 x 25 cm)', description: 'Hiasan Dinding Akrilik Paper Flower' }
+      ];
+
+      let sizesList = [];
+      try {
+        const cachedSizes = localStorage.getItem('zaloma_admin_sizes_v1');
+        if (cachedSizes !== null) {
+          sizesList = JSON.parse(cachedSizes);
+        } else {
+          sizesList = JSON.parse(JSON.stringify(DEFAULT_SIZES));
+          localStorage.setItem('zaloma_admin_sizes_v1', JSON.stringify(sizesList));
+        }
+      } catch (e) {
+        sizesList = JSON.parse(JSON.stringify(DEFAULT_SIZES));
+      }
+
+      function updateSizeBadges() {
+        const badge = document.getElementById('tab-size-badge');
+        if (badge) badge.textContent = sizesList.length;
+      }
+
+      async function persistSizes() {
+        try {
+          localStorage.setItem('zaloma_admin_sizes_v1', JSON.stringify(sizesList));
+          updateSizeBadges();
+          renderSizesCards(currentSizeFilterCat);
+          updateSizeDropdowns();
+
+          await supabase.from('products').upsert({
+            slug: '_sizes_config_',
+            name: 'System Sizes Config',
+            category_slug: '_system_',
+            category_name: 'System',
+            price_from: 0,
+            price_label: 'Rp 0',
+            image: 'https://zalomaflorist.com/favicon.ico',
+            description: JSON.stringify(sizesList),
+            featured: false,
+            city: 'Malang'
+          }, { onConflict: 'slug' });
+        } catch (err) {
+          console.warn('Sync sizes notice:', err);
+        }
+      }
+
+      function updateSizeDropdownForCategory(categorySlug, selectId) {
+        const select = document.getElementById(selectId);
+        if (!select) return;
+
+        const prevVal = select.value;
+        if (!categorySlug) {
+          select.innerHTML = '<option value="">Pilih Ukuran (Pilih kategori dulu)...</option>';
+          return;
+        }
+
+        const baseSlug = categorySlug.split('--')[0];
+        const matchedSizes = sizesList.filter(s => s.category_slug === baseSlug || s.category_slug === categorySlug);
+
+        if (matchedSizes.length === 0) {
+          select.innerHTML = '<option value="">-- Belum ada ukuran khusus (Opsional) --</option>';
+          return;
+        }
+
+        let html = '<option value="">-- Pilih Ukuran (Opsional) --</option>';
+        html += matchedSizes.map(s => {
+          const desc = s.description ? ` (${s.description})` : '';
+          return `<option value="${s.name}">📏 ${s.name}${desc}</option>`;
+        }).join('');
+
+        select.innerHTML = html;
+
+        if (prevVal && matchedSizes.some(s => s.name === prevVal)) {
+          select.value = prevVal;
+        }
+      }
+
+      function updateSizeDropdowns() {
+        const prodCat = document.getElementById('prod-category');
+        const editCat = document.getElementById('edit-prod-category');
+
+        if (prodCat && prodCat.value) {
+          updateSizeDropdownForCategory(prodCat.value, 'prod-size');
+        }
+        if (editCat && editCat.value) {
+          updateSizeDropdownForCategory(editCat.value, 'edit-prod-size');
+        }
+        updateSizeBadges();
+      }
+
+      // Quick manage size shortcuts
+      document.getElementById('quick-manage-size-btn')?.addEventListener('click', () => {
+        switchTab(tabBtnSizes);
+        renderSizesCards();
+      });
+      document.getElementById('edit-quick-manage-size-btn')?.addEventListener('click', () => {
+        editModal.classList.add('hidden');
+        switchTab(tabBtnSizes);
+        renderSizesCards();
+      });
+
+      // Sizes UI Rendering in Tab 5
+      let currentSizeFilterCat = 'all';
+
+      function renderSizesCards(filterCat = 'all') {
+        currentSizeFilterCat = filterCat;
+        const grid = document.getElementById('sizes-cards-grid');
+        const chipsContainer = document.getElementById('sizes-category-filter-chips');
+        if (!grid) return;
+
+        // Populate Category Filter Chips
+        if (chipsContainer) {
+          const uniqueCats = ['all', ...new Set(sizesList.map(s => s.category_slug))];
+          chipsContainer.innerHTML = uniqueCats.map(catSlug => {
+            const isActive = catSlug === currentSizeFilterCat;
+            let label = 'Semua Kategori';
+            if (catSlug !== 'all') {
+              const catObj = categoriesList.find(c => c.slug === catSlug);
+              label = catObj ? catObj.name : catSlug;
+            }
+            const count = catSlug === 'all' ? sizesList.length : sizesList.filter(s => s.category_slug === catSlug).length;
+
+            return `
+              <button 
+                type="button" 
+                data-cat="${catSlug}" 
+                class="size-filter-chip px-3 py-1 rounded-full text-xs font-semibold whitespace-nowrap transition-all cursor-pointer ${
+                  isActive 
+                    ? 'bg-primary text-white shadow-xs' 
+                    : 'bg-white text-slate-600 border border-slate-200 hover:border-slate-300 hover:bg-slate-50'
+                }"
+              >
+                ${label} <span class="${isActive ? 'bg-white/20 text-white' : 'bg-slate-100 text-slate-600'} px-1.5 py-0.2 rounded-full text-[10px] ml-1">${count}</span>
+              </button>
+            `;
+          }).join('');
+
+          chipsContainer.querySelectorAll('.size-filter-chip').forEach(btn => {
+            btn.addEventListener('click', () => {
+              const cat = btn.getAttribute('data-cat');
+              renderSizesCards(cat);
+            });
+          });
+        }
+
+        // Filter sizes
+        const filtered = currentSizeFilterCat === 'all'
+          ? sizesList
+          : sizesList.filter(s => s.category_slug === currentSizeFilterCat);
+
+        if (filtered.length === 0) {
+          grid.innerHTML = `
+            <div class="col-span-full py-12 text-center text-slate-400 bg-white rounded-xl border border-dashed border-slate-200 p-6 text-xs">
+              Belum ada ukuran untuk kategori ini. Klik "+ Tambah Ukuran" untuk menambahkan.
+            </div>
+          `;
+          return;
+        }
+
+        grid.innerHTML = filtered.map(s => {
+          const catObj = categoriesList.find(c => c.slug === s.category_slug);
+          const catName = catObj ? catObj.name : s.category_slug;
+          const isPapan = s.category_slug.includes('papan') || Boolean(s.width && s.height);
+
+          return `
+            <div class="bg-white rounded-xl p-3.5 border border-slate-200 shadow-2xs hover:border-slate-300 transition-all flex flex-col justify-between group">
+              <div>
+                <div class="flex items-center justify-between gap-1 mb-1.5">
+                  <span class="text-[10px] font-semibold text-rose-700 bg-rose-50 border border-rose-100 px-2 py-0.5 rounded-md truncate max-w-[160px]">
+                    ${catName}
+                  </span>
+                  ${isPapan && s.width && s.height ? `
+                    <span class="text-[10px] font-mono font-bold text-slate-500 bg-slate-100 px-1.5 py-0.5 rounded">
+                      📐 ${s.width}m × ${s.height}m
+                    </span>
+                  ` : ''}
+                </div>
+
+                <h4 class="font-bold text-slate-900 text-sm leading-snug flex items-center gap-1.5">
+                  <span class="text-emerald-600">📏</span>
+                  <span>${s.name}</span>
+                </h4>
+
+                ${s.description ? `
+                  <p class="text-[11px] text-slate-500 mt-1 leading-relaxed">${s.description}</p>
+                ` : `
+                  <p class="text-[10px] text-slate-400 mt-1 italic">Tersedia saat memilih kategori ini</p>
+                `}
+              </div>
+
+              <div class="pt-2.5 mt-2.5 border-t border-slate-100 flex items-center justify-end gap-1 text-[11px]">
+                <button type="button" data-id="${s.id}" class="edit-size-btn px-2 py-0.5 rounded text-slate-600 hover:text-primary hover:bg-slate-100 font-medium cursor-pointer transition-colors">
+                  Edit
+                </button>
+                <button type="button" data-id="${s.id}" class="delete-size-btn px-2 py-0.5 rounded text-rose-600 hover:text-rose-700 hover:bg-rose-50 font-medium cursor-pointer transition-colors">
+                  Hapus
+                </button>
+              </div>
+            </div>
+          `;
+        }).join('');
+
+        // Attach action listeners for sizes
+        grid.querySelectorAll('.edit-size-btn').forEach(btn => {
+          btn.addEventListener('click', () => {
+            const id = btn.getAttribute('data-id');
+            const s = sizesList.find(x => x.id === id);
+            if (!s) return;
+            openSizeModalForEdit(s);
+          });
+        });
+
+        grid.querySelectorAll('.delete-size-btn').forEach(btn => {
+          btn.addEventListener('click', async () => {
+            const id = btn.getAttribute('data-id');
+            const s = sizesList.find(x => x.id === id);
+            if (!s) return;
+
+            if (confirm(`Hapus ukuran "${s.name}"?`)) {
+              sizesList = sizesList.filter(x => x.id !== id);
+              await persistSizes();
+              showToast(`Ukuran "${s.name}" berhasil dihapus.`);
+            }
+          });
+        });
+      }
+
+      // Size Modal Logic
+      const sizeModal = document.getElementById('size-modal');
+      const openAddSizeBtn = document.getElementById('open-add-size-btn');
+      const closeSizeModalBtn = document.getElementById('close-size-modal-btn');
+      const cancelSizeBtn = document.getElementById('cancel-size-btn');
+      const sizeForm = document.getElementById('size-form');
+      const sizeCategorySelect = document.getElementById('size-category-select');
+      const sizePapanFields = document.getElementById('size-papan-fields');
+      const sizeGeneralFields = document.getElementById('size-general-fields');
+      const sizeWidthInput = document.getElementById('size-width-input');
+      const sizeHeightInput = document.getElementById('size-height-input');
+      const sizeLabelPapanInput = document.getElementById('size-label-papan-input');
+      const sizePapanPreview = document.getElementById('size-papan-preview');
+      const sizeNameInput = document.getElementById('size-name-input');
+      const sizeDescInput = document.getElementById('size-desc-input');
+      const sizeHintText = document.getElementById('size-hint-text');
+
+      function populateSizeCategoryOptions(selectedSlug = '') {
+        if (!sizeCategorySelect) return;
+        sizeCategorySelect.innerHTML = '<option value="" disabled selected>-- Pilih Kategori Produk --</option>' +
+          categoriesList.map(c => `<option value="${c.slug}">${c.name}</option>`).join('');
+        if (selectedSlug) {
+          sizeCategorySelect.value = selectedSlug;
+        }
+      }
+
+      function updatePapanPreview() {
+        const w = (sizeWidthInput?.value || '2').trim();
+        const h = (sizeHeightInput?.value || '1.2').trim();
+        const formatted = `${w} x ${h} m`;
+        if (sizePapanPreview) sizePapanPreview.textContent = formatted;
+        if (sizeLabelPapanInput && (!sizeLabelPapanInput.dataset.customized || sizeLabelPapanInput.value.includes(' x '))) {
+          sizeLabelPapanInput.value = formatted;
+        }
+      }
+
+      sizeWidthInput?.addEventListener('input', updatePapanPreview);
+      sizeHeightInput?.addEventListener('input', updatePapanPreview);
+      sizeLabelPapanInput?.addEventListener('input', () => {
+        if (sizeLabelPapanInput) sizeLabelPapanInput.dataset.customized = 'true';
+      });
+
+      function handleSizeCategoryChange() {
+        const selectedCatSlug = sizeCategorySelect.value;
+        const isPapan = selectedCatSlug.includes('papan');
+
+        if (isPapan) {
+          sizePapanFields?.classList.remove('hidden');
+          sizeGeneralFields?.classList.add('hidden');
+          updatePapanPreview();
+        } else {
+          sizePapanFields?.classList.add('hidden');
+          sizeGeneralFields?.classList.remove('hidden');
+
+          if (selectedCatSlug === 'bouquet') {
+            if (sizeHintText) sizeHintText.textContent = 'Contoh: Small (5-7 Tangkai), Medium (10-15 Tangkai), Jumbo (50 Tangkai).';
+            if (sizeNameInput && !sizeNameInput.value) sizeNameInput.placeholder = 'Contoh: Medium (10 - 15 Tangkai)';
+          } else if (selectedCatSlug === 'standing-flower') {
+            if (sizeHintText) sizeHintText.textContent = 'Contoh: 1 Tingkat (Tinggi ± 1.2 m), 2 Tingkat (Tinggi ± 1.7 m).';
+            if (sizeNameInput && !sizeNameInput.value) sizeNameInput.placeholder = 'Contoh: 2 Tingkat (Tinggi ± 1.5 - 1.7 m)';
+          } else if (selectedCatSlug === 'bunga-meja') {
+            if (sizeHintText) sizeHintText.textContent = 'Contoh: Mini (Vas 15-20 cm), Medium (Vas 25-30 cm), Rangkaian Mewah.';
+            if (sizeNameInput && !sizeNameInput.value) sizeNameInput.placeholder = 'Contoh: Medium (Vas 25 - 30 cm)';
+          } else if (selectedCatSlug === 'tabulampot') {
+            if (sizeHintText) sizeHintText.textContent = 'Contoh: Pot Diameter 35 cm, Tinggi 100 cm.';
+            if (sizeNameInput && !sizeNameInput.value) sizeNameInput.placeholder = 'Contoh: Pot Sedang (Diameter 35 - 45 cm)';
+          } else {
+            if (sizeHintText) sizeHintText.textContent = 'Masukkan ukuran, dimensi, atau spesifikasi rangkaian produk.';
+            if (sizeNameInput && !sizeNameInput.value) sizeNameInput.placeholder = 'Contoh: Ukuran Standar';
+          }
+        }
+      }
+
+      sizeCategorySelect?.addEventListener('change', handleSizeCategoryChange);
+
+      openAddSizeBtn?.addEventListener('click', () => {
+        document.getElementById('size-edit-id').value = '';
+        document.getElementById('size-modal-title').innerHTML = '<span class="w-2 h-2 rounded-full bg-primary"></span> Tambah Ukuran Produk';
+        sizeForm.reset();
+        if (sizeLabelPapanInput) delete sizeLabelPapanInput.dataset.customized;
+
+        const initialCat = currentSizeFilterCat !== 'all' ? currentSizeFilterCat : (categoriesList[0]?.slug || '');
+        populateSizeCategoryOptions(initialCat);
+        if (initialCat) {
+          sizeCategorySelect.value = initialCat;
+          handleSizeCategoryChange();
+        }
+
+        sizeModal.classList.remove('hidden');
+      });
+
+      function openSizeModalForEdit(s) {
+        document.getElementById('size-edit-id').value = s.id;
+        document.getElementById('size-modal-title').innerHTML = '<span class="w-2 h-2 rounded-full bg-primary"></span> Edit Ukuran Produk';
+        populateSizeCategoryOptions(s.category_slug);
+        sizeCategorySelect.value = s.category_slug;
+        handleSizeCategoryChange();
+
+        const isPapan = s.category_slug.includes('papan') || Boolean(s.width && s.height);
+        if (isPapan) {
+          if (sizeWidthInput) sizeWidthInput.value = s.width || '2';
+          if (sizeHeightInput) sizeHeightInput.value = s.height || '1.2';
+          if (sizeLabelPapanInput) {
+            sizeLabelPapanInput.value = s.name;
+            sizeLabelPapanInput.dataset.customized = 'true';
+          }
+          if (sizePapanPreview) sizePapanPreview.textContent = `${s.width || '2'} x ${s.height || '1.2'} m`;
+        } else {
+          if (sizeNameInput) sizeNameInput.value = s.name;
+        }
+
+        if (sizeDescInput) sizeDescInput.value = s.description || '';
+        sizeModal.classList.remove('hidden');
+      }
+
+      closeSizeModalBtn?.addEventListener('click', () => sizeModal.classList.add('hidden'));
+      cancelSizeBtn?.addEventListener('click', () => sizeModal.classList.add('hidden'));
+
+      sizeForm?.addEventListener('submit', async (e) => {
+        e.preventDefault();
+        const editId = document.getElementById('size-edit-id').value;
+        const catSlug = sizeCategorySelect.value;
+        if (!catSlug) {
+          showToast('Pilih kategori terlebih dahulu.', 'error');
+          return;
+        }
+
+        const isPapan = catSlug.includes('papan');
+        let sizeName = '';
+        let widthVal = '';
+        let heightVal = '';
+
+        if (isPapan) {
+          widthVal = (sizeWidthInput?.value || '').trim();
+          heightVal = (sizeHeightInput?.value || '').trim();
+          if (!widthVal || !heightVal) {
+            showToast('Lebar dan Tinggi harus diisi.', 'error');
+            return;
+          }
+          sizeName = (sizeLabelPapanInput?.value || '').trim() || `${widthVal} x ${heightVal} m`;
+        } else {
+          sizeName = (sizeNameInput?.value || '').trim();
+          if (!sizeName) {
+            showToast('Nama ukuran harus diisi.', 'error');
+            return;
+          }
+        }
+
+        const descVal = (sizeDescInput?.value || '').trim();
+
+        if (editId) {
+          const idx = sizesList.findIndex(x => x.id === editId);
+          if (idx !== -1) {
+            sizesList[idx] = {
+              ...sizesList[idx],
+              category_slug: catSlug,
+              name: sizeName,
+              width: widthVal || undefined,
+              height: heightVal || undefined,
+              description: descVal
+            };
+            showToast(`Ukuran "${sizeName}" berhasil diperbarui.`);
+          }
+        } else {
+          const newId = `size-${Date.now()}`;
+          sizesList.push({
+            id: newId,
+            category_slug: catSlug,
+            name: sizeName,
+            width: widthVal || undefined,
+            height: heightVal || undefined,
+            description: descVal
+          });
+          showToast(`Ukuran "${sizeName}" berhasil ditambahkan.`);
+        }
+
+        sizeModal.classList.add('hidden');
+        await persistSizes();
+      });
+
+      // Initial sizes setup
+      updateSizeBadges();
+      renderSizesCards();
+      updateSizeDropdowns();
+
       // Live Price Preview Formatting
       const priceInput = document.getElementById('prod-price');
       const pricePreview = document.getElementById('price-preview');
@@ -1785,6 +2482,12 @@ const title = "Admin — Zaloma Florist";
             try {
               const cloudCities = JSON.parse(citiesConfigRow.description);
               if (Array.isArray(cloudCities) && cloudCities.length > 0) {
+                if (cloudCities.length <= 1) {
+                  const existingNames = new Set(cloudCities.map(c => typeof c === 'string' ? c : c.name));
+                  DEFAULT_CITIES.forEach(dc => {
+                    if (!existingNames.has(dc.name)) cloudCities.push(dc);
+                  });
+                }
                 citiesList = cloudCities;
                 localStorage.setItem('zaloma_admin_cities_v1', JSON.stringify(citiesList));
                 updateCityDropdowns();
@@ -1794,6 +2497,23 @@ const title = "Admin — Zaloma Florist";
             } catch (e) {}
           } else if (citiesList.length > 0) {
             persistCities();
+          }
+
+          // Check for sizes configuration record
+          const sizesConfigRow = (products || []).find(p => p.slug === '_sizes_config_');
+          if (sizesConfigRow && sizesConfigRow.description) {
+            try {
+              const cloudSizes = JSON.parse(sizesConfigRow.description);
+              if (Array.isArray(cloudSizes) && cloudSizes.length > 0) {
+                sizesList = cloudSizes;
+                localStorage.setItem('zaloma_admin_sizes_v1', JSON.stringify(sizesList));
+                updateSizeBadges();
+                renderSizesCards(currentSizeFilterCat);
+                updateSizeDropdowns();
+              }
+            } catch (e) {}
+          } else if (sizesList.length > 0) {
+            persistSizes();
           }
 
           // Filter out internal system rows
@@ -1910,6 +2630,8 @@ const title = "Admin — Zaloma Florist";
         grid.innerHTML = paginated.map(p => {
           const detailUrl = `/produk/${p.slug}/`;
           const isFeatured = Boolean(p.featured);
+          const sizeMatch = (p.description || '').match(/^\[Ukuran:\s*([^\]]+)\]/);
+          const sizeBadge = sizeMatch ? `<span class="inline-flex items-center gap-1 text-[10px] font-semibold text-emerald-700 bg-emerald-50 border border-emerald-200/60 px-1.5 py-0.5 rounded shrink-0" title="Ukuran: ${sizeMatch[1]}">📏 ${sizeMatch[1]}</span>` : '';
 
           return `
             <div class="bg-white border border-slate-200 rounded-xl overflow-hidden shadow-2xs hover:border-slate-300 transition-all flex flex-col justify-between group">
@@ -1929,9 +2651,12 @@ const title = "Admin — Zaloma Florist";
                   <h3 class="font-semibold text-slate-900 text-xs leading-snug line-clamp-2 hover:text-primary transition-colors">
                     <a href="${detailUrl}" target="_blank">${p.name}</a>
                   </h3>
-                  <div class="flex items-center justify-between gap-1 mt-1">
+                  <div class="flex items-center justify-between gap-1 mt-1 flex-wrap">
                     <p class="font-bold text-primary text-sm">${p.price_label}</p>
-                    ${p.city ? `<span class="text-[10px] text-slate-500 bg-slate-100 px-1.5 py-0.5 rounded truncate max-w-[130px]" title="${p.city}">📍 ${p.city}</span>` : ''}
+                    <div class="flex items-center gap-1 flex-wrap">
+                      ${sizeBadge}
+                      ${p.city ? `<span class="text-[10px] text-slate-500 bg-slate-100 px-1.5 py-0.5 rounded truncate max-w-[130px]" title="${p.city}">📍 ${p.city}</span>` : ''}
+                    </div>
                   </div>
                 </div>
 
@@ -2107,7 +2832,15 @@ const title = "Admin — Zaloma Florist";
             document.getElementById('edit-prod-name').value = p.name;
             document.getElementById('edit-prod-price').value = p.price_from;
             document.getElementById('edit-prod-time').value = p.processing_time || '3 - 5 Jam';
-            document.getElementById('edit-prod-desc').value = p.description || '';
+            // Parse size and clean description
+            const sizeMatch = (p.description || '').match(/^\[Ukuran:\s*([^\]]+)\]\s*\n*/);
+            let currentSize = '';
+            let cleanDesc = p.description || '';
+            if (sizeMatch) {
+              currentSize = sizeMatch[1].trim();
+              cleanDesc = cleanDesc.replace(sizeMatch[0], '');
+            }
+            document.getElementById('edit-prod-desc').value = cleanDesc;
             document.getElementById('edit-prod-featured').checked = Boolean(p.featured);
 
             // Parse category and subcategory
@@ -2140,6 +2873,27 @@ const title = "Admin — Zaloma Florist";
               } else {
                 subcatSelect.innerHTML = '<option value="">Pilih Subkategori...</option>';
                 subcatWrapper.classList.add('hidden');
+              }
+            }
+
+            // Set size dropdown in edit modal
+            const targetCatSlug = cat ? cat.slug : parentCatSlug;
+            if (typeof updateSizeDropdownForCategory === 'function') {
+              updateSizeDropdownForCategory(targetCatSlug, 'edit-prod-size');
+            }
+            const editSizeSelectEl = document.getElementById('edit-prod-size');
+            if (editSizeSelectEl) {
+              if (currentSize) {
+                const exists = Array.from(editSizeSelectEl.options).some(o => o.value === currentSize);
+                if (!exists) {
+                  const opt = document.createElement('option');
+                  opt.value = currentSize;
+                  opt.textContent = `📏 ${currentSize}`;
+                  editSizeSelectEl.appendChild(opt);
+                }
+                editSizeSelectEl.value = currentSize;
+              } else {
+                editSizeSelectEl.value = '';
               }
             }
 
@@ -2250,7 +3004,11 @@ const title = "Admin — Zaloma Florist";
         const processing_time = document.getElementById('edit-prod-time').value.trim();
         const editCitySelect = document.getElementById('edit-prod-city');
         const finalCity = editCitySelect?.value || 'Malang Raya (Kota Malang, Kab. Malang, Kota Batu)';
-        const description = document.getElementById('edit-prod-desc').value.trim();
+        const editSizeSelect = document.getElementById('edit-prod-size');
+        const selectedSize = editSizeSelect ? editSizeSelect.value.trim() : '';
+        let rawDescription = document.getElementById('edit-prod-desc').value.trim();
+        rawDescription = rawDescription.replace(/^\[Ukuran:\s*[^\]]+\]\s*\n*/, '').trim();
+        const description = selectedSize ? `[Ukuran: ${selectedSize}]\n\n${rawDescription}`.trim() : rawDescription;
         const featured = document.getElementById('edit-prod-featured').checked;
         let imageUrl = document.getElementById('edit-prod-current-image').value;
 
@@ -2342,7 +3100,11 @@ const title = "Admin — Zaloma Florist";
         const processingTime = document.getElementById('prod-time').value.trim() || '3 - 5 Jam';
         const citySelect = document.getElementById('prod-city');
         const finalCity = citySelect?.value || 'Malang Raya (Kota Malang, Kab. Malang, Kota Batu)';
-        const description = document.getElementById('prod-desc').value.trim();
+        const addSizeSelect = document.getElementById('prod-size');
+        const selectedSize = addSizeSelect ? addSizeSelect.value.trim() : '';
+        let rawDescription = document.getElementById('prod-desc').value.trim();
+        rawDescription = rawDescription.replace(/^\[Ukuran:\s*[^\]]+\]\s*\n*/, '').trim();
+        const description = selectedSize ? `[Ukuran: ${selectedSize}]\n\n${rawDescription}`.trim() : rawDescription;
         const featured = document.getElementById('prod-featured').checked;
         
         const slugBase = name.toLowerCase().replace(/[^a-z0-9]+/g, '-').replace(/^-+|-+$/g, '');
@@ -2382,6 +3144,7 @@ const title = "Admin — Zaloma Florist";
           showToast(`Produk "${name}" berhasil ditambahkan.`);
           addForm.reset();
           updateCityDropdowns();
+          if (typeof updateSizeDropdowns === 'function') updateSizeDropdowns();
           processedImageBlob = null;
           pricePreview.textContent = 'Rp 0';
           uploadPrompt.classList.remove('hidden');
