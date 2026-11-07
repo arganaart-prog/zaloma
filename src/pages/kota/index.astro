@@ -1,3 +1,4 @@
+
 ---
 import Layout from '../../layouts/Layout.astro';
 import { DEFAULT_CITIES, cityToSlug } from '../../data/cities';
@@ -46,6 +47,28 @@ if (dynamicCities.length === 0) {
   }
 }
 
+// Fallback to admin cities config (products._cities_config_)
+if (dynamicCities.length === 0) {
+  try {
+    const res = await fetch(`${SUPABASE_URL}/rest/v1/products?slug=eq._cities_config_&select=description&limit=1`, {
+      headers: {
+        apikey: SUPABASE_ANON_KEY,
+        Authorization: `Bearer ${SUPABASE_ANON_KEY}`
+      }
+    });
+    if (res.ok) {
+      const data = await res.json();
+      if (Array.isArray(data) && data[0]?.description) {
+        let val = data[0].description;
+        if (typeof val === 'string') val = JSON.parse(val);
+        if (Array.isArray(val)) dynamicCities = val;
+      }
+    }
+  } catch (e) {
+    // Silent fallback
+  }
+}
+
 // Merge & deduplicate
 const cityMap = new Map<string, any>();
 DEFAULT_CITIES.forEach(c => {
@@ -64,7 +87,9 @@ dynamicCities.forEach(c => {
   if (!rawName) return;
   const slug = typeof c === 'object' && c.slug ? c.slug : cityToSlug(rawName);
   const existing = cityMap.get(slug);
-  const image = (typeof c === 'object' && c.image_url) ? c.image_url : (existing?.image || '/images/galeri/gallery-2.webp');
+  const image = (typeof c === 'object' && (c.image || c.image_url))
+    ? (c.image || c.image_url)
+    : (existing?.image || '/images/galeri/gallery-2.webp');
   const description = (typeof c === 'object' && c.description) ? c.description : (existing?.description || `Florist partner pengiriman karangan bunga & buket segar di ${rawName}.`);
   const province = (typeof c === 'object' && c.province_name) ? c.province_name : (existing?.province || 'Area Pengiriman');
 
@@ -240,7 +265,7 @@ const collectionSchema = {
                 <div class="h-px bg-[#f0d5db] flex-1 ml-4 mt-2"></div>
               </div>
 
-              <!-- Cities Grid (Persis Sekarsari - Tanpa Teks "Toko Bunga") -->
+              <!-- Cities Grid -->
               <div class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 gap-6">
                 {group.cities.map((city) => {
                   const href = city.slug === 'malang-raya' ? withBase('/') : withBase(`/kota/${city.slug}/`);
@@ -255,7 +280,7 @@ const collectionSchema = {
                       <!-- Background Image -->
                       <img
                         src={withBase(city.image)}
-                        alt={city.name}
+                        alt={`Toko Bunga ${city.name}`}
                         class="city-card__image"
                         loading="lazy"
                         decoding="async"
@@ -270,9 +295,8 @@ const collectionSchema = {
                       <div class="city-card__content">
                         <div class="flex items-end justify-between gap-3 w-full">
                           <div class="min-w-0 flex-1">
-                            {/* HANYA NAMA KOTA - TANPA TEKS "TOKO BUNGA" */}
                             <h3 class="city-card__title">
-                              {city.name}
+                              Toko Bunga {city.name}
                             </h3>
                             <p class="city-card__province">
                               <svg class="w-3.5 h-3.5 shrink-0 text-[#DFC397] fill-current" viewBox="0 0 24 24">

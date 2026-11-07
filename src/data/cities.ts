@@ -3,6 +3,7 @@ export interface CityItem {
   slug: string;
   image?: string;
   description?: string;
+  province_name?: string;
   isMainArea?: boolean;
   seoTitle?: string;
   seoDescription?: string;
