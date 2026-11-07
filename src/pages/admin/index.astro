@@ -25,7 +25,10 @@ const title = "Admin — Zaloma Florist";
     <!-- ================= LOGIN SCREEN ================= -->
     <div id="login-gate" class="flex-1 flex items-center justify-center p-4">
       <div class="bg-white rounded-2xl shadow-sm border border-slate-200 p-8 w-full max-w-sm animate-fade-in">
-        <div class="mb-6">
+        <div class="mb-6 text-center">
+          <div class="w-12 h-12 rounded-2xl bg-primary text-white font-serif font-bold text-2xl flex items-center justify-center mx-auto mb-3 shadow-sm">
+            Z
+          </div>
           <h1 class="text-xl font-bold text-slate-900 tracking-tight">Admin Zaloma Florist</h1>
           <p class="text-xs text-slate-500 mt-1">Masuk untuk mengelola produk toko.</p>
         </div>
@@ -37,7 +40,7 @@ const title = "Admin — Zaloma Florist";
               type="email" 
               id="admin-email-input" 
               placeholder="nama@gmail.com" 
-              class="w-full px-3.5 py-2.5 rounded-lg border border-slate-300 focus:outline-none focus:border-slate-800 focus:ring-1 focus:ring-slate-800 transition-all text-sm"
+              class="w-full px-3.5 py-2.5 rounded-lg border border-slate-300 focus:outline-none focus:border-primary focus:ring-1 focus:ring-primary/20 transition-all text-sm"
               required
               autocomplete="email"
             />
@@ -48,7 +51,7 @@ const title = "Admin — Zaloma Florist";
               type="password" 
               id="admin-password-input" 
               placeholder="••••••••" 
-              class="w-full px-3.5 py-2.5 rounded-lg border border-slate-300 focus:outline-none focus:border-slate-800 focus:ring-1 focus:ring-slate-800 transition-all text-sm"
+              class="w-full px-3.5 py-2.5 rounded-lg border border-slate-300 focus:outline-none focus:border-primary focus:ring-1 focus:ring-primary/20 transition-all text-sm"
               required
               autocomplete="current-password"
             />
@@ -57,7 +60,7 @@ const title = "Admin — Zaloma Florist";
           <button 
             type="submit" 
             id="login-btn"
-            class="w-full bg-slate-900 hover:bg-slate-800 text-white font-semibold py-2.5 px-4 rounded-lg transition-all duration-150 cursor-pointer text-sm flex items-center justify-center gap-2 active:scale-[0.98]"
+            class="w-full bg-primary hover:bg-primary-dark text-white font-semibold py-2.5 px-4 rounded-lg transition-all duration-150 cursor-pointer text-sm flex items-center justify-center gap-2 active:scale-[0.98] shadow-sm"
           >
             <span id="login-btn-text">Masuk</span>
             <svg id="login-spinner" class="w-4 h-4 animate-spin hidden" fill="none" viewBox="0 0 24 24">
@@ -72,22 +75,22 @@ const title = "Admin — Zaloma Florist";
     <!-- ================= MAIN ADMIN APP ================= -->
     <div id="admin-dashboard" class="hidden flex-1 flex flex-col">
 
-      <!-- Minimal Navbar (No customer headers, no marketing slogans) -->
+      <!-- Minimal Navbar with Elegant Brand Accents -->
       <nav class="bg-white border-b border-slate-200 sticky top-0 z-30">
         <div class="max-w-7xl mx-auto px-4 sm:px-6 flex items-center justify-between h-14">
           
           <!-- Left: Brand & Tabs -->
           <div class="flex items-center gap-6">
             <span class="font-bold text-slate-900 text-sm tracking-tight flex items-center gap-2">
-              <span class="w-2 h-2 rounded-full bg-emerald-500"></span>
-              Zaloma Admin
+              <span class="w-6 h-6 rounded-md bg-primary text-white font-serif font-bold text-xs flex items-center justify-center shadow-2xs">Z</span>
+              <span>Zaloma Admin</span>
             </span>
 
             <div class="flex items-center gap-1 border-l border-slate-200 pl-4 sm:pl-6">
               <button 
                 type="button" 
                 id="tab-btn-catalog" 
-                class="tab-btn active px-3 py-1.5 rounded-md text-xs font-semibold bg-slate-900 text-white transition-all cursor-pointer flex items-center gap-1.5"
+                class="tab-btn active px-3 py-1.5 rounded-md text-xs font-semibold bg-primary text-white transition-all cursor-pointer flex items-center gap-1.5 shadow-2xs"
               >
                 <span>Produk</span>
                 <span id="tab-count-badge" class="px-1.5 py-0.2 rounded-full text-[10px] font-bold bg-white/20 text-white">0</span>
@@ -95,7 +98,7 @@ const title = "Admin — Zaloma Florist";
               <button 
                 type="button" 
                 id="tab-btn-add" 
-                class="tab-btn px-3 py-1.5 rounded-md text-xs font-semibold text-slate-600 hover:text-slate-900 hover:bg-slate-100 transition-all cursor-pointer"
+                class="tab-btn px-3 py-1.5 rounded-md text-xs font-semibold text-slate-600 hover:text-primary hover:bg-accent-bg/50 transition-all cursor-pointer"
               >
                 + Tambah Produk
               </button>
@@ -107,7 +110,7 @@ const title = "Admin — Zaloma Florist";
             <a 
               href="/katalog/" 
               target="_blank" 
-              class="text-xs font-medium text-slate-500 hover:text-slate-900 transition-colors hidden sm:inline-block"
+              class="text-xs font-medium text-slate-500 hover:text-primary transition-colors hidden sm:inline-block"
             >
               Lihat Website ↗
             </a>
@@ -137,7 +140,7 @@ const title = "Admin — Zaloma Florist";
                 type="text" 
                 id="search-filter-input" 
                 placeholder="Cari nama produk..." 
-                class="w-full pl-3 pr-8 py-1.5 rounded-lg border border-slate-200 text-xs focus:outline-none focus:border-slate-800 transition-all"
+                class="w-full pl-3 pr-8 py-1.5 rounded-lg border border-slate-200 text-xs focus:outline-none focus:border-primary focus:ring-1 focus:ring-primary/20 transition-all"
               />
               <button 
                 type="button" 
@@ -151,7 +154,7 @@ const title = "Admin — Zaloma Florist";
             <div class="flex items-center gap-2">
               <select 
                 id="category-filter-select" 
-                class="px-2.5 py-1.5 rounded-lg border border-slate-200 text-xs bg-white text-slate-700 focus:outline-none focus:border-slate-800 transition-all cursor-pointer"
+                class="px-2.5 py-1.5 rounded-lg border border-slate-200 text-xs bg-white text-slate-700 focus:outline-none focus:border-primary focus:ring-1 focus:ring-primary/20 transition-all cursor-pointer"
               >
                 <option value="all">Semua Kategori</option>
                 {CATEGORIES.map(cat => (
@@ -161,7 +164,7 @@ const title = "Admin — Zaloma Florist";
 
               <select 
                 id="sort-select" 
-                class="px-2.5 py-1.5 rounded-lg border border-slate-200 text-xs bg-white text-slate-700 focus:outline-none focus:border-slate-800 transition-all cursor-pointer"
+                class="px-2.5 py-1.5 rounded-lg border border-slate-200 text-xs bg-white text-slate-700 focus:outline-none focus:border-primary focus:ring-1 focus:ring-primary/20 transition-all cursor-pointer"
               >
                 <option value="newest">Terbaru</option>
                 <option value="price-asc">Harga Terendah</option>
@@ -173,7 +176,7 @@ const title = "Admin — Zaloma Florist";
                 type="button" 
                 id="refresh-btn" 
                 title="Muat ulang data" 
-                class="px-2.5 py-1.5 rounded-lg border border-slate-200 text-slate-600 hover:text-slate-900 hover:bg-slate-50 text-xs font-semibold transition-all cursor-pointer active:scale-95"
+                class="px-2.5 py-1.5 rounded-lg border border-slate-200 text-slate-600 hover:text-primary hover:border-primary/40 hover:bg-accent-bg/40 text-xs font-semibold transition-all cursor-pointer active:scale-95"
               >
                 Muat Ulang
               </button>
@@ -203,9 +206,17 @@ const title = "Admin — Zaloma Florist";
         <!-- ================= TAB 2: TAMBAH PRODUK ================= -->
         <section id="tab-add" class="hidden animate-fade-in max-w-2xl mx-auto">
           <div class="bg-white rounded-2xl p-5 sm:p-6 border border-slate-200 shadow-xs">
-            <div class="mb-5 pb-3 border-b border-slate-100">
-              <h2 class="text-base font-bold text-slate-900">Tambah Produk Baru</h2>
-              <p class="text-xs text-slate-500 mt-0.5">Produk akan langsung tampil di website.</p>
+            <div class="mb-5 pb-3 border-b border-slate-100 flex items-center justify-between">
+              <div>
+                <h2 class="text-base font-bold text-slate-900 flex items-center gap-2">
+                  <span class="w-2 h-2 rounded-full bg-primary"></span>
+                  Tambah Produk Baru
+                </h2>
+                <p class="text-xs text-slate-500 mt-0.5">Produk akan langsung tampil di website.</p>
+              </div>
+              <span class="text-[11px] font-semibold px-2.5 py-1 rounded-full bg-accent-bg text-primary border border-soft-cream">
+                Instant Cloud
+              </span>
             </div>
 
             <form id="add-product-form" class="space-y-4">
@@ -220,7 +231,7 @@ const title = "Admin — Zaloma Florist";
                     id="prod-name" 
                     required 
                     placeholder="Contoh: Bunga Papan Wedding 2x1.5m"
-                    class="w-full px-3 py-2 rounded-lg border border-slate-300 text-xs focus:outline-none focus:border-slate-800 transition-all"
+                    class="w-full px-3 py-2 rounded-lg border border-slate-300 text-xs focus:outline-none focus:border-primary focus:ring-1 focus:ring-primary/20 transition-all"
                   />
                 </div>
 
@@ -231,7 +242,7 @@ const title = "Admin — Zaloma Florist";
                   <select 
                     id="prod-category" 
                     required
-                    class="w-full px-3 py-2 rounded-lg border border-slate-300 text-xs focus:outline-none focus:border-slate-800 transition-all bg-white cursor-pointer"
+                    class="w-full px-3 py-2 rounded-lg border border-slate-300 text-xs focus:outline-none focus:border-primary focus:ring-1 focus:ring-primary/20 transition-all bg-white cursor-pointer"
                   >
                     <option value="" disabled selected>Pilih Kategori...</option>
                     {CATEGORIES.map(cat => (
@@ -251,9 +262,9 @@ const title = "Admin — Zaloma Florist";
                     min="10000" 
                     step="5000"
                     placeholder="450000"
-                    class="w-full px-3 py-2 rounded-lg border border-slate-300 text-xs font-mono focus:outline-none focus:border-slate-800 transition-all"
+                    class="w-full px-3 py-2 rounded-lg border border-slate-300 text-xs font-mono focus:outline-none focus:border-primary focus:ring-1 focus:ring-primary/20 transition-all"
                   />
-                  <p id="price-preview" class="text-[11px] font-semibold text-slate-600 mt-1">Rp 0</p>
+                  <p id="price-preview" class="text-[11px] font-bold text-primary mt-1">Rp 0</p>
                 </div>
 
                 <div class="sm:col-span-2">
@@ -265,7 +276,7 @@ const title = "Admin — Zaloma Florist";
                     id="prod-time" 
                     value="3 - 5 Jam" 
                     placeholder="Contoh: 3 - 5 Jam"
-                    class="w-full px-3 py-2 rounded-lg border border-slate-300 text-xs focus:outline-none focus:border-slate-800 transition-all"
+                    class="w-full px-3 py-2 rounded-lg border border-slate-300 text-xs focus:outline-none focus:border-primary focus:ring-1 focus:ring-primary/20 transition-all"
                   />
                 </div>
 
@@ -277,7 +288,7 @@ const title = "Admin — Zaloma Florist";
                   Foto Produk <span class="text-rose-500">*</span>
                 </label>
                 
-                <div class="border border-dashed border-slate-300 hover:border-slate-400 rounded-xl p-4 text-center bg-slate-50 transition-all relative cursor-pointer" id="dropzone">
+                <div class="border border-dashed border-slate-300 hover:border-primary hover:bg-accent-bg/20 rounded-xl p-4 text-center bg-slate-50 transition-all relative cursor-pointer" id="dropzone">
                   <input 
                     type="file" 
                     id="prod-image-file" 
@@ -311,7 +322,7 @@ const title = "Admin — Zaloma Florist";
                   id="prod-desc" 
                   rows="2" 
                   placeholder="Keterangan singkat produk..."
-                  class="w-full px-3 py-2 rounded-lg border border-slate-300 text-xs focus:outline-none focus:border-slate-800 transition-all resize-y"
+                  class="w-full px-3 py-2 rounded-lg border border-slate-300 text-xs focus:outline-none focus:border-primary focus:ring-1 focus:ring-primary/20 transition-all resize-y"
                 ></textarea>
               </div>
 
@@ -320,7 +331,7 @@ const title = "Admin — Zaloma Florist";
                 <input 
                   type="checkbox" 
                   id="prod-featured" 
-                  class="w-4 h-4 rounded text-slate-900 border-slate-300 cursor-pointer"
+                  class="w-4 h-4 rounded text-primary accent-primary border-slate-300 cursor-pointer"
                 />
                 <label for="prod-featured" class="text-xs text-slate-700 cursor-pointer font-medium">
                   Tampilkan sebagai produk unggulan di beranda
@@ -331,7 +342,7 @@ const title = "Admin — Zaloma Florist";
                 <button 
                   type="submit" 
                   id="submit-btn" 
-                  class="bg-slate-900 hover:bg-slate-800 text-white font-semibold py-2 px-5 rounded-lg transition-all duration-150 cursor-pointer text-xs active:scale-95 flex items-center gap-1.5"
+                  class="bg-primary hover:bg-primary-dark text-white font-semibold py-2 px-5 rounded-lg transition-all duration-150 cursor-pointer text-xs active:scale-95 flex items-center gap-1.5 shadow-sm"
                 >
                   <span id="btn-text">Simpan Produk</span>
                   <svg id="btn-spinner" class="w-3.5 h-3.5 animate-spin hidden" fill="none" viewBox="0 0 24 24">
@@ -352,7 +363,10 @@ const title = "Admin — Zaloma Florist";
     <div id="edit-modal" class="hidden fixed inset-0 z-50 bg-black/40 backdrop-blur-xs flex items-center justify-center p-4 animate-fade-in">
       <div class="bg-white rounded-2xl max-w-md w-full p-5 sm:p-6 shadow-xl border border-slate-200 space-y-4 animate-modal-pop">
         <div class="flex items-center justify-between pb-3 border-b border-slate-100">
-          <h3 class="text-sm font-bold text-slate-900">Edit Produk</h3>
+          <h3 class="text-sm font-bold text-slate-900 flex items-center gap-2">
+            <span class="w-2 h-2 rounded-full bg-primary"></span>
+            Edit Produk
+          </h3>
           <button id="close-modal-btn" type="button" class="text-slate-400 hover:text-slate-600 text-sm font-bold cursor-pointer">✕</button>
         </div>
 
@@ -362,13 +376,13 @@ const title = "Admin — Zaloma Florist";
 
           <div>
             <label class="block text-xs font-semibold text-slate-700 mb-1">Nama Produk</label>
-            <input type="text" id="edit-prod-name" required class="w-full px-3 py-1.5 rounded-lg border border-slate-300 text-xs focus:outline-none focus:border-slate-800 transition-all" />
+            <input type="text" id="edit-prod-name" required class="w-full px-3 py-1.5 rounded-lg border border-slate-300 text-xs focus:outline-none focus:border-primary focus:ring-1 focus:ring-primary/20 transition-all" />
           </div>
 
           <div class="grid grid-cols-2 gap-3">
             <div>
               <label class="block text-xs font-semibold text-slate-700 mb-1">Kategori</label>
-              <select id="edit-prod-category" required class="w-full px-2.5 py-1.5 rounded-lg border border-slate-300 text-xs bg-white focus:outline-none focus:border-slate-800 transition-all cursor-pointer">
+              <select id="edit-prod-category" required class="w-full px-2.5 py-1.5 rounded-lg border border-slate-300 text-xs bg-white focus:outline-none focus:border-primary focus:ring-1 focus:ring-primary/20 transition-all cursor-pointer">
                 {CATEGORIES.map(cat => (
                   <option value={cat.slug} data-name={cat.name}>{cat.name}</option>
                 ))}
@@ -376,8 +390,8 @@ const title = "Admin — Zaloma Florist";
             </div>
             <div>
               <label class="block text-xs font-semibold text-slate-700 mb-1">Harga (Rp)</label>
-              <input type="number" id="edit-prod-price" required step="5000" class="w-full px-2.5 py-1.5 rounded-lg border border-slate-300 text-xs font-mono focus:outline-none focus:border-slate-800 transition-all" />
-              <p id="edit-price-preview" class="text-[10px] font-semibold text-slate-500 mt-0.5 truncate"></p>
+              <input type="number" id="edit-prod-price" required step="5000" class="w-full px-2.5 py-1.5 rounded-lg border border-slate-300 text-xs font-mono focus:outline-none focus:border-primary focus:ring-1 focus:ring-primary/20 transition-all" />
+              <p id="edit-price-preview" class="text-[10px] font-bold text-primary mt-0.5 truncate"></p>
             </div>
           </div>
 
@@ -386,7 +400,7 @@ const title = "Admin — Zaloma Florist";
             <div class="flex items-center gap-2.5 p-2 rounded-lg border border-slate-200 bg-slate-50">
               <img id="edit-image-thumbnail" src="" alt="Thumb" class="w-10 h-10 rounded object-cover border border-slate-200 bg-white shrink-0" />
               <div class="flex-1 min-w-0">
-                <label for="edit-prod-image-file" class="text-[11px] font-semibold text-slate-700 hover:text-slate-900 cursor-pointer underline">
+                <label for="edit-prod-image-file" class="text-[11px] font-semibold text-primary hover:text-primary-dark cursor-pointer underline">
                   Ganti Foto
                   <input type="file" id="edit-prod-image-file" accept="image/*" class="hidden" />
                 </label>
@@ -397,22 +411,22 @@ const title = "Admin — Zaloma Florist";
 
           <div>
             <label class="block text-xs font-semibold text-slate-700 mb-1">Estimasi Pengerjaan</label>
-            <input type="text" id="edit-prod-time" class="w-full px-3 py-1.5 rounded-lg border border-slate-300 text-xs focus:outline-none focus:border-slate-800 transition-all" />
+            <input type="text" id="edit-prod-time" class="w-full px-3 py-1.5 rounded-lg border border-slate-300 text-xs focus:outline-none focus:border-primary focus:ring-1 focus:ring-primary/20 transition-all" />
           </div>
 
           <div>
             <label class="block text-xs font-semibold text-slate-700 mb-1">Deskripsi</label>
-            <textarea id="edit-prod-desc" rows="2" class="w-full px-3 py-1.5 rounded-lg border border-slate-300 text-xs focus:outline-none focus:border-slate-800 transition-all resize-y"></textarea>
+            <textarea id="edit-prod-desc" rows="2" class="w-full px-3 py-1.5 rounded-lg border border-slate-300 text-xs focus:outline-none focus:border-primary focus:ring-1 focus:ring-primary/20 transition-all resize-y"></textarea>
           </div>
 
           <div class="flex items-center gap-2 pt-1">
-            <input type="checkbox" id="edit-prod-featured" class="w-4 h-4 rounded text-slate-900 border-slate-300 cursor-pointer" />
+            <input type="checkbox" id="edit-prod-featured" class="w-4 h-4 rounded text-primary accent-primary border-slate-300 cursor-pointer" />
             <label for="edit-prod-featured" class="text-xs text-slate-700 cursor-pointer font-medium">Produk unggulan beranda</label>
           </div>
 
           <div class="pt-3 border-t border-slate-100 flex items-center justify-end gap-2">
             <button type="button" id="cancel-edit-btn" class="px-3 py-1.5 rounded-lg text-xs font-semibold text-slate-500 hover:bg-slate-100 cursor-pointer">Batal</button>
-            <button type="submit" id="save-edit-btn" class="bg-slate-900 hover:bg-slate-800 text-white font-semibold py-1.5 px-4 rounded-lg text-xs transition-all active:scale-95 flex items-center gap-1.5 cursor-pointer">
+            <button type="submit" id="save-edit-btn" class="bg-primary hover:bg-primary-dark text-white font-semibold py-1.5 px-4 rounded-lg text-xs transition-all active:scale-95 flex items-center gap-1.5 cursor-pointer shadow-sm">
               <span id="save-btn-text">Simpan</span>
               <svg id="save-spinner" class="w-3.5 h-3.5 animate-spin hidden" fill="none" viewBox="0 0 24 24">
                 <circle class="opacity-25" cx="12" cy="12" r="10" stroke="currentColor" stroke-width="4"></circle>
@@ -544,15 +558,15 @@ const title = "Admin — Zaloma Florist";
       const tabAdd = document.getElementById('tab-add');
 
       tabBtnCatalog.addEventListener('click', () => {
-        tabBtnCatalog.className = 'tab-btn active px-3 py-1.5 rounded-md text-xs font-semibold bg-slate-900 text-white transition-all cursor-pointer flex items-center gap-1.5';
-        tabBtnAdd.className = 'tab-btn px-3 py-1.5 rounded-md text-xs font-semibold text-slate-600 hover:text-slate-900 hover:bg-slate-100 transition-all cursor-pointer';
+        tabBtnCatalog.className = 'tab-btn active px-3 py-1.5 rounded-md text-xs font-semibold bg-primary text-white transition-all cursor-pointer flex items-center gap-1.5 shadow-2xs';
+        tabBtnAdd.className = 'tab-btn px-3 py-1.5 rounded-md text-xs font-semibold text-slate-600 hover:text-primary hover:bg-accent-bg/50 transition-all cursor-pointer';
         tabCatalog.classList.remove('hidden');
         tabAdd.classList.add('hidden');
       });
 
       tabBtnAdd.addEventListener('click', () => {
-        tabBtnAdd.className = 'tab-btn active px-3 py-1.5 rounded-md text-xs font-semibold bg-slate-900 text-white transition-all cursor-pointer';
-        tabBtnCatalog.className = 'tab-btn px-3 py-1.5 rounded-md text-xs font-semibold text-slate-600 hover:text-slate-900 hover:bg-slate-100 transition-all cursor-pointer flex items-center gap-1.5';
+        tabBtnAdd.className = 'tab-btn active px-3 py-1.5 rounded-md text-xs font-semibold bg-primary text-white transition-all cursor-pointer shadow-2xs';
+        tabBtnCatalog.className = 'tab-btn px-3 py-1.5 rounded-md text-xs font-semibold text-slate-600 hover:text-primary hover:bg-accent-bg/50 transition-all cursor-pointer flex items-center gap-1.5';
         tabAdd.classList.remove('hidden');
         tabCatalog.classList.add('hidden');
       });
@@ -780,19 +794,19 @@ const title = "Admin — Zaloma Florist";
               <!-- Image frame -->
               <div class="relative aspect-4/3 bg-slate-100 overflow-hidden">
                 <img src="${p.image}" alt="${p.name}" loading="lazy" class="w-full h-full object-cover" />
-                <span class="absolute top-2 left-2 bg-slate-900/70 text-white text-[10px] font-medium px-2 py-0.5 rounded backdrop-blur-xs">
+                <span class="absolute top-2 left-2 bg-primary/90 text-white text-[10px] font-medium px-2 py-0.5 rounded backdrop-blur-xs shadow-2xs">
                   ${p.category_name}
                 </span>
-                ${isFeatured ? '<span class="absolute top-2 right-2 bg-amber-500 text-white text-[10px] font-semibold px-1.5 py-0.5 rounded">Unggulan</span>' : ''}
+                ${isFeatured ? '<span class="absolute top-2 right-2 bg-amber-500 text-white text-[10px] font-semibold px-1.5 py-0.5 rounded shadow-2xs">Unggulan</span>' : ''}
               </div>
 
               <!-- Content -->
               <div class="p-3 flex-1 flex flex-col justify-between">
                 <div>
-                  <h3 class="font-semibold text-slate-900 text-xs leading-snug line-clamp-2 hover:text-slate-600 transition-colors">
+                  <h3 class="font-semibold text-slate-900 text-xs leading-snug line-clamp-2 hover:text-primary transition-colors">
                     <a href="${detailUrl}" target="_blank">${p.name}</a>
                   </h3>
-                  <p class="font-bold text-slate-900 text-sm mt-1">${p.price_label}</p>
+                  <p class="font-bold text-primary text-sm mt-1">${p.price_label}</p>
                 </div>
 
                 <!-- Action Row (No customer CTA WA, no excessive emojis) -->
@@ -801,7 +815,7 @@ const title = "Admin — Zaloma Florist";
                     type="button" 
                     data-id="${p.id}" 
                     data-featured="${isFeatured}" 
-                    class="quick-toggle-featured text-[11px] font-medium text-slate-500 hover:text-slate-900 cursor-pointer"
+                    class="quick-toggle-featured text-[11px] font-medium text-slate-500 hover:text-primary cursor-pointer"
                   >
                     ${isFeatured ? 'Lepas Unggulan' : '+ Unggulan'}
                   </button>
@@ -810,7 +824,7 @@ const title = "Admin — Zaloma Florist";
                     <button 
                       type="button" 
                       data-id="${p.id}" 
-                      class="edit-prod-btn text-[11px] font-medium text-slate-700 hover:text-slate-900 bg-slate-100 hover:bg-slate-200 px-2 py-1 rounded transition-colors cursor-pointer"
+                      class="edit-prod-btn text-[11px] font-medium text-slate-700 hover:text-primary hover:bg-accent-bg/60 bg-slate-100 px-2 py-1 rounded transition-colors cursor-pointer"
                     >
                       Edit
                     </button>
@@ -860,7 +874,7 @@ const title = "Admin — Zaloma Florist";
               <button 
                 type="button" 
                 data-page="${p}" 
-                class="admin-page-btn inline-flex items-center justify-center w-7 h-7 rounded text-xs font-medium cursor-pointer ${isActive ? 'bg-slate-900 text-white' : 'border border-slate-200 text-slate-700 hover:bg-slate-50'}"
+                class="admin-page-btn inline-flex items-center justify-center w-7 h-7 rounded text-xs font-medium cursor-pointer transition-all ${isActive ? 'bg-primary text-white shadow-2xs' : 'border border-slate-200 text-slate-700 hover:text-primary hover:border-primary/40 hover:bg-slate-50'}"
               >
                 ${p}
               </button>
