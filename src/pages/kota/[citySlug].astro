@@ -1,7 +1,7 @@
 ---
 import Layout from '../../layouts/Layout.astro';
 import ProductCard from '../../components/ProductCard.astro';
-
+import HeroArticles from '../../components/HeroArticles.astro';
 import BungaPapanSection from '../../components/BungaPapanSection.astro';
 import HandBouquetSection from '../../components/HandBouquetSection.astro';
 import StandingFlowerSection from '../../components/StandingFlowerSection.astro';
@@ -77,8 +77,8 @@ export async function getStaticPaths() {
         image: (c && c.image) || '/images/galeri/gallery-1.webp',
         description: (c && c.description) || `Pengiriman karangan bunga & buket area ${name}`,
         tagline: (c && c.tagline) || `Area ${name} & Sekitarnya`,
-        seoTitle: `Toko Bunga ${name} — Florist Murah & Berkualitas | Zaloma Florist`,
-        seoDescription: `Pesan karangan bunga papan, buket bunga, standing flower di ${name}. Pengerjaan cepat 3-5 jam, bunga segar berkualitas & garansi foto sebelum kirim.`
+        seoTitle: `Toko Bunga ${name} | Buket, Karangan Bunga & Bunga Papan - Zaloma Florist`,
+        seoDescription: `Pesan buket bunga, karangan bunga, bunga papan, papan ucapan, bunga duka cita, bunga pernikahan, dan standing flower di ${name} melalui Zaloma Florist. Pengerjaan cepat 3-5 jam, bunga segar & foto sebelum kirim.`
       });
     }
   });
@@ -118,17 +118,167 @@ export async function getStaticPaths() {
 
 const { city, products = [], allCities = [] } = Astro.props;
 
-// Rotating Featured Products for this city
+// Rotating Featured Products for this city (Matching Home)
 const { activeProducts } = getRotatingHomeProducts(getHomeDisplayProducts(products), 8);
 
-const title = city.seoTitle || `Toko Bunga ${city.name} — Florist Murah, Cepat & Terpercaya`;
-const description = city.seoDescription || `Zaloma Florist melayani karangan bunga papan, hand bouquet, standing flower & ucapan di ${city.name}. Pengerjaan cepat 3 jam, foto sebelum kirim.`;
+// SEO Meta Structure (Sesuai Standar Sekarsari)
+const title = city.seoTitle || `Toko Bunga ${city.name} | Buket, Karangan Bunga & Bunga Papan - Zaloma Florist`;
+const description = city.seoDescription || `Pesan buket bunga, karangan bunga, bunga papan, papan ucapan, bunga duka cita, bunga pernikahan, dan standing flower di ${city.name} melalui Zaloma Florist. Pengerjaan cepat 3-5 jam, bunga segar & foto sebelum kirim.`;
 
-const waGeneralUrl = `https://wa.me/${WHATSAPP_NUMBER}?text=${encodeURIComponent(`Halo Zaloma Florist, saya ingin konsultasi pemesanan bunga untuk pengiriman ke ${city.name}.`)}`;
+const waGeneralUrl = `https://wa.me/${WHATSAPP_NUMBER}?text=${encodeURIComponent(`Halo Zaloma Florist, saya ingin pesan karangan bunga untuk pengiriman ke ${city.name}. Mohon info katalog dan format pemesanannya.`)}`;
+
+// Schema.org Structured Data (Persis Standar Sekarsari)
+const siteUrl = SITE_DOMAIN;
+const citySchema = {
+  '@context': 'https://schema.org',
+  '@graph': [
+    {
+      '@type': 'WebPage',
+      '@id': `${siteUrl}/kota/${city.slug}/#webpage`,
+      'url': `${siteUrl}/kota/${city.slug}/`,
+      'name': title,
+      'description': description,
+      'about': { '@id': `${siteUrl}/#florist` },
+      'mentions': [
+        {
+          '@type': 'Place',
+          'name': city.name,
+          'address': {
+            '@type': 'PostalAddress',
+            'addressLocality': city.name,
+            'addressRegion': 'Jawa Timur',
+            'addressCountry': 'ID'
+          }
+        }
+      ],
+      'mainEntity': {
+        '@type': 'Florist',
+        '@id': `${siteUrl}/kota/${city.slug}/#localbranch`,
+        'name': `Zaloma Florist - ${city.name}`,
+        'url': `${siteUrl}/kota/${city.slug}/`,
+        'image': `${siteUrl}${city.image || '/images/logo/zaloma-logo.webp'}`,
+        'description': description,
+        'areaServed': city.name,
+        'parentOrganization': { '@id': `${siteUrl}/#florist` },
+        'makesOffer': [
+          {
+            '@type': 'Offer',
+            'itemOffered': {
+              '@type': 'Service',
+              'name': `Bunga Papan & Papan Ucapan ${city.name}`,
+              'description': `Karangan bunga papan untuk ucapan selamat, duka cita, peresmian, dan pernikahan di ${city.name}.`,
+              'areaServed': city.name
+            }
+          },
+          {
+            '@type': 'Offer',
+            'itemOffered': {
+              '@type': 'Service',
+              'name': `Buket Bunga & Hand Bouquet ${city.name}`,
+              'description': `Buket bunga segar untuk wisuda, ulang tahun, dan anniversary di ${city.name}.`,
+              'areaServed': city.name
+            }
+          },
+          {
+            '@type': 'Offer',
+            'itemOffered': {
+              '@type': 'Service',
+              'name': `Standing Flower & Bunga Standing ${city.name}`,
+              'description': `Standing flower premium untuk peresmian, pembukaan usaha, dan ucapan duka cita di ${city.name}.`,
+              'areaServed': city.name
+            }
+          },
+          {
+            '@type': 'Offer',
+            'itemOffered': {
+              '@type': 'Service',
+              'name': `Bunga Duka Cita ${city.name}`,
+              'description': `Karangan bunga papan belasungkawa dan standing flower duka cita pengiriman cepat di ${city.name}.`,
+              'areaServed': city.name
+            }
+          },
+          {
+            '@type': 'Offer',
+            'itemOffered': {
+              '@type': 'Service',
+              'name': `Bunga Pernikahan & Wedding ${city.name}`,
+              'description': `Bunga papan wedding dan dekorasi rangkaian pernikahan elegan di ${city.name}.`,
+              'areaServed': city.name
+            }
+          },
+          {
+            '@type': 'Offer',
+            'itemOffered': {
+              '@type': 'Service',
+              'name': `Bunga Meja & Rangkaian Segar ${city.name}`,
+              'description': `Rangkaian vas bunga meja kantor dan hadiah meja elegan di ${city.name}.`,
+              'areaServed': city.name
+            }
+          }
+        ],
+        'address': {
+          '@type': 'PostalAddress',
+          'addressLocality': city.name,
+          'addressRegion': 'Jawa Timur',
+          'addressCountry': 'ID'
+        }
+      }
+    }
+  ]
+};
+
+// 6 Layanan Kata Kunci Lokal (Sesuai Sekarsari cityKeywordServices untuk SEO Optimal)
+const cityKeywordServices = [
+  {
+    title: `Bunga Papan & Papan Ucapan ${city.name}`,
+    desc: `Karangan bunga papan untuk ucapan selamat, duka cita, grand opening, wisuda, peresmian, dan acara perusahaan di ${city.name}.`,
+    keywords: [`bunga papan ${city.name}`, `papan ucapan ${city.name}`, `karangan bunga papan ${city.name}`],
+    icon: '🌸',
+    targetHref: '#bunga-papan'
+  },
+  {
+    title: `Buket Bunga & Hand Bouquet ${city.name}`,
+    desc: `Buket bunga segar untuk ulang tahun, wisuda, anniversary, lamaran, hadiah romantis, dan kejutan personal dengan pengiriman ke ${city.name}.`,
+    keywords: [`buket bunga ${city.name}`, `hand bouquet ${city.name}`, `bucket bunga ${city.name}`],
+    icon: '💐',
+    targetHref: '#hand-bouquet'
+  },
+  {
+    title: `Standing Flower & Bunga Standing ${city.name}`,
+    desc: `Standing flower premium untuk pembukaan usaha, peresmian, acara kantor, acara formal, dan kiriman ucapan elegan di ${city.name}.`,
+    keywords: [`standing flower ${city.name}`, `bunga standing ${city.name}`, `bunga ucapan ${city.name}`],
+    icon: '🏺',
+    targetHref: '#standing-flower'
+  },
+  {
+    title: `Bunga Duka Cita ${city.name}`,
+    desc: `Rangkaian bunga belasungkawa dan papan duka cita untuk rumah duka, keluarga, instansi, atau rekan kerja di ${city.name}.`,
+    keywords: [`bunga duka cita ${city.name}`, `karangan bunga duka cita ${city.name}`, `papan bunga duka cita ${city.name}`],
+    icon: '🕊️',
+    targetHref: '#bunga-papan'
+  },
+  {
+    title: `Bunga Pernikahan & Wedding ${city.name}`,
+    desc: `Bunga wedding, dekorasi rangkaian, dan papan ucapan pernikahan untuk merayakan momen bahagia di ${city.name}.`,
+    keywords: [`bunga pernikahan ${city.name}`, `bunga wedding ${city.name}`, `karangan bunga wedding ${city.name}`],
+    icon: '💍',
+    targetHref: '#bunga-papan'
+  },
+  {
+    title: `Bunga Meja & Rangkaian Bunga ${city.name}`,
+    desc: `Bunga meja dan rangkaian bunga segar untuk kantor, hotel, rumah, meja resepsionis, dan hadiah elegan di ${city.name}.`,
+    keywords: [`bunga meja ${city.name}`, `rangkaian bunga ${city.name}`, `toko bunga ${city.name}`],
+    icon: '🪴',
+    targetHref: '#bunga-meja'
+  }
+];
 ---
 
 <Layout title={title} description={description} activeNav="produk">
   <script is:inline src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
+
+  <!-- Inject Schema.org JSON-LD (Sekarsari Standard) -->
+  <script type="application/ld+json" set:html={JSON.stringify(citySchema)} />
 
   <!-- Breadcrumb -->
   <div class="bg-clean-ivory border-b border-soft-cream/60">
@@ -136,99 +286,166 @@ const waGeneralUrl = `https://wa.me/${WHATSAPP_NUMBER}?text=${encodeURIComponent
       <Breadcrumb items={[
         { label: 'Beranda', href: withBase('/') },
         { label: 'Pengiriman Luar Kota', href: withBase('/#pilih-pengiriman-luar-kota') },
-        { label: city.name }
+        { label: `Toko Bunga ${city.name}` }
       ]} />
     </div>
   </div>
 
-  <!-- City Specific Hero Banner -->
-  <section class="relative bg-gradient-to-b from-clean-ivory via-white to-clean-ivory py-12 sm:py-16 overflow-hidden border-b border-soft-cream/60">
-    <!-- Background Botanical Accents -->
-    <div class="absolute -top-24 -right-24 w-96 h-96 rounded-full bg-accent-bg/40 blur-3xl pointer-events-none"></div>
-    <div class="absolute -bottom-24 -left-24 w-96 h-96 rounded-full bg-secondary/10 blur-3xl pointer-events-none"></div>
+  <!-- Hero Section: Layout 2 Kolom Persis Homepage (Hero Card Kiri + Artikel Edukasi Kanan) -->
+  <section class="promo-hero-wrap">
+    <div class="hero-split-grid max-w-7xl mx-auto">
+      
+      <!-- Kolom Kiri: Hero Banner Khusus Kota (Gaya Homepage) -->
+      <div class="hero-carousel-col">
+        <div class="relative rounded-3xl overflow-hidden bg-gradient-to-br from-primary-dark via-primary to-primary-light text-white p-6 sm:p-10 shadow-xl border border-secondary/30 min-h-[440px] flex flex-col justify-between">
+          <!-- Background Atmospheric Glow & Photo Silhouette -->
+          <div class="absolute -top-24 -right-24 w-96 h-96 rounded-full bg-secondary/15 blur-3xl pointer-events-none"></div>
+          <div class="absolute inset-0 bg-gradient-to-t from-black/85 via-black/40 to-transparent pointer-events-none z-0"></div>
 
-    <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 relative z-10">
-      <div class="max-w-3xl">
-        
-        <!-- City Location Pill -->
-        <div class="inline-flex items-center gap-2 px-3 py-1.5 rounded-full text-xs font-bold uppercase tracking-wider bg-primary/10 text-primary border border-primary/20 mb-4 shadow-2xs">
-          <span class="w-2 h-2 rounded-full bg-primary animate-pulse"></span>
-          <span>WILAYAH PENGIRIMAN: {city.name}</span>
+          <!-- Top Badge: City Location Pill -->
+          <div class="relative z-10 flex items-center justify-between gap-3">
+            <span class="inline-flex items-center gap-2 px-3.5 py-1.5 rounded-full text-xs font-bold uppercase tracking-wider bg-white/15 text-secondary-light border border-secondary/40 backdrop-blur-md shadow-xs">
+              <span class="w-2 h-2 rounded-full bg-emerald-400 animate-pulse"></span>
+              <span>TOKO BUNGA &amp; FLORIST {city.name.toUpperCase()}</span>
+            </span>
+            <span class="text-xs font-bold text-white/75 hidden sm:inline-block">
+              {city.tagline || 'Layanan Florist Terpercaya'}
+            </span>
+          </div>
+
+          <!-- Main Hero Content -->
+          <div class="relative z-10 my-auto py-6">
+            <h1 class="font-serif text-3xl sm:text-4xl lg:text-5xl font-extrabold text-white leading-tight drop-shadow-md">
+              Toko Bunga {city.name}
+            </h1>
+            <p class="font-sans text-sm sm:text-base text-white/90 mt-3 leading-relaxed max-w-xl">
+              {city.description || `Layanan karangan bunga papan pernikahan, duka cita, peresmian, standing flower, dan buket bunga segar terbaik untuk area ${city.name} dan sekitarnya. Pengiriman kilat langsung dari florist profesional.`}
+            </p>
+
+            <!-- 3 Mini Guarantee Chips -->
+            <div class="grid grid-cols-2 sm:grid-cols-3 gap-2.5 my-5 pt-1 max-w-lg">
+              <div class="flex items-center gap-2 p-2 rounded-xl bg-white/10 backdrop-blur-xs border border-white/15 text-xs text-white">
+                <span>⚡</span>
+                <span class="font-semibold">Kirim 3-5 Jam</span>
+              </div>
+              <div class="flex items-center gap-2 p-2 rounded-xl bg-white/10 backdrop-blur-xs border border-white/15 text-xs text-white">
+                <span>📸</span>
+                <span class="font-semibold">Foto Sebelum Kirim</span>
+              </div>
+              <div class="flex items-center gap-2 p-2 rounded-xl bg-white/10 backdrop-blur-xs border border-white/15 text-xs text-white col-span-2 sm:col-span-1">
+                <span>🌸</span>
+                <span class="font-semibold">100% Bunga Segar</span>
+              </div>
+            </div>
+
+            <!-- CTAs -->
+            <div class="flex flex-wrap items-center gap-3 pt-2">
+              <a 
+                href={waGeneralUrl}
+                target="_blank"
+                rel="noopener noreferrer"
+                class="px-6 py-3 rounded-2xl bg-[#25D366] hover:bg-[#20bd5a] text-white font-bold text-xs sm:text-sm transition-all shadow-lg hover:shadow-xl flex items-center gap-2"
+              >
+                <svg class="w-4 h-4 fill-current" viewBox="0 0 24 24"><path d="M12.031 6.172c-3.181 0-5.767 2.586-5.768 5.766-.001 1.298.38 2.27 1.019 3.287l-.711 2.598 2.669-.699c.969.54 1.838.847 2.791.848 3.18 0 5.767-2.587 5.768-5.766.001-3.18-2.585-5.834-5.768-5.834zm3.377 8.243c-.147.411-.75.76-1.042.812-.292.052-.663.097-2.072-.49-1.409-.587-2.327-2.016-2.398-2.112-.07-.095-.572-.76-.572-1.45 0-.69.362-1.029.49-1.173.129-.144.281-.18.375-.18.094 0 .188.001.27.006.086.005.201-.033.315.241.114.275.39 1.025.424 1.107.034.082.057.178.002.288-.055.11-.082.179-.164.275-.082.096-.173.214-.247.288-.082.083-.168.172-.072.337.096.165.427.705.916 1.141.63.562 1.161.736 1.326.818.165.082.261.069.358-.041.096-.11.413-.48.523-.645.11-.165.22-.138.371-.082.151.055.955.45 1.12.533.165.082.275.124.316.192.041.069.041.399-.106.81zM12.012 2.002C6.488 2.002 2 6.49 2 12.014c0 1.942.553 3.755 1.517 5.289L2 22l4.821-1.488A9.97 9.97 0 0 0 12.012 22C17.535 22 22 17.51 22 12.014c0-5.524-4.465-10.012-9.988-10.012z"/></svg>
+                <span>Pesan Sekarang via WA</span>
+              </a>
+              <a 
+                href="#produk-kota-terlaris" 
+                class="px-5 py-3 rounded-2xl bg-white/15 hover:bg-white/25 text-white font-semibold text-xs sm:text-sm transition-all border border-white/20"
+              >
+                Lihat Katalog {city.name}
+              </a>
+            </div>
+          </div>
+
+          <div class="relative z-10 pt-2 border-t border-white/10 flex items-center justify-between text-[11px] text-white/70">
+            <span>Garansi bunga tiba dalam kondisi segar &amp; rapi</span>
+            <span>Bebas Konsultasi 24 Jam</span>
+          </div>
         </div>
+      </div>
 
-        <h1 class="font-serif text-3xl sm:text-4xl lg:text-5xl font-bold text-slate-900 leading-tight">
-          Toko Bunga &amp; Florist {city.name}
-        </h1>
-        <p class="text-sm sm:text-base text-slate-600 mt-4 leading-relaxed">
-          {city.description || `Layanan karangan bunga papan pernikahan, duka cita, peresmian, standing flower, dan buket bunga segar terbaik untuk area ${city.name} dan sekitarnya.`}
-        </p>
+      <!-- Kolom Kanan: Artikel Edukasi Florist (Persis Homepage) -->
+      <aside class="hero-articles-col" aria-label="Artikel &amp; Panduan Florist">
+        <HeroArticles />
+      </aside>
+    </div>
 
-        <!-- Guarantee Highlights -->
-        <div class="grid grid-cols-2 sm:grid-cols-3 gap-3 my-6 pt-2">
-          <div class="flex items-center gap-2 p-2.5 rounded-xl bg-white border border-slate-200 shadow-2xs">
-            <span class="text-lg">⚡</span>
-            <span class="text-xs font-semibold text-slate-700">Kirim Cepat 3-5 Jam</span>
-          </div>
-          <div class="flex items-center gap-2 p-2.5 rounded-xl bg-white border border-slate-200 shadow-2xs">
-            <span class="text-lg">📸</span>
-            <span class="text-xs font-semibold text-slate-700">Foto Sebelum Kirim</span>
-          </div>
-          <div class="flex items-center gap-2 p-2.5 rounded-xl bg-white border border-slate-200 shadow-2xs col-span-2 sm:col-span-1">
-            <span class="text-lg">🌸</span>
-            <span class="text-xs font-semibold text-slate-700">100% Bunga Segar</span>
-          </div>
-        </div>
-
-        <!-- CTA Buttons -->
-        <div class="flex flex-wrap items-center gap-3 pt-2">
-          <a 
-            href="#produk-unggulan" 
-            class="px-5 py-2.5 rounded-xl bg-primary hover:bg-primary-dark text-white font-semibold text-xs sm:text-sm transition-all shadow-sm hover:shadow-md hover:-translate-y-0.5 active:translate-y-0"
-          >
-            Lihat Produk {city.name}
-          </a>
-          <a 
-            href={waGeneralUrl}
-            target="_blank"
-            rel="noopener noreferrer"
-            class="px-5 py-2.5 rounded-xl bg-secondary hover:bg-secondary-dark text-primary-dark font-bold text-xs sm:text-sm transition-all shadow-sm hover:shadow-md hover:-translate-y-0.5 active:translate-y-0 flex items-center gap-2"
-          >
-            <span>Pesan via WhatsApp</span>
-            <svg class="w-4 h-4" fill="currentColor" viewBox="0 0 24 24">
-              <path d="M.057 24l1.687-6.163c-1.041-1.804-1.588-3.849-1.587-5.946.003-6.556 5.338-11.891 11.893-11.891 3.181.001 6.167 1.24 8.413 3.488 2.245 2.248 3.481 5.236 3.48 8.414-.003 6.557-5.338 11.892-11.893 11.892-1.99-.001-3.951-.5-5.688-1.448l-6.305 1.654zm6.597-3.807c1.676.995 3.276 1.591 5.392 1.592 5.448 0 9.886-4.434 9.889-9.885.002-5.462-4.415-9.89-9.881-9.892-5.452 0-9.887 4.434-9.889 9.884-.001 2.225.651 3.891 1.746 5.634l-.999 3.648 3.742-.981z"/>
+    <!-- Trust Features Strip Persis Homepage (4 Pilar Layanan) -->
+    <div class="hero-trust-strip hidden md:block max-w-7xl mx-auto mt-5 pt-4 border-t border-slate-200/80">
+      <div class="grid grid-cols-2 md:grid-cols-4 gap-3.5 sm:gap-4 lg:gap-6">
+        <div class="trust-item flex items-center gap-3">
+          <div class="trust-icon-box w-10 h-10 rounded-xl bg-white border border-slate-200/80 flex items-center justify-center text-primary shadow-sm flex-shrink-0">
+            <svg class="w-5 h-5" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2">
+              <path stroke-linecap="round" stroke-linejoin="round" d="M3 9a2 2 0 012-2h.93a2 2 0 001.664-.89l.812-1.22A2 2 0 0110.07 4h3.86a2 2 0 011.664.89l.812 1.22A2 2 0 0018.07 7H19a2 2 0 012 2v9a2 2 0 01-2 2H5a2 2 0 01-2-2V9z" />
+              <path stroke-linecap="round" stroke-linejoin="round" d="M15 13a3 3 0 11-6 0 3 3 0 016 0z" />
             </svg>
-          </a>
+          </div>
+          <div>
+            <h4 class="text-xs sm:text-sm font-bold text-slate-900 leading-tight">Difoto sebelum diantar</h4>
+            <p class="text-[11px] sm:text-xs text-slate-500 mt-0.5 leading-tight">Laporan foto hasil jadi sebelum dikirim</p>
+          </div>
         </div>
 
+        <div class="trust-item flex items-center gap-3">
+          <div class="trust-icon-box w-10 h-10 rounded-xl bg-white border border-slate-200/80 flex items-center justify-center text-[#0b825d] shadow-sm flex-shrink-0">
+            <svg class="w-5 h-5" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2">
+              <path stroke-linecap="round" stroke-linejoin="round" d="M13 10V3L4 14h7v7l9-11h-7z" />
+            </svg>
+          </div>
+          <div>
+            <h4 class="text-xs sm:text-sm font-bold text-slate-900 leading-tight">Selesai 3-5 jam, siap hari ini</h4>
+            <p class="text-[11px] sm:text-xs text-slate-500 mt-0.5 leading-tight">Bisa pesan dadakan untuk area {city.name}</p>
+          </div>
+        </div>
+
+        <div class="trust-item flex items-center gap-3">
+          <div class="trust-icon-box w-10 h-10 rounded-xl bg-white border border-slate-200/80 flex items-center justify-center text-secondary shadow-sm flex-shrink-0">
+            <svg class="w-5 h-5" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2">
+              <path stroke-linecap="round" stroke-linejoin="round" d="M19 21V5a2 2 0 00-2-2H7a2 2 0 00-2 2v16m14 0h2m-2 0h-5m-9 0H3m2 0h5M9 7h1m-1 4h1m4-4h1m-1 4h1m-5 10v-5a1 1 0 011-1h2a1 1 0 011 1v5m-4 0h4" />
+            </svg>
+          </div>
+          <div>
+            <h4 class="text-xs sm:text-sm font-bold text-slate-900 leading-tight">Bunga Segar Pilihan</h4>
+            <p class="text-[11px] sm:text-xs text-slate-500 mt-0.5 leading-tight">Rangkaian rapi dari bunga berkualitas premium</p>
+          </div>
+        </div>
+
+        <div class="trust-item flex items-center gap-3">
+          <div class="trust-icon-box w-10 h-10 rounded-xl bg-white border border-slate-200/80 flex items-center justify-center text-primary shadow-sm flex-shrink-0">
+            <svg class="w-5 h-5" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2">
+              <path stroke-linecap="round" stroke-linejoin="round" d="M5 8h14M5 8a2 2 0 110-4h14a2 2 0 110 4M5 8v10a2 2 0 002 2h10a2 2 0 002-2V8m-9 4h4" />
+            </svg>
+          </div>
+          <div>
+            <h4 class="text-xs sm:text-sm font-bold text-slate-900 leading-tight">Pengiriman Terpercaya</h4>
+            <p class="text-[11px] sm:text-xs text-slate-500 mt-0.5 leading-tight">Diantar langsung ke lokasi tujuan di {city.name}</p>
+          </div>
+        </div>
       </div>
     </div>
   </section>
 
-  <!-- Category Browser Carousel -->
-  
-
-  <!-- Featured Products for this city -->
-  <section class="py-16 sm:py-20 bg-white" id="produk-unggulan">
+  <!-- Section 1: Produk Terlaris Minggu Ini di Kota Tersebut (Featured Products Persis Home) -->
+  <section class="featured-products-section py-16 sm:py-20 bg-white border-y border-soft-cream/60" id="produk-kota-terlaris">
     <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
-      <div class="flex flex-col sm:flex-row sm:items-end justify-between mb-10 pb-4 border-b border-slate-100 gap-4">
-        <div>
+      <div class="featured-products-header flex flex-col md:flex-row md:items-end justify-between mb-10 pb-4 border-b border-slate-100 gap-4">
+        <div class="max-w-xl">
           <span class="text-xs font-bold uppercase tracking-wider text-secondary flex items-center gap-1.5 mb-1.5">
             <span class="w-1.5 h-1.5 rounded-full bg-secondary"></span>
-            PRODUK PILIHAN AREA {city.name.toUpperCase()}
+            PRODUK TERLARIS DI {city.name.toUpperCase()}
           </span>
-          <h2 class="font-serif text-2xl sm:text-3xl font-bold text-slate-900">
-            Karangan Bunga Favorit di {city.name}
-          </h2>
-          <p class="text-xs sm:text-sm text-slate-500 mt-1">
-            Produk terlaris siap antar ke seluruh alamat penerima di wilayah {city.name}.
-          </p>
+          <h2 class="font-serif text-3xl sm:text-4xl font-bold text-slate-800">Produk Favorit di {city.name}</h2>
+          <p class="text-slate-500 text-sm mt-2 leading-relaxed">Pilihan karangan bunga dan buket paling banyak dipesan pelanggan area {city.name}.</p>
         </div>
         <a 
-          href={withBase('/katalog/')}
-          class="inline-flex items-center gap-1.5 text-xs font-bold text-primary hover:text-primary-dark transition-colors shrink-0"
+          href={withBase('/katalog/')} 
+          class="inline-flex items-center text-sm font-semibold text-primary hover:text-secondary transition-colors group"
         >
-          <span>Lihat Semua Katalog</span>
-          <span>→</span>
+          Lihat Semua Produk
+          <svg class="h-4 w-4 ml-1.5 transform group-hover:translate-x-1 transition-transform" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2">
+            <path stroke-linecap="round" stroke-linejoin="round" d="M9 5l7 7-7 7" />
+          </svg>
         </a>
       </div>
 
@@ -245,14 +462,14 @@ const waGeneralUrl = `https://wa.me/${WHATSAPP_NUMBER}?text=${encodeURIComponent
             Katalog Khusus {city.name} Siap Dipesan Langsung
           </h3>
           <p class="text-xs text-slate-500 max-w-md mx-auto">
-            Seluruh model bunga papan, buket bunga, dan standing flower kami dapat disesuaikan untuk pengiriman ke {city.name}.
+            Seluruh model bunga papan, buket bunga, dan standing flower kami dapat disesuaikan untuk pengiriman ke alamat tujuan di {city.name}.
           </p>
           <div class="pt-2">
             <a 
               href={waGeneralUrl}
               target="_blank"
               rel="noopener noreferrer"
-              class="inline-flex items-center gap-2 px-4 py-2 rounded-xl bg-primary hover:bg-primary-dark text-white font-semibold text-xs shadow-sm transition-all"
+              class="inline-flex items-center gap-2 px-5 py-2.5 rounded-xl bg-primary hover:bg-primary-dark text-white font-semibold text-xs shadow-sm transition-all"
             >
               <span>Hubungi Florist via WhatsApp</span>
               <span>→</span>
@@ -263,15 +480,94 @@ const waGeneralUrl = `https://wa.me/${WHATSAPP_NUMBER}?text=${encodeURIComponent
     </div>
   </section>
 
-  <!-- Detailed Category Sections with City Products -->
-  <BungaPapanSection allProducts={products} />
-  <HandBouquetSection allProducts={products} />
-  <StandingFlowerSection allProducts={products} />
-  <BungaMejaSection allProducts={products} />
-  <TanbulampotSection allProducts={products} />
-  <PaperFlowerSection allProducts={products} />
+  <!-- Section 2: 6 Kartu Layanan SEO Lokal (Sesuai Standar Sekarsari cityKeywordServices) -->
+  <section class="py-16 sm:py-20 bg-clean-ivory border-b border-soft-cream/60" id="layanan-seo-kota">
+    <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
+      <div class="max-w-3xl mb-12">
+        <span class="text-xs font-bold uppercase tracking-wider text-secondary flex items-center gap-1.5 mb-1.5">
+          <span class="w-1.5 h-1.5 rounded-full bg-secondary"></span>
+          LAYANAN FLORIST &amp; KARANGAN BUNGA DI {city.name.toUpperCase()}
+        </span>
+        <h2 class="font-serif text-3xl sm:text-4xl font-bold text-slate-900 leading-tight">
+          Layanan Lengkap Karangan Bunga di {city.name}
+        </h2>
+        <p class="text-sm text-slate-600 mt-2 leading-relaxed">
+          Temukan aneka rangkaian bunga segar berkualitas tinggi dengan layanan konsultasi gratis dan kurir khusus untuk wilayah {city.name}.
+        </p>
+      </div>
 
-  <!-- Switch City Delivery Section -->
+      <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
+        {cityKeywordServices.map((svc) => (
+          <div class="p-6 rounded-2xl bg-white border border-soft-cream/80 shadow-xs hover:shadow-md transition-shadow flex flex-col justify-between group">
+            <div>
+              <div class="w-12 h-12 rounded-xl bg-accent-bg flex items-center justify-center text-2xl mb-4 group-hover:scale-110 transition-transform">
+                {svc.icon}
+              </div>
+              <h3 class="font-serif text-lg font-bold text-slate-900 group-hover:text-primary transition-colors">
+                {svc.title}
+              </h3>
+              <p class="text-xs text-slate-600 mt-2 leading-relaxed">
+                {svc.desc}
+              </p>
+            </div>
+            
+            <div class="pt-4 mt-4 border-t border-slate-100 flex items-center justify-between">
+              <div class="flex flex-wrap gap-1.5">
+                {svc.keywords.slice(0, 2).map((k) => (
+                  <span class="text-[10px] font-semibold text-slate-500 bg-slate-100 px-2 py-0.5 rounded-md">
+                    #{k.replace(/\s+/g, '-')}
+                  </span>
+                ))}
+              </div>
+              <a 
+                href={svc.targetHref} 
+                class="text-xs font-bold text-primary group-hover:text-secondary transition-colors inline-flex items-center gap-1"
+              >
+                <span>Lihat</span>
+                <span>→</span>
+              </a>
+            </div>
+          </div>
+        ))}
+      </div>
+    </div>
+  </section>
+
+  <!-- Detailed Category Sections with City Products (Persis Homepage) -->
+  <div id="hand-bouquet">
+    <HandBouquetSection allProducts={products} />
+  </div>
+  <div id="bunga-papan">
+    <BungaPapanSection allProducts={products} />
+  </div>
+  <div id="standing-flower">
+    <StandingFlowerSection allProducts={products} />
+  </div>
+  <div id="paper-flower">
+    <PaperFlowerSection allProducts={products} />
+  </div>
+  <div id="bunga-meja">
+    <BungaMejaSection allProducts={products} />
+  </div>
+  <div id="tanbulampot">
+    <TanbulampotSection allProducts={products} />
+  </div>
+
+  <!-- Area Layanan / Kecamatan Coverage Text (Sesuai Sekarsari SEO) -->
+  <section class="py-12 bg-white border-y border-soft-cream/60">
+    <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
+      <div class="p-6 sm:p-8 rounded-2xl bg-clean-ivory border border-soft-cream/80">
+        <h3 class="font-serif text-lg font-bold text-slate-900 mb-2">
+          Cakupan Pengiriman Florist Area {city.name}
+        </h3>
+        <p class="text-xs sm:text-sm text-slate-600 leading-relaxed">
+          Zaloma Florist melayani pengiriman rangkaian bunga segar, buket wisuda, standing flower ucapan, dan bunga papan ke seluruh kelurahan, kecamatan, rumah duka, gedung pernikahan, hotel, rumah sakit, instansi perkantoran, dan kawasan hunian di wilayah {city.name} dan sekitarnya. Pengiriman dilakukan menggunakan armada kurir khusus bunga untuk menjamin bunga tiba dalam kondisi sempurna dan tepat waktu.
+        </p>
+      </div>
+    </div>
+  </section>
+
+  <!-- Switch City Delivery Section (Sesuai Sekarsari HomeCityShowcase) -->
   <CityDeliverySection currentCitySlug={city.slug} allCities={allCities} />
 
 </Layout>
@@ -323,4 +619,3 @@ const waGeneralUrl = `https://wa.me/${WHATSAPP_NUMBER}?text=${encodeURIComponent
     }
   })();
 </script>
-
