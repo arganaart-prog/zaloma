@@ -265,17 +265,28 @@ const customCategorySchema = {
       const { data: cloudProducts, error } = await client
         .from('products')
         .select('*')
-        .eq('category_slug', categorySlug)
         .order('created_at', { ascending: false });
 
       if (error || !cloudProducts || cloudProducts.length === 0) return;
+
+      const subcatKeyword = categorySlug.replace('bunga-papan-', '').replace('-malang', '');
+      const liveCategoryProducts = cloudProducts.filter(p => {
+        if (p.slug.startsWith('_')) return false;
+        if (p.category_slug === categorySlug) return true;
+        if (p.category_slug && p.category_slug.startsWith(categorySlug + '--')) return true;
+        if (categorySlug.startsWith('bunga-papan-') && p.category_slug && p.category_slug.includes(subcatKeyword)) return true;
+        if (categorySlug.startsWith('bunga-papan-') && p.category_name && p.category_name.toLowerCase().includes(subcatKeyword.replace('-', ' '))) return true;
+        return false;
+      });
+
+      if (liveCategoryProducts.length === 0) return;
 
       const grid = document.getElementById('category-products-grid');
       if (!grid) return;
 
       grid.innerHTML = '';
 
-      cloudProducts.forEach((p, index) => {
+      liveCategoryProducts.forEach((p, index) => {
         const productUrl = `/produk/${p.slug}/`;
         const buttonLabel = 'Detail';
         const aspectClass = isHandBouquet ? 'aspect-[4/5]' : 'aspect-[20/19]';

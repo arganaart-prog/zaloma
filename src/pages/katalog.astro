@@ -207,7 +207,10 @@ try {
       const itemName = item.getAttribute('data-name') || '';
       const itemDesc = item.getAttribute('data-description') || '';
 
-      const matchesCategory = currentCategory === 'all' || itemCategory === currentCategory;
+      const matchesCategory = currentCategory === 'all' || 
+                              itemCategory === currentCategory || 
+                              itemCategory.startsWith(currentCategory + '--') ||
+                              itemCategory.startsWith(currentCategory + '-');
       const matchesSearch = currentSearch === '' || 
                             itemName.includes(currentSearch) || 
                             itemDesc.includes(currentSearch);
@@ -366,9 +369,8 @@ try {
         return;
       }
 
-      if (!cloudProducts || cloudProducts.length === 0) {
-        return;
-      }
+      const liveProducts = cloudProducts.filter(p => !p.slug.startsWith('_'));
+      if (liveProducts.length === 0) return;
 
       const grid = document.getElementById('products-grid');
       if (!grid) return;
@@ -376,7 +378,7 @@ try {
       // Bersihkan kartu dan render 100% data Supabase secara dinamis
       grid.innerHTML = '';
 
-      cloudProducts.forEach((p, index) => {
+      liveProducts.forEach((p, index) => {
         const productUrl = `/produk/${p.slug}/`;
         const buttonLabel = 'Detail';
 

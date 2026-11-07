@@ -1,6 +1,7 @@
 ---
 import '../../styles/global.css';
 import { CATEGORIES } from '../../data/products';
+import { DEFAULT_CATEGORIES } from '../../data/categories';
 import { SUPABASE_URL, SUPABASE_ANON_KEY, SUPABASE_BUCKET } from '../../data/supabaseConfig';
 import { withBase } from '../../utils/paths';
 
@@ -102,6 +103,14 @@ const title = "Admin — Zaloma Florist";
               >
                 + Tambah Produk
               </button>
+              <button 
+                type="button" 
+                id="tab-btn-categories" 
+                class="tab-btn px-3 py-1.5 rounded-md text-xs font-semibold text-slate-600 hover:text-primary hover:bg-accent-bg/50 transition-all cursor-pointer flex items-center gap-1.5"
+              >
+                <span>Kategori</span>
+                <span id="tab-cat-badge" class="px-1.5 py-0.2 rounded-full text-[10px] font-bold bg-slate-200 text-slate-700">0</span>
+              </button>
             </div>
           </div>
 
@@ -157,9 +166,13 @@ const title = "Admin — Zaloma Florist";
                 class="px-2.5 py-1.5 rounded-lg border border-slate-200 text-xs bg-white text-slate-700 focus:outline-none focus:border-primary focus:ring-1 focus:ring-primary/20 transition-all cursor-pointer"
               >
                 <option value="all">Semua Kategori</option>
-                {CATEGORIES.map(cat => (
-                  <option value={cat.slug}>{cat.name}</option>
-                ))}
+              </select>
+
+              <select 
+                id="subcategory-filter-select" 
+                class="hidden px-2.5 py-1.5 rounded-lg border border-slate-200 text-xs bg-white text-slate-700 focus:outline-none focus:border-primary focus:ring-1 focus:ring-primary/20 transition-all cursor-pointer animate-fade-in"
+              >
+                <option value="all">Semua Subkategori</option>
               </select>
 
               <select 
@@ -245,9 +258,18 @@ const title = "Admin — Zaloma Florist";
                     class="w-full px-3 py-2 rounded-lg border border-slate-300 text-xs focus:outline-none focus:border-primary focus:ring-1 focus:ring-primary/20 transition-all bg-white cursor-pointer"
                   >
                     <option value="" disabled selected>Pilih Kategori...</option>
-                    {CATEGORIES.map(cat => (
-                      <option value={cat.slug} data-name={cat.name}>{cat.name}</option>
-                    ))}
+                  </select>
+                </div>
+
+                <div id="prod-subcategory-wrapper" class="hidden animate-fade-in">
+                  <label for="prod-subcategory" class="block text-xs font-semibold text-slate-700 mb-1">
+                    Subkategori <span class="text-slate-400 font-normal">(Opsional)</span>
+                  </label>
+                  <select 
+                    id="prod-subcategory" 
+                    class="w-full px-3 py-2 rounded-lg border border-slate-300 text-xs focus:outline-none focus:border-primary focus:ring-1 focus:ring-primary/20 transition-all bg-white cursor-pointer"
+                  >
+                    <option value="">Pilih Subkategori...</option>
                   </select>
                 </div>
 
@@ -355,6 +377,31 @@ const title = "Admin — Zaloma Florist";
           </div>
         </section>
 
+        <!-- ================= TAB 3: KELOLA KATEGORI ================= -->
+        <section id="tab-categories" class="hidden animate-fade-in space-y-4 max-w-4xl mx-auto">
+          <div class="bg-white rounded-2xl p-4 sm:p-5 border border-slate-200 shadow-xs flex flex-col sm:flex-row items-start sm:items-center justify-between gap-3">
+            <div>
+              <h2 class="text-base font-bold text-slate-900 flex items-center gap-2">
+                <span class="w-2 h-2 rounded-full bg-primary"></span>
+                Kelola Kategori &amp; Subkategori
+              </h2>
+              <p class="text-xs text-slate-500 mt-0.5">Atur kategori utama dan subkategori untuk pengelompokan produk toko.</p>
+            </div>
+            <button 
+              type="button" 
+              id="open-add-category-btn" 
+              class="bg-primary hover:bg-primary-dark text-white font-semibold py-2 px-4 rounded-lg text-xs transition-all active:scale-95 flex items-center gap-1.5 shadow-sm cursor-pointer shrink-0"
+            >
+              + Tambah Kategori
+            </button>
+          </div>
+
+          <!-- Categories Grid -->
+          <div id="categories-cards-grid" class="grid grid-cols-1 md:grid-cols-2 gap-3.5">
+            <!-- Populated by JS -->
+          </div>
+        </section>
+
       </main>
 
     </div>
@@ -383,15 +430,20 @@ const title = "Admin — Zaloma Florist";
             <div>
               <label class="block text-xs font-semibold text-slate-700 mb-1">Kategori</label>
               <select id="edit-prod-category" required class="w-full px-2.5 py-1.5 rounded-lg border border-slate-300 text-xs bg-white focus:outline-none focus:border-primary focus:ring-1 focus:ring-primary/20 transition-all cursor-pointer">
-                {CATEGORIES.map(cat => (
-                  <option value={cat.slug} data-name={cat.name}>{cat.name}</option>
-                ))}
               </select>
             </div>
             <div>
               <label class="block text-xs font-semibold text-slate-700 mb-1">Harga (Rp)</label>
               <input type="number" id="edit-prod-price" required step="5000" class="w-full px-2.5 py-1.5 rounded-lg border border-slate-300 text-xs font-mono focus:outline-none focus:border-primary focus:ring-1 focus:ring-primary/20 transition-all" />
               <p id="edit-price-preview" class="text-[10px] font-bold text-primary mt-0.5 truncate"></p>
+            </div>
+            <div id="edit-prod-subcategory-wrapper" class="hidden col-span-2 animate-fade-in">
+              <label class="block text-xs font-semibold text-slate-700 mb-1">
+                Subkategori <span class="text-slate-400 font-normal">(Opsional)</span>
+              </label>
+              <select id="edit-prod-subcategory" class="w-full px-2.5 py-1.5 rounded-lg border border-slate-300 text-xs bg-white focus:outline-none focus:border-primary focus:ring-1 focus:ring-primary/20 transition-all cursor-pointer">
+                <option value="">Pilih Subkategori...</option>
+              </select>
             </div>
           </div>
 
@@ -458,7 +510,139 @@ const title = "Admin — Zaloma Florist";
       </div>
     </div>
 
-    <script define:vars={{ SUPABASE_URL, SUPABASE_ANON_KEY, SUPABASE_BUCKET }}>
+    <!-- ================= ADD / EDIT CATEGORY MODAL ================= -->
+    <div id="category-modal" class="hidden fixed inset-0 z-50 bg-black/40 backdrop-blur-xs flex items-center justify-center p-4 animate-fade-in">
+      <div class="bg-white rounded-2xl max-w-sm w-full p-5 shadow-xl border border-slate-200 space-y-3.5 animate-modal-pop">
+        <div class="flex items-center justify-between pb-2.5 border-b border-slate-100">
+          <h3 id="category-modal-title" class="text-sm font-bold text-slate-900 flex items-center gap-2">
+            <span class="w-2 h-2 rounded-full bg-primary"></span>
+            Tambah Kategori Baru
+          </h3>
+          <button id="close-category-modal-btn" type="button" class="text-slate-400 hover:text-slate-600 text-sm font-bold cursor-pointer">✕</button>
+        </div>
+
+        <form id="category-form" class="space-y-3">
+          <input type="hidden" id="category-edit-id" />
+          
+          <div>
+            <label for="category-name-input" class="block text-xs font-semibold text-slate-700 mb-1">
+              Nama Kategori <span class="text-rose-500">*</span>
+            </label>
+            <input 
+              type="text" 
+              id="category-name-input" 
+              required 
+              placeholder="Contoh: Hampers & Parcel"
+              class="w-full px-3 py-1.5 rounded-lg border border-slate-300 text-xs focus:outline-none focus:border-primary focus:ring-1 focus:ring-primary/20 transition-all"
+            />
+          </div>
+
+          <div>
+            <label for="category-slug-input" class="block text-xs font-semibold text-slate-700 mb-1">
+              Slug URL
+            </label>
+            <input 
+              type="text" 
+              id="category-slug-input" 
+              required 
+              placeholder="hampers-parcel"
+              class="w-full px-3 py-1.5 rounded-lg border border-slate-300 text-xs font-mono focus:outline-none focus:border-primary focus:ring-1 focus:ring-primary/20 transition-all bg-slate-50"
+            />
+          </div>
+
+          <div>
+            <label for="category-desc-input" class="block text-xs font-semibold text-slate-700 mb-1">
+              Deskripsi Singkat (Opsional)
+            </label>
+            <textarea 
+              id="category-desc-input" 
+              rows="2" 
+              placeholder="Keterangan singkat kategori..."
+              class="w-full px-3 py-1.5 rounded-lg border border-slate-300 text-xs focus:outline-none focus:border-primary focus:ring-1 focus:ring-primary/20 transition-all resize-none"
+            ></textarea>
+          </div>
+
+          <div class="pt-2 border-t border-slate-100 flex items-center justify-end gap-2">
+            <button type="button" id="cancel-category-btn" class="px-3 py-1.5 rounded-lg text-xs font-semibold text-slate-500 hover:bg-slate-100 cursor-pointer">Batal</button>
+            <button type="submit" id="save-category-btn" class="bg-primary hover:bg-primary-dark text-white font-semibold py-1.5 px-4 rounded-lg text-xs transition-all active:scale-95 flex items-center gap-1.5 cursor-pointer shadow-sm">
+              Simpan Kategori
+            </button>
+          </div>
+        </form>
+      </div>
+    </div>
+
+    <!-- ================= ADD SUBCATEGORY MODAL ================= -->
+    <div id="subcategory-modal" class="hidden fixed inset-0 z-50 bg-black/40 backdrop-blur-xs flex items-center justify-center p-4 animate-fade-in">
+      <div class="bg-white rounded-2xl max-w-sm w-full p-5 shadow-xl border border-slate-200 space-y-3.5 animate-modal-pop">
+        <div class="flex items-center justify-between pb-2.5 border-b border-slate-100">
+          <h3 class="text-sm font-bold text-slate-900 flex items-center gap-2">
+            <span class="w-2 h-2 rounded-full bg-primary"></span>
+            Tambah Subkategori
+          </h3>
+          <button id="close-subcat-modal-btn" type="button" class="text-slate-400 hover:text-slate-600 text-sm font-bold cursor-pointer">✕</button>
+        </div>
+
+        <p class="text-xs text-slate-500">
+          Kategori Induk: <span id="subcat-parent-label" class="font-bold text-slate-800"></span>
+        </p>
+
+        <form id="subcategory-form" class="space-y-3">
+          <input type="hidden" id="subcat-parent-category-id" />
+          
+          <div>
+            <label for="subcat-name-input" class="block text-xs font-semibold text-slate-700 mb-1">
+              Nama Subkategori <span class="text-rose-500">*</span>
+            </label>
+            <input 
+              type="text" 
+              id="subcat-name-input" 
+              required 
+              placeholder="Contoh: Buket Wisuda / Duka Cita"
+              class="w-full px-3 py-1.5 rounded-lg border border-slate-300 text-xs focus:outline-none focus:border-primary focus:ring-1 focus:ring-primary/20 transition-all"
+            />
+          </div>
+
+          <div>
+            <label for="subcat-slug-input" class="block text-xs font-semibold text-slate-700 mb-1">
+              Slug URL
+            </label>
+            <input 
+              type="text" 
+              id="subcat-slug-input" 
+              required 
+              placeholder="wisuda"
+              class="w-full px-3 py-1.5 rounded-lg border border-slate-300 text-xs font-mono focus:outline-none focus:border-primary focus:ring-1 focus:ring-primary/20 transition-all bg-slate-50"
+            />
+          </div>
+
+          <div class="pt-2 border-t border-slate-100 flex items-center justify-end gap-2">
+            <button type="button" id="cancel-subcat-btn" class="px-3 py-1.5 rounded-lg text-xs font-semibold text-slate-500 hover:bg-slate-100 cursor-pointer">Batal</button>
+            <button type="submit" id="save-subcat-btn" class="bg-primary hover:bg-primary-dark text-white font-semibold py-1.5 px-4 rounded-lg text-xs transition-all active:scale-95 flex items-center gap-1.5 cursor-pointer shadow-sm">
+              Simpan Subkategori
+            </button>
+          </div>
+        </form>
+      </div>
+    </div>
+
+    <!-- ================= DELETE CATEGORY MODAL ================= -->
+    <div id="delete-category-modal" class="hidden fixed inset-0 z-50 bg-black/40 backdrop-blur-xs flex items-center justify-center p-4 animate-fade-in">
+      <div class="bg-white rounded-2xl max-w-xs w-full p-5 shadow-xl border border-slate-200 text-center space-y-3 animate-modal-pop">
+        <h3 class="text-sm font-bold text-slate-900">Hapus Kategori?</h3>
+        <p id="delete-category-name" class="text-xs text-slate-600 line-clamp-2 font-medium"></p>
+        <p class="text-[11px] text-slate-400">Seluruh subkategori di dalamnya juga akan terhapus.</p>
+        
+        <div class="flex items-center gap-2 pt-2">
+          <button type="button" id="cancel-delete-category-btn" class="flex-1 px-3 py-1.5 rounded-lg text-xs font-semibold text-slate-600 bg-slate-100 hover:bg-slate-200 cursor-pointer">Batal</button>
+          <button type="button" id="confirm-delete-category-btn" class="flex-1 bg-rose-600 hover:bg-rose-700 text-white font-semibold py-1.5 px-3 rounded-lg text-xs transition-all active:scale-95 flex items-center justify-center gap-1 cursor-pointer">
+            Hapus
+          </button>
+        </div>
+      </div>
+    </div>
+
+    <script define:vars={{ SUPABASE_URL, SUPABASE_ANON_KEY, SUPABASE_BUCKET, DEFAULT_CATEGORIES }}>
       // Initialize Supabase Client
       const supabase = window.supabase.createClient(SUPABASE_URL, SUPABASE_ANON_KEY);
 
@@ -554,22 +738,438 @@ const title = "Admin — Zaloma Florist";
       // Tab Switching
       const tabBtnCatalog = document.getElementById('tab-btn-catalog');
       const tabBtnAdd = document.getElementById('tab-btn-add');
+      const tabBtnCategories = document.getElementById('tab-btn-categories');
       const tabCatalog = document.getElementById('tab-catalog');
       const tabAdd = document.getElementById('tab-add');
+      const tabCategories = document.getElementById('tab-categories');
 
-      tabBtnCatalog.addEventListener('click', () => {
-        tabBtnCatalog.className = 'tab-btn active px-3 py-1.5 rounded-md text-xs font-semibold bg-primary text-white transition-all cursor-pointer flex items-center gap-1.5 shadow-2xs';
-        tabBtnAdd.className = 'tab-btn px-3 py-1.5 rounded-md text-xs font-semibold text-slate-600 hover:text-primary hover:bg-accent-bg/50 transition-all cursor-pointer';
-        tabCatalog.classList.remove('hidden');
-        tabAdd.classList.add('hidden');
+      function switchTab(activeTab) {
+        const tabs = [
+          { btn: tabBtnCatalog, pane: tabCatalog, isCatalog: true },
+          { btn: tabBtnAdd, pane: tabAdd },
+          { btn: tabBtnCategories, pane: tabCategories }
+        ];
+
+        tabs.forEach(t => {
+          if (!t.btn || !t.pane) return;
+          if (t.btn === activeTab) {
+            t.btn.className = `tab-btn active px-3 py-1.5 rounded-md text-xs font-semibold bg-primary text-white transition-all cursor-pointer shadow-2xs flex items-center gap-1.5`;
+            t.pane.classList.remove('hidden');
+          } else {
+            t.btn.className = `tab-btn px-3 py-1.5 rounded-md text-xs font-semibold text-slate-600 hover:text-primary hover:bg-accent-bg/50 transition-all cursor-pointer flex items-center gap-1.5`;
+            t.pane.classList.add('hidden');
+          }
+        });
+      }
+
+      tabBtnCatalog?.addEventListener('click', () => switchTab(tabBtnCatalog));
+      tabBtnAdd?.addEventListener('click', () => switchTab(tabBtnAdd));
+      tabBtnCategories?.addEventListener('click', () => {
+        switchTab(tabBtnCategories);
+        renderCategoriesCards();
       });
 
-      tabBtnAdd.addEventListener('click', () => {
-        tabBtnAdd.className = 'tab-btn active px-3 py-1.5 rounded-md text-xs font-semibold bg-primary text-white transition-all cursor-pointer shadow-2xs';
-        tabBtnCatalog.className = 'tab-btn px-3 py-1.5 rounded-md text-xs font-semibold text-slate-600 hover:text-primary hover:bg-accent-bg/50 transition-all cursor-pointer flex items-center gap-1.5';
-        tabAdd.classList.remove('hidden');
-        tabCatalog.classList.add('hidden');
+      // Categories State Management
+      let categoriesList = [];
+      try {
+        const cached = localStorage.getItem('zaloma_admin_categories');
+        if (cached) categoriesList = JSON.parse(cached);
+      } catch (e) {}
+
+      if (!categoriesList || !Array.isArray(categoriesList) || categoriesList.length === 0) {
+        categoriesList = JSON.parse(JSON.stringify(DEFAULT_CATEGORIES || []));
+      }
+
+      function updateCategoryBadges() {
+        const badge = document.getElementById('tab-cat-badge');
+        if (badge) badge.textContent = categoriesList.length;
+      }
+
+      function toSlug(str) {
+        return (str || '').toLowerCase()
+          .replace(/[^\w\s-]/g, '')
+          .trim()
+          .replace(/\s+/g, '-');
+      }
+
+      // Persist categories to localStorage and Supabase Cloud
+      async function persistCategories() {
+        try {
+          localStorage.setItem('zaloma_admin_categories', JSON.stringify(categoriesList));
+          updateCategoryDropdowns();
+          renderCategoriesCards();
+          updateCategoryBadges();
+
+          await supabase.from('products').upsert({
+            slug: '_categories_config_',
+            name: 'System Categories Config',
+            category_slug: '_system_',
+            category_name: 'System',
+            price_from: 0,
+            price_label: 'Rp 0',
+            image: 'https://zalomaflorist.com/favicon.ico',
+            description: JSON.stringify(categoriesList),
+            featured: false,
+            city: 'Malang'
+          }, { onConflict: 'slug' });
+        } catch (err) {
+          console.warn('Sync categories notice:', err);
+        }
+      }
+
+      // Populate Category Dropdowns
+      function updateCategoryDropdowns() {
+        const catFilter = document.getElementById('category-filter-select');
+        const prodCat = document.getElementById('prod-category');
+        const editCat = document.getElementById('edit-prod-category');
+
+        const prevFilterVal = catFilter ? catFilter.value : 'all';
+        const prevProdVal = prodCat ? prodCat.value : '';
+        const prevEditVal = editCat ? editCat.value : '';
+
+        if (catFilter) {
+          catFilter.innerHTML = '<option value="all">Semua Kategori</option>' +
+            categoriesList.map(c => `<option value="${c.slug}">${c.name}</option>`).join('');
+          if (categoriesList.some(c => c.slug === prevFilterVal)) {
+            catFilter.value = prevFilterVal;
+          }
+        }
+
+        if (prodCat) {
+          prodCat.innerHTML = '<option value="" disabled selected>Pilih Kategori...</option>' +
+            categoriesList.map(c => `<option value="${c.slug}" data-name="${c.name}">${c.name}</option>`).join('');
+          if (prevProdVal && categoriesList.some(c => c.slug === prevProdVal)) {
+            prodCat.value = prevProdVal;
+          }
+        }
+
+        if (editCat) {
+          editCat.innerHTML = '<option value="" disabled selected>Pilih Kategori...</option>' +
+            categoriesList.map(c => `<option value="${c.slug}" data-name="${c.name}">${c.name}</option>`).join('');
+          if (prevEditVal && categoriesList.some(c => c.slug === prevEditVal)) {
+            editCat.value = prevEditVal;
+          }
+        }
+
+        updateCategoryBadges();
+      }
+
+      // Dynamic Subcategory Select for Add Form
+      const prodCategorySelect = document.getElementById('prod-category');
+      const prodSubcatWrapper = document.getElementById('prod-subcategory-wrapper');
+      const prodSubcatSelect = document.getElementById('prod-subcategory');
+
+      prodCategorySelect?.addEventListener('change', () => {
+        const selectedSlug = prodCategorySelect.value;
+        const cat = categoriesList.find(c => c.slug === selectedSlug);
+        if (cat && cat.subcategories && cat.subcategories.length > 0) {
+          prodSubcatSelect.innerHTML = '<option value="">Pilih Subkategori (Opsional)...</option>' +
+            cat.subcategories.map(s => `<option value="${s.slug}" data-name="${s.name}">${s.name}</option>`).join('');
+          prodSubcatWrapper.classList.remove('hidden');
+        } else {
+          prodSubcatSelect.innerHTML = '<option value="">Pilih Subkategori...</option>';
+          prodSubcatWrapper.classList.add('hidden');
+        }
       });
+
+      // Dynamic Subcategory Select for Edit Modal
+      const editCategorySelect = document.getElementById('edit-prod-category');
+      const editSubcatWrapper = document.getElementById('edit-prod-subcategory-wrapper');
+      const editSubcatSelect = document.getElementById('edit-prod-subcategory');
+
+      editCategorySelect?.addEventListener('change', () => {
+        const selectedSlug = editCategorySelect.value;
+        const cat = categoriesList.find(c => c.slug === selectedSlug);
+        if (cat && cat.subcategories && cat.subcategories.length > 0) {
+          editSubcatSelect.innerHTML = '<option value="">Pilih Subkategori (Opsional)...</option>' +
+            cat.subcategories.map(s => `<option value="${s.slug}" data-name="${s.name}">${s.name}</option>`).join('');
+          editSubcatWrapper.classList.remove('hidden');
+        } else {
+          editSubcatSelect.innerHTML = '<option value="">Pilih Subkategori...</option>';
+          editSubcatWrapper.classList.add('hidden');
+        }
+      });
+
+      // Dynamic Subcategory Filter for Catalog List
+      const categoryFilterSelect = document.getElementById('category-filter-select');
+      const subcategoryFilterSelect = document.getElementById('subcategory-filter-select');
+
+      categoryFilterSelect?.addEventListener('change', () => {
+        const selectedSlug = categoryFilterSelect.value;
+        if (selectedSlug !== 'all') {
+          const cat = categoriesList.find(c => c.slug === selectedSlug);
+          if (cat && cat.subcategories && cat.subcategories.length > 0) {
+            subcategoryFilterSelect.innerHTML = '<option value="all">Semua Subkategori</option>' +
+              cat.subcategories.map(s => `<option value="${s.slug}">${s.name}</option>`).join('');
+            subcategoryFilterSelect.classList.remove('hidden');
+          } else {
+            subcategoryFilterSelect.classList.add('hidden');
+            subcategoryFilterSelect.value = 'all';
+          }
+        } else {
+          subcategoryFilterSelect.classList.add('hidden');
+          subcategoryFilterSelect.value = 'all';
+        }
+        renderFilteredCatalog(true);
+      });
+
+      subcategoryFilterSelect?.addEventListener('change', () => renderFilteredCatalog(true));
+
+      // Category Cards Rendering
+      function renderCategoriesCards() {
+        const container = document.getElementById('categories-cards-grid');
+        if (!container) return;
+
+        if (categoriesList.length === 0) {
+          container.innerHTML = `
+            <div class="col-span-full py-12 text-center text-slate-400 bg-white rounded-xl border border-dashed border-slate-200 p-6 text-xs">
+              Belum ada kategori yang ditambahkan. Klik "+ Tambah Kategori" di atas.
+            </div>
+          `;
+          return;
+        }
+
+        container.innerHTML = categoriesList.map(cat => {
+          const subcats = cat.subcategories || [];
+          return `
+            <div class="bg-white border border-slate-200 rounded-xl p-4 shadow-2xs hover:border-slate-300 transition-all flex flex-col justify-between space-y-3">
+              <div>
+                <div class="flex items-start justify-between gap-2">
+                  <div>
+                    <h3 class="font-bold text-slate-900 text-sm flex items-center gap-1.5">
+                      <span>${cat.name}</span>
+                      <span class="text-[10px] font-medium px-2 py-0.5 rounded-full bg-slate-100 text-slate-600 font-mono">${cat.slug}</span>
+                    </h3>
+                    ${cat.description ? `<p class="text-xs text-slate-500 mt-1 line-clamp-1">${cat.description}</p>` : ''}
+                  </div>
+                  <div class="flex items-center gap-1">
+                    <button 
+                      type="button" 
+                      data-id="${cat.id || cat.slug}" 
+                      data-name="${cat.name}" 
+                      class="delete-category-btn text-[11px] font-medium text-rose-600 hover:text-rose-700 bg-rose-50 hover:bg-rose-100 px-2 py-1 rounded transition-colors cursor-pointer"
+                      title="Hapus Kategori"
+                    >
+                      Hapus
+                    </button>
+                  </div>
+                </div>
+
+                <!-- Subcategories Chips Section -->
+                <div class="mt-3 pt-3 border-t border-slate-100">
+                  <div class="flex items-center justify-between mb-2">
+                    <span class="text-[11px] font-semibold text-slate-700">Subkategori (${subcats.length}):</span>
+                    <button 
+                      type="button" 
+                      data-cat-id="${cat.id || cat.slug}" 
+                      data-cat-name="${cat.name}" 
+                      class="open-add-subcat-btn text-[11px] font-semibold text-primary hover:text-primary-dark cursor-pointer flex items-center gap-1"
+                    >
+                      + Subkategori
+                    </button>
+                  </div>
+
+                  <div class="flex flex-wrap gap-1.5 min-h-[28px]">
+                    ${subcats.length > 0 ? subcats.map(sub => `
+                      <span class="inline-flex items-center gap-1.5 px-2.5 py-1 rounded-md text-[11px] bg-accent-bg text-primary border border-soft-cream font-medium">
+                        <span>${sub.name}</span>
+                        <button 
+                          type="button" 
+                          data-cat-id="${cat.id || cat.slug}" 
+                          data-sub-slug="${sub.slug}" 
+                          data-sub-name="${sub.name}" 
+                          class="delete-subcat-btn text-primary/60 hover:text-rose-600 cursor-pointer font-bold leading-none"
+                          title="Hapus Subkategori"
+                        >
+                          ✕
+                        </button>
+                      </span>
+                    `).join('') : `
+                      <span class="text-[11px] text-slate-400 italic">Belum ada subkategori (klik "+ Subkategori" untuk menambah).</span>
+                    `}
+                  </div>
+                </div>
+              </div>
+            </div>
+          `;
+        }).join('');
+
+        attachCategoryListeners();
+      }
+
+      // Category Action Listeners
+      let pendingDeleteCatId = null;
+      const categoryModal = document.getElementById('category-modal');
+      const openAddCategoryBtn = document.getElementById('open-add-category-btn');
+      const closeCategoryModalBtn = document.getElementById('close-category-modal-btn');
+      const cancelCategoryBtn = document.getElementById('cancel-category-btn');
+      const categoryForm = document.getElementById('category-form');
+      const categoryNameInput = document.getElementById('category-name-input');
+      const categorySlugInput = document.getElementById('category-slug-input');
+      const categoryDescInput = document.getElementById('category-desc-input');
+
+      openAddCategoryBtn?.addEventListener('click', () => {
+        categoryForm.reset();
+        document.getElementById('category-edit-id').value = '';
+        categoryModal.classList.remove('hidden');
+        categoryNameInput.focus();
+      });
+
+      closeCategoryModalBtn?.addEventListener('click', () => categoryModal.classList.add('hidden'));
+      cancelCategoryBtn?.addEventListener('click', () => categoryModal.classList.add('hidden'));
+
+      categoryNameInput?.addEventListener('input', () => {
+        categorySlugInput.value = toSlug(categoryNameInput.value);
+      });
+
+      categoryForm?.addEventListener('submit', async (e) => {
+        e.preventDefault();
+        const name = categoryNameInput.value.trim();
+        let slug = categorySlugInput.value.trim() || toSlug(name);
+        const desc = categoryDescInput.value.trim();
+
+        if (!name) return;
+
+        // Check if slug exists
+        const existingIdx = categoriesList.findIndex(c => c.slug === slug);
+        if (existingIdx !== -1) {
+          slug = `${slug}-${Date.now().toString().slice(-4)}`;
+        }
+
+        const newCat = {
+          id: slug,
+          name,
+          slug,
+          description: desc,
+          subcategories: []
+        };
+
+        categoriesList.push(newCat);
+        await persistCategories();
+        categoryModal.classList.add('hidden');
+        showToast(`Kategori "${name}" berhasil ditambahkan.`);
+      });
+
+      // Subcategory Modal & Handlers
+      const subcategoryModal = document.getElementById('subcategory-modal');
+      const closeSubcatModalBtn = document.getElementById('close-subcat-modal-btn');
+      const cancelSubcatBtn = document.getElementById('cancel-subcat-btn');
+      const subcategoryForm = document.getElementById('subcategory-form');
+      const subcatParentIdInput = document.getElementById('subcat-parent-category-id');
+      const subcatParentLabel = document.getElementById('subcat-parent-label');
+      const subcatNameInput = document.getElementById('subcat-name-input');
+      const subcatSlugInput = document.getElementById('subcat-slug-input');
+
+      closeSubcatModalBtn?.addEventListener('click', () => subcategoryModal.classList.add('hidden'));
+      cancelSubcatBtn?.addEventListener('click', () => subcategoryModal.classList.add('hidden'));
+
+      subcatNameInput?.addEventListener('input', () => {
+        subcatSlugInput.value = toSlug(subcatNameInput.value);
+      });
+
+      subcategoryForm?.addEventListener('submit', async (e) => {
+        e.preventDefault();
+        const parentId = subcatParentIdInput.value;
+        const name = subcatNameInput.value.trim();
+        let slug = subcatSlugInput.value.trim() || toSlug(name);
+
+        if (!name || !parentId) return;
+
+        const parentCat = categoriesList.find(c => (c.id || c.slug) === parentId);
+        if (!parentCat) {
+          showToast('Kategori induk tidak ditemukan.', 'error');
+          return;
+        }
+
+        if (!parentCat.subcategories) parentCat.subcategories = [];
+
+        // Check duplicate
+        if (parentCat.subcategories.some(s => s.slug === slug)) {
+          slug = `${slug}-${Date.now().toString().slice(-4)}`;
+        }
+
+        parentCat.subcategories.push({
+          id: slug,
+          name,
+          slug
+        });
+
+        await persistCategories();
+        subcategoryModal.classList.add('hidden');
+        showToast(`Subkategori "${name}" berhasil ditambahkan ke ${parentCat.name}.`);
+      });
+
+      // Delete Category Modal & Handlers
+      const deleteCatModal = document.getElementById('delete-category-modal');
+      const cancelDeleteCatBtn = document.getElementById('cancel-delete-category-btn');
+      const confirmDeleteCatBtn = document.getElementById('confirm-delete-category-btn');
+      const deleteCatNameLabel = document.getElementById('delete-category-name');
+
+      cancelDeleteCatBtn?.addEventListener('click', () => {
+        deleteCatModal.classList.add('hidden');
+        pendingDeleteCatId = null;
+      });
+
+      confirmDeleteCatBtn?.addEventListener('click', async () => {
+        if (!pendingDeleteCatId) return;
+
+        const cat = categoriesList.find(c => (c.id || c.slug) === pendingDeleteCatId);
+        const name = cat ? cat.name : '';
+
+        categoriesList = categoriesList.filter(c => (c.id || c.slug) !== pendingDeleteCatId);
+        await persistCategories();
+
+        deleteCatModal.classList.add('hidden');
+        pendingDeleteCatId = null;
+        showToast(`Kategori "${name}" berhasil dihapus.`);
+      });
+
+      function attachCategoryListeners() {
+        // Open Add Subcategory Button
+        document.querySelectorAll('.open-add-subcat-btn').forEach(btn => {
+          btn.addEventListener('click', () => {
+            const catId = btn.getAttribute('data-cat-id');
+            const catName = btn.getAttribute('data-cat-name');
+            subcatParentIdInput.value = catId;
+            subcatParentLabel.textContent = catName;
+            subcategoryForm.reset();
+            subcategoryModal.classList.remove('hidden');
+            subcatNameInput.focus();
+          });
+        });
+
+        // Delete Subcategory Button
+        document.querySelectorAll('.delete-subcat-btn').forEach(btn => {
+          btn.addEventListener('click', async (e) => {
+            e.stopPropagation();
+            const catId = btn.getAttribute('data-cat-id');
+            const subSlug = btn.getAttribute('data-sub-slug');
+            const subName = btn.getAttribute('data-sub-name');
+
+            const parentCat = categoriesList.find(c => (c.id || c.slug) === catId);
+            if (!parentCat || !parentCat.subcategories) return;
+
+            parentCat.subcategories = parentCat.subcategories.filter(s => s.slug !== subSlug);
+            await persistCategories();
+            showToast(`Subkategori "${subName}" dihapus.`);
+          });
+        });
+
+        // Delete Category Button
+        document.querySelectorAll('.delete-category-btn').forEach(btn => {
+          btn.addEventListener('click', () => {
+            const id = btn.getAttribute('data-id');
+            const name = btn.getAttribute('data-name');
+            pendingDeleteCatId = id;
+            if (deleteCatNameLabel) deleteCatNameLabel.textContent = `"${name}"`;
+            deleteCatModal.classList.remove('hidden');
+          });
+        });
+      }
+
+      // Initial categories setup
+      updateCategoryDropdowns();
+      renderCategoriesCards();
 
       // Live Price Preview Formatting
       const priceInput = document.getElementById('prod-price');
@@ -691,7 +1291,23 @@ const title = "Admin — Zaloma Florist";
 
           if (error) throw error;
 
-          allProductsList = products || [];
+          // Check for categories configuration record
+          const configRow = (products || []).find(p => p.slug === '_categories_config_');
+          if (configRow && configRow.description) {
+            try {
+              const cloudCats = JSON.parse(configRow.description);
+              if (Array.isArray(cloudCats) && cloudCats.length > 0) {
+                categoriesList = cloudCats;
+                localStorage.setItem('zaloma_admin_categories', JSON.stringify(categoriesList));
+                updateCategoryDropdowns();
+                renderCategoriesCards();
+                updateCategoryBadges();
+              }
+            } catch (e) {}
+          }
+
+          // Filter out internal system rows
+          allProductsList = (products || []).filter(p => !p.slug.startsWith('_'));
           if (tabCountBadge) tabCountBadge.textContent = allProductsList.length;
 
           renderFilteredCatalog();
@@ -729,7 +1345,6 @@ const title = "Admin — Zaloma Florist";
         renderFilteredCatalog(true);
       });
 
-      categorySelect.addEventListener('change', () => renderFilteredCatalog(true));
       sortSelect.addEventListener('change', () => renderFilteredCatalog(true));
 
       // Render Catalog Grid
@@ -744,12 +1359,30 @@ const title = "Admin — Zaloma Florist";
 
         const query = searchInput.value.toLowerCase().trim();
         const cat = categorySelect.value;
+        const subcatSelect = document.getElementById('subcategory-filter-select');
+        const subcat = subcatSelect ? subcatSelect.value : 'all';
         const sort = sortSelect.value;
 
         let filtered = allProductsList.filter(p => {
-          const matchCat = cat === 'all' || p.category_slug === cat;
+          let matchCat = cat === 'all';
+          if (!matchCat) {
+            const parentSlug = p.category_slug ? p.category_slug.split('--')[0] : '';
+            const catObj = categoriesList.find(c => c.slug === cat);
+            const catName = catObj ? catObj.name : '';
+            matchCat = parentSlug === cat || p.category_slug === cat || (catName && p.category_name && p.category_name.startsWith(catName));
+          }
+
+          let matchSub = subcat === 'all';
+          if (!matchSub && matchCat) {
+            const catObj = categoriesList.find(c => c.slug === cat);
+            const subObj = catObj ? (catObj.subcategories || []).find(s => s.slug === subcat) : null;
+            const subName = subObj ? subObj.name : '';
+            matchSub = (p.category_slug && p.category_slug.includes('--' + subcat)) || 
+                       (subName && p.category_name && p.category_name.includes(' • ' + subName));
+          }
+
           const matchQuery = !query || p.name.toLowerCase().includes(query);
-          return matchCat && matchQuery;
+          return matchCat && matchSub && matchQuery;
         });
 
         // Sorting
@@ -809,7 +1442,7 @@ const title = "Admin — Zaloma Florist";
                   <p class="font-bold text-primary text-sm mt-1">${p.price_label}</p>
                 </div>
 
-                <!-- Action Row (No customer CTA WA, no excessive emojis) -->
+                <!-- Action Row -->
                 <div class="pt-2.5 mt-2.5 border-t border-slate-100 flex items-center justify-between gap-1 text-xs">
                   <button 
                     type="button" 
@@ -979,11 +1612,43 @@ const title = "Admin — Zaloma Florist";
             document.getElementById('edit-prod-id').value = p.id;
             document.getElementById('edit-prod-current-image').value = p.image;
             document.getElementById('edit-prod-name').value = p.name;
-            document.getElementById('edit-prod-category').value = p.category_slug;
             document.getElementById('edit-prod-price').value = p.price_from;
             document.getElementById('edit-prod-time').value = p.processing_time || '3 - 5 Jam';
             document.getElementById('edit-prod-desc').value = p.description || '';
             document.getElementById('edit-prod-featured').checked = Boolean(p.featured);
+
+            // Parse category and subcategory
+            const parentCatSlug = p.category_slug ? p.category_slug.split('--')[0] : '';
+            let currentSubcatSlug = p.category_slug && p.category_slug.includes('--') ? p.category_slug.split('--')[1] : '';
+            let currentSubcatName = '';
+            if (p.category_name && p.category_name.includes(' • ')) {
+              currentSubcatName = p.category_name.split(' • ')[1].trim();
+            }
+
+            const catSelect = document.getElementById('edit-prod-category');
+            const subcatWrapper = document.getElementById('edit-prod-subcategory-wrapper');
+            const subcatSelect = document.getElementById('edit-prod-subcategory');
+
+            // Find matching category
+            const cat = categoriesList.find(c => c.slug === parentCatSlug || c.slug === p.category_slug || (p.category_name && p.category_name.startsWith(c.name)));
+            if (cat && catSelect) {
+              catSelect.value = cat.slug;
+              if (cat.subcategories && cat.subcategories.length > 0) {
+                subcatSelect.innerHTML = '<option value="">Pilih Subkategori (Opsional)...</option>' +
+                  cat.subcategories.map(s => `<option value="${s.slug}" data-name="${s.name}">${s.name}</option>`).join('');
+                subcatWrapper.classList.remove('hidden');
+
+                if (currentSubcatSlug) {
+                  subcatSelect.value = currentSubcatSlug;
+                } else if (currentSubcatName) {
+                  const matchingSub = cat.subcategories.find(s => s.name.toLowerCase() === currentSubcatName.toLowerCase());
+                  if (matchingSub) subcatSelect.value = matchingSub.slug;
+                }
+              } else {
+                subcatSelect.innerHTML = '<option value="">Pilih Subkategori...</option>';
+                subcatWrapper.classList.add('hidden');
+              }
+            }
 
             const editThumb = document.getElementById('edit-image-thumbnail');
             if (editThumb) editThumb.src = p.image;
@@ -1057,8 +1722,22 @@ const title = "Admin — Zaloma Florist";
         const id = document.getElementById('edit-prod-id').value;
         const name = document.getElementById('edit-prod-name').value.trim();
         const catSelect = document.getElementById('edit-prod-category');
-        const category_slug = catSelect.value;
-        const category_name = catSelect.options[catSelect.selectedIndex].getAttribute('data-name');
+        const categorySlug = catSelect.value;
+        const catObj = categoriesList.find(c => c.slug === categorySlug);
+        const categoryName = catObj ? catObj.name : (catSelect.options[catSelect.selectedIndex]?.getAttribute('data-name') || categorySlug);
+
+        const subcatSelect = document.getElementById('edit-prod-subcategory');
+        const subcatSlug = subcatSelect ? subcatSelect.value : '';
+        const subcatObj = subcatSlug && catObj ? (catObj.subcategories || []).find(s => s.slug === subcatSlug) : null;
+        const subcatName = subcatObj ? subcatObj.name : '';
+
+        let finalCategoryName = categoryName;
+        let finalCategorySlug = categorySlug;
+        if (subcatName) {
+          finalCategoryName = `${categoryName} • ${subcatName}`;
+          finalCategorySlug = `${categorySlug}--${subcatSlug}`;
+        }
+
         const price_from = Number(document.getElementById('edit-prod-price').value);
         const price_label = new Intl.NumberFormat('id-ID', { style: 'currency', currency: 'IDR', maximumFractionDigits: 0 }).format(price_from);
         const processing_time = document.getElementById('edit-prod-time').value.trim();
@@ -1092,8 +1771,8 @@ const title = "Admin — Zaloma Florist";
             .from('products')
             .update({
               name,
-              category_slug,
-              category_name,
+              category_slug: finalCategorySlug,
+              category_name: finalCategoryName,
               price_from,
               price_label,
               processing_time,
@@ -1133,7 +1812,21 @@ const title = "Admin — Zaloma Florist";
         const name = document.getElementById('prod-name').value.trim();
         const categorySelect = document.getElementById('prod-category');
         const categorySlug = categorySelect.value;
-        const categoryName = categorySelect.options[categorySelect.selectedIndex].getAttribute('data-name');
+        const catObj = categoriesList.find(c => c.slug === categorySlug);
+        const categoryName = catObj ? catObj.name : (categorySelect.options[categorySelect.selectedIndex]?.getAttribute('data-name') || categorySlug);
+
+        const subcatSelect = document.getElementById('prod-subcategory');
+        const subcatSlug = subcatSelect ? subcatSelect.value : '';
+        const subcatObj = subcatSlug && catObj ? (catObj.subcategories || []).find(s => s.slug === subcatSlug) : null;
+        const subcatName = subcatObj ? subcatObj.name : '';
+
+        let finalCategoryName = categoryName;
+        let finalCategorySlug = categorySlug;
+        if (subcatName) {
+          finalCategoryName = `${categoryName} • ${subcatName}`;
+          finalCategorySlug = `${categorySlug}--${subcatSlug}`;
+        }
+
         const priceFrom = Number(document.getElementById('prod-price').value);
         const priceLabel = new Intl.NumberFormat('id-ID', { style: 'currency', currency: 'IDR', maximumFractionDigits: 0 }).format(priceFrom);
         const processingTime = document.getElementById('prod-time').value.trim() || '3 - 5 Jam';
@@ -1161,8 +1854,8 @@ const title = "Admin — Zaloma Florist";
           const { error: insertError } = await supabase.from('products').insert([{
             name,
             slug,
-            category_slug: categorySlug,
-            category_name: categoryName,
+            category_slug: finalCategorySlug,
+            category_name: finalCategoryName,
             price_from: priceFrom,
             price_label: priceLabel,
             image: publicUrlData.publicUrl,
