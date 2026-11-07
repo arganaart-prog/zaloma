@@ -5,10 +5,16 @@ import CategoryProductCard from './CategoryProductCard.astro';
 import { withBase } from '../utils/paths';
 import { getHomeBungaPapanProducts } from '../utils/productHelpers';
 
-const dukaCitaProducts = getHomeBungaPapanProducts(PRODUCTS, 'bunga-papan-duka-cita-malang');
-const weddingProducts = getHomeBungaPapanProducts(PRODUCTS, 'bunga-papan-wedding-malang');
-const congratulationsProducts = getHomeBungaPapanProducts(PRODUCTS, 'bunga-papan-congratulations-malang');
-const semiStyrofoamProducts = getHomeBungaPapanProducts(PRODUCTS, 'bunga-papan-semi-styrofoam-malang');
+interface Props {
+  allProducts?: any[];
+}
+
+const { allProducts = [] } = Astro.props;
+const source = allProducts.length > 0 ? allProducts : PRODUCTS;
+
+const dukaCitaProducts = getHomeBungaPapanProducts(source, 'bunga-papan-duka-cita-malang');
+const weddingProducts = getHomeBungaPapanProducts(source, 'bunga-papan-wedding-malang');
+const congratulationsProducts = getHomeBungaPapanProducts(source, 'bunga-papan-congratulations-malang');
 
 interface Tab {
   id: string;
@@ -87,9 +93,19 @@ const tabs: Tab[] = [
           class:list={['bunga-papan-panel', index !== 0 && 'hidden']}
         >
           <div class="grid grid-cols-2 md:grid-cols-3 lg:grid-cols-4 gap-4 sm:gap-6">
-            {tab.products.map((product, productIndex) => (
-              <CategoryProductCard product={product} aspect="aspect-square" priority={index === 0 && productIndex < 2} />
-            ))}
+            {tab.products.length > 0 ? (
+              tab.products.slice(0, 8).map((product, productIndex) => (
+                <CategoryProductCard product={product} aspect="aspect-square" priority={index === 0 && productIndex < 2} />
+              ))
+            ) : (
+              <div class="col-span-full py-12 text-center text-slate-400 text-xs">
+                <svg class="w-6 h-6 animate-spin mx-auto text-primary mb-2 opacity-80" fill="none" viewBox="0 0 24 24">
+                  <circle class="opacity-25" cx="12" cy="12" r="10" stroke="currentColor" stroke-width="4"></circle>
+                  <path class="opacity-75" fill="currentColor" d="M4 12a8 8 0 018-8v8H4z"></path>
+                </svg>
+                Memuat bunga papan {tab.label}...
+              </div>
+            )}
           </div>
 
           <!-- View all link -->
@@ -112,33 +128,38 @@ const tabs: Tab[] = [
 
 <script>
   function initBungaPapanTabs() {
-    document.querySelectorAll('[data-bunga-papan-tabs]').forEach((tabList) => {
-      const root = tabList.closest('#bunga-papan-ucapan');
-      if (!root) return;
-
-      const tabs = root.querySelectorAll('.bunga-papan-tab') as NodeListOf<HTMLButtonElement>;
-      const panels = root.querySelectorAll('.bunga-papan-panel') as NodeListOf<HTMLElement>;
+    const tabContainers = document.querySelectorAll('[data-bunga-papan-tabs]');
+    tabContainers.forEach((container) => {
+      const tabs = container.querySelectorAll<HTMLButtonElement>('.bunga-papan-tab');
+      const section = container.closest('section');
+      if (!section) return;
+      const panels = section.querySelectorAll<HTMLElement>('.bunga-papan-panel');
 
       tabs.forEach((tab) => {
         tab.addEventListener('click', () => {
           const targetId = tab.dataset.tab;
           if (!targetId) return;
 
+          // Update tabs state
           tabs.forEach((t) => {
-            const isActive = t.dataset.tab === targetId;
-            t.setAttribute('aria-selected', isActive ? 'true' : 'false');
-            t.classList.toggle('bg-primary', isActive);
-            t.classList.toggle('text-white', isActive);
-            t.classList.toggle('border-primary', isActive);
-            t.classList.toggle('shadow-md', isActive);
-            t.classList.toggle('bg-white', !isActive);
-            t.classList.toggle('text-slate-500', !isActive);
-            t.classList.toggle('border-soft-cream/80', !isActive);
+            const isSelected = t === tab;
+            t.setAttribute('aria-selected', isSelected ? 'true' : 'false');
+            if (isSelected) {
+              t.classList.remove('bg-white', 'text-slate-500', 'border-soft-cream/80', 'hover:text-primary', 'hover:border-primary/40');
+              t.classList.add('bg-primary', 'text-white', 'border-primary', 'shadow-md');
+            } else {
+              t.classList.remove('bg-primary', 'text-white', 'border-primary', 'shadow-md');
+              t.classList.add('bg-white', 'text-slate-500', 'border-soft-cream/80', 'hover:text-primary', 'hover:border-primary/40');
+            }
           });
 
+          // Update panels state
           panels.forEach((panel) => {
-            const isActive = panel.dataset.panel === targetId;
-            panel.classList.toggle('hidden', !isActive);
+            if (panel.dataset.panel === targetId) {
+              panel.classList.remove('hidden');
+            } else {
+              panel.classList.add('hidden');
+            }
           });
         });
       });
@@ -148,4 +169,3 @@ const tabs: Tab[] = [
   initBungaPapanTabs();
   document.addEventListener('astro:page-load', initBungaPapanTabs);
 </script>
-

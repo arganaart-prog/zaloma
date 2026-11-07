@@ -1,6 +1,7 @@
 ---
 import Layout from '../layouts/Layout.astro';
 import { WHATSAPP_NUMBER } from '../data/constants';
+import { SUPABASE_URL, SUPABASE_ANON_KEY } from '../data/supabaseConfig';
 import { withBase } from '../utils/paths';
 
 Astro.response.status = 404;
@@ -11,8 +12,22 @@ const whatsappUrl = `https://wa.me/${WHATSAPP_NUMBER}?text=${encodeURIComponent(
 ---
 
 <Layout title={title} description={description} robots="noindex, follow" showTestimonials={false}>
+  <!-- Supabase JS SDK for dynamic product fallback -->
+  <script is:inline src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
 
-  <div class="e404-root">
+  <!-- Container jika URL ternyata adalah produk dinamis baru -->
+  <div id="dynamic-product-view" class="hidden max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-8 min-h-[60vh]">
+    <div id="dynamic-product-spinner" class="py-24 text-center">
+      <svg class="w-10 h-10 animate-spin text-primary mx-auto mb-3" fill="none" viewBox="0 0 24 24">
+        <circle class="opacity-25" cx="12" cy="12" r="10" stroke="currentColor" stroke-width="4"></circle>
+        <path class="opacity-75" fill="currentColor" d="M4 12a8 8 0 018-8v8H4z"></path>
+      </svg>
+      <p class="text-sm font-semibold text-slate-500">Memuat detail produk...</p>
+    </div>
+    <div id="dynamic-product-content" class="hidden"></div>
+  </div>
+
+  <div class="e404-root" id="e404-container">
 
     <!-- Left column: editorial content -->
     <div class="e404-left">
@@ -117,6 +132,127 @@ const whatsappUrl = `https://wa.me/${WHATSAPP_NUMBER}?text=${encodeURIComponent(
     </div>
 
   </div>
+
+  <script define:vars={{ SUPABASE_URL, SUPABASE_ANON_KEY, WHATSAPP_NUMBER }}>
+    async function checkDynamicProductRoute() {
+      const pathname = window.location.pathname;
+      const match = pathname.match(/\/produk\/([^\/]+)/);
+      if (!match || !match[1] || match[1] === 'detail') return;
+
+      const slug = match[1];
+      const e404Container = document.getElementById('e404-container');
+      const dynamicView = document.getElementById('dynamic-product-view');
+      const spinner = document.getElementById('dynamic-product-spinner');
+      const content = document.getElementById('dynamic-product-content');
+
+      if (e404Container) e404Container.classList.add('hidden');
+      if (dynamicView) dynamicView.classList.remove('hidden');
+
+      try {
+        if (!window.supabase) return;
+        const client = window.supabase.createClient(SUPABASE_URL, SUPABASE_ANON_KEY);
+        const { data: p, error } = await client
+          .from('products')
+          .select('*')
+          .eq('slug', slug)
+          .maybeSingle();
+
+        if (error || !p) {
+          if (dynamicView) dynamicView.classList.add('hidden');
+          if (e404Container) e404Container.classList.remove('hidden');
+          return;
+        }
+
+        document.title = `${p.name} - Zaloma Florist Malang`;
+
+        const waText = encodeURIComponent(`Halo Zaloma Florist, saya ingin pesan ${p.name} (${p.price_label}). Mohon info ketersediaan dan format pemesanannya.`);
+        const waUrl = `https://wa.me/${WHATSAPP_NUMBER}?text=${waText}`;
+
+        if (content) {
+          content.innerHTML = `
+            <nav aria-label="Breadcrumb" class="mb-6">
+              <ol class="flex items-center space-x-2 text-xs font-semibold text-slate-500 flex-wrap">
+                <li><a href="/" class="hover:text-primary transition-colors">Beranda</a></li>
+                <li class="text-slate-300">/</li>
+                <li><a href="/katalog/" class="hover:text-primary transition-colors">Katalog</a></li>
+                <li class="text-slate-300">/</li>
+                <li><a href="/kategori/${p.category_slug}/" class="hover:text-primary transition-colors">${p.category_name || 'Kategori'}</a></li>
+                <li class="text-slate-300">/</li>
+                <li class="text-slate-800 font-bold">${p.name}</li>
+              </ol>
+            </nav>
+
+            <div class="bg-white rounded-2xl sm:rounded-3xl border border-soft-cream/80 overflow-hidden shadow-xs">
+              <div class="grid grid-cols-1 lg:grid-cols-12 gap-8 lg:gap-12 p-5 sm:p-8 lg:p-12">
+                <div class="lg:col-span-6 flex flex-col gap-6">
+                  <div class="relative aspect-square rounded-2xl overflow-hidden bg-clean-ivory border border-soft-cream/60">
+                    <img src="${p.image}" alt="${p.name}" class="w-full h-full object-cover object-top" />
+                    ${p.featured ? '<div class="absolute top-4 left-4"><span class="bg-secondary text-primary-dark text-xs uppercase tracking-wider font-bold px-3 py-1.5 rounded-full shadow-sm">Populer &amp; Terlaris</span></div>' : ''}
+                  </div>
+                  <div class="grid grid-cols-3 gap-3 p-4 rounded-xl bg-accent-bg/60 border border-soft-cream/60 text-center">
+                    <div>
+                      <span class="block text-primary font-bold text-xs sm:text-sm">3 - 5 Jam</span>
+                      <span class="text-[11px] text-slate-500">Pengerjaan</span>
+                    </div>
+                    <div class="border-x border-soft-cream/80">
+                      <span class="block text-primary font-bold text-xs sm:text-sm">Difoto</span>
+                      <span class="text-[11px] text-slate-500">Sebelum Kirim</span>
+                    </div>
+                    <div>
+                      <span class="block text-primary font-bold text-xs sm:text-sm">Gratis Ongkir</span>
+                      <span class="text-[11px] text-slate-500">Malang Kota</span>
+                    </div>
+                  </div>
+                </div>
+
+                <div class="lg:col-span-6 flex flex-col justify-between space-y-6">
+                  <div class="space-y-4">
+                    <div class="flex items-center gap-2 flex-wrap">
+                      <a href="/kategori/${p.category_slug}/" class="inline-block text-xs font-semibold text-secondary uppercase tracking-wider bg-accent-bg px-2.5 py-1 rounded-md border border-soft-cream">
+                        ${p.category_name || 'Kategori'}
+                      </a>
+                      <span class="text-xs text-slate-400">&bull;</span>
+                      <span class="text-xs font-medium text-slate-500">Toko Bunga Malang</span>
+                    </div>
+                    <h1 class="font-serif text-2xl sm:text-3xl lg:text-4xl font-bold text-slate-900 leading-tight">
+                      ${p.name}
+                    </h1>
+                    <div class="p-4 sm:p-5 rounded-2xl bg-gradient-to-br from-clean-ivory to-accent-bg border border-soft-cream">
+                      <span class="text-xs font-semibold uppercase tracking-wider text-slate-500 block mb-1">Estimasi Harga</span>
+                      <div class="flex items-baseline gap-3">
+                        <span class="font-sans text-3xl sm:text-4xl font-extrabold text-primary">${p.price_label}</span>
+                        <span class="text-xs text-slate-500 font-medium">(Bisa kustom sesuai budget)</span>
+                      </div>
+                    </div>
+                    <div class="pt-2">
+                      <h2 class="text-sm font-bold text-slate-800 uppercase tracking-wider mb-2">Deskripsi Produk</h2>
+                      <p class="text-slate-600 text-sm sm:text-base leading-relaxed">${p.description || 'Pilihan karangan bunga berkualitas dari Zaloma Florist Malang.'}</p>
+                    </div>
+                  </div>
+
+                  <div class="pt-4 border-t border-soft-cream/80 space-y-3">
+                    <a href="${waUrl}" target="_blank" rel="noopener noreferrer" class="w-full inline-flex items-center justify-center gap-2 px-6 py-4 bg-[#25D366] hover:bg-[#20bd5a] text-white font-bold text-base rounded-xl shadow-md hover:shadow-lg transition-all text-center">
+                      <svg class="w-5 h-5 fill-current" viewBox="0 0 24 24"><path d="M12.031 6.172c-3.181 0-5.767 2.586-5.768 5.766-.001 1.298.38 2.27 1.019 3.287l-.711 2.598 2.669-.699c.969.54 1.838.847 2.791.848 3.18 0 5.767-2.587 5.768-5.766.001-3.18-2.585-5.834-5.768-5.834zm3.377 8.243c-.147.411-.75.76-1.042.812-.292.052-.663.097-2.072-.49-1.409-.587-2.327-2.016-2.398-2.112-.07-.095-.572-.76-.572-1.45 0-.69.362-1.029.49-1.173.129-.144.281-.18.375-.18.094 0 .188.001.27.006.086.005.201-.033.315.241.114.275.39 1.025.424 1.107.034.082.057.178.002.288-.055.11-.082.179-.164.275-.082.096-.173.214-.247.288-.082.083-.168.172-.072.337.096.165.427.705.916 1.141.63.562 1.161.736 1.326.818.165.082.261.069.358-.041.096-.11.413-.48.523-.645.11-.165.22-.138.371-.082.151.055.955.45 1.12.533.165.082.275.124.316.192.041.069.041.399-.106.81zM12.012 2.002C6.488 2.002 2 6.49 2 12.014c0 1.942.553 3.755 1.517 5.289L2 22l4.821-1.488A9.97 9.97 0 0 0 12.012 22C17.535 22 22 17.51 22 12.014c0-5.524-4.465-10.012-9.988-10.012z"/></svg>
+                      Pesan Sekarang via WhatsApp
+                    </a>
+                    <p class="text-center text-xs text-slate-400">Respons cepat 24 jam &bull; Konsultasi gratis</p>
+                  </div>
+                </div>
+              </div>
+            </div>
+          `;
+          if (spinner) spinner.classList.add('hidden');
+          content.classList.remove('hidden');
+        }
+
+      } catch (e) {
+        if (dynamicView) dynamicView.classList.add('hidden');
+        if (e404Container) e404Container.classList.remove('hidden');
+      }
+    }
+
+    checkDynamicProductRoute();
+  </script>
 
 </Layout>
 

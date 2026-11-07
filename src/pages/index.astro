@@ -10,17 +10,50 @@ import StandingFlowerSection from '../components/StandingFlowerSection.astro';
 import PaperFlowerSection from '../components/PaperFlowerSection.astro';
 import BungaMejaSection from '../components/BungaMejaSection.astro';
 import TanbulampotSection from '../components/TanbulampotSection.astro';
-import { PRODUCTS } from '../data/products';
 import { WHATSAPP_NUMBER } from '../data/constants';
 import { SUPABASE_URL, SUPABASE_ANON_KEY } from '../data/supabaseConfig';
 import { withBase } from '../utils/paths';
 import { getRotatingHomeProducts } from '../utils/rotatingProducts';
 import { getHomeDisplayProducts } from '../utils/productHelpers';
 
-const INITIAL_SLUGS = PRODUCTS.map(p => p.slug);
+// Ambil produk live dari Supabase saat build time untuk SEO & instant SSR render
+let homeLiveProducts: any[] = [];
+try {
+  const res = await fetch(`${SUPABASE_URL}/rest/v1/products?select=*&order=created_at.desc`, {
+    headers: {
+      apikey: SUPABASE_ANON_KEY,
+      Authorization: `Bearer ${SUPABASE_ANON_KEY}`
+    }
+  });
+  if (res.ok) {
+    const data = await res.json();
+    if (Array.isArray(data)) {
+      homeLiveProducts = data.map(p => ({
+        id: p.id,
+        slug: p.slug,
+        name: p.name,
+        categorySlug: p.category_slug,
+        categoryName: p.category_name,
+        city: p.city || 'Malang',
+        priceFrom: Number(p.price_from) || 0,
+        priceLabel: p.price_label,
+        image: p.image,
+        imageWidth: 800,
+        imageHeight: 800,
+        description: p.description || '',
+        featured: Boolean(p.featured),
+        whatsappText: `Halo Zaloma Florist, saya ingin pesan ${p.name} (${p.price_label}).`,
+        processingTime: p.processing_time || '3 - 5 Jam',
+        serviceArea: ['Kota Malang', 'Kabupaten Malang', 'Kota Batu']
+      }));
+    }
+  }
+} catch (err) {
+  console.warn('[Zaloma Build] Homepage fetch warning:', err);
+}
 
 // Batasi 8 produk unggulan; rotasi setiap 3 hari
-const { activeProducts } = getRotatingHomeProducts(getHomeDisplayProducts(PRODUCTS), 8);
+const { activeProducts } = getRotatingHomeProducts(getHomeDisplayProducts(homeLiveProducts), 8);
 
 // SEO Meta
 const title = "Toko Bunga Malang Murah & Berkualitas - Florist Cepat";
@@ -158,13 +191,52 @@ const description = "Zaloma Florist menyediakan bunga papan, hand bouquet, stand
 
         <!-- 8 Featured Products (100% Live dari Supabase) -->
         <div id="featured-products-slider" data-featured-products-slider class="featured-products-slider grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-6 lg:gap-8 px-4 sm:px-6 lg:px-8">
-          <div class="col-span-full py-12 text-center text-slate-400 text-xs">
-            <svg class="w-7 h-7 animate-spin mx-auto text-primary mb-2 opacity-80" fill="none" viewBox="0 0 24 24">
-              <circle class="opacity-25" cx="12" cy="12" r="10" stroke="currentColor" stroke-width="4"></circle>
-              <path class="opacity-75" fill="currentColor" d="M4 12a8 8 0 018-8v8H4z"></path>
-            </svg>
-            Memuat produk unggulan...
-          </div>
+          {activeProducts.length > 0 ? (
+            activeProducts.map((p, index) => (
+              <div class="classic-product-card product-card-shell group bg-white rounded-[14px] border border-soft-cream/70 overflow-hidden shadow-[0_1px_4px_rgba(15,23,42,0.03)]">
+                <a href={withBase(`/produk/${p.slug}/`)} class="classic-product-image image-load-shell block relative aspect-[20/22] bg-slate-100 overflow-hidden">
+                  <img
+                    src={p.image}
+                    alt={`Foto ${p.name} Florist Malang`}
+                    loading={index < 2 ? 'eager' : 'lazy'}
+                    class="relative z-0 object-cover object-top w-full h-full transition-transform duration-700 ease-out group-hover:scale-[1.012]"
+                  />
+                  <div class="classic-product-badges absolute top-3 left-3 z-10 flex gap-2">
+                    <span class="bg-secondary text-primary-dark text-[10px] tracking-wider uppercase font-semibold px-2.5 py-1 rounded-xs shadow-xs">
+                      Terpopuler
+                    </span>
+                  </div>
+                </a>
+                <div class="classic-product-info p-4.5 sm:p-5 flex flex-col justify-between min-h-[190px] sm:min-h-[200px]">
+                  <div>
+                    <p class="classic-product-category text-[11px] font-semibold tracking-wider text-slate-500 uppercase mb-1">{p.categoryName}</p>
+                    <h3 class="classic-product-title font-serif font-bold text-slate-800 line-clamp-2 leading-snug group-hover:text-primary transition-colors duration-200 text-base sm:text-lg">
+                      <a href={withBase(`/produk/${p.slug}/`)}>{p.name}</a>
+                    </h3>
+                  </div>
+                  <div class="classic-product-price-wrap pt-3.5 sm:pt-4">
+                    <div class="classic-product-price-box rounded-md border border-soft-cream/70 bg-accent-bg/70 p-2.5 sm:p-3">
+                      <p class="classic-product-price-label text-[10px] font-bold uppercase tracking-[0.18em] text-secondary-dark">Harga</p>
+                      <div class="classic-product-price-row mt-1.5 flex items-center justify-between gap-2.5 sm:gap-3">
+                        <p class="classic-product-price font-sans text-lg sm:text-xl font-extrabold leading-none text-primary">{p.priceLabel}</p>
+                        <a href={withBase(`/produk/${p.slug}/`)} class="classic-product-detail inline-flex shrink-0 items-center justify-center rounded-full bg-primary px-3.5 py-2 text-[11px] font-bold text-white shadow-xs transition-colors duration-200 group-hover:bg-primary-dark">
+                          Detail
+                        </a>
+                      </div>
+                    </div>
+                  </div>
+                </div>
+              </div>
+            ))
+          ) : (
+            <div class="col-span-full py-12 text-center text-slate-400 text-xs">
+              <svg class="w-7 h-7 animate-spin mx-auto text-primary mb-2 opacity-80" fill="none" viewBox="0 0 24 24">
+                <circle class="opacity-25" cx="12" cy="12" r="10" stroke="currentColor" stroke-width="4"></circle>
+                <path class="opacity-75" fill="currentColor" d="M4 12a8 8 0 018-8v8H4z"></path>
+              </svg>
+              Memuat produk unggulan...
+            </div>
+          )}
         </div>
       </div>
 
@@ -674,6 +746,7 @@ const description = "Zaloma Florist menyediakan bunga papan, hand bouquet, stand
       });
     }
 
+    (window as any).initFeaturedProductsSlider = initFeaturedProductsSlider;
     initFeaturedProductsSlider();
     document.addEventListener('astro:page-load', initFeaturedProductsSlider);
 
@@ -758,22 +831,22 @@ const description = "Zaloma Florist menyediakan bunga papan, hand bouquet, stand
     document.addEventListener('astro:page-load', scheduleDailyCategoryRotation);
   </script>
   <!-- Hand Bouquet Section -->
-  <HandBouquetSection />
+  <HandBouquetSection allProducts={homeLiveProducts} />
 
   <!-- Bunga Papan Section -->
-  <BungaPapanSection />
+  <BungaPapanSection allProducts={homeLiveProducts} />
 
   <!-- Standing Flower Section -->
-  <StandingFlowerSection />
+  <StandingFlowerSection allProducts={homeLiveProducts} />
 
   <!-- Paper Flower Section -->
-  <PaperFlowerSection />
+  <PaperFlowerSection allProducts={homeLiveProducts} />
 
   <!-- Bunga Meja Section -->
-  <BungaMejaSection />
+  <BungaMejaSection allProducts={homeLiveProducts} />
 
   <!-- Tanbulampot Section -->
-  <TanbulampotSection />
+  <TanbulampotSection allProducts={homeLiveProducts} />
 
   <!-- Service Area Section (Jawa Timur & Malang Raya) -->
   <section class="py-20 bg-primary text-white relative overflow-hidden" id="area-pengiriman">
@@ -964,7 +1037,7 @@ const description = "Zaloma Florist menyediakan bunga papan, hand bouquet, stand
 
 </Layout>
 
-<script define:vars={{ SUPABASE_URL, SUPABASE_ANON_KEY, WHATSAPP_NUMBER, INITIAL_SLUGS }}>
+<script define:vars={{ SUPABASE_URL, SUPABASE_ANON_KEY }}>
   async function syncHomeProducts() {
     try {
       if (!window.supabase) return;
@@ -977,7 +1050,6 @@ const description = "Zaloma Florist menyediakan bunga papan, hand bouquet, stand
       if (error || !allProducts || allProducts.length === 0) return;
 
       const cloudSlugMap = new Map(allProducts.map(p => [p.slug, p]));
-      const initialSlugs = new Set(INITIAL_SLUGS || []);
 
       // 1. Sinkronisasi seluruh kartu produk di beranda (hapus yang dihapus, update harga & nama yang diedit)
       document.querySelectorAll('a[href*="/produk/"]').forEach(link => {
@@ -1017,13 +1089,11 @@ const description = "Zaloma Florist menyediakan bunga papan, hand bouquet, stand
       // 2. Sinkronisasi Featured Products Slider di beranda
       const featuredSlider = document.getElementById('featured-products-slider');
       const featuredCloud = allProducts.filter(p => p.featured);
-      if (featuredSlider && featuredCloud.length > 0) {
-        featuredSlider.innerHTML = featuredCloud.slice(0, 8).map((p, index) => {
-          const isStatic = initialSlugs.has(p.slug);
-          const prodUrl = isStatic 
-            ? `/produk/${p.slug}/` 
-            : `https://wa.me/${WHATSAPP_NUMBER}?text=${encodeURIComponent(`Halo Zaloma Florist, saya ingin pesan ${p.name} (${p.price_label}).`)}`;
-          const detailLabel = isStatic ? 'Detail' : 'Pesan WA';
+      const displayFeatured = featuredCloud.length > 0 ? featuredCloud : allProducts;
+      if (featuredSlider && displayFeatured.length > 0) {
+        featuredSlider.innerHTML = displayFeatured.slice(0, 8).map((p, index) => {
+          const prodUrl = `/produk/${p.slug}/`;
+          const detailLabel = 'Detail';
           return `
             <div class="classic-product-card product-card-shell group bg-white rounded-[14px] border border-soft-cream/70 overflow-hidden shadow-[0_1px_4px_rgba(15,23,42,0.03)]">
               <a href="${prodUrl}" class="classic-product-image image-load-shell block relative aspect-[20/22] bg-slate-100 overflow-hidden">
@@ -1061,6 +1131,11 @@ const description = "Zaloma Florist menyediakan bunga papan, hand bouquet, stand
             </div>
           `;
         }).join('');
+
+        delete featuredSlider.dataset.featuredSliderReady;
+        if (typeof window.initFeaturedProductsSlider === 'function') {
+          window.initFeaturedProductsSlider();
+        }
       }
 
       // Helper untuk kartu produk kategori di beranda

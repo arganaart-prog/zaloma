@@ -2,7 +2,7 @@
 import Layout from '../layouts/Layout.astro';
 import ProductCard from '../components/ProductCard.astro';
 import Breadcrumb from '../components/Breadcrumb.astro';
-import { CATEGORIES, PRODUCTS } from '../data/products';
+import { CATEGORIES } from '../data/products';
 import { getProductDisplayName } from '../utils/productHelpers';
 import { SUPABASE_URL, SUPABASE_ANON_KEY } from '../data/supabaseConfig';
 import { WHATSAPP_NUMBER } from '../data/constants';
@@ -11,7 +11,41 @@ import { WHATSAPP_NUMBER } from '../data/constants';
 const title = "Katalog Karangan Bunga Zaloma Florist — Toko Bunga Malang";
 const description = "Bunga papan, hand bouquet, standing flower, dan tanaman ucapan di Malang. Pengerjaan 3 jam, difoto sebelum dikirim. Pilih model dan pesan via WhatsApp.";
 
-const INITIAL_SLUGS = PRODUCTS.map(p => p.slug);
+// Ambil produk live dari Supabase saat build time untuk SEO & instant render
+let initialProducts: any[] = [];
+try {
+  const res = await fetch(`${SUPABASE_URL}/rest/v1/products?select=*&order=created_at.desc`, {
+    headers: {
+      apikey: SUPABASE_ANON_KEY,
+      Authorization: `Bearer ${SUPABASE_ANON_KEY}`
+    }
+  });
+  if (res.ok) {
+    const data = await res.json();
+    if (Array.isArray(data)) {
+      initialProducts = data.map(p => ({
+        id: p.id,
+        slug: p.slug,
+        name: p.name,
+        categorySlug: p.category_slug,
+        categoryName: p.category_name,
+        city: p.city || 'Malang',
+        priceFrom: Number(p.price_from) || 0,
+        priceLabel: p.price_label,
+        image: p.image,
+        imageWidth: 800,
+        imageHeight: 800,
+        description: p.description || '',
+        featured: Boolean(p.featured),
+        whatsappText: `Halo Zaloma Florist, saya ingin pesan ${p.name} (${p.price_label}).`,
+        processingTime: p.processing_time || '3 - 5 Jam',
+        serviceArea: ['Kota Malang', 'Kabupaten Malang', 'Kota Batu']
+      }));
+    }
+  }
+} catch (err) {
+  console.warn('[Zaloma Build] Katalog fetch warning:', err);
+}
 ---
 
 <Layout title={title} description={description}>
@@ -53,13 +87,26 @@ const INITIAL_SLUGS = PRODUCTS.map(p => p.slug);
 
     <!-- Products Grid (100% Live dari Supabase) -->
     <div class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-8" id="products-grid">
-      <div class="col-span-full py-24 text-center" id="catalog-loading">
-        <svg class="w-10 h-10 animate-spin text-primary mx-auto mb-3" fill="none" viewBox="0 0 24 24">
-          <circle class="opacity-25" cx="12" cy="12" r="10" stroke="currentColor" stroke-width="4"></circle>
-          <path class="opacity-75" fill="currentColor" d="M4 12a8 8 0 018-8v8H4z"></path>
-        </svg>
-        <p class="text-sm font-semibold text-slate-500">Memuat seluruh katalog produk...</p>
-      </div>
+      {initialProducts.length > 0 ? (
+        initialProducts.map((p, index) => (
+          <div 
+            class="product-item-wrapper" 
+            data-category={p.categorySlug} 
+            data-name={p.name.toLowerCase()} 
+            data-description={p.description.toLowerCase()}
+          >
+            <ProductCard product={p} priority={index < 3} />
+          </div>
+        ))
+      ) : (
+        <div class="col-span-full py-24 text-center" id="catalog-loading">
+          <svg class="w-10 h-10 animate-spin text-primary mx-auto mb-3" fill="none" viewBox="0 0 24 24">
+            <circle class="opacity-25" cx="12" cy="12" r="10" stroke="currentColor" stroke-width="4"></circle>
+            <path class="opacity-75" fill="currentColor" d="M4 12a8 8 0 018-8v8H4z"></path>
+          </svg>
+          <p class="text-sm font-semibold text-slate-500">Memuat seluruh katalog produk...</p>
+        </div>
+      )}
     </div>
 
     <!-- Pagination Container -->
@@ -84,11 +131,10 @@ const INITIAL_SLUGS = PRODUCTS.map(p => p.slug);
   </div>
 </Layout>
 
-<script define:vars={{ SUPABASE_URL, SUPABASE_ANON_KEY, WHATSAPP_NUMBER, INITIAL_SLUGS }}>
+<script define:vars={{ SUPABASE_URL, SUPABASE_ANON_KEY }}>
   // Filter & Search Logic
   const buttons = document.querySelectorAll('.filter-btn');
   const emptyState = document.getElementById('empty-state');
-  const initialSlugs = new Set(INITIAL_SLUGS || []);
 
   // Read URL query parameters
   const urlParams = new URLSearchParams(window.location.search);
@@ -289,7 +335,6 @@ const INITIAL_SLUGS = PRODUCTS.map(p => p.slug);
   // Category filter buttons click handlers
   buttons.forEach(button => {
     button.addEventListener('click', () => {
-      // 1. Update button styling
       buttons.forEach(btn => {
         btn.classList.remove('bg-primary', 'text-white', 'border-primary');
         btn.classList.add('bg-white', 'text-slate-600', 'border-soft-cream');
@@ -297,10 +342,7 @@ const INITIAL_SLUGS = PRODUCTS.map(p => p.slug);
       button.classList.remove('bg-white', 'text-slate-600', 'border-soft-cream');
       button.classList.add('bg-primary', 'text-white', 'border-primary');
 
-      // 2. Set new category filter
       currentCategory = button.getAttribute('data-filter') || 'all';
-
-      // 3. Apply changes and reset to page 1
       applyFilters(true);
     });
   });
@@ -321,31 +363,22 @@ const INITIAL_SLUGS = PRODUCTS.map(p => p.slug);
 
       if (error) {
         console.error('[Zaloma Supabase Error]:', error.message || error);
-        console.warn('[Zaloma Info] Pastikan RLS (Row Level Security) tabel "products" di Supabase mengizinkan SELECT untuk publik (anon).');
         return;
       }
 
-      // Jika di Supabase belum ada data (0 produk), tetap tampilkan katalog default bawaan
       if (!cloudProducts || cloudProducts.length === 0) {
-        console.info('[Zaloma] Tabel Supabase masih kosong. Menampilkan katalog lokal bawaan.');
         return;
       }
 
       const grid = document.getElementById('products-grid');
       if (!grid) return;
 
-      // Bersihkan kartu bawaan dan jadikan data Supabase sebagai Single Source of Truth
-      // Setiap produk yang dihapus di Supabase otomatis HILANG dari website,
-      // produk baru seketika MUNCUL, dan editan harga/nama langsung TERUPDATE.
+      // Bersihkan kartu dan render 100% data Supabase secara dinamis
       grid.innerHTML = '';
 
       cloudProducts.forEach((p, index) => {
-        const isStatic = initialSlugs.has(p.slug);
-        const productUrl = isStatic 
-          ? `/produk/${p.slug}/` 
-          : `https://wa.me/${WHATSAPP_NUMBER}?text=${encodeURIComponent(`Halo Zaloma Florist, saya ingin pesan ${p.name} (${p.price_label}).`)}`;
-        const buttonLabel = isStatic ? 'Detail' : 'Pesan WA';
-        const targetAttr = isStatic ? '' : 'target="_blank" rel="noopener noreferrer"';
+        const productUrl = `/produk/${p.slug}/`;
+        const buttonLabel = 'Detail';
 
         const wrapper = document.createElement('div');
         wrapper.className = 'product-item-wrapper';
@@ -355,7 +388,7 @@ const INITIAL_SLUGS = PRODUCTS.map(p => p.slug);
 
         wrapper.innerHTML = `
           <article class="product-card-shell group relative h-full overflow-hidden rounded-[14px] border border-soft-cream/70 bg-white shadow-[0_1px_4px_rgba(15,23,42,0.03)] hover-gold-grow">
-            <a href="${productUrl}" ${targetAttr} class="flex h-full flex-col no-underline">
+            <a href="${productUrl}" class="flex h-full flex-col no-underline">
               <div class="image-load-shell relative -mx-px -mt-px aspect-[20/19] overflow-hidden bg-clean-ivory">
                 <img
                   src="${p.image}"
@@ -399,19 +432,24 @@ const INITIAL_SLUGS = PRODUCTS.map(p => p.slug);
             </a>
           </article>
         `;
-
         grid.appendChild(wrapper);
       });
 
-      // Terapkan ulang filter & paginasi untuk produk live
-      applyFilters(true);
-
+      applyFilters(false);
     } catch (err) {
-      console.warn('Gagal memuat produk cloud:', err);
+      console.warn('Gagal memuat produk katalog live:', err);
     }
   }
 
   loadCloudProducts();
 </script>
 
-
+<style>
+  .hover-gold-grow {
+    transition: transform 0.25s ease, box-shadow 0.25s ease;
+  }
+  .hover-gold-grow:hover {
+    transform: translateY(-3px);
+    box-shadow: 0 10px 25px -5px rgba(85, 101, 75, 0.12), 0 8px 10px -6px rgba(85, 101, 75, 0.08);
+  }
+</style>

@@ -4,9 +4,16 @@ import HomeOrderProductCard from './HomeOrderProductCard.astro';
 import { withBase } from '../utils/paths';
 import { getDailyShuffledProducts } from '../utils/rotatingProducts';
 
+interface Props {
+  allProducts?: any[];
+}
+
+const { allProducts = [] } = Astro.props;
+const source = allProducts.length > 0 ? allProducts : PRODUCTS;
+
 const categorySlug = 'standing-flower-malang';
 const standingFlowerProducts = getDailyShuffledProducts(
-  PRODUCTS.filter((p) => p.categorySlug === categorySlug),
+  source.filter((p) => p.categorySlug === categorySlug),
   categorySlug
 );
 
@@ -26,11 +33,21 @@ const categoryHref = '/kategori/standing-flower-malang/';
       class="daily-rotate-grid grid grid-cols-2 md:grid-cols-3 lg:grid-cols-4 gap-4 sm:gap-6 max-w-4xl mx-auto lg:max-w-none"
       data-daily-rotate-category={categorySlug}
     >
-      {standingFlowerProducts.map((product, index) => (
-        <div class="daily-product-item h-full" data-product-slug={product.slug}>
-          <HomeOrderProductCard product={product} arch priority={index < 2} />
+      {standingFlowerProducts.length > 0 ? (
+        standingFlowerProducts.slice(0, 8).map((product, index) => (
+          <div class="daily-product-item h-full" data-product-slug={product.slug}>
+            <HomeOrderProductCard product={product} arch priority={index < 2} />
+          </div>
+        ))
+      ) : (
+        <div class="col-span-full py-12 text-center text-slate-400 text-xs">
+          <svg class="w-6 h-6 animate-spin mx-auto text-primary mb-2 opacity-80" fill="none" viewBox="0 0 24 24">
+            <circle class="opacity-25" cx="12" cy="12" r="10" stroke="currentColor" stroke-width="4"></circle>
+            <path class="opacity-75" fill="currentColor" d="M4 12a8 8 0 018-8v8H4z"></path>
+          </svg>
+          Memuat standing flower...
         </div>
-      ))}
+      )}
     </div>
 
     <div class="text-center mt-10">
@@ -46,5 +63,3 @@ const categoryHref = '/kategori/standing-flower-malang/';
     </div>
   </div>
 </section>
-
-

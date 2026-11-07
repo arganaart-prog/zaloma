@@ -3,7 +3,13 @@ import { PRODUCTS } from '../data/products';
 import ProductCard from './ProductCard.astro';
 import { withBase } from '../utils/paths';
 
-const handBouquetProducts = PRODUCTS.filter(
+interface Props {
+  allProducts?: any[];
+}
+
+const { allProducts = [] } = Astro.props;
+const source = allProducts.length > 0 ? allProducts : PRODUCTS;
+const handBouquetProducts = source.filter(
   (p) => p.categorySlug === 'hand-bouquet-malang'
 );
 
@@ -21,9 +27,19 @@ const categoryHref = '/kategori/hand-bouquet-malang/';
     </div>
 
     <div class="grid grid-cols-2 sm:grid-cols-3 lg:grid-cols-4 gap-4 sm:gap-6">
-      {handBouquetProducts.map((product, index) => (
-        <ProductCard product={product} variant="compact" priority={index < 2} />
-      ))}
+      {handBouquetProducts.length > 0 ? (
+        handBouquetProducts.slice(0, 8).map((product, index) => (
+          <ProductCard product={product} variant="compact" priority={index < 2} />
+        ))
+      ) : (
+        <div class="col-span-full py-12 text-center text-slate-400 text-xs">
+          <svg class="w-6 h-6 animate-spin mx-auto text-primary mb-2 opacity-80" fill="none" viewBox="0 0 24 24">
+            <circle class="opacity-25" cx="12" cy="12" r="10" stroke="currentColor" stroke-width="4"></circle>
+            <path class="opacity-75" fill="currentColor" d="M4 12a8 8 0 018-8v8H4z"></path>
+          </svg>
+          Memuat pilihan buket bunga...
+        </div>
+      )}
     </div>
 
     <div class="text-center mt-10">
@@ -39,4 +55,3 @@ const categoryHref = '/kategori/hand-bouquet-malang/';
     </div>
   </div>
 </section>
-
