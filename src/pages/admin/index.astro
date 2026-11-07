@@ -1,48 +1,36 @@
 ---
 import Layout from '../../layouts/Layout.astro';
-import { CATEGORIES, PRODUCTS } from '../../data/products';
+import { CATEGORIES } from '../../data/products';
 import { SUPABASE_URL, SUPABASE_ANON_KEY, SUPABASE_BUCKET } from '../../data/supabaseConfig';
 import { WHATSAPP_NUMBER } from '../../data/constants';
 
 const title = "Pusat Kontrol & Dashboard Produk — Zaloma Florist";
 const description = "Dashboard kelola seluruh katalog produk Zaloma Florist Malang.";
-
-// Minimal default products payload for migration
-const INITIAL_PRODUCTS = PRODUCTS.map(p => ({
-  name: p.name,
-  slug: p.slug,
-  category_slug: p.categorySlug,
-  category_name: p.categoryName,
-  price_from: p.priceFrom,
-  price_label: p.priceLabel,
-  image: p.image.startsWith('http') ? p.image : `https://zalomaflorist.com${p.image}`,
-  description: p.description || '',
-  featured: p.featured || false,
-  processing_time: p.processingTime || '3 - 5 Jam',
-  city: p.city || 'Malang'
-}));
 ---
 
 <Layout title={title} description={description} robots="noindex, nofollow" showTestimonials={false}>
   <!-- Supabase JS SDK via CDN -->
   <script is:inline src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
 
-  <div class="min-h-screen bg-slate-50/70 py-6 px-3 sm:px-6 lg:px-8 font-sans">
+  <!-- Toast Notification Container -->
+  <div id="toast-container" class="fixed top-5 right-5 z-50 flex flex-col gap-2 pointer-events-none" aria-live="polite"></div>
+
+  <div class="min-h-screen bg-slate-50/70 py-6 px-3 sm:px-6 lg:px-8 font-sans admin-wrapper">
     <div class="max-w-6xl mx-auto">
 
       <!-- ================= LOGIN SCREEN ================= -->
-      <div id="login-gate" class="bg-white rounded-2xl shadow-xl border border-soft-cream p-6 sm:p-10 max-w-md mx-auto text-center my-12">
+      <div id="login-gate" class="bg-white rounded-3xl shadow-xl border border-soft-cream/80 p-6 sm:p-10 max-w-md mx-auto text-center my-12 animate-fade-in">
         <div class="w-16 h-16 rounded-2xl bg-accent-bg text-primary flex items-center justify-center mx-auto mb-4 border border-soft-cream shadow-xs">
           <svg class="w-8 h-8" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2">
             <path stroke-linecap="round" stroke-linejoin="round" d="M12 15v2m-6 4h12a2 2 0 002-2v-6a2 2 0 00-2-2H6a2 2 0 00-2 2v6a2 2 0 002 2zm10-10V7a4 4 0 00-8 0v4h8z" />
           </svg>
         </div>
         <h1 class="font-serif text-2xl font-bold text-slate-800">Admin Zaloma Florist</h1>
-        <p class="text-xs sm:text-sm text-slate-500 mt-1 mb-6">Pusat kontrol dan manajemen seluruh produk toko bunga.</p>
+        <p class="text-xs sm:text-sm text-slate-500 mt-1 mb-6">Pusat kontrol dan manajemen katalog toko bunga.</p>
 
         <form id="login-form" class="space-y-4 text-left">
           <div>
-            <label for="admin-email-input" class="block text-xs font-bold uppercase tracking-wider text-slate-700 mb-1">Email Admin</label>
+            <label for="admin-email-input" class="block text-xs font-bold uppercase tracking-wider text-slate-700 mb-1.5">Email Admin</label>
             <input 
               type="email" 
               id="admin-email-input" 
@@ -53,7 +41,7 @@ const INITIAL_PRODUCTS = PRODUCTS.map(p => ({
             />
           </div>
           <div>
-            <label for="admin-password-input" class="block text-xs font-bold uppercase tracking-wider text-slate-700 mb-1">Password</label>
+            <label for="admin-password-input" class="block text-xs font-bold uppercase tracking-wider text-slate-700 mb-1.5">Password</label>
             <input 
               type="password" 
               id="admin-password-input" 
@@ -62,12 +50,12 @@ const INITIAL_PRODUCTS = PRODUCTS.map(p => ({
               required
               autocomplete="current-password"
             />
-            <p id="login-error" class="text-xs text-rose-600 mt-2 font-semibold hidden"></p>
+            <p id="login-error" class="text-xs text-rose-600 mt-2 font-semibold hidden animate-fade-in"></p>
           </div>
           <button 
             type="submit" 
             id="login-btn"
-            class="w-full bg-primary hover:bg-primary-dark text-white font-bold py-3.5 px-6 rounded-xl shadow-md hover:shadow-lg transition-all duration-200 cursor-pointer text-sm flex items-center justify-center gap-2"
+            class="w-full bg-primary hover:bg-primary-dark text-white font-bold py-3.5 px-6 rounded-xl shadow-md hover:shadow-lg transition-all duration-200 cursor-pointer text-sm flex items-center justify-center gap-2 active:scale-[0.98]"
           >
             <span id="login-btn-text">Masuk ke Dashboard</span>
             <svg id="login-spinner" class="w-4 h-4 animate-spin hidden" fill="none" viewBox="0 0 24 24">
@@ -78,43 +66,49 @@ const INITIAL_PRODUCTS = PRODUCTS.map(p => ({
         </form>
         <p class="text-[11px] text-slate-400 mt-6 flex items-center justify-center gap-1.5">
           <svg class="w-3.5 h-3.5 text-emerald-600 shrink-0" fill="currentColor" viewBox="0 0 20 20"><path fill-rule="evenodd" d="M2.166 4.999A11.954 11.954 0 0010 1.944 11.954 11.954 0 0017.834 5c.11.65.166 1.32.166 2.001 0 5.225-3.34 9.67-8 11.317C5.34 16.67 2 12.225 2 7c0-.682.057-1.35.166-2.001zm11.541 3.708a1 1 0 00-1.414-1.414L9 10.586 7.707 9.293a1 1 0 00-1.414 1.414l2 2a1 1 0 001.414 0l4-4z" clip-rule="evenodd" /></svg>
-          Diproteksi Supabase Enterprise Authentication
+          Tersambung ke Supabase Cloud Database
         </p>
       </div>
 
       <!-- ================= MAIN DASHBOARD ================= -->
-      <div id="admin-dashboard" class="hidden space-y-6">
+      <div id="admin-dashboard" class="hidden space-y-6 animate-fade-in">
 
         <!-- Top Navigation Bar -->
-        <header class="bg-white rounded-2xl p-4 sm:p-6 border border-soft-cream/80 shadow-xs flex flex-col md:flex-row justify-between items-start md:items-center gap-4">
+        <header class="bg-white rounded-2xl p-4 sm:p-5 border border-soft-cream/80 shadow-xs flex flex-col md:flex-row justify-between items-start md:items-center gap-4 transition-all hover:border-soft-cream">
           <div class="flex items-center gap-3">
-            <div class="w-10 h-10 rounded-xl bg-primary text-white flex items-center justify-center font-serif font-bold text-lg shadow-xs">
+            <div class="w-11 h-11 rounded-2xl bg-gradient-to-br from-primary to-primary-dark text-white flex items-center justify-center font-serif font-bold text-xl shadow-sm relative">
               Z
+              <span class="absolute -bottom-0.5 -right-0.5 flex h-3 w-3">
+                <span class="animate-ping absolute inline-flex h-full w-full rounded-full bg-emerald-400 opacity-75"></span>
+                <span class="relative inline-flex rounded-full h-3 w-3 bg-emerald-500 border-2 border-white"></span>
+              </span>
             </div>
             <div>
               <div class="flex items-center gap-2">
                 <h1 class="font-serif text-xl sm:text-2xl font-bold text-slate-800">Dashboard Toko Bunga</h1>
                 <span class="inline-flex items-center gap-1 text-[10px] font-bold uppercase tracking-wider text-emerald-700 bg-emerald-50 px-2 py-0.5 rounded-full border border-emerald-200">
-                  <span class="w-1.5 h-1.5 rounded-full bg-emerald-500 animate-pulse"></span> Cloud Aktif
+                  Online
                 </span>
               </div>
-              <p class="text-xs text-slate-500">Kelola harga, foto, kategori, dan stok semua produk Zaloma Florist.</p>
+              <p class="text-xs text-slate-500">Kelola katalog, harga, dan foto produk Zaloma Florist.</p>
             </div>
           </div>
 
-          <div class="flex items-center gap-2 w-full md:w-auto">
-            <span id="user-email-display" class="text-xs font-semibold text-slate-600 bg-slate-100 px-3 py-2 rounded-xl hidden sm:inline-block"></span>
+          <div class="flex items-center gap-2 w-full md:w-auto justify-between md:justify-end">
+            <span id="user-email-display" class="text-xs font-semibold text-slate-600 bg-slate-100 px-3 py-2 rounded-xl hidden sm:inline-block max-w-[200px] truncate"></span>
+            
             <a 
               href="/katalog/" 
               target="_blank" 
-              class="flex-1 md:flex-initial inline-flex items-center justify-center gap-1.5 px-3.5 py-2 text-xs font-semibold rounded-xl border border-slate-200 text-slate-700 hover:bg-slate-50 transition-colors"
+              class="inline-flex items-center justify-center gap-1.5 px-3.5 py-2 text-xs font-semibold rounded-xl border border-slate-200 text-slate-700 hover:border-primary hover:text-primary hover:bg-slate-50 transition-all duration-200 active:scale-95 shadow-2xs"
             >
-              Lihat Website ↗
+              Lihat Web ↗
             </a>
+
             <button 
               id="logout-btn" 
               type="button" 
-              class="px-3.5 py-2 text-xs font-semibold rounded-xl bg-slate-100 text-slate-600 hover:bg-rose-50 hover:text-rose-600 transition-colors cursor-pointer"
+              class="px-3.5 py-2 text-xs font-semibold rounded-xl bg-slate-100 text-slate-600 hover:bg-rose-50 hover:text-rose-600 transition-all duration-200 cursor-pointer active:scale-95"
             >
               Keluar
             </button>
@@ -122,75 +116,59 @@ const INITIAL_PRODUCTS = PRODUCTS.map(p => ({
         </header>
 
         <!-- Stats Overview Cards -->
-        <div class="grid grid-cols-2 sm:grid-cols-4 gap-3 sm:gap-4">
-          <div class="bg-white p-4 rounded-xl border border-slate-200/80 shadow-2xs">
-            <span class="text-[11px] font-bold text-slate-400 uppercase tracking-wider block">Total Produk</span>
-            <p id="stat-total" class="font-serif text-2xl font-bold text-slate-800 mt-1">0</p>
-          </div>
-          <div class="bg-white p-4 rounded-xl border border-slate-200/80 shadow-2xs">
-            <span class="text-[11px] font-bold text-slate-400 uppercase tracking-wider block">Produk Populer</span>
-            <p id="stat-featured" class="font-serif text-2xl font-bold text-primary mt-1">0</p>
-          </div>
-          <div class="bg-white p-4 rounded-xl border border-slate-200/80 shadow-2xs">
-            <span class="text-[11px] font-bold text-slate-400 uppercase tracking-wider block">Kategori Aktif</span>
-            <p id="stat-categories" class="font-serif text-2xl font-bold text-secondary-dark mt-1">{CATEGORIES.length}</p>
-          </div>
-          <div class="bg-white p-4 rounded-xl border border-slate-200/80 shadow-2xs">
-            <span class="text-[11px] font-bold text-slate-400 uppercase tracking-wider block">Penyimpanan Cloud</span>
-            <p class="font-serif text-sm font-bold text-emerald-600 mt-2.5 flex items-center gap-1">
-              <svg class="w-4 h-4" fill="currentColor" viewBox="0 0 20 20"><path fill-rule="evenodd" d="M10 18a8 8 0 100-16 8 8 0 000 16zm3.707-9.293a1 1 0 00-1.414-1.414L9 10.586 7.707 9.293a1 1 0 00-1.414 1.414l2 2a1 1 0 001.414 0l4-4z" clip-rule="evenodd" /></svg>
-              Tersambung
-            </p>
-          </div>
-        </div>
-
-        <!-- Migration Banner (Appears if Supabase has 0 products) -->
-        <div id="migration-banner" class="hidden bg-gradient-to-r from-amber-50 to-orange-50 border border-amber-200 rounded-2xl p-5 shadow-xs">
-          <div class="flex flex-col sm:flex-row items-start sm:items-center justify-between gap-4">
-            <div class="flex items-start gap-3">
-              <span class="text-2xl">💡</span>
-              <div>
-                <h3 class="font-bold text-slate-800 text-sm sm:text-base">Impor Semua Produk Bawaan ({INITIAL_PRODUCTS.length} Produk) ke Cloud?</h3>
-                <p class="text-xs text-slate-600 mt-0.5">Database Supabase Anda masih kosong. Klik tombol di kanan untuk memasukkan seluruh produk katalog bawaan ke database agar semuanya bisa langsung Anda atur dan edit dari HP.</p>
-              </div>
+        <div class="grid grid-cols-3 gap-3 sm:gap-4">
+          <div class="stat-card bg-white p-4 sm:p-5 rounded-2xl border border-slate-200/80 shadow-2xs transition-all duration-200 hover:-translate-y-0.5 hover:shadow-sm hover:border-primary/30">
+            <div class="flex items-center justify-between">
+              <span class="text-[11px] font-bold text-slate-400 uppercase tracking-wider">Total Produk</span>
+              <span class="w-7 h-7 rounded-lg bg-primary/10 text-primary flex items-center justify-center text-xs">📦</span>
             </div>
-            <button 
-              id="import-defaults-btn" 
-              type="button" 
-              class="w-full sm:w-auto shrink-0 bg-primary hover:bg-primary-dark text-white font-bold py-2.5 px-5 rounded-xl text-xs shadow-sm transition-all cursor-pointer flex items-center justify-center gap-2"
-            >
-              <span id="import-btn-text">Impor Semua Produk Sekarang</span>
-              <svg id="import-spinner" class="w-4 h-4 animate-spin hidden" fill="none" viewBox="0 0 24 24">
-                <circle class="opacity-25" cx="12" cy="12" r="10" stroke="currentColor" stroke-width="4"></circle>
-                <path class="opacity-75" fill="currentColor" d="M4 12a8 8 0 018-8v8H4z"></path>
-              </svg>
-            </button>
+            <p id="stat-total" class="font-serif text-2xl sm:text-3xl font-bold text-slate-800 mt-2">0</p>
+            <p class="text-[11px] text-slate-400 mt-0.5">Produk aktif di cloud</p>
+          </div>
+
+          <div class="stat-card bg-white p-4 sm:p-5 rounded-2xl border border-slate-200/80 shadow-2xs transition-all duration-200 hover:-translate-y-0.5 hover:shadow-sm hover:border-amber-300">
+            <div class="flex items-center justify-between">
+              <span class="text-[11px] font-bold text-slate-400 uppercase tracking-wider">Unggulan</span>
+              <span class="w-7 h-7 rounded-lg bg-amber-50 text-amber-500 flex items-center justify-center text-xs">⭐</span>
+            </div>
+            <p id="stat-featured" class="font-serif text-2xl sm:text-3xl font-bold text-amber-600 mt-2">0</p>
+            <p class="text-[11px] text-slate-400 mt-0.5">Tampil di beranda</p>
+          </div>
+
+          <div class="stat-card bg-white p-4 sm:p-5 rounded-2xl border border-slate-200/80 shadow-2xs transition-all duration-200 hover:-translate-y-0.5 hover:shadow-sm hover:border-secondary/40">
+            <div class="flex items-center justify-between">
+              <span class="text-[11px] font-bold text-slate-400 uppercase tracking-wider">Kategori</span>
+              <span class="w-7 h-7 rounded-lg bg-secondary/15 text-secondary-dark flex items-center justify-center text-xs">🏷️</span>
+            </div>
+            <p id="stat-categories" class="font-serif text-2xl sm:text-3xl font-bold text-secondary-dark mt-2">{CATEGORIES.length}</p>
+            <p class="text-[11px] text-slate-400 mt-0.5">Kategori siap pakai</p>
           </div>
         </div>
 
         <!-- Navigation Tabs -->
-        <div class="flex items-center gap-2 border-b border-slate-200">
+        <div class="flex items-center gap-2 border-b border-slate-200/80 pt-1">
           <button 
             type="button" 
             id="tab-btn-catalog" 
-            class="tab-btn active px-4 py-3 text-xs sm:text-sm font-bold border-b-2 border-primary text-primary transition-colors cursor-pointer"
+            class="tab-btn active px-4 py-3 text-xs sm:text-sm font-bold border-b-2 border-primary text-primary transition-all duration-200 cursor-pointer flex items-center gap-2"
           >
-            📋 Semua Produk Toko
+            <span>📋 Semua Produk</span>
+            <span id="tab-count-badge" class="px-2 py-0.5 rounded-full text-[10px] font-bold bg-primary/10 text-primary">0</span>
           </button>
           <button 
             type="button" 
             id="tab-btn-add" 
-            class="tab-btn px-4 py-3 text-xs sm:text-sm font-bold border-b-2 border-transparent text-slate-500 hover:text-slate-800 transition-colors cursor-pointer"
+            class="tab-btn px-4 py-3 text-xs sm:text-sm font-bold border-b-2 border-transparent text-slate-500 hover:text-slate-800 transition-all duration-200 cursor-pointer flex items-center gap-1.5"
           >
-            ➕ Tambah Produk Baru
+            <span>➕ Tambah Produk</span>
           </button>
         </div>
 
         <!-- ================= TAB 1: SEMUA PRODUK ================= -->
-        <section id="tab-catalog" class="space-y-4">
+        <section id="tab-catalog" class="space-y-4 tab-content animate-fade-in">
           
           <!-- Search & Filter Controls -->
-          <div class="bg-white p-4 rounded-xl border border-slate-200/80 shadow-2xs flex flex-col md:flex-row gap-3 items-stretch md:items-center justify-between">
+          <div class="bg-white p-3.5 sm:p-4 rounded-2xl border border-slate-200/80 shadow-2xs flex flex-col md:flex-row gap-3 items-stretch md:items-center justify-between">
             <div class="relative flex-1">
               <svg class="w-4 h-4 text-slate-400 absolute left-3.5 top-1/2 -translate-y-1/2" fill="none" viewBox="0 0 24 24" stroke="currentColor">
                 <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M21 21l-6-6m2-5a7 7 0 11-14 0 7 7 0 0114 0z" />
@@ -199,14 +177,21 @@ const INITIAL_PRODUCTS = PRODUCTS.map(p => ({
                 type="text" 
                 id="search-filter-input" 
                 placeholder="Cari produk berdasarkan nama..." 
-                class="w-full pl-10 pr-4 py-2.5 rounded-xl border border-slate-200 text-xs sm:text-sm focus:outline-none focus:border-primary focus:ring-1 focus:ring-primary/20"
+                class="w-full pl-10 pr-9 py-2.5 rounded-xl border border-slate-200 text-xs sm:text-sm focus:outline-none focus:border-primary focus:ring-1 focus:ring-primary/20 transition-all"
               />
+              <button 
+                type="button" 
+                id="clear-search-btn" 
+                class="hidden absolute right-3 top-1/2 -translate-y-1/2 text-slate-400 hover:text-slate-600 text-xs font-bold w-5 h-5 rounded-full bg-slate-100 items-center justify-center cursor-pointer"
+              >
+                ✕
+              </button>
             </div>
 
-            <div class="flex items-center gap-2">
+            <div class="flex items-center gap-2 flex-wrap sm:flex-nowrap">
               <select 
                 id="category-filter-select" 
-                class="px-3 py-2.5 rounded-xl border border-slate-200 text-xs sm:text-sm bg-white text-slate-700 focus:outline-none focus:border-primary"
+                class="flex-1 sm:flex-initial px-3 py-2.5 rounded-xl border border-slate-200 text-xs sm:text-sm bg-white text-slate-700 focus:outline-none focus:border-primary transition-all cursor-pointer"
               >
                 <option value="all">Semua Kategori</option>
                 {CATEGORIES.map(cat => (
@@ -216,29 +201,41 @@ const INITIAL_PRODUCTS = PRODUCTS.map(p => ({
 
               <select 
                 id="sort-select" 
-                class="px-3 py-2.5 rounded-xl border border-slate-200 text-xs sm:text-sm bg-white text-slate-700 focus:outline-none focus:border-primary"
+                class="flex-1 sm:flex-initial px-3 py-2.5 rounded-xl border border-slate-200 text-xs sm:text-sm bg-white text-slate-700 focus:outline-none focus:border-primary transition-all cursor-pointer"
               >
                 <option value="newest">Terbaru</option>
                 <option value="price-asc">Harga Terendah</option>
                 <option value="price-desc">Harga Tertinggi</option>
                 <option value="name-asc">Nama (A - Z)</option>
               </select>
+
+              <button 
+                type="button" 
+                id="refresh-btn" 
+                title="Muat ulang data" 
+                class="p-2.5 rounded-xl border border-slate-200 text-slate-600 hover:border-primary hover:text-primary hover:bg-slate-50 transition-all duration-200 cursor-pointer active:scale-95 shadow-2xs"
+              >
+                <svg id="refresh-icon" class="w-4 h-4 transition-transform duration-300" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2">
+                  <path stroke-linecap="round" stroke-linejoin="round" d="M4 4v5h.582m15.356 2A8.001 8.001 0 004.582 9m0 0H9m11 11v-5h-.581m0 0a8.003 8.003 0 01-15.357-2m15.357 2H15" />
+                </svg>
+              </button>
             </div>
           </div>
 
           <!-- Product Grid -->
           <div id="catalog-products-grid" class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-4">
+            <!-- Loading Skeleton Shimmer -->
             <div class="col-span-full py-16 text-center text-slate-400 text-sm">
               <svg class="w-8 h-8 animate-spin mx-auto text-primary mb-3" fill="none" viewBox="0 0 24 24">
                 <circle class="opacity-25" cx="12" cy="12" r="10" stroke="currentColor" stroke-width="4"></circle>
                 <path class="opacity-75" fill="currentColor" d="M4 12a8 8 0 018-8v8H4z"></path>
               </svg>
-              Memuat data produk...
+              Memuat data produk dari Supabase...
             </div>
           </div>
 
           <!-- Admin Pagination Container -->
-          <div id="admin-pagination-container" class="bg-white p-4 rounded-xl border border-slate-200/80 shadow-2xs flex flex-col sm:flex-row items-center justify-between gap-3">
+          <div id="admin-pagination-container" class="bg-white p-4 rounded-2xl border border-slate-200/80 shadow-2xs flex flex-col sm:flex-row items-center justify-between gap-3">
             <p id="admin-pag-info" class="text-xs text-slate-500 font-medium">
               Menampilkan <span id="admin-pag-start" class="font-bold text-slate-700">0</span> - <span id="admin-pag-end" class="font-bold text-slate-700">0</span> dari <span id="admin-pag-total" class="font-bold text-slate-700">0</span> produk
             </p>
@@ -249,11 +246,16 @@ const INITIAL_PRODUCTS = PRODUCTS.map(p => ({
         </section>
 
         <!-- ================= TAB 2: TAMBAH PRODUK BARU ================= -->
-        <section id="tab-add" class="hidden">
-          <div class="bg-white rounded-2xl p-6 sm:p-8 border border-soft-cream shadow-xs">
-            <div class="mb-6 pb-4 border-b border-slate-100">
-              <h2 class="font-serif text-xl font-bold text-slate-800">Tambah Produk Baru</h2>
-              <p class="text-xs text-slate-500 mt-0.5">Produk baru akan langsung tampil di website dan katalog seketika.</p>
+        <section id="tab-add" class="hidden tab-content animate-fade-in">
+          <div class="bg-white rounded-3xl p-6 sm:p-8 border border-soft-cream/80 shadow-xs">
+            <div class="mb-6 pb-4 border-b border-slate-100 flex items-center justify-between">
+              <div>
+                <h2 class="font-serif text-xl font-bold text-slate-800">Tambah Produk Baru</h2>
+                <p class="text-xs text-slate-500 mt-0.5">Produk baru langsung aktif di website tanpa perlu build ulang.</p>
+              </div>
+              <span class="text-xs font-semibold px-3 py-1 rounded-full bg-accent-bg text-primary border border-soft-cream">
+                Instant Cloud
+              </span>
             </div>
 
             <form id="add-product-form" class="space-y-6">
@@ -281,7 +283,7 @@ const INITIAL_PRODUCTS = PRODUCTS.map(p => ({
                   <select 
                     id="prod-category" 
                     required
-                    class="w-full px-4 py-3 rounded-xl border border-slate-200 text-sm focus:outline-none focus:border-primary focus:ring-2 focus:ring-primary/20 transition-all bg-white"
+                    class="w-full px-4 py-3 rounded-xl border border-slate-200 text-sm focus:outline-none focus:border-primary focus:ring-2 focus:ring-primary/20 transition-all bg-white cursor-pointer"
                   >
                     <option value="" disabled selected>Pilih Kategori...</option>
                     {CATEGORIES.map(cat => (
@@ -332,7 +334,7 @@ const INITIAL_PRODUCTS = PRODUCTS.map(p => ({
                   Foto Produk <span class="text-rose-500">*</span>
                 </label>
                 
-                <div class="border-2 border-dashed border-slate-300 hover:border-primary rounded-2xl p-6 text-center bg-slate-50/60 transition-colors relative cursor-pointer" id="dropzone">
+                <div class="border-2 border-dashed border-slate-300 hover:border-primary rounded-2xl p-6 text-center bg-slate-50/60 transition-all duration-200 relative cursor-pointer group" id="dropzone">
                   <input 
                     type="file" 
                     id="prod-image-file" 
@@ -342,7 +344,7 @@ const INITIAL_PRODUCTS = PRODUCTS.map(p => ({
                   />
                   
                   <div id="upload-prompt" class="space-y-2">
-                    <div class="w-12 h-12 rounded-full bg-accent-bg text-primary flex items-center justify-center mx-auto border border-soft-cream">
+                    <div class="w-12 h-12 rounded-full bg-accent-bg text-primary flex items-center justify-center mx-auto border border-soft-cream group-hover:scale-110 transition-transform duration-200">
                       <svg class="w-6 h-6" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2">
                         <path stroke-linecap="round" stroke-linejoin="round" d="M3 9a2 2 0 012-2h.93a2 2 0 001.664-.89l.812-1.22A2 2 0 0110.07 4h3.86a2 2 0 011.664.89l.812 1.22A2 2 0 0018.07 7H19a2 2 0 012 2v9a2 2 0 01-2 2H5a2 2 0 01-2-2V9z" />
                         <path stroke-linecap="round" stroke-linejoin="round" d="M15 13a3 3 0 11-6 0 3 3 0 016 0z" />
@@ -353,12 +355,12 @@ const INITIAL_PRODUCTS = PRODUCTS.map(p => ({
                   </div>
 
                   <!-- Preview Gambar -->
-                  <div id="image-preview-container" class="hidden space-y-3">
+                  <div id="image-preview-container" class="hidden space-y-3 animate-fade-in">
                     <img id="image-preview" src="" alt="Preview Foto" class="max-h-64 mx-auto rounded-xl object-contain shadow-sm border border-slate-200" />
                     <div class="flex items-center justify-center gap-3 text-xs">
                       <span id="orig-size-label" class="text-slate-400">Asli: 0 KB</span>
                       <span class="text-slate-300">→</span>
-                      <span id="comp-size-label" class="font-bold text-emerald-600 bg-emerald-50 px-2 py-0.5 rounded-full">Kompres: 0 KB</span>
+                      <span id="comp-size-label" class="font-bold text-emerald-600 bg-emerald-50 px-2 py-0.5 rounded-full border border-emerald-200">Kompres: 0 KB</span>
                     </div>
                     <p class="text-[11px] text-slate-400">Ketuk gambar untuk mengganti foto</p>
                   </div>
@@ -387,7 +389,7 @@ const INITIAL_PRODUCTS = PRODUCTS.map(p => ({
                   class="w-4 h-4 rounded text-primary focus:ring-primary border-slate-300 cursor-pointer"
                 />
                 <label for="prod-featured" class="text-xs font-semibold text-slate-700 cursor-pointer">
-                  Tandai sebagai Produk Terpopuler / Unggulan
+                  Tandai sebagai Produk Terpopuler / Unggulan (Tampil di slider beranda)
                 </label>
               </div>
 
@@ -396,7 +398,7 @@ const INITIAL_PRODUCTS = PRODUCTS.map(p => ({
                 <button 
                   type="submit" 
                   id="submit-btn" 
-                  class="w-full sm:w-auto inline-flex items-center justify-center gap-2 bg-primary hover:bg-primary-dark text-white font-bold py-3.5 px-8 rounded-xl shadow-md hover:shadow-lg transition-all duration-200 cursor-pointer text-sm"
+                  class="w-full sm:w-auto inline-flex items-center justify-center gap-2 bg-primary hover:bg-primary-dark text-white font-bold py-3.5 px-8 rounded-xl shadow-md hover:shadow-lg transition-all duration-200 cursor-pointer text-sm active:scale-95"
                 >
                   <span id="btn-text">Simpan &amp; Publikasikan Produk</span>
                   <svg id="btn-spinner" class="w-4 h-4 animate-spin hidden" fill="none" viewBox="0 0 24 24">
@@ -405,8 +407,6 @@ const INITIAL_PRODUCTS = PRODUCTS.map(p => ({
                   </svg>
                 </button>
               </div>
-
-              <div id="form-alert" class="hidden p-4 rounded-xl text-sm font-medium"></div>
             </form>
           </div>
         </section>
@@ -417,25 +417,26 @@ const INITIAL_PRODUCTS = PRODUCTS.map(p => ({
   </div>
 
   <!-- ================= EDIT PRODUCT MODAL ================= -->
-  <div id="edit-modal" class="hidden fixed inset-0 z-50 bg-black/60 backdrop-blur-xs flex items-center justify-center p-4 overflow-y-auto">
-    <div class="bg-white rounded-2xl max-w-lg w-full p-6 sm:p-8 shadow-2xl border border-slate-200 my-8 space-y-5">
+  <div id="edit-modal" class="hidden fixed inset-0 z-50 bg-black/60 backdrop-blur-xs flex items-center justify-center p-4 overflow-y-auto animate-fade-in">
+    <div class="bg-white rounded-3xl max-w-lg w-full p-6 sm:p-8 shadow-2xl border border-slate-200 my-8 space-y-5 animate-modal-pop">
       <div class="flex items-center justify-between pb-3 border-b border-slate-100">
         <h3 class="font-serif text-lg font-bold text-slate-800">Edit Produk</h3>
-        <button id="close-modal-btn" type="button" class="text-slate-400 hover:text-slate-600 text-xl font-bold cursor-pointer">✕</button>
+        <button id="close-modal-btn" type="button" class="text-slate-400 hover:text-slate-600 text-xl font-bold cursor-pointer w-8 h-8 rounded-lg hover:bg-slate-100 flex items-center justify-center transition-colors">✕</button>
       </div>
 
       <form id="edit-product-form" class="space-y-4">
         <input type="hidden" id="edit-prod-id" />
+        <input type="hidden" id="edit-prod-current-image" />
 
         <div>
           <label class="block text-xs font-bold uppercase tracking-wider text-slate-700 mb-1">Nama Produk</label>
-          <input type="text" id="edit-prod-name" required class="w-full px-3 py-2.5 rounded-xl border border-slate-200 text-sm focus:outline-none focus:border-primary" />
+          <input type="text" id="edit-prod-name" required class="w-full px-3.5 py-2.5 rounded-xl border border-slate-200 text-sm focus:outline-none focus:border-primary transition-all" />
         </div>
 
         <div class="grid grid-cols-2 gap-3">
           <div>
             <label class="block text-xs font-bold uppercase tracking-wider text-slate-700 mb-1">Kategori</label>
-            <select id="edit-prod-category" required class="w-full px-3 py-2.5 rounded-xl border border-slate-200 text-xs sm:text-sm bg-white focus:outline-none focus:border-primary">
+            <select id="edit-prod-category" required class="w-full px-3 py-2.5 rounded-xl border border-slate-200 text-xs sm:text-sm bg-white focus:outline-none focus:border-primary transition-all cursor-pointer">
               {CATEGORIES.map(cat => (
                 <option value={cat.slug} data-name={cat.name}>{cat.name}</option>
               ))}
@@ -443,36 +444,84 @@ const INITIAL_PRODUCTS = PRODUCTS.map(p => ({
           </div>
           <div>
             <label class="block text-xs font-bold uppercase tracking-wider text-slate-700 mb-1">Harga (Rp)</label>
-            <input type="number" id="edit-prod-price" required step="5000" class="w-full px-3 py-2.5 rounded-xl border border-slate-200 text-sm font-semibold font-mono focus:outline-none focus:border-primary" />
+            <input type="number" id="edit-prod-price" required step="5000" class="w-full px-3.5 py-2.5 rounded-xl border border-slate-200 text-sm font-semibold font-mono focus:outline-none focus:border-primary transition-all" />
+            <p id="edit-price-preview" class="text-[10px] font-bold text-primary mt-1 truncate"></p>
+          </div>
+        </div>
+
+        <!-- Ganti Foto Produk (Opsional saat Edit) -->
+        <div class="pt-1">
+          <label class="block text-xs font-bold uppercase tracking-wider text-slate-700 mb-1">Foto Produk</label>
+          <div class="flex items-center gap-3 p-3 rounded-xl border border-slate-200 bg-slate-50/50">
+            <img id="edit-image-thumbnail" src="" alt="Thumbnail" class="w-14 h-14 rounded-lg object-cover border border-slate-200 bg-white shrink-0" />
+            <div class="flex-1 min-w-0">
+              <label for="edit-prod-image-file" class="inline-flex items-center gap-1.5 px-3 py-1.5 rounded-lg bg-white border border-slate-200 hover:border-primary hover:text-primary text-xs font-semibold cursor-pointer transition-all shadow-2xs">
+                <span>📷 Ganti Foto</span>
+                <input type="file" id="edit-prod-image-file" accept="image/*" class="hidden" />
+              </label>
+              <p id="edit-image-note" class="text-[11px] text-slate-400 mt-1 truncate">Biarkan kosong jika tidak ingin mengganti foto.</p>
+            </div>
           </div>
         </div>
 
         <div>
           <label class="block text-xs font-bold uppercase tracking-wider text-slate-700 mb-1">Estimasi Pengerjaan</label>
-          <input type="text" id="edit-prod-time" class="w-full px-3 py-2.5 rounded-xl border border-slate-200 text-sm focus:outline-none focus:border-primary" />
+          <input type="text" id="edit-prod-time" class="w-full px-3.5 py-2.5 rounded-xl border border-slate-200 text-sm focus:outline-none focus:border-primary transition-all" />
         </div>
 
         <div>
           <label class="block text-xs font-bold uppercase tracking-wider text-slate-700 mb-1">Deskripsi</label>
-          <textarea id="edit-prod-desc" rows="2" class="w-full px-3 py-2 rounded-xl border border-slate-200 text-xs sm:text-sm focus:outline-none focus:border-primary"></textarea>
+          <textarea id="edit-prod-desc" rows="2" class="w-full px-3.5 py-2 rounded-xl border border-slate-200 text-xs sm:text-sm focus:outline-none focus:border-primary transition-all resize-y"></textarea>
         </div>
 
         <div class="flex items-center gap-2">
           <input type="checkbox" id="edit-prod-featured" class="w-4 h-4 rounded text-primary focus:ring-primary border-slate-300 cursor-pointer" />
-          <label for="edit-prod-featured" class="text-xs font-semibold text-slate-700 cursor-pointer">Produk Populer / Unggulan</label>
+          <label for="edit-prod-featured" class="text-xs font-semibold text-slate-700 cursor-pointer">Produk Populer / Unggulan (Tampil di Beranda)</label>
         </div>
 
         <div class="pt-4 border-t border-slate-100 flex items-center justify-end gap-2">
-          <button type="button" id="cancel-edit-btn" class="px-4 py-2.5 rounded-xl text-xs font-semibold text-slate-600 hover:bg-slate-100 cursor-pointer">Batal</button>
-          <button type="submit" id="save-edit-btn" class="bg-primary hover:bg-primary-dark text-white font-bold py-2.5 px-6 rounded-xl text-xs shadow-md cursor-pointer">Simpan Perubahan</button>
+          <button type="button" id="cancel-edit-btn" class="px-4 py-2.5 rounded-xl text-xs font-semibold text-slate-600 hover:bg-slate-100 cursor-pointer transition-colors">Batal</button>
+          <button type="submit" id="save-edit-btn" class="bg-primary hover:bg-primary-dark text-white font-bold py-2.5 px-6 rounded-xl text-xs shadow-md hover:shadow-lg cursor-pointer transition-all active:scale-95 flex items-center gap-2">
+            <span id="save-btn-text">Simpan Perubahan</span>
+            <svg id="save-spinner" class="w-3.5 h-3.5 animate-spin hidden" fill="none" viewBox="0 0 24 24">
+              <circle class="opacity-25" cx="12" cy="12" r="10" stroke="currentColor" stroke-width="4"></circle>
+              <path class="opacity-75" fill="currentColor" d="M4 12a8 8 0 018-8v8H4z"></path>
+            </svg>
+          </button>
         </div>
       </form>
     </div>
   </div>
 
+  <!-- ================= DELETE CONFIRMATION MODAL ================= -->
+  <div id="delete-modal" class="hidden fixed inset-0 z-50 bg-black/60 backdrop-blur-xs flex items-center justify-center p-4 animate-fade-in">
+    <div class="bg-white rounded-3xl max-w-sm w-full p-6 shadow-2xl border border-slate-200 text-center space-y-4 animate-modal-pop">
+      <div class="w-12 h-12 rounded-full bg-rose-50 text-rose-600 flex items-center justify-center mx-auto border border-rose-100">
+        <svg class="w-6 h-6" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2">
+          <path stroke-linecap="round" stroke-linejoin="round" d="M19 7l-.867 12.142A2 2 0 0116.138 21H7.862a2 2 0 01-1.995-1.858L5 7m5 4v6m4-6v6m1-10V4a1 1 0 00-1-1h-4a1 1 0 00-1 1v3M4 7h16" />
+        </svg>
+      </div>
+      <div>
+        <h3 class="font-serif text-lg font-bold text-slate-800">Hapus Produk?</h3>
+        <p id="delete-modal-product-name" class="text-xs font-semibold text-slate-600 mt-1 max-w-xs mx-auto line-clamp-2"></p>
+        <p class="text-[11px] text-slate-400 mt-2">Produk akan dihapus permanen dari Supabase dan website.</p>
+      </div>
+      <div class="flex items-center justify-center gap-2 pt-2">
+        <button type="button" id="cancel-delete-btn" class="flex-1 px-4 py-2.5 rounded-xl text-xs font-semibold text-slate-600 bg-slate-100 hover:bg-slate-200 cursor-pointer transition-colors">Batal</button>
+        <button type="button" id="confirm-delete-btn" class="flex-1 bg-rose-600 hover:bg-rose-700 text-white font-bold py-2.5 px-4 rounded-xl text-xs shadow-md cursor-pointer transition-all active:scale-95 flex items-center justify-center gap-1.5">
+          <span id="delete-btn-text">Hapus Sekarang</span>
+          <svg id="delete-spinner" class="w-3.5 h-3.5 animate-spin hidden" fill="none" viewBox="0 0 24 24">
+            <circle class="opacity-25" cx="12" cy="12" r="10" stroke="currentColor" stroke-width="4"></circle>
+            <path class="opacity-75" fill="currentColor" d="M4 12a8 8 0 018-8v8H4z"></path>
+          </svg>
+        </button>
+      </div>
+    </div>
+  </div>
+
 </Layout>
 
-<script define:vars={{ SUPABASE_URL, SUPABASE_ANON_KEY, SUPABASE_BUCKET, WHATSAPP_NUMBER, INITIAL_PRODUCTS }}>
+<script define:vars={{ SUPABASE_URL, SUPABASE_ANON_KEY, SUPABASE_BUCKET, WHATSAPP_NUMBER }}>
   // Initialize Supabase Client
   const supabase = window.supabase.createClient(SUPABASE_URL, SUPABASE_ANON_KEY);
 
@@ -490,6 +539,40 @@ const INITIAL_PRODUCTS = PRODUCTS.map(p => ({
   const userEmailDisplay = document.getElementById('user-email-display');
 
   let allProductsList = [];
+  let pendingDeleteId = null;
+
+  // Toast Notification Helper
+  function showToast(message, type = 'success') {
+    const container = document.getElementById('toast-container');
+    if (!container) return;
+
+    const toast = document.createElement('div');
+    const isSuccess = type === 'success';
+    const isError = type === 'error';
+    const icon = isSuccess ? '✓' : isError ? '✕' : 'ℹ';
+    const bgClass = isSuccess ? 'bg-slate-900 text-white border-emerald-500/50' : isError ? 'bg-rose-900 text-white border-rose-500/50' : 'bg-slate-900 text-white border-slate-700';
+
+    toast.className = `pointer-events-auto flex items-center gap-2.5 px-4 py-3 rounded-2xl border shadow-xl text-xs font-semibold ${bgClass} animate-toast-in`;
+    toast.innerHTML = `
+      <span class="w-5 h-5 rounded-full ${isSuccess ? 'bg-emerald-500 text-white' : isError ? 'bg-rose-500 text-white' : 'bg-slate-700 text-white'} flex items-center justify-center font-bold text-[10px] shrink-0">${icon}</span>
+      <span class="flex-1">${message}</span>
+      <button type="button" class="text-white/60 hover:text-white ml-2 text-sm font-bold cursor-pointer">✕</button>
+    `;
+
+    toast.querySelector('button')?.addEventListener('click', () => {
+      toast.classList.add('animate-fade-out');
+      setTimeout(() => toast.remove(), 200);
+    });
+
+    container.appendChild(toast);
+
+    setTimeout(() => {
+      if (toast.isConnected) {
+        toast.classList.add('animate-fade-out');
+        setTimeout(() => toast.remove(), 200);
+      }
+    }, 3200);
+  }
 
   // Listen to Supabase Auth State (Auto-login & persistent session)
   supabase.auth.onAuthStateChange((event, session) => {
@@ -524,7 +607,7 @@ const INITIAL_PRODUCTS = PRODUCTS.map(p => ({
       });
 
       if (error) throw error;
-      // onAuthStateChange handles UI switch automatically
+      showToast('Berhasil masuk ke dashboard!', 'success');
     } catch (err) {
       console.error(err);
       loginError.textContent = err.message === 'Invalid login credentials'
@@ -545,6 +628,7 @@ const INITIAL_PRODUCTS = PRODUCTS.map(p => ({
     await supabase.auth.signOut();
     logoutBtn.disabled = false;
     logoutBtn.textContent = 'Keluar';
+    showToast('Anda telah keluar dari admin.', 'info');
   });
 
   // Tab Switching
@@ -571,7 +655,7 @@ const INITIAL_PRODUCTS = PRODUCTS.map(p => ({
     tabCatalog.classList.add('hidden');
   });
 
-  // Price formatting helper
+  // Price formatting helper for Add Form
   const priceInput = document.getElementById('prod-price');
   const pricePreview = document.getElementById('price-preview');
   priceInput.addEventListener('input', () => {
@@ -579,7 +663,51 @@ const INITIAL_PRODUCTS = PRODUCTS.map(p => ({
     pricePreview.textContent = 'Format: ' + new Intl.NumberFormat('id-ID', { style: 'currency', currency: 'IDR', maximumFractionDigits: 0 }).format(val);
   });
 
-  // Client-side Canvas Image Compression
+  // Price formatting helper for Edit Form
+  const editPriceInput = document.getElementById('edit-prod-price');
+  const editPricePreview = document.getElementById('edit-price-preview');
+  editPriceInput?.addEventListener('input', () => {
+    const val = Number(editPriceInput.value) || 0;
+    editPricePreview.textContent = 'Format: ' + new Intl.NumberFormat('id-ID', { style: 'currency', currency: 'IDR', maximumFractionDigits: 0 }).format(val);
+  });
+
+  // Client-side Canvas Image Compression Helper
+  function compressImage(file, maxDim = 1200, quality = 0.82) {
+    return new Promise((resolve, reject) => {
+      const img = new Image();
+      const reader = new FileReader();
+
+      reader.onload = (e) => { img.src = e.target.result; };
+      reader.onerror = reject;
+
+      img.onload = () => {
+        let width = img.width;
+        let height = img.height;
+
+        if (width > height && width > maxDim) {
+          height = Math.round((height * maxDim) / width);
+          width = maxDim;
+        } else if (height > maxDim) {
+          width = Math.round((width * maxDim) / height);
+          height = maxDim;
+        }
+
+        const canvas = document.createElement('canvas');
+        canvas.width = width;
+        canvas.height = height;
+        const ctx = canvas.getContext('2d');
+        ctx.drawImage(img, 0, 0, width, height);
+
+        canvas.toBlob((blob) => {
+          if (blob) resolve(blob);
+          else reject(new Error('Gagal mengompres gambar'));
+        }, 'image/webp', quality);
+      };
+      reader.readAsDataURL(file);
+    });
+  }
+
+  // Add Product Image Dropzone Handler
   const imageFileInput = document.getElementById('prod-image-file');
   const imagePreview = document.getElementById('image-preview');
   const previewContainer = document.getElementById('image-preview-container');
@@ -593,38 +721,49 @@ const INITIAL_PRODUCTS = PRODUCTS.map(p => ({
     if (!file) return;
 
     origSizeLabel.textContent = `Asli: ${(file.size / 1024).toFixed(0)} KB`;
-    const img = new Image();
-    const reader = new FileReader();
+    try {
+      const blob = await compressImage(file);
+      processedImageBlob = blob;
+      compSizeLabel.textContent = `Kompres: ${(blob.size / 1024).toFixed(0)} KB`;
+      imagePreview.src = URL.createObjectURL(blob);
+      uploadPrompt.classList.add('hidden');
+      previewContainer.classList.remove('hidden');
+    } catch (err) {
+      console.error(err);
+      showToast('Gagal memproses gambar.', 'error');
+    }
+  });
 
-    reader.onload = (re) => { img.src = re.target.result; };
-    img.onload = () => {
-      const maxDim = 1200;
-      let width = img.width;
-      let height = img.height;
+  // Edit Product Image Replacement Handler
+  const editImageFileInput = document.getElementById('edit-prod-image-file');
+  const editImageThumbnail = document.getElementById('edit-image-thumbnail');
+  const editImageNote = document.getElementById('edit-image-note');
+  let editNewImageBlob = null;
 
-      if (width > height && width > maxDim) {
-        height = Math.round((height * maxDim) / width);
-        width = maxDim;
-      } else if (height > maxDim) {
-        width = Math.round((width * maxDim) / height);
-        height = maxDim;
-      }
+  editImageFileInput?.addEventListener('change', async (e) => {
+    const file = e.target.files[0];
+    if (!file) return;
 
-      const canvas = document.createElement('canvas');
-      canvas.width = width;
-      canvas.height = height;
-      const ctx = canvas.getContext('2d');
-      ctx.drawImage(img, 0, 0, width, height);
+    try {
+      const blob = await compressImage(file);
+      editNewImageBlob = blob;
+      editImageThumbnail.src = URL.createObjectURL(blob);
+      editImageNote.textContent = `Foto baru terpilih: ${(blob.size / 1024).toFixed(0)} KB (WebP)`;
+      editImageNote.className = 'text-[11px] font-bold text-emerald-600 mt-1 truncate';
+    } catch (err) {
+      console.error(err);
+      showToast('Gagal memproses gambar baru.', 'error');
+    }
+  });
 
-      canvas.toBlob((blob) => {
-        processedImageBlob = blob;
-        compSizeLabel.textContent = `Kompres: ${(blob.size / 1024).toFixed(0)} KB`;
-        imagePreview.src = URL.createObjectURL(blob);
-        uploadPrompt.classList.add('hidden');
-        previewContainer.classList.remove('hidden');
-      }, 'image/webp', 0.82);
-    };
-    reader.readAsDataURL(file);
+  // Refresh Button Handler
+  const refreshBtn = document.getElementById('refresh-btn');
+  const refreshIcon = document.getElementById('refresh-icon');
+  refreshBtn?.addEventListener('click', async () => {
+    refreshIcon.classList.add('rotate-180');
+    await loadAllProducts();
+    setTimeout(() => refreshIcon.classList.remove('rotate-180'), 300);
+    showToast('Data produk diperbarui.', 'info');
   });
 
   // Load All Products from Supabase
@@ -632,7 +771,7 @@ const INITIAL_PRODUCTS = PRODUCTS.map(p => ({
     const grid = document.getElementById('catalog-products-grid');
     const statTotal = document.getElementById('stat-total');
     const statFeatured = document.getElementById('stat-featured');
-    const migrationBanner = document.getElementById('migration-banner');
+    const tabCountBadge = document.getElementById('tab-count-badge');
 
     try {
       const { data: products, error } = await supabase
@@ -644,23 +783,17 @@ const INITIAL_PRODUCTS = PRODUCTS.map(p => ({
 
       allProductsList = products || [];
 
-      // Check if migration is needed
-      if (allProductsList.length === 0) {
-        migrationBanner.classList.remove('hidden');
-      } else {
-        migrationBanner.classList.add('hidden');
-      }
-
       // Update Stats
-      statTotal.textContent = allProductsList.length;
-      statFeatured.textContent = allProductsList.filter(p => p.featured).length;
+      if (statTotal) statTotal.textContent = allProductsList.length;
+      if (statFeatured) statFeatured.textContent = allProductsList.filter(p => p.featured).length;
+      if (tabCountBadge) tabCountBadge.textContent = allProductsList.length;
 
       renderFilteredCatalog();
 
     } catch (err) {
       console.error(err);
       grid.innerHTML = `
-        <div class="col-span-full py-12 text-center text-rose-600 bg-rose-50 border border-rose-200 rounded-xl p-4 text-xs">
+        <div class="col-span-full py-12 text-center text-rose-600 bg-rose-50 border border-rose-200 rounded-2xl p-6 text-xs">
           Gagal mengambil data dari Supabase: ${err.message}. Pastikan koneksi internet aktif.
         </div>
       `;
@@ -671,15 +804,30 @@ const INITIAL_PRODUCTS = PRODUCTS.map(p => ({
   const ADMIN_PER_PAGE = 12;
   let adminCurrentPage = 1;
 
-  // Filter & Render Catalog Cards
+  // Filter & Search Controls
   const searchInput = document.getElementById('search-filter-input');
+  const clearSearchBtn = document.getElementById('clear-search-btn');
   const categorySelect = document.getElementById('category-filter-select');
   const sortSelect = document.getElementById('sort-select');
 
-  searchInput.addEventListener('input', () => renderFilteredCatalog(true));
+  searchInput.addEventListener('input', () => {
+    if (clearSearchBtn) {
+      if (searchInput.value.trim()) clearSearchBtn.classList.remove('hidden');
+      else clearSearchBtn.classList.add('hidden');
+    }
+    renderFilteredCatalog(true);
+  });
+
+  clearSearchBtn?.addEventListener('click', () => {
+    searchInput.value = '';
+    clearSearchBtn.classList.add('hidden');
+    renderFilteredCatalog(true);
+  });
+
   categorySelect.addEventListener('change', () => renderFilteredCatalog(true));
   sortSelect.addEventListener('change', () => renderFilteredCatalog(true));
 
+  // Render Filtered Catalog
   function renderFilteredCatalog(resetPage = false) {
     if (resetPage) adminCurrentPage = 1;
 
@@ -713,7 +861,8 @@ const INITIAL_PRODUCTS = PRODUCTS.map(p => ({
 
     if (totalFiltered === 0) {
       grid.innerHTML = `
-        <div class="col-span-full py-16 text-center text-slate-400 bg-white rounded-xl border border-dashed border-slate-200">
+        <div class="col-span-full py-16 text-center text-slate-400 bg-white rounded-2xl border border-dashed border-slate-200 p-8 animate-fade-in">
+          <span class="text-3xl block mb-2">🔍</span>
           <p class="font-serif font-bold text-base text-slate-700">Tidak ada produk yang cocok</p>
           <p class="text-xs text-slate-500 mt-1">Coba ubah kata kunci pencarian atau ganti pilihan kategori.</p>
         </div>
@@ -732,53 +881,105 @@ const INITIAL_PRODUCTS = PRODUCTS.map(p => ({
     if (pagEndEl) pagEndEl.textContent = endIdx;
     if (pagTotalEl) pagTotalEl.textContent = totalFiltered;
 
-    grid.innerHTML = paginated.map(p => `
-      <div class="bg-white border border-slate-200/90 rounded-2xl overflow-hidden shadow-2xs hover:shadow-md hover:border-primary/40 transition-all flex flex-col justify-between group">
-        <div class="relative aspect-4/3 bg-slate-100 overflow-hidden">
-          <img src="${p.image}" alt="${p.name}" loading="lazy" class="w-full h-full object-cover group-hover:scale-102 transition-transform duration-300" />
-          <span class="absolute top-2.5 left-2.5 bg-black/60 text-white text-[10px] font-bold px-2.5 py-0.5 rounded-full backdrop-blur-xs">
-            ${p.category_name}
-          </span>
-          ${p.featured ? '<span class="absolute top-2.5 right-2.5 bg-amber-500 text-white text-[10px] font-bold px-2 py-0.5 rounded shadow-xs">Unggulan</span>' : ''}
-        </div>
+    grid.innerHTML = paginated.map((p, index) => {
+      const detailUrl = `/produk/${p.slug}/`;
+      const isFeatured = Boolean(p.featured);
 
-        <div class="p-4 sm:p-5 flex-1 flex flex-col justify-between">
-          <div>
-            <h3 class="font-serif font-bold text-slate-800 text-sm sm:text-base leading-snug line-clamp-2">${p.name}</h3>
-            <p class="font-sans font-extrabold text-primary text-base sm:text-lg mt-1.5">${p.price_label}</p>
-            ${p.description ? `<p class="text-xs text-slate-500 line-clamp-2 mt-1.5">${p.description}</p>` : ''}
-          </div>
+      return `
+        <div class="product-admin-card bg-white border border-slate-200/90 rounded-2xl overflow-hidden shadow-2xs hover:shadow-md hover:border-primary/40 transition-all duration-200 flex flex-col justify-between group animate-slide-up" style="animation-delay: ${index * 30}ms;">
+          
+          <!-- Image frame -->
+          <div class="relative aspect-4/3 bg-slate-100 overflow-hidden">
+            <img src="${p.image}" alt="${p.name}" loading="lazy" class="w-full h-full object-cover group-hover:scale-102 transition-transform duration-300" />
+            
+            <div class="absolute inset-0 bg-gradient-to-t from-black/40 via-transparent to-transparent pointer-events-none"></div>
 
-          <div class="pt-3.5 mt-3.5 border-t border-slate-100 flex items-center justify-between gap-2">
-            <a 
-              href="https://wa.me/${WHATSAPP_NUMBER}?text=Halo%20Zaloma%20Florist,%20saya%20tertarik%20dengan%20${encodeURIComponent(p.name)}" 
-              target="_blank" 
-              class="text-[11px] font-bold text-emerald-700 hover:text-emerald-800 flex items-center gap-1"
-            >
-              Tes WA ↗
-            </a>
+            <!-- Top Left: Category Badge -->
+            <span class="absolute top-2.5 left-2.5 bg-black/60 text-white text-[10px] font-bold px-2.5 py-0.5 rounded-full backdrop-blur-xs shadow-xs">
+              ${p.category_name}
+            </span>
 
-            <div class="flex items-center gap-1.5">
+            <!-- Top Right: Featured Toggle & Eye Link -->
+            <div class="absolute top-2.5 right-2.5 flex items-center gap-1.5">
               <button 
                 type="button" 
                 data-id="${p.id}" 
-                class="edit-prod-btn text-[11px] font-bold text-slate-700 hover:text-primary bg-slate-100 hover:bg-primary/10 px-3 py-1.5 rounded-lg transition-colors cursor-pointer"
+                data-featured="${isFeatured}" 
+                title="${isFeatured ? 'Hapus dari Unggulan' : 'Jadikan Unggulan'}" 
+                class="quick-toggle-featured w-7 h-7 rounded-full flex items-center justify-center transition-all duration-200 cursor-pointer shadow-xs active:scale-90 ${isFeatured ? 'bg-amber-500 text-white hover:bg-amber-600' : 'bg-black/50 text-white/80 hover:bg-black/80 hover:text-white backdrop-blur-xs'}"
               >
-                ✏️ Edit
+                ⭐
               </button>
-              <button 
-                type="button" 
-                data-id="${p.id}" 
-                data-name="${p.name}" 
-                class="delete-prod-btn text-[11px] font-bold text-rose-600 hover:text-rose-800 bg-rose-50 hover:bg-rose-100 px-3 py-1.5 rounded-lg transition-colors cursor-pointer"
+              
+              <a 
+                href="${detailUrl}" 
+                target="_blank" 
+                title="Buka halaman produk di tab baru" 
+                class="w-7 h-7 rounded-full bg-black/50 text-white/80 hover:bg-black/80 hover:text-white backdrop-blur-xs flex items-center justify-center transition-all cursor-pointer shadow-xs"
               >
-                Hapus
-              </button>
+                👁
+              </a>
             </div>
+
+            <!-- Bottom Left overlay: Processing time -->
+            <span class="absolute bottom-2 left-2.5 text-white/90 text-[10px] font-medium flex items-center gap-1 drop-shadow-sm">
+              ⏱ ${p.processing_time || '3 - 5 Jam'}
+            </span>
+          </div>
+
+          <!-- Body -->
+          <div class="p-4 sm:p-5 flex-1 flex flex-col justify-between">
+            <div>
+              <h3 class="font-serif font-bold text-slate-800 text-sm sm:text-base leading-snug line-clamp-2 hover:text-primary transition-colors">
+                <a href="${detailUrl}" target="_blank">${p.name}</a>
+              </h3>
+              <p class="font-sans font-extrabold text-primary text-base sm:text-lg mt-1.5">${p.price_label}</p>
+              ${p.description ? `<p class="text-xs text-slate-500 line-clamp-2 mt-1.5 leading-relaxed">${p.description}</p>` : ''}
+            </div>
+
+            <!-- Footer Action Row -->
+            <div class="pt-3.5 mt-3.5 border-t border-slate-100 flex items-center justify-between gap-1.5 flex-wrap">
+              <div class="flex items-center gap-2">
+                <a 
+                  href="https://wa.me/${WHATSAPP_NUMBER}?text=Halo%20Zaloma%20Florist,%20saya%20tertarik%20dengan%20${encodeURIComponent(p.name)}" 
+                  target="_blank" 
+                  class="text-[11px] font-bold text-emerald-700 hover:text-emerald-800 flex items-center gap-0.5 hover:underline"
+                >
+                  Tes WA ↗
+                </a>
+                <button 
+                  type="button" 
+                  data-url="https://zalomaflorist.com${detailUrl}" 
+                  class="copy-link-btn text-[11px] font-semibold text-slate-400 hover:text-slate-700 transition-colors cursor-pointer"
+                  title="Salin Link Produk"
+                >
+                  🔗 Salin
+                </button>
+              </div>
+
+              <div class="flex items-center gap-1">
+                <button 
+                  type="button" 
+                  data-id="${p.id}" 
+                  class="edit-prod-btn text-[11px] font-bold text-slate-700 hover:text-primary bg-slate-100 hover:bg-primary/10 px-2.5 py-1.5 rounded-lg transition-all duration-200 cursor-pointer active:scale-95"
+                >
+                  ✏️ Edit
+                </button>
+                <button 
+                  type="button" 
+                  data-id="${p.id}" 
+                  data-name="${p.name}" 
+                  class="delete-prod-btn text-[11px] font-bold text-rose-600 hover:text-rose-800 bg-rose-50 hover:bg-rose-100 px-2.5 py-1.5 rounded-lg transition-all duration-200 cursor-pointer active:scale-95"
+                >
+                  Hapus
+                </button>
+              </div>
+            </div>
+
           </div>
         </div>
-      </div>
-    `).join('');
+      `;
+    }).join('');
 
     renderAdminPaginationControls(totalPages);
     attachActionListeners();
@@ -796,7 +997,7 @@ const INITIAL_PRODUCTS = PRODUCTS.map(p => ({
     let html = `
       <button 
         type="button" 
-        class="admin-prev-btn inline-flex items-center justify-center w-8 h-8 rounded-lg border border-slate-200 text-xs font-bold transition-all ${adminCurrentPage === 1 ? 'opacity-40 cursor-not-allowed bg-slate-50 text-slate-300' : 'cursor-pointer hover:border-primary hover:text-primary text-slate-700 bg-white shadow-2xs'}"
+        class="admin-prev-btn inline-flex items-center justify-center w-8 h-8 rounded-lg border border-slate-200 text-xs font-bold transition-all ${adminCurrentPage === 1 ? 'opacity-40 cursor-not-allowed bg-slate-50 text-slate-300' : 'cursor-pointer hover:border-primary hover:text-primary text-slate-700 bg-white shadow-2xs active:scale-95'}"
         ${adminCurrentPage === 1 ? 'disabled' : ''}
         aria-label="Halaman Sebelumnya"
       >
@@ -811,7 +1012,7 @@ const INITIAL_PRODUCTS = PRODUCTS.map(p => ({
           <button 
             type="button" 
             data-page="${p}" 
-            class="admin-page-btn inline-flex items-center justify-center w-8 h-8 rounded-lg text-xs font-bold transition-all cursor-pointer ${isActive ? 'bg-primary text-white shadow-xs' : 'border border-slate-200 text-slate-700 bg-white hover:border-primary hover:text-primary shadow-2xs'}"
+            class="admin-page-btn inline-flex items-center justify-center w-8 h-8 rounded-lg text-xs font-bold transition-all cursor-pointer active:scale-95 ${isActive ? 'bg-primary text-white shadow-xs' : 'border border-slate-200 text-slate-700 bg-white hover:border-primary hover:text-primary shadow-2xs'}"
           >
             ${p}
           </button>
@@ -824,7 +1025,7 @@ const INITIAL_PRODUCTS = PRODUCTS.map(p => ({
     html += `
       <button 
         type="button" 
-        class="admin-next-btn inline-flex items-center justify-center w-8 h-8 rounded-lg border border-slate-200 text-xs font-bold transition-all ${adminCurrentPage === totalPages ? 'opacity-40 cursor-not-allowed bg-slate-50 text-slate-300' : 'cursor-pointer hover:border-primary hover:text-primary text-slate-700 bg-white shadow-2xs'}"
+        class="admin-next-btn inline-flex items-center justify-center w-8 h-8 rounded-lg border border-slate-200 text-xs font-bold transition-all ${adminCurrentPage === totalPages ? 'opacity-40 cursor-not-allowed bg-slate-50 text-slate-300' : 'cursor-pointer hover:border-primary hover:text-primary text-slate-700 bg-white shadow-2xs active:scale-95'}"
         ${adminCurrentPage === totalPages ? 'disabled' : ''}
         aria-label="Halaman Selanjutnya"
       >
@@ -863,53 +1064,149 @@ const INITIAL_PRODUCTS = PRODUCTS.map(p => ({
   }
 
   function attachActionListeners() {
-    // Delete Button Listener
-    document.querySelectorAll('.delete-prod-btn').forEach(btn => {
-      btn.addEventListener('click', async () => {
+    // Quick Toggle Featured Button Listener
+    document.querySelectorAll('.quick-toggle-featured').forEach(btn => {
+      btn.addEventListener('click', async (e) => {
+        e.stopPropagation();
         const id = btn.getAttribute('data-id');
-        const name = btn.getAttribute('data-name');
-        if (!confirm(`Apakah Anda yakin ingin menghapus "${name}"?`)) return;
+        const currentFeatured = btn.getAttribute('data-featured') === 'true';
+        const newFeatured = !currentFeatured;
 
-        btn.textContent = '...';
         btn.disabled = true;
+        btn.classList.add('animate-pulse');
 
         try {
-          const { error } = await supabase.from('products').delete().eq('id', id);
+          const { error } = await supabase
+            .from('products')
+            .update({ featured: newFeatured })
+            .eq('id', id);
+
           if (error) throw error;
-          loadAllProducts();
+
+          const p = allProductsList.find(x => x.id === id);
+          if (p) p.featured = newFeatured;
+
+          const statFeatured = document.getElementById('stat-featured');
+          if (statFeatured) statFeatured.textContent = allProductsList.filter(x => x.featured).length;
+
+          renderFilteredCatalog(false);
+          showToast(newFeatured ? 'Produk dijadikan unggulan!' : 'Produk dilepas dari unggulan.', 'success');
         } catch (err) {
-          alert('Gagal menghapus: ' + err.message);
-          btn.textContent = 'Hapus';
+          showToast('Gagal mengubah status unggulan: ' + err.message, 'error');
           btn.disabled = false;
+          btn.classList.remove('animate-pulse');
         }
       });
     });
 
-    // Edit Button Listener
+    // Copy Link Button Listener
+    document.querySelectorAll('.copy-link-btn').forEach(btn => {
+      btn.addEventListener('click', async () => {
+        const url = btn.getAttribute('data-url');
+        if (!url) return;
+        try {
+          await navigator.clipboard.writeText(url);
+          showToast('Link produk berhasil disalin!', 'success');
+        } catch {
+          showToast(url, 'info');
+        }
+      });
+    });
+
+    // Delete Button Listener (Opens Modal)
+    document.querySelectorAll('.delete-prod-btn').forEach(btn => {
+      btn.addEventListener('click', () => {
+        const id = btn.getAttribute('data-id');
+        const name = btn.getAttribute('data-name');
+        pendingDeleteId = id;
+
+        const modalNameEl = document.getElementById('delete-modal-product-name');
+        if (modalNameEl) modalNameEl.textContent = `"${name}"`;
+
+        document.getElementById('delete-modal').classList.remove('hidden');
+      });
+    });
+
+    // Edit Button Listener (Opens Modal)
     document.querySelectorAll('.edit-prod-btn').forEach(btn => {
       btn.addEventListener('click', () => {
         const id = btn.getAttribute('data-id');
         const p = allProductsList.find(x => x.id === id);
         if (!p) return;
 
+        editNewImageBlob = null;
         document.getElementById('edit-prod-id').value = p.id;
+        document.getElementById('edit-prod-current-image').value = p.image;
         document.getElementById('edit-prod-name').value = p.name;
         document.getElementById('edit-prod-category').value = p.category_slug;
         document.getElementById('edit-prod-price').value = p.price_from;
         document.getElementById('edit-prod-time').value = p.processing_time || '3 - 5 Jam';
         document.getElementById('edit-prod-desc').value = p.description || '';
-        document.getElementById('edit-prod-featured').checked = p.featured;
+        document.getElementById('edit-prod-featured').checked = Boolean(p.featured);
+
+        const editThumb = document.getElementById('edit-image-thumbnail');
+        if (editThumb) editThumb.src = p.image;
+
+        const editNote = document.getElementById('edit-image-note');
+        if (editNote) {
+          editNote.textContent = 'Biarkan kosong jika tidak ingin mengganti foto.';
+          editNote.className = 'text-[11px] text-slate-400 mt-1 truncate';
+        }
+
+        const editPricePreview = document.getElementById('edit-price-preview');
+        if (editPricePreview && p.price_from) {
+          editPricePreview.textContent = 'Format: ' + new Intl.NumberFormat('id-ID', { style: 'currency', currency: 'IDR', maximumFractionDigits: 0 }).format(p.price_from);
+        }
 
         document.getElementById('edit-modal').classList.remove('hidden');
       });
     });
   }
 
+  // Delete Modal Actions
+  const deleteModal = document.getElementById('delete-modal');
+  const cancelDeleteBtn = document.getElementById('cancel-delete-btn');
+  const confirmDeleteBtn = document.getElementById('confirm-delete-btn');
+  const deleteBtnText = document.getElementById('delete-btn-text');
+  const deleteSpinner = document.getElementById('delete-spinner');
+
+  cancelDeleteBtn?.addEventListener('click', () => {
+    deleteModal.classList.add('hidden');
+    pendingDeleteId = null;
+  });
+
+  confirmDeleteBtn?.addEventListener('click', async () => {
+    if (!pendingDeleteId) return;
+
+    confirmDeleteBtn.disabled = true;
+    deleteBtnText.textContent = 'Menghapus...';
+    deleteSpinner.classList.remove('hidden');
+
+    try {
+      const { error } = await supabase.from('products').delete().eq('id', pendingDeleteId);
+      if (error) throw error;
+
+      deleteModal.classList.add('hidden');
+      showToast('Produk berhasil dihapus.', 'success');
+      loadAllProducts();
+    } catch (err) {
+      showToast('Gagal menghapus produk: ' + err.message, 'error');
+    } finally {
+      confirmDeleteBtn.disabled = false;
+      deleteBtnText.textContent = 'Hapus Sekarang';
+      deleteSpinner.classList.add('hidden');
+      pendingDeleteId = null;
+    }
+  });
+
   // Edit Modal Actions
   const editModal = document.getElementById('edit-modal');
   const closeModalBtn = document.getElementById('close-modal-btn');
   const cancelEditBtn = document.getElementById('cancel-edit-btn');
   const editForm = document.getElementById('edit-product-form');
+  const saveEditBtn = document.getElementById('save-edit-btn');
+  const saveBtnText = document.getElementById('save-btn-text');
+  const saveSpinner = document.getElementById('save-spinner');
 
   closeModalBtn.addEventListener('click', () => editModal.classList.add('hidden'));
   cancelEditBtn.addEventListener('click', () => editModal.classList.add('hidden'));
@@ -926,12 +1223,31 @@ const INITIAL_PRODUCTS = PRODUCTS.map(p => ({
     const processing_time = document.getElementById('edit-prod-time').value.trim();
     const description = document.getElementById('edit-prod-desc').value.trim();
     const featured = document.getElementById('edit-prod-featured').checked;
+    let imageUrl = document.getElementById('edit-prod-current-image').value;
 
-    const saveBtn = document.getElementById('save-edit-btn');
-    saveBtn.textContent = 'Menyimpan...';
-    saveBtn.disabled = true;
+    saveEditBtn.disabled = true;
+    saveBtnText.textContent = 'Menyimpan...';
+    saveSpinner.classList.remove('hidden');
 
     try {
+      // Jika admin mengganti foto, upload ke storage
+      if (editNewImageBlob) {
+        saveBtnText.textContent = 'Upload foto baru...';
+        const p = allProductsList.find(x => x.id === id);
+        const slug = p ? p.slug : `prod-${Date.now()}`;
+        const fileName = `${slug}-${Date.now()}.webp`;
+
+        const { error: uploadError } = await supabase.storage
+          .from(SUPABASE_BUCKET)
+          .upload(fileName, editNewImageBlob, { contentType: 'image/webp', upsert: true });
+
+        if (uploadError) throw new Error('Upload foto baru gagal: ' + uploadError.message);
+
+        const { data: publicUrlData } = supabase.storage.from(SUPABASE_BUCKET).getPublicUrl(fileName);
+        imageUrl = publicUrlData.publicUrl;
+      }
+
+      saveBtnText.textContent = 'Memperbarui data...';
       const { error } = await supabase
         .from('products')
         .update({
@@ -942,59 +1258,35 @@ const INITIAL_PRODUCTS = PRODUCTS.map(p => ({
           price_label,
           processing_time,
           description,
-          featured
+          featured,
+          image: imageUrl
         })
         .eq('id', id);
 
       if (error) throw error;
 
       editModal.classList.add('hidden');
+      showToast('Perubahan produk berhasil disimpan!', 'success');
       loadAllProducts();
     } catch (err) {
-      alert('Gagal mengupdate produk: ' + err.message);
+      showToast('Gagal mengupdate: ' + err.message, 'error');
     } finally {
-      saveBtn.textContent = 'Simpan Perubahan';
-      saveBtn.disabled = false;
+      saveEditBtn.disabled = false;
+      saveBtnText.textContent = 'Simpan Perubahan';
+      saveSpinner.classList.add('hidden');
     }
   });
 
-  // Import Default Products Batch Action
-  const importBtn = document.getElementById('import-defaults-btn');
-  const importBtnText = document.getElementById('import-btn-text');
-  const importSpinner = document.getElementById('import-spinner');
-
-  importBtn?.addEventListener('click', async () => {
-    if (!confirm(`Impor ${INITIAL_PRODUCTS.length} produk katalog sekarang ke database cloud?`)) return;
-
-    importBtn.disabled = true;
-    importBtnText.textContent = `Mengimpor ${INITIAL_PRODUCTS.length} Produk...`;
-    importSpinner.classList.remove('hidden');
-
-    try {
-      const { error } = await supabase.from('products').upsert(INITIAL_PRODUCTS, { onConflict: 'slug' });
-      if (error) throw error;
-      alert(`Sukses! ${INITIAL_PRODUCTS.length} produk berhasil diimpor ke database Supabase.`);
-      loadAllProducts();
-    } catch (err) {
-      alert('Gagal mengimpor: ' + err.message);
-    } finally {
-      importBtn.disabled = false;
-      importBtnText.textContent = 'Impor Semua Produk Sekarang';
-      importSpinner.classList.add('hidden');
-    }
-  });
-
-  // Add Product Form
+  // Add Product Form Handler
   const addForm = document.getElementById('add-product-form');
   const submitBtn = document.getElementById('submit-btn');
   const btnText = document.getElementById('btn-text');
   const btnSpinner = document.getElementById('btn-spinner');
-  const formAlert = document.getElementById('form-alert');
 
   addForm.addEventListener('submit', async (e) => {
     e.preventDefault();
     if (!processedImageBlob) {
-      alert('Silakan pilih atau potret foto produk terlebih dahulu.');
+      showToast('Silakan pilih atau potret foto produk terlebih dahulu.', 'error');
       return;
     }
 
@@ -1012,9 +1304,8 @@ const INITIAL_PRODUCTS = PRODUCTS.map(p => ({
     const slug = `${slugBase}-${Date.now().toString().slice(-4)}`;
 
     submitBtn.disabled = true;
-    btnText.textContent = 'Mengompres Foto & Menyimpan...';
+    btnText.textContent = 'Mengupload foto & menyimpan...';
     btnSpinner.classList.remove('hidden');
-    formAlert.classList.add('hidden');
 
     try {
       const fileName = `${slug}-${Date.now()}.webp`;
@@ -1043,7 +1334,7 @@ const INITIAL_PRODUCTS = PRODUCTS.map(p => ({
 
       if (insertError) throw new Error('Simpan database gagal: ' + insertError.message);
 
-      alert(`Berhasil! Produk "${name}" berhasil ditambahkan.`);
+      showToast(`Produk "${name}" berhasil ditambahkan!`, 'success');
       addForm.reset();
       processedImageBlob = null;
       pricePreview.textContent = 'Format: Rp 0';
@@ -1055,14 +1346,97 @@ const INITIAL_PRODUCTS = PRODUCTS.map(p => ({
       loadAllProducts();
 
     } catch (err) {
-      alert('Error: ' + err.message);
+      showToast('Error: ' + err.message, 'error');
     } finally {
       submitBtn.disabled = false;
       btnText.textContent = 'Simpan & Publikasikan Produk';
       btnSpinner.classList.add('hidden');
     }
   });
-
-  // Check auth on load
-  checkAuth();
 </script>
+
+<style>
+  /* ================= SUBTLE LIGHTWEIGHT ANIMATIONS ================= */
+  @keyframes fadeIn {
+    from {
+      opacity: 0;
+      transform: translateY(4px);
+    }
+    to {
+      opacity: 1;
+      transform: translateY(0);
+    }
+  }
+
+  @keyframes modalPop {
+    from {
+      opacity: 0;
+      transform: scale(0.96) translateY(8px);
+    }
+    to {
+      opacity: 1;
+      transform: scale(1) translateY(0);
+    }
+  }
+
+  @keyframes slideUp {
+    from {
+      opacity: 0;
+      transform: translateY(12px);
+    }
+    to {
+      opacity: 1;
+      transform: translateY(0);
+    }
+  }
+
+  @keyframes toastIn {
+    from {
+      opacity: 0;
+      transform: translateX(20px) scale(0.95);
+    }
+    to {
+      opacity: 1;
+      transform: translateX(0) scale(1);
+    }
+  }
+
+  @keyframes fadeOut {
+    from {
+      opacity: 1;
+      transform: translateX(0);
+    }
+    to {
+      opacity: 0;
+      transform: translateX(20px);
+    }
+  }
+
+  .animate-fade-in {
+    animation: fadeIn 0.28s cubic-bezier(0.16, 1, 0.3, 1) forwards;
+  }
+
+  .animate-modal-pop {
+    animation: modalPop 0.22s cubic-bezier(0.16, 1, 0.3, 1) forwards;
+  }
+
+  .animate-slide-up {
+    animation: slideUp 0.3s cubic-bezier(0.16, 1, 0.3, 1) both;
+  }
+
+  .animate-toast-in {
+    animation: toastIn 0.25s cubic-bezier(0.16, 1, 0.3, 1) forwards;
+  }
+
+  .animate-fade-out {
+    animation: fadeOut 0.2s cubic-bezier(0.16, 1, 0.3, 1) forwards;
+  }
+
+  .product-admin-card {
+    will-change: transform, box-shadow;
+  }
+
+  .stat-card {
+    will-change: transform;
+  }
+</style>
