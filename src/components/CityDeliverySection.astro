@@ -10,8 +10,8 @@ interface Props {
 const { currentCitySlug = 'malang-raya', allCities = [] } = Astro.props;
 
 // Merge provided cities with DEFAULT_CITIES
-const mergedCities = [];
-const seenSlugs = new Set();
+const mergedCities: any[] = [];
+const seenSlugs = new Set<string>();
 
 (allCities || []).forEach(c => {
   const name = typeof c === 'string' ? c : c.name;
