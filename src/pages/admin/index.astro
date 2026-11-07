@@ -182,6 +182,13 @@ const title = "Admin — Zaloma Florist";
                 class="px-2.5 py-1.5 rounded-lg border border-slate-200 text-xs bg-white text-slate-700 focus:outline-none focus:border-primary focus:ring-1 focus:ring-primary/20 transition-all cursor-pointer"
               >
                 <option value="all">Semua Kategori</option>
+                <option value="bunga-papan">Bunga Papan</option>
+                <option value="bunga-papan-semi-styrofoam">Bunga Papan Semi Styrofoam</option>
+                <option value="bouquet">Bouquet</option>
+                <option value="standing-flower">Standing Flower</option>
+                <option value="bunga-meja">Bunga Meja</option>
+                <option value="tabulampot">Tabulampot</option>
+                <option value="paper-flower">Paper Flower</option>
               </select>
 
               <select 
@@ -274,6 +281,13 @@ const title = "Admin — Zaloma Florist";
                     class="w-full px-3 py-2 rounded-lg border border-slate-300 text-xs focus:outline-none focus:border-primary focus:ring-1 focus:ring-primary/20 transition-all bg-white cursor-pointer"
                   >
                     <option value="" disabled selected>Pilih Kategori...</option>
+                    <option value="bunga-papan" data-name="Bunga Papan">Bunga Papan</option>
+                    <option value="bunga-papan-semi-styrofoam" data-name="Bunga Papan Semi Styrofoam">Bunga Papan Semi Styrofoam</option>
+                    <option value="bouquet" data-name="Bouquet">Bouquet</option>
+                    <option value="standing-flower" data-name="Standing Flower">Standing Flower</option>
+                    <option value="bunga-meja" data-name="Bunga Meja">Bunga Meja</option>
+                    <option value="tabulampot" data-name="Tabulampot">Tabulampot</option>
+                    <option value="paper-flower" data-name="Paper Flower">Paper Flower</option>
                   </select>
                 </div>
 
@@ -361,7 +375,45 @@ const title = "Admin — Zaloma Florist";
                     id="prod-size" 
                     class="w-full px-3 py-2 rounded-lg border border-slate-300 text-xs bg-white focus:outline-none focus:border-primary focus:ring-1 focus:ring-primary/20 transition-all cursor-pointer"
                   >
-                    <option value="">Pilih Ukuran (Pilih kategori dulu)...</option>
+                    <option value="">-- Pilih Ukuran (Opsional) --</option>
+                    <optgroup label="Bunga Papan">
+                      <option value="2 x 1.2 m" data-category="bunga-papan">📏 2 x 1.2 m (Ukuran Standar)</option>
+                      <option value="2 x 1.5 m" data-category="bunga-papan">📏 2 x 1.5 m (Ukuran Sedang)</option>
+                      <option value="2 x 1.8 m" data-category="bunga-papan">📏 2 x 1.8 m (Ukuran Besar)</option>
+                      <option value="2 x 2 m" data-category="bunga-papan">📏 2 x 2 m (Ukuran Jumbo)</option>
+                      <option value="4 x 2 m" data-category="bunga-papan">📏 4 x 2 m (Ukuran Gandeng Double)</option>
+                    </optgroup>
+                    <optgroup label="Bunga Papan Semi Styrofoam">
+                      <option value="2 x 1.2 m" data-category="bunga-papan-semi-styrofoam">📏 2 x 1.2 m (Standar Semi 3D)</option>
+                      <option value="2 x 1.5 m" data-category="bunga-papan-semi-styrofoam">📏 2 x 1.5 m (Sedang Semi 3D)</option>
+                      <option value="2 x 2 m" data-category="bunga-papan-semi-styrofoam">📏 2 x 2 m (Jumbo Semi 3D)</option>
+                    </optgroup>
+                    <optgroup label="Bouquet">
+                      <option value="Small (5 - 7 Tangkai)" data-category="bouquet">📏 Small (5 - 7 Tangkai)</option>
+                      <option value="Medium (10 - 15 Tangkai)" data-category="bouquet">📏 Medium (10 - 15 Tangkai)</option>
+                      <option value="Large (20 - 30 Tangkai)" data-category="bouquet">📏 Large (20 - 30 Tangkai)</option>
+                      <option value="Jumbo (50+ Tangkai)" data-category="bouquet">📏 Jumbo (50+ Tangkai)</option>
+                    </optgroup>
+                    <optgroup label="Standing Flower">
+                      <option value="1 Tingkat (Tinggi ± 1.2 m)" data-category="standing-flower">📏 1 Tingkat (Tinggi ± 1.2 m)</option>
+                      <option value="2 Tingkat (Tinggi ± 1.5 - 1.7 m)" data-category="standing-flower">📏 2 Tingkat (Tinggi ± 1.5 - 1.7 m)</option>
+                      <option value="3 Tingkat / Luxury (Tinggi ± 2 m)" data-category="standing-flower">📏 3 Tingkat / Luxury (Tinggi ± 2 m)</option>
+                    </optgroup>
+                    <optgroup label="Bunga Meja">
+                      <option value="Compact / Mini (Vas 15 - 20 cm)" data-category="bunga-meja">📏 Compact / Mini (Vas 15 - 20 cm)</option>
+                      <option value="Medium (Vas 25 - 30 cm)" data-category="bunga-meja">📏 Medium (Vas 25 - 30 cm)</option>
+                      <option value="Large / Mewah (Vas > 35 cm)" data-category="bunga-meja">📏 Large / Mewah (Vas > 35 cm)</option>
+                    </optgroup>
+                    <optgroup label="Tabulampot">
+                      <option value="Pot Kecil (Diameter 25 - 30 cm)" data-category="tabulampot">📏 Pot Kecil (Diameter 25 - 30 cm)</option>
+                      <option value="Pot Sedang (Diameter 35 - 45 cm)" data-category="tabulampot">📏 Pot Sedang (Diameter 35 - 45 cm)</option>
+                      <option value="Pot Besar (Diameter > 50 cm)" data-category="tabulampot">📏 Pot Besar (Diameter > 50 cm)</option>
+                    </optgroup>
+                    <optgroup label="Paper Flower">
+                      <option value="2 x 1.2 m (Papan Kertas Standar)" data-category="paper-flower">📏 2 x 1.2 m (Papan Kertas Standar)</option>
+                      <option value="2 x 1.5 m (Papan Kertas Sedang)" data-category="paper-flower">📏 2 x 1.5 m (Papan Kertas Sedang)</option>
+                      <option value="Frame / Box (20 x 25 cm)" data-category="paper-flower">📏 Frame / Box (20 x 25 cm)</option>
+                    </optgroup>
                   </select>
                   <p class="text-[10px] text-slate-400 mt-1">Pilihan ukuran otomatis menyesuaikan kategori yang dipilih.</p>
                 </div>
@@ -595,6 +647,14 @@ const title = "Admin — Zaloma Florist";
             <div>
               <label class="block text-xs font-semibold text-slate-700 mb-1">Kategori</label>
               <select id="edit-prod-category" required class="w-full px-2.5 py-1.5 rounded-lg border border-slate-300 text-xs bg-white focus:outline-none focus:border-primary focus:ring-1 focus:ring-primary/20 transition-all cursor-pointer">
+                <option value="" disabled selected>Pilih Kategori...</option>
+                <option value="bunga-papan" data-name="Bunga Papan">Bunga Papan</option>
+                <option value="bunga-papan-semi-styrofoam" data-name="Bunga Papan Semi Styrofoam">Bunga Papan Semi Styrofoam</option>
+                <option value="bouquet" data-name="Bouquet">Bouquet</option>
+                <option value="standing-flower" data-name="Standing Flower">Standing Flower</option>
+                <option value="bunga-meja" data-name="Bunga Meja">Bunga Meja</option>
+                <option value="tabulampot" data-name="Tabulampot">Tabulampot</option>
+                <option value="paper-flower" data-name="Paper Flower">Paper Flower</option>
               </select>
             </div>
             <div>
@@ -662,7 +722,45 @@ const title = "Admin — Zaloma Florist";
               </button>
             </div>
             <select id="edit-prod-size" class="w-full px-3 py-1.5 rounded-lg border border-slate-300 text-xs bg-white focus:outline-none focus:border-primary focus:ring-1 focus:ring-primary/20 transition-all cursor-pointer">
-              <option value="">Pilih Ukuran (Pilih kategori dulu)...</option>
+              <option value="">-- Pilih Ukuran (Opsional) --</option>
+              <optgroup label="Bunga Papan">
+                <option value="2 x 1.2 m" data-category="bunga-papan">📏 2 x 1.2 m (Ukuran Standar)</option>
+                <option value="2 x 1.5 m" data-category="bunga-papan">📏 2 x 1.5 m (Ukuran Sedang)</option>
+                <option value="2 x 1.8 m" data-category="bunga-papan">📏 2 x 1.8 m (Ukuran Besar)</option>
+                <option value="2 x 2 m" data-category="bunga-papan">📏 2 x 2 m (Ukuran Jumbo)</option>
+                <option value="4 x 2 m" data-category="bunga-papan">📏 4 x 2 m (Ukuran Gandeng Double)</option>
+              </optgroup>
+              <optgroup label="Bunga Papan Semi Styrofoam">
+                <option value="2 x 1.2 m" data-category="bunga-papan-semi-styrofoam">📏 2 x 1.2 m (Standar Semi 3D)</option>
+                <option value="2 x 1.5 m" data-category="bunga-papan-semi-styrofoam">📏 2 x 1.5 m (Sedang Semi 3D)</option>
+                <option value="2 x 2 m" data-category="bunga-papan-semi-styrofoam">📏 2 x 2 m (Jumbo Semi 3D)</option>
+              </optgroup>
+              <optgroup label="Bouquet">
+                <option value="Small (5 - 7 Tangkai)" data-category="bouquet">📏 Small (5 - 7 Tangkai)</option>
+                <option value="Medium (10 - 15 Tangkai)" data-category="bouquet">📏 Medium (10 - 15 Tangkai)</option>
+                <option value="Large (20 - 30 Tangkai)" data-category="bouquet">📏 Large (20 - 30 Tangkai)</option>
+                <option value="Jumbo (50+ Tangkai)" data-category="bouquet">📏 Jumbo (50+ Tangkai)</option>
+              </optgroup>
+              <optgroup label="Standing Flower">
+                <option value="1 Tingkat (Tinggi ± 1.2 m)" data-category="standing-flower">📏 1 Tingkat (Tinggi ± 1.2 m)</option>
+                <option value="2 Tingkat (Tinggi ± 1.5 - 1.7 m)" data-category="standing-flower">📏 2 Tingkat (Tinggi ± 1.5 - 1.7 m)</option>
+                <option value="3 Tingkat / Luxury (Tinggi ± 2 m)" data-category="standing-flower">📏 3 Tingkat / Luxury (Tinggi ± 2 m)</option>
+              </optgroup>
+              <optgroup label="Bunga Meja">
+                <option value="Compact / Mini (Vas 15 - 20 cm)" data-category="bunga-meja">📏 Compact / Mini (Vas 15 - 20 cm)</option>
+                <option value="Medium (Vas 25 - 30 cm)" data-category="bunga-meja">📏 Medium (Vas 25 - 30 cm)</option>
+                <option value="Large / Mewah (Vas > 35 cm)" data-category="bunga-meja">📏 Large / Mewah (Vas > 35 cm)</option>
+              </optgroup>
+              <optgroup label="Tabulampot">
+                <option value="Pot Kecil (Diameter 25 - 30 cm)" data-category="tabulampot">📏 Pot Kecil (Diameter 25 - 30 cm)</option>
+                <option value="Pot Sedang (Diameter 35 - 45 cm)" data-category="tabulampot">📏 Pot Sedang (Diameter 35 - 45 cm)</option>
+                <option value="Pot Besar (Diameter > 50 cm)" data-category="tabulampot">📏 Pot Besar (Diameter > 50 cm)</option>
+              </optgroup>
+              <optgroup label="Paper Flower">
+                <option value="2 x 1.2 m (Papan Kertas Standar)" data-category="paper-flower">📏 2 x 1.2 m (Papan Kertas Standar)</option>
+                <option value="2 x 1.5 m (Papan Kertas Sedang)" data-category="paper-flower">📏 2 x 1.5 m (Papan Kertas Sedang)</option>
+                <option value="Frame / Box (20 x 25 cm)" data-category="paper-flower">📏 Frame / Box (20 x 25 cm)</option>
+              </optgroup>
             </select>
           </div>
 
@@ -1268,10 +1366,25 @@ const title = "Admin — Zaloma Florist";
         const prevProdVal = prodCat ? prodCat.value : '';
         const prevEditVal = editCat ? editCat.value : '';
 
+        const combinedCats = [];
+        const seenSlugs = new Set();
+        (categoriesList || []).forEach(c => {
+          if (c && c.slug && !seenSlugs.has(c.slug)) {
+            seenSlugs.add(c.slug);
+            combinedCats.push(c);
+          }
+        });
+        (DEFAULT_CATEGORIES || []).forEach(c => {
+          if (c && c.slug && !seenSlugs.has(c.slug)) {
+            seenSlugs.add(c.slug);
+            combinedCats.push(c);
+          }
+        });
+
         if (catFilter) {
           catFilter.innerHTML = '<option value="all">Semua Kategori</option>' +
-            categoriesList.map(c => `<option value="${c.slug}">${c.name}</option>`).join('');
-          if (categoriesList.some(c => c.slug === prevFilterVal)) {
+            combinedCats.map(c => `<option value="${c.slug}">${c.name}</option>`).join('');
+          if (combinedCats.some(c => c.slug === prevFilterVal)) {
             catFilter.value = prevFilterVal;
           } else {
             catFilter.value = 'all';
@@ -1280,16 +1393,16 @@ const title = "Admin — Zaloma Florist";
 
         if (prodCat) {
           prodCat.innerHTML = '<option value="" disabled selected>Pilih Kategori...</option>' +
-            categoriesList.map(c => `<option value="${c.slug}" data-name="${c.name}">${c.name}</option>`).join('');
-          if (prevProdVal && categoriesList.some(c => c.slug === prevProdVal)) {
+            combinedCats.map(c => `<option value="${c.slug}" data-name="${c.name}">${c.name}</option>`).join('');
+          if (prevProdVal && combinedCats.some(c => c.slug === prevProdVal)) {
             prodCat.value = prevProdVal;
           }
         }
 
         if (editCat) {
           editCat.innerHTML = '<option value="" disabled selected>Pilih Kategori...</option>' +
-            categoriesList.map(c => `<option value="${c.slug}" data-name="${c.name}">${c.name}</option>`).join('');
-          if (prevEditVal && categoriesList.some(c => c.slug === prevEditVal)) {
+            combinedCats.map(c => `<option value="${c.slug}" data-name="${c.name}">${c.name}</option>`).join('');
+          if (prevEditVal && combinedCats.some(c => c.slug === prevEditVal)) {
             editCat.value = prevEditVal;
           }
         }
@@ -2041,28 +2154,73 @@ const title = "Admin — Zaloma Florist";
         if (!select) return;
 
         const prevVal = select.value;
-        if (!categorySlug) {
-          select.innerHTML = '<option value="">Pilih Ukuran (Pilih kategori dulu)...</option>';
-          return;
-        }
+        const baseSlug = (categorySlug || '').split('--')[0];
 
-        const baseSlug = categorySlug.split('--')[0];
-        const matchedSizes = sizesList.filter(s => s.category_slug === baseSlug || s.category_slug === categorySlug);
-
-        if (matchedSizes.length === 0) {
-          select.innerHTML = '<option value="">-- Belum ada ukuran khusus (Opsional) --</option>';
-          return;
-        }
+        // Combine categories
+        const combinedCats = [];
+        const seenSlugs = new Set();
+        (categoriesList || []).forEach(c => {
+          if (c && c.slug && !seenSlugs.has(c.slug)) {
+            seenSlugs.add(c.slug);
+            combinedCats.push(c);
+          }
+        });
+        (DEFAULT_CATEGORIES || []).forEach(c => {
+          if (c && c.slug && !seenSlugs.has(c.slug)) {
+            seenSlugs.add(c.slug);
+            combinedCats.push(c);
+          }
+        });
 
         let html = '<option value="">-- Pilih Ukuran (Opsional) --</option>';
-        html += matchedSizes.map(s => {
-          const desc = s.description ? ` (${s.description})` : '';
-          return `<option value="${s.name}">📏 ${s.name}${desc}</option>`;
-        }).join('');
+
+        if (baseSlug) {
+          const matchedSizes = sizesList.filter(s => s.category_slug === baseSlug || s.category_slug === categorySlug);
+          const otherSizes = sizesList.filter(s => s.category_slug !== baseSlug && s.category_slug !== categorySlug);
+
+          if (matchedSizes.length > 0) {
+            const currentCatObj = combinedCats.find(c => c.slug === baseSlug);
+            const currentCatName = currentCatObj ? currentCatObj.name : baseSlug;
+            html += `<optgroup label="Ukuran untuk ${currentCatName}">`;
+            html += matchedSizes.map(s => {
+              const desc = s.description ? ` (${s.description})` : '';
+              return `<option value="${s.name}" data-category="${s.category_slug}">📏 ${s.name}${desc}</option>`;
+            }).join('');
+            html += `</optgroup>`;
+          }
+
+          if (otherSizes.length > 0) {
+            combinedCats.forEach(cat => {
+              if (cat.slug === baseSlug) return;
+              const catSizes = otherSizes.filter(s => s.category_slug === cat.slug);
+              if (catSizes.length > 0) {
+                html += `<optgroup label="Ukuran ${cat.name}">`;
+                html += catSizes.map(s => {
+                  const desc = s.description ? ` (${s.description})` : '';
+                  return `<option value="${s.name}" data-category="${s.category_slug}">📏 ${s.name}${desc}</option>`;
+                }).join('');
+                html += `</optgroup>`;
+              }
+            });
+          }
+        } else {
+          // NO category selected yet: SHOW ALL SIZES FROM DATABASE GROUPED BY CATEGORY!
+          combinedCats.forEach(cat => {
+            const catSizes = sizesList.filter(s => s.category_slug === cat.slug);
+            if (catSizes.length > 0) {
+              html += `<optgroup label="${cat.name}">`;
+              html += catSizes.map(s => {
+                const desc = s.description ? ` (${s.description})` : '';
+                return `<option value="${s.name}" data-category="${s.category_slug}">📏 ${s.name}${desc}</option>`;
+              }).join('');
+              html += `</optgroup>`;
+            }
+          });
+        }
 
         select.innerHTML = html;
 
-        if (prevVal && matchedSizes.some(s => s.name === prevVal)) {
+        if (prevVal) {
           select.value = prevVal;
         }
       }
@@ -2071,14 +2229,30 @@ const title = "Admin — Zaloma Florist";
         const prodCat = document.getElementById('prod-category');
         const editCat = document.getElementById('edit-prod-category');
 
-        if (prodCat && prodCat.value) {
-          updateSizeDropdownForCategory(prodCat.value, 'prod-size');
-        }
-        if (editCat && editCat.value) {
-          updateSizeDropdownForCategory(editCat.value, 'edit-prod-size');
-        }
+        updateSizeDropdownForCategory(prodCat ? prodCat.value : '', 'prod-size');
+        updateSizeDropdownForCategory(editCat ? editCat.value : '', 'edit-prod-size');
         updateSizeBadges();
       }
+
+      const prodSizeSelect = document.getElementById('prod-size');
+      prodSizeSelect?.addEventListener('change', () => {
+        const selectedOpt = prodSizeSelect.options[prodSizeSelect.selectedIndex];
+        const catSlug = selectedOpt?.getAttribute('data-category');
+        if (catSlug && prodCategorySelect && !prodCategorySelect.value) {
+          prodCategorySelect.value = catSlug;
+          prodCategorySelect.dispatchEvent(new Event('change'));
+        }
+      });
+
+      const editProdSizeSelect = document.getElementById('edit-prod-size');
+      editProdSizeSelect?.addEventListener('change', () => {
+        const selectedOpt = editProdSizeSelect.options[editProdSizeSelect.selectedIndex];
+        const catSlug = selectedOpt?.getAttribute('data-category');
+        if (catSlug && editCategorySelect && !editCategorySelect.value) {
+          editCategorySelect.value = catSlug;
+          editCategorySelect.dispatchEvent(new Event('change'));
+        }
+      });
 
       // Quick manage size shortcuts
       document.getElementById('quick-manage-size-btn')?.addEventListener('click', () => {
