@@ -8,7 +8,11 @@ export default defineConfig({
   // GitHub Pages project site: https://arganaart-prog.github.io/zaloma-florist/
   base: '/',
   devToolbar: { enabled: false },
-  integrations: [sitemap()],
+  integrations: [
+    sitemap({
+      filter: (page) => !page.includes('/admin') && !page.includes('/produk/detail')
+    })
+  ],
   vite: {
     plugins: [tailwindcss()],
   }
