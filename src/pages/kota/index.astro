@@ -80,10 +80,32 @@ dynamicCities.forEach(c => {
 
 const allCities = Array.from(cityMap.values());
 
+// Group cities by Province (Persis Sekarsari)
+const groupMap = new Map<string, any[]>();
+allCities.forEach(city => {
+  const prov = city.province || 'Area Pengiriman';
+  if (!groupMap.has(prov)) {
+    groupMap.set(prov, []);
+  }
+  groupMap.get(prov)!.push(city);
+});
+
+// Urutkan provinsi
+const sortedProvinces = Array.from(groupMap.keys()).sort((a, b) => {
+  if (a.includes('Jawa Timur')) return -1;
+  if (b.includes('Jawa Timur')) return 1;
+  return a.localeCompare(b);
+});
+
+const groupedCities = sortedProvinces.map(prov => ({
+  province: prov,
+  cities: groupMap.get(prov)!
+}));
+
 const siteUrl = 'https://zalomaflorist.com';
-const pageTitle = 'Area Pengiriman Bunga Indonesia | Zaloma Florist';
-const pageDesc = 'Lihat daftar kota jangkauan pengiriman Zaloma Florist untuk pesan bunga online, karangan bunga papan, buket bunga, standing flower & bunga meja terpercaya di Indonesia.';
-const waConsultUrl = `https://wa.me/${WHATSAPP_NUMBER}?text=${encodeURIComponent('Halo Zaloma Florist, saya ingin tanya pengiriman bunga ke kota saya...')}`;
+const pageTitle = 'Area Jangkauan Pengiriman Seluruh Kota | Zaloma Florist';
+const pageDesc = 'Lihat daftar lengkap kota jangkauan pengiriman karangan bunga, buket bunga, standing flower & bunga meja terpercaya dari Zaloma Florist di seluruh Indonesia.';
+const waConsultUrl = `https://wa.me/${WHATSAPP_NUMBER}?text=${encodeURIComponent('Halo Zaloma Florist, saya ingin tanya ketersediaan pengiriman bunga ke kota saya...')}`;
 
 // Schema JSON-LD CollectionPage
 const collectionSchema = {
@@ -97,7 +119,7 @@ const collectionSchema = {
     'itemListElement': allCities.map((c, i) => ({
       '@type': 'ListItem',
       'position': i + 1,
-      'name': `Toko Bunga ${c.name} - Zaloma Florist`,
+      'name': `${c.name} - Zaloma Florist`,
       'url': `${siteUrl}/kota/${c.slug}/`
     }))
   }
@@ -110,257 +132,598 @@ const collectionSchema = {
   schema={collectionSchema}
   canonical={`${siteUrl}/kota/`}
 >
-  <div class="min-h-screen bg-[#FDFBF7]">
-    <!-- HERO SECTION KOTA -->
-    <section class="relative bg-gradient-to-br from-[#1C2E24] via-[#243B2E] to-[#16251D] text-white pt-28 pb-16 md:pt-36 md:pb-24 overflow-hidden">
-      <!-- Decorative background blur/orbs -->
-      <div class="absolute inset-0 opacity-15 pointer-events-none" style="background-image: radial-gradient(circle at 20% 30%, #C5A25D 0%, transparent 40%), radial-gradient(circle at 80% 70%, #5B8266 0%, transparent 45%);"></div>
+  <div class="kota-page-root">
+    
+    <!-- =====================================================
+         HERO SECTION (Persis Desain Sekarsari dengan Warna Zaloma)
+         ===================================================== -->
+    <section class="kota-hero">
+      <!-- Background Image -->
+      <div class="kota-hero__bg" aria-hidden="true"></div>
       
-      <div class="container mx-auto px-4 sm:px-6 lg:px-8 max-w-6xl relative z-10 text-center">
+      <!-- Multi-layer Gradient Overlay Zaloma (#20080F ke #671E2F) -->
+      <div class="kota-hero__overlay" aria-hidden="true"></div>
+      <div class="kota-hero__overlay-bottom" aria-hidden="true"></div>
+
+      <!-- Decorative Orbs & Lines -->
+      <div class="kota-hero__decor" aria-hidden="true">
+        <div class="kota-hero__orb kota-hero__orb--1"></div>
+        <div class="kota-hero__orb kota-hero__orb--2"></div>
+        <div class="kota-hero__line kota-hero__line--1"></div>
+        <div class="kota-hero__line kota-hero__line--2"></div>
+        <div class="kota-hero__line kota-hero__line--3"></div>
+      </div>
+
+      <div class="kota-hero__container">
         <!-- Eyebrow -->
-        <div class="inline-flex items-center gap-2 px-4 py-1.5 rounded-full bg-white/10 backdrop-blur-md border border-white/20 text-[#E2C37E] text-xs font-semibold uppercase tracking-wider mb-5">
-          <span class="w-2 h-2 rounded-full bg-[#E2C37E] animate-ping"></span>
-          Jangkauan Pengiriman Florist Nasional
+        <div class="kota-hero__eyebrow">
+          <span class="kota-hero__eyebrow-dot"></span>
+          JANGKAUAN NASIONAL
         </div>
-
-        <h1 class="text-3xl sm:text-4xl md:text-5xl lg:text-6xl font-serif font-bold tracking-tight text-white mb-5 leading-tight">
-          Kirim Bunga ke <span class="text-[#E2C37E] underline decoration-[#C5A25D]/50 decoration-wavy">Seluruh Kota</span>
+        
+        <h1 class="kota-hero__title">
+          Kirim Bunga ke <span class="kota-hero__accent">Seluruh Kota</span>
         </h1>
-
-        <p class="text-gray-300 text-sm sm:text-base md:text-lg max-w-2xl mx-auto leading-relaxed mb-8">
-          Pilih kota tujuan pengiriman Anda. Kami bermitra dengan workshop florist profesional di setiap kota untuk menjamin kesegaran bunga dan kecepatan tiba di lokasi acara.
+        
+        <p class="kota-hero__desc">
+          Pilih kota tujuan pengiriman Anda. Kami bermitra dengan florist profesional di setiap wilayah untuk menjamin kesegaran dan keindahan bunga pesanan Anda.
         </p>
 
-        <!-- Trust Badges Strip -->
-        <div class="flex flex-wrap items-center justify-center gap-3 sm:gap-6 mb-10 text-xs sm:text-sm text-gray-200">
-          <div class="flex items-center gap-2 bg-white/10 backdrop-blur-sm px-4 py-2 rounded-full border border-white/15">
-            <svg class="w-4 h-4 text-[#E2C37E]" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M17.657 16.657L13.414 20.9a1.998 1.998 0 01-2.827 0l-4.244-4.243a8 8 0 1111.314 0z"/><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M15 11a3 3 0 11-6 0 3 3 0 016 0z"/></svg>
-            <span><strong class="text-white">{allCities.length}+ Kota</strong> Tersedia</span>
+        <!-- Trust Badges Persis Sekarsari -->
+        <div class="kota-hero__trust">
+          <div class="kota-hero__trust-item">
+            <svg class="w-4 h-4 text-[#DFC397]" fill="currentColor" viewBox="0 0 24 24">
+              <path d="M19 13h-2V7h2m-6 6h-2V7h2m6 10a2 2 0 0 1-2 2a2 2 0 0 1-2-2a2 2 0 0 1 2-2a2 2 0 0 1 2 2m-10 0a2 2 0 0 1-2 2a2 2 0 0 1-2-2a2 2 0 0 1 2-2a2 2 0 0 1 2 2m11-8v6h-2v-6m-4-6H3a2 2 0 0 0-2 2v10a2 2 0 0 0 2 2h1.2A3 3 0 0 1 7 19a3 3 0 0 1 2.8-2h4.4a3 3 0 0 1 2.8 2a3 3 0 0 1 2.8-2H21a2 2 0 0 0 2-2V9l-3-4h-5z"/>
+            </svg>
+            <span>{allCities.length}+ Kota Tersedia</span>
           </div>
-          <div class="flex items-center gap-2 bg-white/10 backdrop-blur-sm px-4 py-2 rounded-full border border-white/15">
-            <svg class="w-4 h-4 text-[#E2C37E]" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 12l2 2 4-4m6 2a9 9 0 11-18 0 9 9 0 0118 0z"/></svg>
-            <span>Garansi Kesegaran Bunga</span>
+          <div class="kota-hero__trust-item">
+            <svg class="w-4 h-4 text-[#DFC397]" fill="currentColor" viewBox="0 0 24 24">
+              <path d="M12 1L3 5v6c0 5.55 3.84 10.74 9 12c5.16-1.26 9-6.45 9-12V5l-9-4zm-2 16l-4-4l1.41-1.41L10 14.17l6.59-6.59L18 9l-8 8z"/>
+            </svg>
+            <span>Garansi Kualitas</span>
           </div>
-          <div class="flex items-center gap-2 bg-white/10 backdrop-blur-sm px-4 py-2 rounded-full border border-white/15">
-            <svg class="w-4 h-4 text-[#E2C37E]" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 8v4l3 3m6-3a9 9 0 11-18 0 9 9 0 0118 0z"/></svg>
-            <span>Same Day Delivery Cepat</span>
+          <div class="kota-hero__trust-item">
+            <svg class="w-4 h-4 text-[#DFC397]" fill="currentColor" viewBox="0 0 24 24">
+              <path d="M12 2A10 10 0 1 0 22 12A10 10 0 0 0 12 2zm1 15h-2v-6h2zm0-8h-2V7h2z"/>
+            </svg>
+            <span>Same Day Delivery</span>
           </div>
         </div>
 
-        <!-- Realtime Search Bar -->
-        <div class="max-w-xl mx-auto relative">
-          <div class="relative flex items-center bg-white/95 backdrop-blur-md rounded-2xl shadow-2xl p-2 border border-white/30 text-gray-800 transition-all focus-within:ring-4 focus-within:ring-[#C5A25D]/40">
-            <div class="pl-3 pr-2 text-[#5B8266]">
-              <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2.5" d="M21 21l-6-6m2-5a7 7 0 11-14 0 7 7 0 0114 0z"/></svg>
-            </div>
-            <input 
-              id="directory-city-search" 
-              type="text" 
-              placeholder="Ketik nama kota tujuan Anda (contoh: Surabaya, Malang, Batu)..."
-              class="w-full bg-transparent border-none text-gray-800 placeholder-gray-400 text-sm sm:text-base font-medium focus:outline-none focus:ring-0 py-2.5 px-2"
-              autocomplete="off"
-            />
-            <button 
-              id="clear-directory-search" 
-              type="button" 
-              class="hidden px-2.5 py-1 text-xs text-gray-400 hover:text-gray-700 font-semibold"
-              title="Reset pencarian"
-            >
-              Clear
-            </button>
+        <!-- Glassmorphism Search Bar -->
+        <div class="kota-hero__search">
+          <div class="kota-hero__search-icon">
+            <svg class="w-5 h-5 text-gray-400" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+              <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M21 21l-6-6m2-5a7 7 0 11-14 0 7 7 0 0114 0z" />
+            </svg>
           </div>
-          <p class="text-xs text-gray-400 mt-2.5">
-            Ditemukan <span id="cities-counter" class="text-[#E2C37E] font-bold">{allCities.length}</span> kota jangkauan aktif.
-          </p>
+          <input 
+            id="searchAllCitiesInput" 
+            type="search" 
+            class="kota-hero__search-input" 
+            placeholder="Cari kota atau provinsi tujuan Anda..." 
+            autocomplete="off"
+          />
         </div>
+      </div>
+
+      <!-- Bottom Wave Divider -->
+      <div class="kota-hero__wave" aria-hidden="true">
+        <svg viewBox="0 0 1440 100" fill="none" xmlns="http://www.w3.org/2000/svg" preserveAspectRatio="none">
+          <path d="M0,60L80,55C160,50,320,40,480,45C640,50,800,70,960,72C1120,74,1280,58,1360,50L1440,42L1440,100L1360,100C1280,100,1120,100,960,100C800,100,640,100,480,100C320,100,160,100,80,100L0,100Z" fill="rgba(250, 240, 241, 0.4)" />
+          <path d="M0,75L80,78C160,81,320,87,480,83C640,79,800,65,960,62C1120,59,1280,67,1360,71L1440,75L1440,100L1360,100C1280,100,1120,100,960,100C800,100,640,100,480,100C320,100,160,100,80,100L0,100Z" fill="#FAF0F1" />
+        </svg>
       </div>
     </section>
 
-    <!-- BREADCRUMB -->
-    <div class="bg-[#F4EFEA] border-b border-[#E8DFC8]/60 py-3">
-      <div class="container mx-auto px-4 sm:px-6 lg:px-8 max-w-6xl">
-        <nav class="flex items-center text-xs text-gray-500 gap-2">
-          <a href={withBase('/')} class="hover:text-[#5B8266] transition-colors">Beranda</a>
-          <svg class="w-3.5 h-3.5 text-gray-400" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 5l7 7-7 7"/></svg>
-          <span class="text-gray-800 font-semibold">Area Pengiriman Kota</span>
-        </nav>
-      </div>
-    </div>
-
-    <!-- MAIN CITIES GRID SECTION -->
-    <section class="py-12 md:py-20">
-      <div class="container mx-auto px-4 sm:px-6 lg:px-8 max-w-6xl">
+    <!-- =====================================================
+         CONTENT SECTION (Grouped per Province Persis Sekarsari)
+         ===================================================== -->
+    <section class="py-16 bg-[#FAF0F1]/50">
+      <div class="container mx-auto px-4 sm:px-6 lg:px-8 max-w-7xl">
         
-        <!-- Header -->
-        <div class="flex flex-col sm:flex-row sm:items-end justify-between gap-4 mb-10 pb-4 border-b border-gray-200">
-          <div>
-            <span class="text-[#5B8266] text-xs font-bold uppercase tracking-wider block mb-1">Katalog Wilayah</span>
-            <h2 class="text-2xl sm:text-3xl font-serif font-bold text-gray-900">Daftar Kota Jangkauan Pengiriman</h2>
-          </div>
-          <p class="text-xs sm:text-sm text-gray-500 max-w-md">
-            Pilih kota untuk melihat katalog karangan bunga, buket & standing flower yang tersedia khusus untuk area tersebut.
-          </p>
-        </div>
-
-        <!-- City Cards Grid -->
-        <div id="city-cards-grid" class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-6">
-          {allCities.map((city) => (
-            <a
-              href={withBase(`/kota/${city.slug}/`)}
-              data-city-card
-              data-city-name={city.name.toLowerCase()}
-              data-city-province={city.province.toLowerCase()}
-              class="group relative h-56 sm:h-64 rounded-2xl overflow-hidden block border border-gray-100 shadow-md hover:shadow-2xl transition-all duration-500 hover:-translate-y-1.5 bg-[#1C2E24]"
-            >
-              <!-- Background Image -->
-              <img
-                src={withBase(city.image)}
-                alt={`Toko Bunga ${city.name} - Zaloma Florist`}
-                class="absolute inset-0 w-full h-full object-cover group-hover:scale-110 transition-transform duration-700 ease-out opacity-85"
-                loading="lazy"
-              />
-
-              <!-- Multi-layer Gradient Overlay for readability -->
-              <div class="absolute inset-0 bg-gradient-to-t from-black/90 via-black/45 to-transparent"></div>
-
-              <!-- Top Badges -->
-              <div class="absolute top-4 left-4 right-4 flex items-center justify-between pointer-events-none z-10">
-                <span class="inline-flex items-center gap-1.5 px-3 py-1 rounded-full text-[11px] font-semibold bg-white/20 backdrop-blur-md text-white border border-white/25">
-                  <span class="w-1.5 h-1.5 rounded-full bg-emerald-400"></span>
-                  {city.isMainArea ? 'Workshop Pusat' : 'Layanan Mitra'}
-                </span>
-                <span class="inline-flex items-center text-[10px] text-white/90 bg-black/40 backdrop-blur-md px-2.5 py-1 rounded-full border border-white/10">
-                  Same Day 3 Jam
-                </span>
-              </div>
-
-              <!-- Content Bottom -->
-              <div class="absolute inset-0 flex flex-col justify-end p-5 z-10">
-                <div class="flex items-end justify-between gap-3">
-                  <div class="min-w-0 flex-1">
-                    <h3 class="text-xl sm:text-2xl font-serif font-bold text-white mb-1 group-hover:text-[#E2C37E] transition-colors drop-shadow line-clamp-1">
-                      {city.name}
-                    </h3>
-                    <p class="text-white/80 text-xs font-medium flex items-center gap-1 line-clamp-1">
-                      <svg class="w-3.5 h-3.5 text-[#E2C37E] shrink-0" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M17.657 16.657L13.414 20.9a1.998 1.998 0 01-2.827 0l-4.244-4.243a8 8 0 1111.314 0z"/></svg>
-                      <span>{city.province}</span>
-                    </p>
-                  </div>
-
-                  <!-- Arrow Circle Button -->
-                  <div class="w-10 h-10 rounded-full bg-white/20 backdrop-blur-md flex items-center justify-center text-white border border-white/30 shrink-0 group-hover:bg-[#C5A25D] group-hover:border-[#C5A25D] transition-colors shadow-lg">
-                    <svg class="w-4 h-4 transform group-hover:translate-x-0.5 group-hover:-translate-y-0.5 transition-transform" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2.5" d="M14 5l7 7m0 0l-7 7m7-7H3"/></svg>
-                  </div>
+        <div id="provincesWrapper">
+          {groupedCities.map((group) => (
+            <div class="province-group mb-16 last:mb-0" data-province-section>
+              
+              <!-- Province Header -->
+              <div class="flex items-center gap-4 mb-8">
+                <div class="w-12 h-12 rounded-2xl bg-white border border-[#f0d5db] shadow-sm flex items-center justify-center text-[#893144] text-xl shrink-0">
+                  <svg class="w-6 h-6 fill-current" viewBox="0 0 24 24">
+                    <path d="M12 2C8.13 2 5 5.13 5 9c0 5.25 7 13 7 13s7-7.75 7-13c0-3.87-3.13-7-7-7zm0 9.5c-1.38 0-2.5-1.12-2.5-2.5s1.12-2.5 2.5-2.5 2.5 1.12 2.5 2.5-1.12 2.5-2.5 2.5z"/>
+                  </svg>
                 </div>
+                <h2 class="text-2xl sm:text-3xl lg:text-4xl font-bold text-[#671E2F] font-serif">
+                  {group.province}
+                </h2>
+                <div class="h-px bg-[#f0d5db] flex-1 ml-4 mt-2"></div>
               </div>
-            </a>
+
+              <!-- Cities Grid (Persis Sekarsari - Tanpa Teks "Toko Bunga") -->
+              <div class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 gap-6">
+                {group.cities.map((city) => {
+                  const href = city.slug === 'malang-raya' ? withBase('/') : withBase(`/kota/${city.slug}/`);
+                  return (
+                    <a
+                      href={href}
+                      class="city-card group"
+                      data-city-card
+                      data-city-name={city.name.toLowerCase()}
+                      data-province-name={city.province.toLowerCase()}
+                    >
+                      <!-- Background Image -->
+                      <img
+                        src={withBase(city.image)}
+                        alt={city.name}
+                        class="city-card__image"
+                        loading="lazy"
+                        decoding="async"
+                        width="800"
+                        height="600"
+                      />
+
+                      <!-- Gradient Overlay -->
+                      <div class="city-card__overlay"></div>
+
+                      <!-- Content -->
+                      <div class="city-card__content">
+                        <div class="flex items-end justify-between gap-3 w-full">
+                          <div class="min-w-0 flex-1">
+                            {/* HANYA NAMA KOTA - TANPA TEKS "TOKO BUNGA" */}
+                            <h3 class="city-card__title">
+                              {city.name}
+                            </h3>
+                            <p class="city-card__province">
+                              <svg class="w-3.5 h-3.5 shrink-0 text-[#DFC397] fill-current" viewBox="0 0 24 24">
+                                <path d="M12 2C8.13 2 5 5.13 5 9c0 5.25 7 13 7 13s7-7.75 7-13c0-3.87-3.13-7-7-7zm0 9.5c-1.38 0-2.5-1.12-2.5-2.5s1.12-2.5 2.5-2.5 2.5 1.12 2.5 2.5-1.12 2.5-2.5 2.5z"/>
+                              </svg>
+                              <span>{city.province || 'Indonesia'}</span>
+                            </p>
+                          </div>
+
+                          <!-- Arrow Button -->
+                          <div class="city-card__arrow">
+                            <svg class="w-4 h-4 fill-current transform group-hover:translate-x-0.5 transition-transform" viewBox="0 0 24 24">
+                              <path d="M13.172 12l-4.95-4.95 1.414-1.414L16 12l-6.364 6.364-1.414-1.414z"/>
+                            </svg>
+                          </div>
+                        </div>
+                      </div>
+                    </a>
+                  );
+                })}
+              </div>
+
+            </div>
           ))}
         </div>
 
-        <!-- Empty State Container -->
-        <div id="city-empty-container" class="hidden text-center py-16 px-4 bg-white rounded-3xl border border-gray-100 shadow-sm max-w-lg mx-auto mt-8">
-          <div class="w-16 h-16 rounded-full bg-[#FAF5E6] flex items-center justify-center text-[#C5A25D] mx-auto mb-4">
-            <svg class="w-8 h-8" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="1.5" d="M17.657 16.657L13.414 20.9a1.998 1.998 0 01-2.827 0l-4.244-4.243a8 8 0 1111.314 0z"/><path stroke-linecap="round" stroke-linejoin="round" stroke-width="1.5" d="M15 11a3 3 0 11-6 0 3 3 0 016 0z"/></svg>
+        <!-- Empty State -->
+        <div id="allCitiesEmptyState" class="hidden text-center py-20">
+          <div class="w-20 h-20 rounded-full bg-white border border-[#f0d5db] flex items-center justify-center text-[#893144] text-3xl mx-auto mb-4 shadow-sm">
+            <svg class="w-10 h-10" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+              <path stroke-linecap="round" stroke-linejoin="round" stroke-width="1.8" d="M17.657 16.657L13.414 20.9a1.998 1.998 0 01-2.827 0l-4.244-4.243a8 8 0 1111.314 0z"/>
+              <path stroke-linecap="round" stroke-linejoin="round" stroke-width="1.8" d="M15 11a3 3 0 11-6 0 3 3 0 016 0z"/>
+            </svg>
           </div>
-          <h3 class="text-lg font-bold text-gray-900 mb-1">Kota Tidak Ditemukan</h3>
-          <p class="text-sm text-gray-500 mb-6">
-            Kami mungkin belum menampilkan kota tersebut di daftar katalog web, namun kami siap membantu pengiriman melalui jaringan florist kami.
+          <h3 class="text-xl font-bold text-[#671E2F] mb-2 font-serif">Kota Tidak Ditemukan</h3>
+          <p class="text-gray-500 max-w-md mx-auto text-sm">
+            Kami belum menampilkan atau belum menemukan area yang Anda cari. Anda dapat menghubungi layanan pelanggan kami untuk pengiriman khusus.
           </p>
-          <a
-            href={waConsultUrl}
-            target="_blank"
-            rel="noopener noreferrer"
-            class="inline-flex items-center gap-2 px-6 py-3 rounded-full bg-[#25D366] text-white font-semibold text-sm hover:bg-[#1EBE5D] transition-colors shadow-md"
-          >
-            <svg class="w-4 h-4" fill="currentColor" viewBox="0 0 24 24"><path d="M.057 24l1.687-6.163c-1.041-1.804-1.588-3.849-1.587-5.946.003-6.556 5.338-11.891 11.893-11.891 3.181.001 6.167 1.24 8.413 3.488 2.245 2.248 3.481 5.236 3.48 8.414-.003 6.557-5.338 11.892-11.893 11.892-1.99-.001-3.951-.5-5.688-1.448l-6.305 1.654zm6.597-3.807c1.676.995 3.276 1.591 5.392 1.592 5.448 0 9.886-4.434 9.889-9.885.002-5.462-4.415-9.89-9.881-9.892-5.452 0-9.887 4.434-9.889 9.884-.001 2.225.651 3.891 1.746 5.634l-.999 3.648 3.742-.981zm11.387-5.464c-.074-.124-.272-.198-.57-.347-.297-.149-1.758-.868-2.031-.967-.272-.099-.47-.149-.669.149-.198.297-.768.967-.941 1.165-.173.198-.347.223-.644.074-.297-.149-1.255-.462-2.39-1.475-.883-.788-1.48-1.761-1.653-2.059-.173-.297-.018-.458.13-.606.134-.133.297-.347.446-.521.151-.172.2-.296.3-.495.099-.198.05-.372-.025-.521-.075-.148-.669-1.611-.916-2.206-.242-.579-.487-.501-.669-.51l-.57-.01c-.198 0-.52.074-.792.372s-1.04 1.016-1.04 2.479 1.065 2.876 1.213 3.074c.149.198 2.095 3.2 5.076 4.487.709.306 1.263.489 1.694.626.712.226 1.36.194 1.872.118.571-.085 1.758-.719 2.006-1.413.248-.695.248-1.29.173-1.414z"/></svg>
-            Tanya Pengiriman ke Kota Anda via WA
-          </a>
         </div>
 
-        <!-- WhatsApp Consultation CTA Box (Sekarsari Style) -->
-        <div class="mt-16 bg-gradient-to-br from-[#1C2E24] to-[#2E4A3B] rounded-3xl p-8 sm:p-12 text-white text-center shadow-xl relative overflow-hidden">
-          <div class="absolute -right-16 -top-16 w-56 h-56 bg-[#C5A25D]/15 rounded-full blur-3xl pointer-events-none"></div>
+        <!-- WhatsApp Consultation CTA Box (Persis Sekarsari, Palet Zaloma) -->
+        <div class="mt-20 max-w-4xl mx-auto bg-gradient-to-br from-[#893144] to-[#671E2F] rounded-[2rem] p-8 md:p-12 text-center text-white shadow-2xl relative overflow-hidden">
+          <div class="absolute top-0 right-0 w-64 h-64 bg-white/10 rounded-full blur-3xl -translate-y-1/2 translate-x-1/2"></div>
           
-          <div class="w-14 h-14 rounded-2xl bg-white/10 backdrop-blur-md border border-white/20 flex items-center justify-center text-[#E2C37E] mx-auto mb-5 shadow-inner">
-            <svg class="w-7 h-7" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="1.8" d="M8 12h.01M12 12h.01M16 12h.01M21 12c0 4.418-4.03 8-9 8a9.863 9.863 0 01-4.255-.949L3 20l1.395-3.72C3.512 15.042 3 13.574 3 12c0-4.418 4.03-8 9-8s9 3.582 9 8z"/></svg>
+          <div class="w-16 h-16 rounded-2xl bg-white/10 backdrop-blur-md border border-white/20 flex items-center justify-center text-white mx-auto mb-6 shadow-inner">
+            <svg class="w-8 h-8 fill-current" viewBox="0 0 24 24">
+              <path d="M12.031 6.172c-3.181 0-5.767 2.586-5.768 5.766-.001 1.298.38 2.27 1.019 3.287l-.711 2.598 2.669-.699c.969.54 1.838.847 2.791.848 3.18 0 5.767-2.587 5.768-5.766.001-3.18-2.585-5.834-5.768-5.834zm3.377 8.243c-.147.411-.75.76-1.042.812-.292.052-.663.097-2.072-.49-1.409-.587-2.327-2.016-2.398-2.112-.07-.095-.572-.76-.572-1.45 0-.69.362-1.029.49-1.173.129-.144.281-.18.375-.18.094 0 .188.001.27.006.086.005.201-.033.315.241.114.275.39 1.025.424 1.107.034.082.057.178.002.288-.055.11-.082.179-.164.275-.082.096-.173.214-.247.288-.082.083-.168.172-.072.337.096.165.427.705.916 1.141.63.562 1.161.736 1.326.818.165.082.261.069.358-.041.096-.11.413-.48.523-.645.11-.165.22-.138.371-.082.151.055.955.45 1.12.533.165.082.275.124.316.192.041.069.041.399-.106.81zM12.012 2.002C6.488 2.002 2 6.49 2 12.014c0 1.942.553 3.755 1.517 5.289L2 22l4.821-1.488A9.97 9.97 0 0 0 12.012 22C17.535 22 22 17.51 22 12.014c0-5.524-4.465-10.012-9.988-10.012z"/>
+            </svg>
           </div>
 
-          <h3 class="text-2xl sm:text-3xl font-serif font-bold mb-3">Tidak Menemukan Kota Tujuan Anda?</h3>
-          <p class="text-gray-300 text-sm sm:text-base max-w-2xl mx-auto mb-8 font-light leading-relaxed">
-            Zaloma Florist melayani pengiriman khusus ke seluruh Indonesia melalui jaringan rekanan workshop terpercaya. Konsultasikan kota, alamat dan jenis bunga yang Anda butuhkan dengan tim kami.
+          <h3 class="text-2xl md:text-3xl font-bold mb-4 font-serif">
+            Tidak menemukan kota tujuan Anda?
+          </h3>
+          <p class="text-white/80 text-base md:text-lg font-light mb-8 max-w-2xl mx-auto leading-relaxed">
+            Jangan khawatir! Hubungi tim layanan pelanggan kami via WhatsApp untuk meminta layanan pengiriman khusus ke kota Anda.
           </p>
-
           <a
             href={waConsultUrl}
             target="_blank"
             rel="noopener noreferrer"
-            class="inline-flex items-center gap-3 bg-white text-[#1C2E24] px-8 py-4 rounded-full font-bold text-sm sm:text-base hover:bg-[#FAF5E6] hover:text-[#5B8266] transition-all shadow-lg hover:shadow-2xl hover:-translate-y-0.5"
+            class="inline-flex items-center gap-3 bg-white text-[#893144] px-8 py-4 rounded-full font-bold text-base hover:bg-[#FAF0F1] transition-all shadow-lg hover:shadow-xl hover:-translate-y-0.5"
           >
-            <svg class="w-5 h-5 text-[#25D366]" fill="currentColor" viewBox="0 0 24 24"><path d="M.057 24l1.687-6.163c-1.041-1.804-1.588-3.849-1.587-5.946.003-6.556 5.338-11.891 11.893-11.891 3.181.001 6.167 1.24 8.413 3.488 2.245 2.248 3.481 5.236 3.48 8.414-.003 6.557-5.338 11.892-11.893 11.892-1.99-.001-3.951-.5-5.688-1.448l-6.305 1.654zm6.597-3.807c1.676.995 3.276 1.591 5.392 1.592 5.448 0 9.886-4.434 9.889-9.885.002-5.462-4.415-9.89-9.881-9.892-5.452 0-9.887 4.434-9.889 9.884-.001 2.225.651 3.891 1.746 5.634l-.999 3.648 3.742-.981zm11.387-5.464c-.074-.124-.272-.198-.57-.347-.297-.149-1.758-.868-2.031-.967-.272-.099-.47-.149-.669.149-.198.297-.768.967-.941 1.165-.173.198-.347.223-.644.074-.297-.149-1.255-.462-2.39-1.475-.883-.788-1.48-1.761-1.653-2.059-.173-.297-.018-.458.13-.606.134-.133.297-.347.446-.521.151-.172.2-.296.3-.495.099-.198.05-.372-.025-.521-.075-.148-.669-1.611-.916-2.206-.242-.579-.487-.501-.669-.51l-.57-.01c-.198 0-.52.074-.792.372s-1.04 1.016-1.04 2.479 1.065 2.876 1.213 3.074c.149.198 2.095 3.2 5.076 4.487.709.306 1.263.489 1.694.626.712.226 1.36.194 1.872.118.571-.085 1.758-.719 2.006-1.413.248-.695.248-1.29.173-1.414z"/></svg>
-            Konsultasi WhatsApp Sekarang
+            <svg class="w-5 h-5 fill-current" viewBox="0 0 24 24">
+              <path d="M12.031 6.172c-3.181 0-5.767 2.586-5.768 5.766-.001 1.298.38 2.27 1.019 3.287l-.711 2.598 2.669-.699c.969.54 1.838.847 2.791.848 3.18 0 5.767-2.587 5.768-5.766.001-3.18-2.585-5.834-5.768-5.834zm3.377 8.243c-.147.411-.75.76-1.042.812-.292.052-.663.097-2.072-.49-1.409-.587-2.327-2.016-2.398-2.112-.07-.095-.572-.76-.572-1.45 0-.69.362-1.029.49-1.173.129-.144.281-.18.375-.18.094 0 .188.001.27.006.086.005.201-.033.315.241.114.275.39 1.025.424 1.107.034.082.057.178.002.288-.055.11-.082.179-.164.275-.082.096-.173.214-.247.288-.082.083-.168.172-.072.337.096.165.427.705.916 1.141.63.562 1.161.736 1.326.818.165.082.261.069.358-.041.096-.11.413-.48.523-.645.11-.165.22-.138.371-.082.151.055.955.45 1.12.533.165.082.275.124.316.192.041.069.041.399-.106.81zM12.012 2.002C6.488 2.002 2 6.49 2 12.014c0 1.942.553 3.755 1.517 5.289L2 22l4.821-1.488A9.97 9.97 0 0 0 12.012 22C17.535 22 22 17.51 22 12.014c0-5.524-4.465-10.012-9.988-10.012z"/>
+            </svg>
+            <span>Chat dengan CS Kami</span>
           </a>
         </div>
 
       </div>
     </section>
+
   </div>
 </Layout>
 
+<style>
+/* =========================================================
+   KOTA DIRECTORY PAGE (Persis Sekarsari dengan Palet Zaloma)
+   ========================================================= */
+
+.kota-page-root {
+  background-color: #FAF0F1;
+  min-height: 100vh;
+}
+
+/* ── Hero Section ── */
+.kota-hero {
+  position: relative;
+  min-height: 520px;
+  display: flex;
+  align-items: center;
+  overflow: hidden;
+  background-color: #240d13;
+  padding-top: 130px;
+  padding-bottom: 100px;
+}
+
+.kota-hero__bg {
+  position: absolute;
+  inset: 0;
+  background-image: url('/images/showcase/hero-florist-premium.webp');
+  background-size: cover;
+  background-position: center right;
+  background-repeat: no-repeat;
+  z-index: 0;
+  opacity: 0.45;
+}
+
+.kota-hero__overlay {
+  position: absolute;
+  inset: 0;
+  background: linear-gradient(
+    105deg,
+    rgba(36, 13, 19, 0.95) 0%,
+    rgba(50, 16, 25, 0.90) 35%,
+    rgba(103, 30, 47, 0.72) 65%,
+    rgba(137, 49, 68, 0.35) 90%,
+    transparent 100%
+  );
+  z-index: 1;
+}
+
+.kota-hero__overlay-bottom {
+  position: absolute;
+  inset: 0;
+  background: linear-gradient(180deg, transparent 0%, rgba(36, 13, 19, 0.4) 100%);
+  z-index: 1;
+}
+
+/* ── Decorative ── */
+.kota-hero__decor {
+  position: absolute;
+  inset: 0;
+  pointer-events: none;
+  z-index: 2;
+}
+
+.kota-hero__orb {
+  position: absolute;
+  border-radius: 50%;
+  filter: blur(70px);
+}
+
+.kota-hero__orb--1 {
+  top: -40px;
+  left: 15%;
+  width: 260px;
+  height: 260px;
+  background: radial-gradient(circle, rgba(168, 71, 92, 0.28) 0%, transparent 70%);
+}
+
+.kota-hero__orb--2 {
+  bottom: -50px;
+  right: 25%;
+  width: 220px;
+  height: 220px;
+  background: radial-gradient(circle, rgba(197, 146, 83, 0.18) 0%, transparent 70%);
+}
+
+.kota-hero__line {
+  position: absolute;
+  top: 0;
+  width: 1px;
+  height: 100%;
+  background: linear-gradient(180deg, transparent, rgba(255,255,255,0.06), transparent);
+}
+
+.kota-hero__line--1 { left: 25%; }
+.kota-hero__line--2 { left: 50%; }
+.kota-hero__line--3 { left: 75%; }
+
+/* ── Container ── */
+.kota-hero__container {
+  position: relative;
+  z-index: 5;
+  width: min(100%, 820px);
+  margin: 0 auto;
+  padding: 0 24px;
+  text-align: center;
+}
+
+/* ── Eyebrow ── */
+.kota-hero__eyebrow {
+  display: inline-flex;
+  align-items: center;
+  gap: 10px;
+  font-size: 12px;
+  font-weight: 800;
+  text-transform: uppercase;
+  letter-spacing: 0.22em;
+  color: #DFC397;
+  margin-bottom: 18px;
+}
+
+.kota-hero__eyebrow-dot {
+  width: 6px;
+  height: 6px;
+  border-radius: 50%;
+  background: #C59253;
+  animation: kotaDotPulse 2s ease-in-out infinite;
+}
+
+@keyframes kotaDotPulse {
+  0%, 100% { opacity: 0.6; transform: scale(1); }
+  50% { opacity: 1; transform: scale(1.3); }
+}
+
+/* ── Title ── */
+.kota-hero__title {
+  font-family: 'Playfair Display', Georgia, serif;
+  font-size: clamp(34px, 5vw, 56px);
+  font-weight: 800;
+  color: #fff;
+  line-height: 1.15;
+  margin: 0 0 16px;
+}
+
+.kota-hero__accent {
+  color: #DFC397;
+  font-style: italic;
+}
+
+.kota-hero__desc {
+  font-size: clamp(14px, 1.8vw, 17px);
+  line-height: 1.7;
+  color: rgba(255, 255, 255, 0.85);
+  max-width: 660px;
+  margin: 0 auto 30px;
+}
+
+/* ── Trust Badges ── */
+.kota-hero__trust {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  flex-wrap: wrap;
+  gap: 12px;
+  margin-bottom: 32px;
+}
+
+.kota-hero__trust-item {
+  display: inline-flex;
+  align-items: center;
+  gap: 8px;
+  padding: 8px 18px;
+  border-radius: 999px;
+  background: rgba(255, 255, 255, 0.08);
+  backdrop-blur: 10px;
+  border: 1px solid rgba(255, 255, 255, 0.15);
+  color: #fff;
+  font-size: 13px;
+  font-weight: 600;
+}
+
+/* ── Glassmorphism Search ── */
+.kota-hero__search {
+  display: flex;
+  align-items: center;
+  width: min(100%, 560px);
+  margin: 0 auto;
+  padding: 6px 16px;
+  background: rgba(255, 255, 255, 0.95);
+  backdrop-blur: 12px;
+  border-radius: 999px;
+  box-shadow: 0 16px 36px rgba(0, 0, 0, 0.3);
+  border: 1px solid rgba(255, 255, 255, 0.8);
+  transition: box-shadow 0.2s ease, transform 0.2s ease;
+}
+
+.kota-hero__search:focus-within {
+  transform: translateY(-2px);
+  box-shadow: 0 20px 42px rgba(103, 30, 47, 0.35);
+}
+
+.kota-hero__search-icon {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  margin-right: 8px;
+}
+
+.kota-hero__search-input {
+  width: 100%;
+  height: 44px;
+  border: none;
+  background: transparent;
+  color: #240d13;
+  font-size: 15px;
+  outline: none;
+}
+
+.kota-hero__search-input::placeholder {
+  color: #8c8f94;
+}
+
+/* ── Bottom Wave ── */
+.kota-hero__wave {
+  position: absolute;
+  bottom: 0;
+  left: 0;
+  right: 0;
+  height: 48px;
+  pointer-events: none;
+  z-index: 3;
+}
+
+.kota-hero__wave svg {
+  display: block;
+  width: 100%;
+  height: 100%;
+}
+
+/* ── City Card Sekarsari Style ── */
+.city-card {
+  position: relative;
+  display: block;
+  height: 200px;
+  overflow: hidden;
+  border-radius: 16px;
+  color: #fff;
+  text-decoration: none;
+  background:
+    radial-gradient(circle at 35% 26%, rgba(255, 255, 255, 0.25), transparent 34%),
+    linear-gradient(135deg, #A8475C, #671E2F);
+  box-shadow: 0 4px 12px rgba(24, 22, 23, 0.08);
+  border: 1px solid rgba(240, 213, 219, 0.6);
+  transition: transform 0.25s ease, box-shadow 0.25s ease;
+}
+
+/* Hover Halus tanpa animasi lebay */
+.city-card:hover {
+  transform: translateY(-3px);
+  box-shadow: 0 10px 22px rgba(103, 30, 47, 0.2);
+}
+
+.city-card__image {
+  position: absolute;
+  inset: 0;
+  width: 100%;
+  height: 100%;
+  object-fit: cover;
+  transition: opacity 0.3s ease;
+}
+
+.city-card__overlay {
+  position: absolute;
+  inset: 0;
+  background: linear-gradient(180deg, rgba(0, 0, 0, 0.05) 25%, rgba(20, 5, 10, 0.88) 100%);
+}
+
+.city-card__content {
+  position: absolute;
+  inset: 0;
+  display: flex;
+  flex-direction: column;
+  justify-content: flex-end;
+  padding: 16px 20px;
+  z-index: 2;
+}
+
+.city-card__title {
+  margin: 0 0 4px;
+  font-family: 'Playfair Display', Georgia, serif;
+  font-size: 20px;
+  font-weight: 700;
+  color: #fff;
+  line-height: 1.2;
+  text-shadow: 0 2px 6px rgba(0,0,0,0.5);
+}
+
+.city-card__province {
+  display: flex;
+  align-items: center;
+  gap: 6px;
+  margin: 0;
+  color: rgba(255, 255, 255, 0.9);
+  font-size: 13px;
+  font-weight: 500;
+}
+
+.city-card__arrow {
+  width: 32px;
+  height: 32px;
+  border-radius: 50%;
+  background: rgba(255, 255, 255, 0.2);
+  backdrop-blur: 4px;
+  border: 1px solid rgba(255, 255, 255, 0.4);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  color: #fff;
+  font-size: 16px;
+  flex-shrink: 0;
+  transition: background 0.2s ease, transform 0.2s ease;
+}
+
+.city-card:hover .city-card__arrow {
+  background: #C59253;
+  border-color: #C59253;
+  transform: translateX(2px);
+}
+</style>
+
 <script is:inline>
-  document.addEventListener('DOMContentLoaded', () => {
-    const searchInput = document.getElementById('directory-city-search');
-    const clearBtn = document.getElementById('clear-directory-search');
-    const counterEl = document.getElementById('cities-counter');
-    const cards = Array.from(document.querySelectorAll('[data-city-card]'));
-    const emptyContainer = document.getElementById('city-empty-container');
+(function() {
+  const searchInput = document.getElementById('searchAllCitiesInput');
+  const cityCards = Array.from(document.querySelectorAll('[data-city-card]'));
+  const provinceSections = Array.from(document.querySelectorAll('[data-province-section]'));
+  const emptyState = document.getElementById('allCitiesEmptyState');
 
-    if (!searchInput) return;
+  if (!searchInput) return;
 
-    function filterCities() {
-      const q = searchInput.value.trim().toLowerCase();
-      let visibleCount = 0;
+  function handleSearch() {
+    const q = searchInput.value.trim().toLowerCase();
+    let totalVisible = 0;
 
-      if (q) {
-        clearBtn?.classList.remove('hidden');
-      } else {
-        clearBtn?.classList.add('hidden');
-      }
+    provinceSections.forEach(section => {
+      const cards = Array.from(section.querySelectorAll('[data-city-card]'));
+      let sectionVisibleCount = 0;
 
       cards.forEach(card => {
         const name = card.getAttribute('data-city-name') || '';
-        const prov = card.getAttribute('data-city-province') || '';
-        const match = !q || name.includes(q) || prov.includes(q);
+        const prov = card.getAttribute('data-province-name') || '';
+        const matches = !q || name.includes(q) || prov.includes(q);
 
-        if (match) {
+        if (matches) {
           card.style.display = '';
-          visibleCount++;
+          sectionVisibleCount++;
+          totalVisible++;
         } else {
           card.style.display = 'none';
         }
       });
 
-      if (counterEl) {
-        counterEl.textContent = String(visibleCount);
+      // Sembunyikan section provinsi jika seluruh kota di dalamnya tersembunyi
+      if (sectionVisibleCount === 0) {
+        section.style.display = 'none';
+      } else {
+        section.style.display = '';
       }
+    });
 
-      if (emptyContainer) {
-        if (visibleCount === 0) {
-          emptyContainer.classList.remove('hidden');
-        } else {
-          emptyContainer.classList.add('hidden');
-        }
+    if (emptyState) {
+      if (totalVisible === 0) {
+        emptyState.classList.remove('hidden');
+      } else {
+        emptyState.classList.add('hidden');
       }
     }
+  }
 
-    searchInput.addEventListener('input', filterCities);
-
-    if (clearBtn) {
-      clearBtn.addEventListener('click', () => {
-        searchInput.value = '';
-        filterCities();
-        searchInput.focus();
-      });
-    }
-  });
+  searchInput.addEventListener('input', handleSearch);
+})();
 </script>
-
