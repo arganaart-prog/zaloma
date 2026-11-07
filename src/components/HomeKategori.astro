@@ -1,0 +1,321 @@
+---
+import { CATEGORIES } from '../data/products';
+import { withBase } from '../utils/paths';
+
+interface Props {
+  cityName?: string;
+  citySlug?: string;
+}
+
+const { cityName = '', citySlug = '' } = Astro.props;
+
+// Daftar momen/kategori utama dari data kategori Zaloma
+const momentCategories = [
+  {
+    name: 'Bunga Papan Grand Opening',
+    slug: 'bunga-papan-congratulations-malang',
+    image: '/images/kategori/congratulations.webp',
+  },
+  {
+    name: 'Bunga Papan Duka Cita',
+    slug: 'bunga-papan-duka-cita-malang',
+    image: '/images/kategori/duka-cita.webp',
+  },
+  {
+    name: 'Bunga Papan Wedding',
+    slug: 'bunga-papan-wedding-malang',
+    image: '/images/kategori/wedding.webp',
+  },
+  {
+    name: 'Bunga Papan Semi Styrofoam',
+    slug: 'bunga-papan-semi-styrofoam-malang',
+    image: '/images/kategori/semi-styrofoam.webp',
+  },
+  {
+    name: 'Hand Bouquet',
+    slug: 'hand-bouquet-malang',
+    image: '/images/kategori/hand-bouquet.webp',
+  },
+  {
+    name: 'Standing Flower',
+    slug: 'standing-flower-malang',
+    image: '/images/kategori/standing-flower.webp',
+  },
+  {
+    name: 'Bunga Meja',
+    slug: 'bunga-meja-malang',
+    image: '/images/kategori/bunga-meja.svg',
+  },
+  {
+    name: 'Paper Flower',
+    slug: 'paper-flower-malang',
+    image: '/images/kategori/paper-flower.webp',
+  },
+  {
+    name: 'Tanbulampot',
+    slug: 'tanbulampot-malang',
+    image: '/images/kategori/tanbulampot.webp',
+  }
+];
+
+function getCategoryLink(slug: string) {
+  if (citySlug) {
+    return withBase(`/kategori/${slug}/?city=${citySlug}&refer=city`);
+  }
+  return withBase(`/kategori/${slug}/`);
+}
+---
+
+<section class="kategori-section">
+  <!-- Decorative Glow Backgrounds (Warna Zaloma: Sage & Gold) -->
+  <div class="kategori-section__bg" aria-hidden="true">
+    <div class="kategori-section__glow kategori-section__glow--left"></div>
+    <div class="kategori-section__glow kategori-section__glow--right"></div>
+  </div>
+
+  <div class="kategori-section__container max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
+    <div class="kategori-section__header">
+      <span class="kategori-section__subtitle">PILIH BERDASARKAN MOMEN</span>
+      <h2 class="kategori-section__title">Kategori Produk {cityName ? cityName : ''}</h2>
+      <div class="kategori-section__divider">
+        <span></span>
+        <svg class="w-5 h-5 text-secondary" viewBox="0 0 24 24" fill="currentColor">
+          <path d="M12 2C11.5 4 10 5.5 8 6C10 6.5 11.5 8 12 10C12.5 8 14 6.5 16 6C14 5.5 12.5 4 12 2ZM6 11C5.5 12.5 4.5 13.5 3 14C4.5 14.5 5.5 15.5 6 17C6.5 15.5 7.5 14.5 9 14C7.5 13.5 6.5 12.5 6 11ZM18 11C17.5 12.5 16.5 13.5 15 14C16.5 14.5 17.5 15.5 18 17C18.5 15.5 19.5 14.5 21 14C19.5 13.5 18.5 12.5 18 11ZM12 14C10.9 14 10 14.9 10 16C10 17.1 10.9 18 12 18C13.1 18 14 17.1 14 16C14 14.9 13.1 14 12 14Z" />
+        </svg>
+        <span></span>
+      </div>
+      <p class="kategori-section__desc">
+        Temukan berbagai jenis rangkaian bunga segar yang dirangkai khusus untuk menyempurnakan setiap momen berharga Anda.
+      </p>
+    </div>
+
+    <div class="kategori-section__grid">
+      {momentCategories.map((item) => (
+        <a href={getCategoryLink(item.slug)} class="kategori-card group">
+          <div class="kategori-card__visual">
+            <div class="kategori-card__ring"></div>
+            <img
+              src={withBase(item.image)}
+              alt={`${item.name} ${cityName}`}
+              class="kategori-card__img"
+              loading="lazy"
+              decoding="async"
+              width="100"
+              height="100"
+            />
+          </div>
+          <div class="kategori-card__content">
+            <h3 class="kategori-card__title">
+              {item.name}{cityName ? ` ${cityName}` : ''}
+            </h3>
+          </div>
+        </a>
+      ))}
+    </div>
+  </div>
+</section>
+
+<style>
+/* =========================================================
+   KATEGORI SECTION (Sekarsari Architecture + Zaloma Colors)
+   ========================================================= */
+.kategori-section {
+  position: relative;
+  width: 100%;
+  padding: 50px 0 80px;
+  background: #ffffff;
+  overflow: hidden;
+  margin-top: -1px;
+}
+
+.kategori-section__bg {
+  position: absolute;
+  inset: 0;
+  pointer-events: none;
+  z-index: 0;
+}
+
+.kategori-section__glow {
+  position: absolute;
+  border-radius: 50%;
+  filter: blur(90px);
+  opacity: 0.45;
+}
+
+/* Zaloma Sage Green Glow & Warm Gold Glow */
+.kategori-section__glow--left {
+  top: -100px;
+  left: -50px;
+  width: 420px;
+  height: 420px;
+  background: radial-gradient(circle, rgba(197, 162, 93, 0.2) 0%, transparent 70%);
+}
+
+.kategori-section__glow--right {
+  bottom: -100px;
+  right: -50px;
+  width: 420px;
+  height: 420px;
+  background: radial-gradient(circle, rgba(63, 75, 55, 0.12) 0%, transparent 70%);
+}
+
+.kategori-section__container {
+  position: relative;
+  z-index: 1;
+}
+
+.kategori-section__header {
+  text-align: center;
+  max-width: 680px;
+  margin: 0 auto 52px;
+}
+
+.kategori-section__subtitle {
+  display: block;
+  color: var(--color-secondary, #C5A25D);
+  font-size: 13px;
+  font-weight: 800;
+  letter-spacing: 3px;
+  text-transform: uppercase;
+  margin-bottom: 12px;
+}
+
+.kategori-section__title {
+  color: var(--color-primary-dark, #1C2E24);
+  font-family: var(--font-serif), Georgia, 'Times New Roman', serif;
+  font-size: clamp(30px, 4vw, 42px);
+  font-weight: 800;
+  line-height: 1.2;
+  margin: 0 0 16px;
+}
+
+.kategori-section__divider {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  gap: 12px;
+  margin-bottom: 18px;
+  color: var(--color-secondary, #C5A25D);
+}
+
+.kategori-section__divider span {
+  width: 44px;
+  height: 1.5px;
+  background: #E5DDC8;
+}
+
+.kategori-section__desc {
+  color: #64748b;
+  font-size: 15.5px;
+  line-height: 1.6;
+}
+
+.kategori-section__grid {
+  display: flex;
+  flex-wrap: wrap;
+  justify-content: center;
+  gap: 28px 24px;
+  padding: 0 12px;
+}
+
+/* Kategori Card */
+.kategori-card {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  width: 104px;
+  text-decoration: none;
+  cursor: pointer;
+  transition: transform 0.25s ease;
+}
+
+.kategori-card__visual {
+  position: relative;
+  width: 82px;
+  height: 82px;
+  border-radius: 50%;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  margin-bottom: 10px;
+  background:
+    radial-gradient(circle at 32% 22%, rgba(255, 255, 255, 0.8), transparent 35%),
+    linear-gradient(135deg, #FAF5E6, #EFE6D2);
+  box-shadow: 0 4px 14px rgba(45, 56, 46, 0.1);
+  border: 2px solid #EFE6D2;
+  transition: transform 0.3s ease, box-shadow 0.3s ease, border-color 0.3s ease;
+  z-index: 1;
+  overflow: hidden;
+}
+
+.kategori-card__visual::before {
+  content: '';
+  position: absolute;
+  inset: 0;
+  background: linear-gradient(135deg, rgba(255, 255, 255, 0.3), rgba(63, 75, 55, 0.05));
+  z-index: 0;
+}
+
+.kategori-card__img {
+  width: 100%;
+  height: 100%;
+  object-fit: cover;
+  z-index: 2;
+  transition: transform 0.35s ease;
+}
+
+.kategori-card__title {
+  color: #475569;
+  font-size: 13.5px;
+  font-weight: 600;
+  margin: 0;
+  transition: color 0.3s ease;
+  text-align: center;
+  line-height: 1.35;
+}
+
+/* Hover Effects */
+.kategori-card:hover .kategori-card__visual {
+  transform: translateY(-4px) scale(1.04);
+  box-shadow: 0 10px 22px rgba(63, 75, 55, 0.18);
+  border-color: var(--color-secondary, #C5A25D);
+}
+
+.kategori-card:hover .kategori-card__img {
+  transform: scale(1.08);
+}
+
+.kategori-card:hover .kategori-card__title {
+  color: var(--color-primary, #3F4B37);
+  font-weight: 700;
+}
+
+/* Responsive */
+@media (max-width: 768px) {
+  .kategori-section {
+    padding: 36px 0 52px;
+  }
+  .kategori-section__header {
+    margin-bottom: 32px;
+  }
+  .kategori-section__title {
+    font-size: 26px;
+  }
+  .kategori-section__desc {
+    font-size: 13.5px;
+  }
+  .kategori-section__grid {
+    gap: 18px 14px;
+  }
+  .kategori-card {
+    width: 84px;
+  }
+  .kategori-card__visual {
+    width: 66px;
+    height: 66px;
+  }
+  .kategori-card__title {
+    font-size: 11.5px;
+  }
+}
+</style>
