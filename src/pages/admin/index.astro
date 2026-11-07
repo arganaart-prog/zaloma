@@ -111,6 +111,14 @@ const title = "Admin — Zaloma Florist";
                 <span>Kategori</span>
                 <span id="tab-cat-badge" class="px-1.5 py-0.2 rounded-full text-[10px] font-bold bg-slate-200 text-slate-700">0</span>
               </button>
+              <button 
+                type="button" 
+                id="tab-btn-cities" 
+                class="tab-btn px-3 py-1.5 rounded-md text-xs font-semibold text-slate-600 hover:text-primary hover:bg-accent-bg/50 transition-all cursor-pointer flex items-center gap-1.5"
+              >
+                <span>Kota</span>
+                <span id="tab-city-badge" class="px-1.5 py-0.2 rounded-full text-[10px] font-bold bg-slate-200 text-slate-700">0</span>
+              </button>
             </div>
           </div>
 
@@ -303,27 +311,22 @@ const title = "Admin — Zaloma Florist";
                 </div>
 
                 <div class="sm:col-span-2">
-                  <label for="prod-city" class="block text-xs font-semibold text-slate-700 mb-1">
-                    Wilayah / Area Pengiriman
-                  </label>
+                  <div class="flex items-center justify-between mb-1">
+                    <label for="prod-city" class="block text-xs font-semibold text-slate-700">
+                      Wilayah / Area Pengiriman <span class="text-rose-500">*</span>
+                    </label>
+                    <button type="button" id="quick-manage-city-btn" class="text-[11px] text-primary hover:text-primary-dark hover:underline font-medium cursor-pointer">
+                      ⚙️ Kelola Kota
+                    </button>
+                  </div>
                   <select 
                     id="prod-city" 
+                    required
                     class="w-full px-3 py-2 rounded-lg border border-slate-300 text-xs bg-white focus:outline-none focus:border-primary focus:ring-1 focus:ring-primary/20 transition-all cursor-pointer"
                   >
-                    <option value="Malang Raya (Kota Malang, Kab. Malang, Kota Batu)">Malang Raya (Kota Malang, Kab. Malang, Kota Batu)</option>
-                    <option value="Bisa Dikirim ke Mana Saja">🌍 Bisa Dikirim ke Mana Saja</option>
-                    <option value="Kota Malang">Kota Malang</option>
-                    <option value="Kota Batu">Kota Batu</option>
-                    <option value="Kabupaten Malang">Kabupaten Malang</option>
-                    <option value="custom">Wilayah Lain (Ketik Manual)...</option>
+                    <option value="" disabled selected>Pilih Wilayah / Kota Pengiriman...</option>
                   </select>
-                  <input 
-                    type="text" 
-                    id="prod-city-custom" 
-                    placeholder="Ketik nama kota / jangkauan pengiriman..." 
-                    class="hidden mt-2 w-full px-3 py-2 rounded-lg border border-slate-300 text-xs focus:outline-none focus:border-primary focus:ring-1 focus:ring-primary/20 transition-all animate-fade-in"
-                  />
-                  <p class="text-[10px] text-slate-400 mt-1">Pilih jangkauan kirim produk ini (contoh: Bisa Dikirim ke Mana Saja atau khusus Malang Raya).</p>
+                  <p class="text-[10px] text-slate-400 mt-1">Pilih kota pengiriman yang tersedia di sistem untuk produk ini.</p>
                 </div>
 
               </div>
@@ -426,6 +429,31 @@ const title = "Admin — Zaloma Florist";
           </div>
         </section>
 
+        <!-- ================= TAB 4: KELOLA WILAYAH / KOTA ================= -->
+        <section id="tab-cities" class="hidden animate-fade-in space-y-4 max-w-4xl mx-auto">
+          <div class="bg-white rounded-2xl p-4 sm:p-5 border border-slate-200 shadow-xs flex flex-col sm:flex-row items-start sm:items-center justify-between gap-3">
+            <div>
+              <h2 class="text-base font-bold text-slate-900 flex items-center gap-2">
+                <span class="w-2 h-2 rounded-full bg-primary"></span>
+                Kelola Wilayah / Kota Pengiriman
+              </h2>
+              <p class="text-xs text-slate-500 mt-0.5">Daftar kota yang tersedia di sistem Supabase saat menambah atau mengedit produk.</p>
+            </div>
+            <button 
+              type="button" 
+              id="open-add-city-btn" 
+              class="bg-primary hover:bg-primary-dark text-white font-semibold py-2 px-4 rounded-lg text-xs transition-all active:scale-95 flex items-center gap-1.5 shadow-sm cursor-pointer shrink-0"
+            >
+              + Tambah Kota
+            </button>
+          </div>
+
+          <!-- Cities Grid -->
+          <div id="cities-cards-grid" class="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 gap-3">
+            <!-- Populated by JS -->
+          </div>
+        </section>
+
       </main>
 
     </div>
@@ -491,16 +519,15 @@ const title = "Admin — Zaloma Florist";
           </div>
 
           <div>
-            <label for="edit-prod-city" class="block text-xs font-semibold text-slate-700 mb-1">Wilayah / Area Pengiriman</label>
-            <select id="edit-prod-city" class="w-full px-3 py-1.5 rounded-lg border border-slate-300 text-xs bg-white focus:outline-none focus:border-primary focus:ring-1 focus:ring-primary/20 transition-all cursor-pointer">
-              <option value="Malang Raya (Kota Malang, Kab. Malang, Kota Batu)">Malang Raya (Kota Malang, Kab. Malang, Kota Batu)</option>
-              <option value="Bisa Dikirim ke Mana Saja">🌍 Bisa Dikirim ke Mana Saja</option>
-              <option value="Kota Malang">Kota Malang</option>
-              <option value="Kota Batu">Kota Batu</option>
-              <option value="Kabupaten Malang">Kabupaten Malang</option>
-              <option value="custom">Wilayah Lain (Ketik Manual)...</option>
+            <div class="flex items-center justify-between mb-1">
+              <label for="edit-prod-city" class="block text-xs font-semibold text-slate-700">Wilayah / Area Pengiriman</label>
+              <button type="button" id="edit-quick-manage-city-btn" class="text-[10px] text-primary hover:text-primary-dark hover:underline font-medium cursor-pointer">
+                ⚙️ Kelola Kota
+              </button>
+            </div>
+            <select id="edit-prod-city" required class="w-full px-3 py-1.5 rounded-lg border border-slate-300 text-xs bg-white focus:outline-none focus:border-primary focus:ring-1 focus:ring-primary/20 transition-all cursor-pointer">
+              <option value="" disabled selected>Pilih Wilayah / Kota Pengiriman...</option>
             </select>
-            <input type="text" id="edit-prod-city-custom" placeholder="Ketik nama kota / jangkauan..." class="hidden mt-1.5 w-full px-3 py-1.5 rounded-lg border border-slate-300 text-xs focus:outline-none focus:border-primary focus:ring-1 focus:ring-primary/20 transition-all" />
           </div>
 
           <div>
@@ -701,6 +728,57 @@ const title = "Admin — Zaloma Florist";
       </div>
     </div>
 
+    <!-- ================= ADD / EDIT CITY MODAL ================= -->
+    <div id="city-modal" class="hidden fixed inset-0 z-50 bg-black/40 backdrop-blur-xs flex items-center justify-center p-4 animate-fade-in">
+      <div class="bg-white rounded-2xl max-w-sm w-full p-5 sm:p-6 shadow-xl border border-slate-200 space-y-3.5 animate-modal-pop">
+        <div class="flex items-center justify-between pb-2.5 border-b border-slate-100">
+          <h3 id="city-modal-title" class="text-sm font-bold text-slate-900 flex items-center gap-2">
+            <span class="w-2 h-2 rounded-full bg-primary"></span>
+            Tambah Wilayah / Kota
+          </h3>
+          <button id="close-city-modal-btn" type="button" class="text-slate-400 hover:text-slate-600 text-sm font-bold cursor-pointer">✕</button>
+        </div>
+
+        <form id="city-form" class="space-y-3">
+          <input type="hidden" id="city-edit-index" value="-1" />
+
+          <div>
+            <label for="city-name-input" class="block text-xs font-semibold text-slate-700 mb-1">
+              Nama Wilayah / Kota <span class="text-rose-500">*</span>
+            </label>
+            <input 
+              type="text" 
+              id="city-name-input" 
+              required 
+              placeholder="Contoh: Kota Malang atau Bisa Dikirim ke Mana Saja"
+              class="w-full px-3 py-2 rounded-lg border border-slate-300 text-xs focus:outline-none focus:border-primary focus:ring-1 focus:ring-primary/20 transition-all"
+            />
+          </div>
+
+          <div>
+            <label for="city-desc-input" class="block text-xs font-semibold text-slate-700 mb-1">
+              Keterangan / Catatan <span class="text-slate-400 font-normal">(Opsional)</span>
+            </label>
+            <input 
+              type="text" 
+              id="city-desc-input" 
+              placeholder="Contoh: Pengiriman reguler 3-5 jam"
+              class="w-full px-3 py-2 rounded-lg border border-slate-300 text-xs focus:outline-none focus:border-primary focus:ring-1 focus:ring-primary/20 transition-all"
+            />
+          </div>
+
+          <div class="pt-3 border-t border-slate-100 flex items-center justify-end gap-2">
+            <button type="button" id="cancel-city-btn" class="px-3 py-1.5 rounded-lg text-xs font-semibold text-slate-500 hover:bg-slate-100 cursor-pointer">
+              Batal
+            </button>
+            <button type="submit" id="save-city-btn" class="bg-primary hover:bg-primary-dark text-white font-semibold py-1.5 px-4 rounded-lg text-xs transition-all active:scale-95 cursor-pointer shadow-sm">
+              Simpan Kota
+            </button>
+          </div>
+        </form>
+      </div>
+    </div>
+
     <script define:vars={{ SUPABASE_URL, SUPABASE_ANON_KEY, SUPABASE_BUCKET, DEFAULT_CATEGORIES }}>
       // Initialize Supabase Client
       const supabase = window.supabase.createClient(SUPABASE_URL, SUPABASE_ANON_KEY);
@@ -798,15 +876,18 @@ const title = "Admin — Zaloma Florist";
       const tabBtnCatalog = document.getElementById('tab-btn-catalog');
       const tabBtnAdd = document.getElementById('tab-btn-add');
       const tabBtnCategories = document.getElementById('tab-btn-categories');
+      const tabBtnCities = document.getElementById('tab-btn-cities');
       const tabCatalog = document.getElementById('tab-catalog');
       const tabAdd = document.getElementById('tab-add');
       const tabCategories = document.getElementById('tab-categories');
+      const tabCities = document.getElementById('tab-cities');
 
       function switchTab(activeTab) {
         const tabs = [
           { btn: tabBtnCatalog, pane: tabCatalog, isCatalog: true },
           { btn: tabBtnAdd, pane: tabAdd },
-          { btn: tabBtnCategories, pane: tabCategories }
+          { btn: tabBtnCategories, pane: tabCategories },
+          { btn: tabBtnCities, pane: tabCities }
         ];
 
         tabs.forEach(t => {
@@ -826,6 +907,10 @@ const title = "Admin — Zaloma Florist";
       tabBtnCategories?.addEventListener('click', () => {
         switchTab(tabBtnCategories);
         renderCategoriesCards();
+      });
+      tabBtnCities?.addEventListener('click', () => {
+        switchTab(tabBtnCities);
+        renderCitiesCards();
       });
 
       // Categories State Management (v3 with requested initial categories)
@@ -980,27 +1065,15 @@ const title = "Admin — Zaloma Florist";
         renderFilteredCatalog(true);
       });
 
-      // Dynamic City Custom Input for Add and Edit Forms
-      const prodCitySelect = document.getElementById('prod-city');
-      const prodCityCustom = document.getElementById('prod-city-custom');
-      prodCitySelect?.addEventListener('change', () => {
-        if (prodCitySelect.value === 'custom') {
-          prodCityCustom?.classList.remove('hidden');
-          prodCityCustom?.focus();
-        } else {
-          prodCityCustom?.classList.add('hidden');
-        }
+      // Quick Manage City Buttons
+      document.getElementById('quick-manage-city-btn')?.addEventListener('click', () => {
+        switchTab(tabBtnCities);
+        renderCitiesCards();
       });
-
-      const editCitySelect = document.getElementById('edit-prod-city');
-      const editCityCustom = document.getElementById('edit-prod-city-custom');
-      editCitySelect?.addEventListener('change', () => {
-        if (editCitySelect.value === 'custom') {
-          editCityCustom?.classList.remove('hidden');
-          editCityCustom?.focus();
-        } else {
-          editCityCustom?.classList.add('hidden');
-        }
+      document.getElementById('edit-quick-manage-city-btn')?.addEventListener('click', () => {
+        document.getElementById('edit-modal')?.classList.add('hidden');
+        switchTab(tabBtnCities);
+        renderCitiesCards();
       });
 
       subcategoryFilterSelect?.addEventListener('change', () => renderFilteredCatalog(true));
@@ -1349,6 +1422,221 @@ const title = "Admin — Zaloma Florist";
       updateCategoryDropdowns();
       renderCategoriesCards();
 
+      // ================= CITIES STATE MANAGEMENT =================
+      const DEFAULT_CITIES = [
+        { name: "Malang Raya (Kota Malang, Kab. Malang, Kota Batu)", description: "Area utama Malang Raya" },
+        { name: "Bisa Dikirim ke Mana Saja", description: "Pengiriman ke seluruh Indonesia / ekspedisi" },
+        { name: "Kota Malang", description: "Wilayah Kota Malang" },
+        { name: "Kota Batu", description: "Wilayah Kota Batu" },
+        { name: "Kabupaten Malang", description: "Wilayah Kabupaten Malang" },
+        { name: "Surabaya", description: "Kota Surabaya & sekitarnya" },
+        { name: "Sidoarjo", description: "Kabupaten Sidoarjo" },
+        { name: "Gresik", description: "Kabupaten Gresik" },
+        { name: "Pasuruan", description: "Kota & Kab. Pasuruan" },
+        { name: "Kediri", description: "Kota & Kab. Kediri" },
+        { name: "Blitar", description: "Kota & Kab. Blitar" }
+      ];
+
+      let citiesList = [];
+      try {
+        const cachedCities = localStorage.getItem('zaloma_admin_cities_v1');
+        if (cachedCities !== null) {
+          citiesList = JSON.parse(cachedCities);
+        } else {
+          citiesList = JSON.parse(JSON.stringify(DEFAULT_CITIES));
+          localStorage.setItem('zaloma_admin_cities_v1', JSON.stringify(citiesList));
+        }
+      } catch (e) {
+        citiesList = JSON.parse(JSON.stringify(DEFAULT_CITIES));
+      }
+
+      function updateCityBadges() {
+        const badge = document.getElementById('tab-city-badge');
+        if (badge) badge.textContent = citiesList.length;
+      }
+
+      async function persistCities() {
+        try {
+          localStorage.setItem('zaloma_admin_cities_v1', JSON.stringify(citiesList));
+          updateCityDropdowns();
+          renderCitiesCards();
+          updateCityBadges();
+
+          await supabase.from('products').upsert({
+            slug: '_cities_config_',
+            name: 'System Cities Config',
+            category_slug: '_system_',
+            category_name: 'System',
+            price_from: 0,
+            price_label: 'Rp 0',
+            image: 'https://zalomaflorist.com/favicon.ico',
+            description: JSON.stringify(citiesList),
+            featured: false,
+            city: 'Malang'
+          }, { onConflict: 'slug' });
+        } catch (err) {
+          console.warn('Sync cities notice:', err);
+        }
+      }
+
+      function updateCityDropdowns() {
+        const prodCity = document.getElementById('prod-city');
+        const editCity = document.getElementById('edit-prod-city');
+
+        const prevProdCity = prodCity ? prodCity.value : '';
+        const prevEditCity = editCity ? editCity.value : '';
+
+        const optionsHtml = citiesList.map(c => {
+          const val = typeof c === 'string' ? c : c.name;
+          const isWorldwide = val.includes('Mana Saja');
+          const icon = isWorldwide ? '🌍 ' : '📍 ';
+          return `<option value="${val}">${icon}${val}</option>`;
+        }).join('');
+
+        if (prodCity) {
+          prodCity.innerHTML = '<option value="" disabled selected>Pilih Wilayah / Kota Pengiriman...</option>' + optionsHtml;
+          if (prevProdCity && citiesList.some(c => (typeof c === 'string' ? c : c.name) === prevProdCity)) {
+            prodCity.value = prevProdCity;
+          } else if (citiesList.length > 0) {
+            prodCity.value = typeof citiesList[0] === 'string' ? citiesList[0] : citiesList[0].name;
+          }
+        }
+
+        if (editCity) {
+          editCity.innerHTML = '<option value="" disabled selected>Pilih Wilayah / Kota Pengiriman...</option>' + optionsHtml;
+          if (prevEditCity && citiesList.some(c => (typeof c === 'string' ? c : c.name) === prevEditCity)) {
+            editCity.value = prevEditCity;
+          }
+        }
+
+        updateCityBadges();
+      }
+
+      function renderCitiesCards() {
+        const grid = document.getElementById('cities-cards-grid');
+        if (!grid) return;
+
+        if (citiesList.length === 0) {
+          grid.innerHTML = `
+            <div class="col-span-full py-12 text-center text-slate-400 bg-white rounded-xl border border-dashed border-slate-200 p-6 text-xs">
+              Belum ada wilayah/kota pengiriman. Klik "+ Tambah Kota" untuk menambahkan.
+            </div>
+          `;
+          return;
+        }
+
+        grid.innerHTML = citiesList.map((c, idx) => {
+          const name = typeof c === 'string' ? c : c.name;
+          const desc = typeof c === 'string' ? '' : (c.description || '');
+          const isWorldwide = name.includes('Mana Saja');
+
+          return `
+            <div class="bg-white rounded-xl p-3.5 border border-slate-200 shadow-2xs hover:border-slate-300 transition-all flex flex-col justify-between group">
+              <div>
+                <div class="flex items-center gap-2">
+                  <span class="w-6 h-6 rounded-lg ${isWorldwide ? 'bg-sky-50 text-sky-600' : 'bg-rose-50 text-primary'} flex items-center justify-center text-xs shrink-0">
+                    ${isWorldwide ? '🌍' : '📍'}
+                  </span>
+                  <h4 class="font-bold text-slate-800 text-xs leading-snug truncate" title="${name}">
+                    ${name}
+                  </h4>
+                </div>
+                ${desc ? `<p class="text-[11px] text-slate-500 mt-1.5 line-clamp-2 leading-relaxed">${desc}</p>` : '<p class="text-[10px] text-slate-400 mt-1 italic">Tersedia untuk pengiriman produk</p>'}
+              </div>
+
+              <div class="pt-2.5 mt-2.5 border-t border-slate-100 flex items-center justify-end gap-1 text-[11px]">
+                <button type="button" data-index="${idx}" class="edit-city-btn px-2 py-0.5 rounded text-slate-600 hover:text-primary hover:bg-slate-100 font-medium cursor-pointer transition-colors">
+                  Edit
+                </button>
+                <button type="button" data-index="${idx}" class="delete-city-btn px-2 py-0.5 rounded text-rose-600 hover:text-rose-700 hover:bg-rose-50 font-medium cursor-pointer transition-colors">
+                  Hapus
+                </button>
+              </div>
+            </div>
+          `;
+        }).join('');
+
+        // Attach action listeners for cities
+        grid.querySelectorAll('.edit-city-btn').forEach(btn => {
+          btn.addEventListener('click', () => {
+            const idx = Number(btn.getAttribute('data-index'));
+            const c = citiesList[idx];
+            if (!c) return;
+            const name = typeof c === 'string' ? c : c.name;
+            const desc = typeof c === 'string' ? '' : (c.description || '');
+
+            document.getElementById('city-edit-index').value = idx;
+            document.getElementById('city-modal-title').innerHTML = '<span class="w-2 h-2 rounded-full bg-primary"></span> Edit Wilayah / Kota';
+            document.getElementById('city-name-input').value = name;
+            document.getElementById('city-desc-input').value = desc;
+            document.getElementById('city-modal').classList.remove('hidden');
+            document.getElementById('city-name-input')?.focus();
+          });
+        });
+
+        grid.querySelectorAll('.delete-city-btn').forEach(btn => {
+          btn.addEventListener('click', async () => {
+            const idx = Number(btn.getAttribute('data-index'));
+            const c = citiesList[idx];
+            if (!c) return;
+            const name = typeof c === 'string' ? c : c.name;
+
+            if (confirm(`Hapus wilayah/kota "${name}" dari pilihan?`)) {
+              citiesList.splice(idx, 1);
+              await persistCities();
+              showToast(`Wilayah "${name}" berhasil dihapus.`);
+            }
+          });
+        });
+      }
+
+      // City Modal Handlers
+      const cityModal = document.getElementById('city-modal');
+      const openAddCityBtn = document.getElementById('open-add-city-btn');
+      const closeCityModalBtn = document.getElementById('close-city-modal-btn');
+      const cancelCityBtn = document.getElementById('cancel-city-btn');
+      const cityForm = document.getElementById('city-form');
+
+      openAddCityBtn?.addEventListener('click', () => {
+        document.getElementById('city-edit-index').value = '-1';
+        document.getElementById('city-modal-title').innerHTML = '<span class="w-2 h-2 rounded-full bg-primary"></span> Tambah Wilayah / Kota';
+        cityForm.reset();
+        cityModal.classList.remove('hidden');
+        document.getElementById('city-name-input')?.focus();
+      });
+
+      closeCityModalBtn?.addEventListener('click', () => cityModal.classList.add('hidden'));
+      cancelCityBtn?.addEventListener('click', () => cityModal.classList.add('hidden'));
+
+      cityForm?.addEventListener('submit', async (e) => {
+        e.preventDefault();
+        const editIdx = Number(document.getElementById('city-edit-index').value);
+        const name = document.getElementById('city-name-input').value.trim();
+        const desc = document.getElementById('city-desc-input').value.trim();
+
+        if (!name) return;
+
+        if (editIdx >= 0 && editIdx < citiesList.length) {
+          citiesList[editIdx] = { name, description: desc };
+          showToast(`Wilayah "${name}" berhasil diperbarui.`);
+        } else {
+          const exists = citiesList.some(c => (typeof c === 'string' ? c : c.name).toLowerCase() === name.toLowerCase());
+          if (exists) {
+            showToast(`Wilayah "${name}" sudah terdaftar.`, 'error');
+            return;
+          }
+          citiesList.push({ name, description: desc });
+          showToast(`Wilayah "${name}" berhasil ditambahkan.`);
+        }
+
+        cityModal.classList.add('hidden');
+        await persistCities();
+      });
+
+      // Initial cities setup
+      updateCityDropdowns();
+      renderCitiesCards();
+
       // Live Price Preview Formatting
       const priceInput = document.getElementById('prod-price');
       const pricePreview = document.getElementById('price-preview');
@@ -1489,6 +1777,23 @@ const title = "Admin — Zaloma Florist";
             } catch (e) {}
           } else if (categoriesList.length > 0) {
             persistCategories();
+          }
+
+          // Check for cities configuration record
+          const citiesConfigRow = (products || []).find(p => p.slug === '_cities_config_');
+          if (citiesConfigRow && citiesConfigRow.description) {
+            try {
+              const cloudCities = JSON.parse(citiesConfigRow.description);
+              if (Array.isArray(cloudCities) && cloudCities.length > 0) {
+                citiesList = cloudCities;
+                localStorage.setItem('zaloma_admin_cities_v1', JSON.stringify(citiesList));
+                updateCityDropdowns();
+                renderCitiesCards();
+                updateCityBadges();
+              }
+            } catch (e) {}
+          } else if (citiesList.length > 0) {
+            persistCities();
           }
 
           // Filter out internal system rows
@@ -1853,34 +2158,17 @@ const title = "Admin — Zaloma Florist";
             }
 
             // Set city in edit modal
-            const prodCity = p.city || 'Malang Raya (Kota Malang, Kab. Malang, Kota Batu)';
             const editCitySelectEl = document.getElementById('edit-prod-city');
-            const editCityCustomEl = document.getElementById('edit-prod-city-custom');
-            const standardCities = [
-              'Malang Raya (Kota Malang, Kab. Malang, Kota Batu)',
-              'Bisa Dikirim ke Mana Saja',
-              'Kota Malang',
-              'Kota Batu',
-              'Kabupaten Malang'
-            ];
-            if (standardCities.includes(prodCity)) {
-              if (editCitySelectEl) editCitySelectEl.value = prodCity;
-              if (editCityCustomEl) {
-                editCityCustomEl.classList.add('hidden');
-                editCityCustomEl.value = '';
+            if (editCitySelectEl) {
+              const currentCity = p.city || 'Malang Raya (Kota Malang, Kab. Malang, Kota Batu)';
+              const exists = Array.from(editCitySelectEl.options).some(o => o.value === currentCity);
+              if (!exists && currentCity) {
+                const opt = document.createElement('option');
+                opt.value = currentCity;
+                opt.textContent = `📍 ${currentCity}`;
+                editCitySelectEl.appendChild(opt);
               }
-            } else if (prodCity === 'Malang') {
-              if (editCitySelectEl) editCitySelectEl.value = 'Malang Raya (Kota Malang, Kab. Malang, Kota Batu)';
-              if (editCityCustomEl) {
-                editCityCustomEl.classList.add('hidden');
-                editCityCustomEl.value = '';
-              }
-            } else {
-              if (editCitySelectEl) editCitySelectEl.value = 'custom';
-              if (editCityCustomEl) {
-                editCityCustomEl.classList.remove('hidden');
-                editCityCustomEl.value = prodCity;
-              }
+              editCitySelectEl.value = currentCity;
             }
 
             document.getElementById('edit-modal').classList.remove('hidden');
@@ -1961,11 +2249,7 @@ const title = "Admin — Zaloma Florist";
         const price_label = new Intl.NumberFormat('id-ID', { style: 'currency', currency: 'IDR', maximumFractionDigits: 0 }).format(price_from);
         const processing_time = document.getElementById('edit-prod-time').value.trim();
         const editCitySelect = document.getElementById('edit-prod-city');
-        const editCityCustom = document.getElementById('edit-prod-city-custom');
-        let finalCity = editCitySelect ? editCitySelect.value : 'Malang Raya (Kota Malang, Kab. Malang, Kota Batu)';
-        if (finalCity === 'custom' && editCityCustom) {
-          finalCity = editCityCustom.value.trim() || 'Malang Raya (Kota Malang, Kab. Malang, Kota Batu)';
-        }
+        const finalCity = editCitySelect?.value || 'Malang Raya (Kota Malang, Kab. Malang, Kota Batu)';
         const description = document.getElementById('edit-prod-desc').value.trim();
         const featured = document.getElementById('edit-prod-featured').checked;
         let imageUrl = document.getElementById('edit-prod-current-image').value;
@@ -2057,11 +2341,7 @@ const title = "Admin — Zaloma Florist";
         const priceLabel = new Intl.NumberFormat('id-ID', { style: 'currency', currency: 'IDR', maximumFractionDigits: 0 }).format(priceFrom);
         const processingTime = document.getElementById('prod-time').value.trim() || '3 - 5 Jam';
         const citySelect = document.getElementById('prod-city');
-        const cityCustom = document.getElementById('prod-city-custom');
-        let finalCity = citySelect ? citySelect.value : 'Malang Raya (Kota Malang, Kab. Malang, Kota Batu)';
-        if (finalCity === 'custom' && cityCustom) {
-          finalCity = cityCustom.value.trim() || 'Malang Raya (Kota Malang, Kab. Malang, Kota Batu)';
-        }
+        const finalCity = citySelect?.value || 'Malang Raya (Kota Malang, Kab. Malang, Kota Batu)';
         const description = document.getElementById('prod-desc').value.trim();
         const featured = document.getElementById('prod-featured').checked;
         
@@ -2101,7 +2381,7 @@ const title = "Admin — Zaloma Florist";
 
           showToast(`Produk "${name}" berhasil ditambahkan.`);
           addForm.reset();
-          if (cityCustom) cityCustom.classList.add('hidden');
+          updateCityDropdowns();
           processedImageBlob = null;
           pricePreview.textContent = 'Rp 0';
           uploadPrompt.classList.remove('hidden');
