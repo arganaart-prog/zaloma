@@ -78,7 +78,7 @@ DEFAULT_CITIES.forEach(c => {
     image: c.image || '/images/galeri/gallery-1.webp',
     description: c.description || 'Pengiriman karangan bunga, buket & standing flower cepat.',
     isMainArea: Boolean(c.isMainArea),
-    province: c.isMainArea ? 'Jawa Timur (Workshop Utama)' : 'Area Pengiriman'
+    province: c.province_name || (c.isMainArea ? 'Jawa Timur' : 'Indonesia')
   });
 });
 
