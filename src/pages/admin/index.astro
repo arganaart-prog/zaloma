@@ -511,8 +511,54 @@ const title = "Admin — Zaloma Florist";
           </div>
 
           <!-- Category Filter for Sizes -->
-          <div class="flex items-center gap-2 overflow-x-auto pb-1 text-xs" id="sizes-category-filter-chips">
-            <!-- Populated dynamically: "Semua", "Bunga Papan", "Bouquet", etc. -->
+          <div class="bg-white rounded-xl p-3 border border-slate-200 shadow-2xs space-y-2">
+            <div class="flex items-center justify-between gap-2 flex-wrap">
+              <span class="text-xs font-bold text-slate-700 flex items-center gap-1.5">
+                <span class="w-1.5 h-1.5 rounded-full bg-primary"></span>
+                Filter Kategori Ukuran:
+              </span>
+              <div class="flex items-center gap-2">
+                <span class="text-[11px] text-slate-400 hidden sm:inline">Pilih atau geser kategori:</span>
+                <select id="sizes-category-filter-select" class="px-2.5 py-1 rounded-lg border border-slate-300 text-xs bg-slate-50 font-medium focus:outline-none focus:border-primary cursor-pointer">
+                  <option value="all">Semua Kategori</option>
+                  <option value="bunga-papan">Bunga Papan</option>
+                  <option value="bunga-papan-semi-styrofoam">Bunga Papan Semi Styrofoam</option>
+                  <option value="bouquet">Bouquet</option>
+                  <option value="standing-flower">Standing Flower</option>
+                  <option value="bunga-meja">Bunga Meja</option>
+                  <option value="tabulampot">Tabulampot</option>
+                  <option value="paper-flower">Paper Flower</option>
+                </select>
+              </div>
+            </div>
+
+            <div class="relative flex items-center">
+              <button 
+                type="button" 
+                id="sizes-chip-scroll-left" 
+                aria-label="Geser ke kiri"
+                class="hidden sm:inline-flex items-center justify-center w-7 h-7 rounded-full bg-white shadow border border-slate-200 text-slate-700 hover:text-primary hover:bg-slate-50 shrink-0 cursor-pointer transition-all z-10 -mr-2"
+              >
+                ‹
+              </button>
+
+              <div 
+                class="flex items-center gap-2 overflow-x-auto py-1 px-1 text-xs scroll-smooth flex-1 select-none" 
+                id="sizes-category-filter-chips"
+                style="scrollbar-width: thin; -webkit-overflow-scrolling: touch;"
+              >
+                <!-- Populated dynamically: "Semua", "Bunga Papan", "Bouquet", etc. -->
+              </div>
+
+              <button 
+                type="button" 
+                id="sizes-chip-scroll-right" 
+                aria-label="Geser ke kanan"
+                class="hidden sm:inline-flex items-center justify-center w-7 h-7 rounded-full bg-white shadow border border-slate-200 text-slate-700 hover:text-primary hover:bg-slate-50 shrink-0 cursor-pointer transition-all z-10 -ml-2"
+              >
+                ›
+              </button>
+            </div>
           </div>
 
           <!-- Sizes Grid -->
@@ -894,6 +940,13 @@ const title = "Admin — Zaloma Florist";
               class="w-full px-3 py-2 rounded-lg border border-slate-300 text-xs bg-white focus:outline-none focus:border-primary focus:ring-1 focus:ring-primary/20 transition-all cursor-pointer"
             >
               <option value="" disabled selected>-- Pilih Kategori Produk --</option>
+              <option value="bunga-papan">Bunga Papan</option>
+              <option value="bunga-papan-semi-styrofoam">Bunga Papan Semi Styrofoam</option>
+              <option value="bouquet">Bouquet</option>
+              <option value="standing-flower">Standing Flower</option>
+              <option value="bunga-meja">Bunga Meja</option>
+              <option value="tabulampot">Tabulampot</option>
+              <option value="paper-flower">Paper Flower</option>
             </select>
             <p class="text-[10px] text-slate-400 mt-1">Form input ukuran di bawah otomatis menyesuaikan tipe kategori.</p>
           </div>
@@ -1150,6 +1203,13 @@ const title = "Admin — Zaloma Florist";
         const cached = localStorage.getItem('zaloma_admin_categories_v3');
         if (cached !== null) {
           categoriesList = JSON.parse(cached);
+          if (!Array.isArray(categoriesList) || categoriesList.length <= 1) {
+            const existingSlugs = new Set((categoriesList || []).map(c => c.slug));
+            (DEFAULT_CATEGORIES || []).forEach(dc => {
+              if (!existingSlugs.has(dc.slug)) categoriesList.push(dc);
+            });
+            localStorage.setItem('zaloma_admin_categories_v3', JSON.stringify(categoriesList));
+          }
         } else {
           // Seed with DEFAULT_CATEGORIES
           categoriesList = JSON.parse(JSON.stringify(DEFAULT_CATEGORIES || []));
@@ -1931,6 +1991,14 @@ const title = "Admin — Zaloma Florist";
         const cachedSizes = localStorage.getItem('zaloma_admin_sizes_v1');
         if (cachedSizes !== null) {
           sizesList = JSON.parse(cachedSizes);
+          if (!Array.isArray(sizesList) || sizesList.length < DEFAULT_SIZES.length) {
+            const existingKeys = new Set((sizesList || []).map(s => `${s.category_slug}::${s.name}`));
+            DEFAULT_SIZES.forEach(ds => {
+              const key = `${ds.category_slug}::${ds.name}`;
+              if (!existingKeys.has(key)) sizesList.push(ds);
+            });
+            localStorage.setItem('zaloma_admin_sizes_v1', JSON.stringify(sizesList));
+          }
         } else {
           sizesList = JSON.parse(JSON.stringify(DEFAULT_SIZES));
           localStorage.setItem('zaloma_admin_sizes_v1', JSON.stringify(sizesList));
@@ -2032,14 +2100,21 @@ const title = "Admin — Zaloma Florist";
         const chipsContainer = document.getElementById('sizes-category-filter-chips');
         if (!grid) return;
 
+        // Combine all categories so ALL categories are always available in the filter
+        const allCategorySlugs = new Set();
+        (categoriesList || []).forEach(c => c && c.slug && allCategorySlugs.add(c.slug));
+        (DEFAULT_CATEGORIES || []).forEach(c => c && c.slug && allCategorySlugs.add(c.slug));
+        (sizesList || []).forEach(s => s && s.category_slug && allCategorySlugs.add(s.category_slug));
+
+        const uniqueCats = ['all', ...allCategorySlugs];
+
         // Populate Category Filter Chips
         if (chipsContainer) {
-          const uniqueCats = ['all', ...new Set(sizesList.map(s => s.category_slug))];
           chipsContainer.innerHTML = uniqueCats.map(catSlug => {
             const isActive = catSlug === currentSizeFilterCat;
             let label = 'Semua Kategori';
             if (catSlug !== 'all') {
-              const catObj = categoriesList.find(c => c.slug === catSlug);
+              const catObj = (categoriesList || []).find(c => c.slug === catSlug) || (DEFAULT_CATEGORIES || []).find(c => c.slug === catSlug);
               label = catObj ? catObj.name : catSlug;
             }
             const count = catSlug === 'all' ? sizesList.length : sizesList.filter(s => s.category_slug === catSlug).length;
@@ -2065,6 +2140,42 @@ const title = "Admin — Zaloma Florist";
               renderSizesCards(cat);
             });
           });
+
+          // Enable mouse wheel horizontal scrolling
+          if (!chipsContainer.dataset.wheelBound) {
+            chipsContainer.dataset.wheelBound = 'true';
+            chipsContainer.addEventListener('wheel', (e) => {
+              if (e.deltaY !== 0) {
+                e.preventDefault();
+                chipsContainer.scrollLeft += e.deltaY;
+              }
+            }, { passive: false });
+          }
+        }
+
+        // Wire up scroll buttons
+        const scrollLeftBtn = document.getElementById('sizes-chip-scroll-left');
+        const scrollRightBtn = document.getElementById('sizes-chip-scroll-right');
+        if (scrollLeftBtn) scrollLeftBtn.onclick = () => chipsContainer?.scrollBy({ left: -220, behavior: 'smooth' });
+        if (scrollRightBtn) scrollRightBtn.onclick = () => chipsContainer?.scrollBy({ left: 220, behavior: 'smooth' });
+
+        // Populate and sync dropdown selector
+        const selectEl = document.getElementById('sizes-category-filter-select');
+        if (selectEl) {
+          selectEl.innerHTML = uniqueCats.map(catSlug => {
+            let label = 'Semua Kategori';
+            if (catSlug !== 'all') {
+              const catObj = (categoriesList || []).find(c => c.slug === catSlug) || (DEFAULT_CATEGORIES || []).find(c => c.slug === catSlug);
+              label = catObj ? catObj.name : catSlug;
+            }
+            const count = catSlug === 'all' ? sizesList.length : sizesList.filter(s => s.category_slug === catSlug).length;
+            const isSel = catSlug === currentSizeFilterCat ? 'selected' : '';
+            return `<option value="${catSlug}" ${isSel}>${label} (${count})</option>`;
+          }).join('');
+
+          selectEl.onchange = () => {
+            renderSizesCards(selectEl.value);
+          };
         }
 
         // Filter sizes
@@ -2073,9 +2184,14 @@ const title = "Admin — Zaloma Florist";
           : sizesList.filter(s => s.category_slug === currentSizeFilterCat);
 
         if (filtered.length === 0) {
+          const currentCatObj = (categoriesList || []).find(c => c.slug === currentSizeFilterCat) || (DEFAULT_CATEGORIES || []).find(c => c.slug === currentSizeFilterCat);
+          const currentCatName = currentCatObj ? currentCatObj.name : currentSizeFilterCat;
           grid.innerHTML = `
-            <div class="col-span-full py-12 text-center text-slate-400 bg-white rounded-xl border border-dashed border-slate-200 p-6 text-xs">
-              Belum ada ukuran untuk kategori ini. Klik "+ Tambah Ukuran" untuk menambahkan.
+            <div class="col-span-full py-12 text-center text-slate-500 bg-white rounded-xl border border-dashed border-slate-200 p-6 text-xs space-y-2">
+              <p>Belum ada ukuran khusus untuk kategori <strong>"${currentCatName}"</strong>.</p>
+              <button type="button" class="inline-flex items-center gap-1.5 px-3 py-1.5 rounded-lg bg-primary hover:bg-primary-dark text-white font-semibold text-xs cursor-pointer shadow-xs" onclick="document.getElementById('open-add-size-btn')?.click()">
+                + Tambah Ukuran untuk ${currentCatName}
+              </button>
             </div>
           `;
           return;
@@ -2168,10 +2284,28 @@ const title = "Admin — Zaloma Florist";
 
       function populateSizeCategoryOptions(selectedSlug = '') {
         if (!sizeCategorySelect) return;
+        const combinedCats = [];
+        const seenSlugs = new Set();
+        (categoriesList || []).forEach(c => {
+          if (c && c.slug && !seenSlugs.has(c.slug)) {
+            seenSlugs.add(c.slug);
+            combinedCats.push(c);
+          }
+        });
+        (DEFAULT_CATEGORIES || []).forEach(c => {
+          if (c && c.slug && !seenSlugs.has(c.slug)) {
+            seenSlugs.add(c.slug);
+            combinedCats.push(c);
+          }
+        });
+
         sizeCategorySelect.innerHTML = '<option value="" disabled selected>-- Pilih Kategori Produk --</option>' +
-          categoriesList.map(c => `<option value="${c.slug}">${c.name}</option>`).join('');
-        if (selectedSlug) {
+          combinedCats.map(c => `<option value="${c.slug}">${c.name}</option>`).join('');
+
+        if (selectedSlug && seenSlugs.has(selectedSlug)) {
           sizeCategorySelect.value = selectedSlug;
+        } else if (combinedCats.length > 0) {
+          sizeCategorySelect.value = combinedCats[0].slug;
         }
       }
 
@@ -2460,6 +2594,12 @@ const title = "Admin — Zaloma Florist";
             try {
               const cloudCats = JSON.parse(configRow.description);
               if (Array.isArray(cloudCats) && cloudCats.length > 0) {
+                if (cloudCats.length <= 1) {
+                  const existingSlugs = new Set(cloudCats.map(c => c.slug));
+                  (DEFAULT_CATEGORIES || []).forEach(dc => {
+                    if (!existingSlugs.has(dc.slug)) cloudCats.push(dc);
+                  });
+                }
                 categoriesList = cloudCats;
                 localStorage.setItem('zaloma_admin_categories_v3', JSON.stringify(categoriesList));
                 localStorage.setItem('zaloma_admin_categories_v2', JSON.stringify(categoriesList));
@@ -2505,6 +2645,13 @@ const title = "Admin — Zaloma Florist";
             try {
               const cloudSizes = JSON.parse(sizesConfigRow.description);
               if (Array.isArray(cloudSizes) && cloudSizes.length > 0) {
+                if (cloudSizes.length < DEFAULT_SIZES.length) {
+                  const existingKeys = new Set(cloudSizes.map(s => `${s.category_slug}::${s.name}`));
+                  DEFAULT_SIZES.forEach(ds => {
+                    const key = `${ds.category_slug}::${ds.name}`;
+                    if (!existingKeys.has(key)) cloudSizes.push(ds);
+                  });
+                }
                 sizesList = cloudSizes;
                 localStorage.setItem('zaloma_admin_sizes_v1', JSON.stringify(sizesList));
                 updateSizeBadges();
