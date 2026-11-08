@@ -87,8 +87,8 @@ export function extractConfigCategories(rawProducts: any[]): DerivedCategory[] {
             seoKeywords: c.seoKeywords || '',
           }));
       }
-    } catch (e) {
-      // JSON parse failed, fall through
+    } catch (error) {
+      console.warn('[Zaloma] Failed to parse Supabase category configuration:', error);
     }
   }
   return [];

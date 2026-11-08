@@ -9,6 +9,7 @@ interface Props {
   type?: 'website' | 'product';
   schema?: Record<string, any>;
   robots?: string;
+  canonical?: string;
 }
 
 const {
@@ -18,10 +19,13 @@ const {
   image = '/images/banner/default-og.webp',
   type = 'website',
   schema,
-  robots = 'index, follow, max-image-preview:large'
+  robots = 'index, follow, max-image-preview:large',
+  canonical
 } = Astro.props;
 
-const canonicalURL = new URL(withBase(stripBase(Astro.url.pathname)), Astro.site);
+const canonicalURL = canonical
+  ? new URL(canonical, Astro.site)
+  : new URL(withBase(stripBase(Astro.url.pathname)), Astro.site);
 const ogImageURL = new URL(withBase(image), Astro.site);
 const siteName = 'Zaloma Florist';
 const fullTitle = title.toLowerCase().includes(siteName.toLowerCase()) ? title : `${title} | ${siteName}`;
@@ -79,4 +83,3 @@ const securityPolicy = [
 {schema && (
   <script type="application/ld+json" is:inline set:html={JSON.stringify(schema)} />
 )}
-

@@ -21,41 +21,45 @@ function withBase(path: string): string {
     <link rel="icon" type="image/x-icon" href={withBase('/favicon.ico')} />
     <script is:inline src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
   </head>
-  <body class="bg-slate-100/70 text-slate-800 font-sans antialiased min-h-screen flex flex-col">
+  <body class="admin-page bg-[#f7f5f2] text-slate-800 font-sans antialiased min-h-screen flex flex-col">
 
     <!-- Toast Notification Container -->
-    <div id="toast-container" class="fixed top-4 right-4 z-50 flex flex-col gap-2 pointer-events-none" aria-live="polite"></div>
+    <div id="toast-container" class="fixed top-3 inset-x-3 sm:inset-x-auto sm:right-4 sm:top-4 z-50 flex flex-col gap-2 pointer-events-none" aria-live="polite"></div>
 
     <!-- ================= LOGIN SCREEN ================= -->
-    <div id="login-gate" class="flex-1 flex items-center justify-center p-4">
-      <div class="bg-white rounded-2xl shadow-sm border border-slate-200 p-8 w-full max-w-sm animate-fade-in">
-        <div class="mb-6 text-center">
-          <div class="w-12 h-12 rounded-2xl bg-primary text-white font-serif font-bold text-2xl flex items-center justify-center mx-auto mb-3 shadow-sm">
-            Z
+    <div id="login-gate" class="relative isolate flex-1 flex items-center justify-center overflow-hidden bg-[radial-gradient(ellipse_at_top_left,_rgba(142,95,43,0.12),_transparent_44%),radial-gradient(ellipse_at_bottom_right,_rgba(103,30,47,0.12),_transparent_42%)] p-4 py-10 sm:p-8">
+      <div class="pointer-events-none absolute -left-24 top-1/4 h-64 w-64 rounded-full border border-[#8e5f2b]/10 sm:h-96 sm:w-96" aria-hidden="true"></div>
+      <div class="pointer-events-none absolute -right-20 bottom-1/4 h-56 w-56 rounded-full border border-[#671e2f]/10 sm:h-80 sm:w-80" aria-hidden="true"></div>
+      <div class="relative w-full max-w-md overflow-hidden rounded-3xl border border-white/80 bg-white/95 p-6 shadow-[0_28px_90px_rgba(54,36,32,0.14)] backdrop-blur sm:p-9 animate-fade-in">
+        <div class="absolute inset-x-0 top-0 h-1 bg-gradient-to-r from-[#671e2f] via-[#c59253] to-[#671e2f]" aria-hidden="true"></div>
+        <div class="mb-7 text-center">
+          <div class="mx-auto mb-5 flex h-[4.5rem] w-[4.5rem] items-center justify-center rounded-2xl border border-[#eadbd0] bg-[#fdf7f7] shadow-sm">
+            <img src={withBase('/images/logo/zaloma-logo.webp')} alt="" class="h-14 w-14 object-contain" width="56" height="56" />
           </div>
-          <h1 class="text-xl font-bold text-slate-900 tracking-tight">Admin Zaloma Florist</h1>
-          <p class="text-xs text-slate-500 mt-1">Masuk untuk mengelola produk toko.</p>
+          <p class="mb-2 text-[0.65rem] font-bold uppercase tracking-[0.24em] text-[#8e5f2b]">Ruang Kontrol Toko</p>
+          <h1 class="text-2xl font-bold tracking-tight text-slate-900 sm:text-[1.7rem]">Selamat datang</h1>
+          <p class="mx-auto mt-2 max-w-xs text-sm leading-relaxed text-slate-500">Masuk untuk mengelola produk, kategori, wilayah, dan ukuran Zaloma Florist.</p>
         </div>
 
-        <form id="login-form" class="space-y-4">
+        <form id="login-form" class="space-y-5">
           <div>
-            <label for="admin-email-input" class="block text-sm font-semibold text-slate-700 mb-2">Email</label>
+            <label for="admin-email-input" class="mb-2 block text-sm font-semibold text-slate-700">Email</label>
             <input 
               type="email" 
               id="admin-email-input" 
               placeholder="nama@gmail.com" 
-              class="w-full px-4 py-3 rounded-lg border border-slate-300 focus:outline-none focus:border-primary focus:ring-2 focus:ring-primary/20 transition-all text-sm"
+              class="w-full rounded-xl border border-slate-200 bg-slate-50/70 px-4 py-3.5 text-base transition-all placeholder:text-slate-400 focus:border-primary focus:bg-white focus:outline-none focus:ring-4 focus:ring-primary/10 sm:text-sm"
               required
               autocomplete="email"
             />
           </div>
           <div>
-            <label for="admin-password-input" class="block text-sm font-semibold text-slate-700 mb-2">Password</label>
+            <label for="admin-password-input" class="mb-2 block text-sm font-semibold text-slate-700">Password</label>
             <input 
               type="password" 
               id="admin-password-input" 
               placeholder="••••••••" 
-              class="w-full px-4 py-3 rounded-lg border border-slate-300 focus:outline-none focus:border-primary focus:ring-2 focus:ring-primary/20 transition-all text-sm"
+              class="w-full rounded-xl border border-slate-200 bg-slate-50/70 px-4 py-3.5 text-base transition-all placeholder:text-slate-400 focus:border-primary focus:bg-white focus:outline-none focus:ring-4 focus:ring-primary/10 sm:text-sm"
               required
               autocomplete="current-password"
             />
@@ -64,7 +68,7 @@ function withBase(path: string): string {
           <button 
             type="submit" 
             id="login-btn"
-            class="w-full bg-primary hover:bg-primary-dark text-white font-semibold py-3 px-4 rounded-lg transition-all duration-150 cursor-pointer text-sm flex items-center justify-center gap-2 active:scale-[0.98] shadow-sm min-h-[44px]"
+            class="mt-1 flex min-h-12 w-full cursor-pointer items-center justify-center gap-2 rounded-xl bg-primary px-4 py-3 text-sm font-semibold text-white shadow-[0_8px_18px_rgba(103,30,47,0.18)] transition-all duration-150 hover:bg-primary-dark hover:shadow-lg active:scale-[0.99]"
           >
             <span id="login-btn-text">Masuk</span>
             <svg id="login-spinner" class="w-4 h-4 animate-spin hidden" fill="none" viewBox="0 0 24 24">
@@ -80,17 +84,21 @@ function withBase(path: string): string {
     <div id="admin-dashboard" class="hidden flex-1 flex flex-col">
 
       <!-- Admin Navbar -->
-      <nav class="bg-white border-b border-slate-200 sticky top-0 z-30">
+      <nav class="admin-nav sticky top-0 z-30 border-b border-slate-200/80 bg-white/95 shadow-[0_4px_18px_rgba(30,41,59,0.04)] backdrop-blur">
         <!-- Row 1: Brand + User Actions -->
-        <div class="max-w-7xl mx-auto px-4 sm:px-6 flex items-center justify-between h-14">
-          <span class="font-bold text-slate-900 text-sm tracking-tight flex items-center gap-2">
-            <span class="w-7 h-7 rounded-lg bg-primary text-white font-serif font-bold text-sm flex items-center justify-center shadow-sm">Z</span>
-            <span>Zaloma Admin</span>
+        <div class="mx-auto flex h-16 max-w-7xl items-center justify-between px-3 sm:px-6">
+          <span class="flex min-w-0 items-center gap-2.5 font-bold tracking-tight text-slate-900 sm:gap-3">
+            <span class="flex h-9 w-9 shrink-0 items-center justify-center rounded-xl bg-gradient-to-br from-[#671e2f] to-[#893144] font-serif text-base font-bold text-white shadow-sm ring-1 ring-[#671e2f]/10">Z</span>
+            <span class="min-w-0">
+              <span class="block truncate text-sm sm:text-base">Zaloma Florist</span>
+              <span class="mt-0.5 hidden text-[0.6rem] font-bold uppercase tracking-[0.18em] text-slate-400 sm:block">Admin Workspace</span>
+            </span>
           </span>
 
-          <div class="flex items-center gap-3">
-            <a href="/katalog/" target="_blank" class="text-xs font-medium text-slate-500 hover:text-primary transition-colors hidden sm:inline-flex items-center gap-1">
-              Lihat Website
+          <div class="flex shrink-0 items-center gap-1 sm:gap-3">
+            <a href={withBase('/katalog/')} target="_blank" rel="noopener noreferrer" class="inline-flex min-h-10 items-center gap-1 rounded-lg px-2 text-xs font-semibold text-slate-500 transition-colors hover:bg-slate-50 hover:text-primary sm:px-3">
+              <span class="hidden sm:inline">Lihat Website</span>
+              <span class="sm:hidden">Website</span>
               <svg class="w-3 h-3" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2"><path stroke-linecap="round" stroke-linejoin="round" d="M14 5l7 7-7 7M21 12H3" /></svg>
             </a>
             <span id="user-email-display" class="text-xs text-slate-400 hidden md:inline-block max-w-[180px] truncate"></span>
@@ -102,28 +110,28 @@ function withBase(path: string): string {
         </div>
 
         <!-- Row 2: Tab Navigation (horizontally scrollable on mobile) -->
-        <div class="border-t border-slate-100">
-          <div class="max-w-7xl mx-auto px-4 sm:px-6 py-2 flex items-center gap-2 overflow-x-auto scrollbar-hide">
-            <button type="button" id="tab-btn-catalog" class="tab-btn active px-4 py-2.5 rounded-lg text-sm font-semibold bg-primary text-white transition-all cursor-pointer flex items-center gap-2 shadow-sm shrink-0 min-h-[44px]">
+        <div class="border-t border-slate-100/90 bg-slate-50/60">
+          <div class="admin-tabs mx-auto flex max-w-7xl items-center gap-1.5 overflow-x-auto px-3 py-2 scrollbar-hide sm:gap-2 sm:px-6">
+            <button type="button" id="tab-btn-catalog" class="tab-btn active flex min-h-11 shrink-0 cursor-pointer items-center gap-2 rounded-xl bg-primary px-3.5 py-2.5 text-sm font-semibold text-white shadow-sm transition-all sm:px-4">
               <svg class="w-4 h-4" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2"><path stroke-linecap="round" stroke-linejoin="round" d="M4 6h16M4 10h16M4 14h16M4 18h16" /></svg>
               <span>Produk</span>
               <span id="tab-count-badge" class="px-2 py-0.5 rounded-full text-xs font-bold bg-white/20 text-white">0</span>
             </button>
-            <button type="button" id="tab-btn-add" class="tab-btn px-4 py-2.5 rounded-lg text-sm font-semibold text-slate-600 hover:text-primary hover:bg-accent-bg/50 transition-all cursor-pointer flex items-center gap-2 shrink-0 min-h-[44px]">
+            <button type="button" id="tab-btn-add" class="tab-btn flex min-h-11 shrink-0 cursor-pointer items-center gap-2 rounded-xl px-3.5 py-2.5 text-sm font-semibold text-slate-600 transition-all hover:bg-white hover:text-primary sm:px-4">
               <svg class="w-4 h-4" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2"><path stroke-linecap="round" stroke-linejoin="round" d="M12 4v16m8-8H4" /></svg>
               <span>Tambah Produk</span>
             </button>
-            <button type="button" id="tab-btn-categories" class="tab-btn px-4 py-2.5 rounded-lg text-sm font-semibold text-slate-600 hover:text-primary hover:bg-accent-bg/50 transition-all cursor-pointer flex items-center gap-2 shrink-0 min-h-[44px]">
+            <button type="button" id="tab-btn-categories" class="tab-btn flex min-h-11 shrink-0 cursor-pointer items-center gap-2 rounded-xl px-3.5 py-2.5 text-sm font-semibold text-slate-600 transition-all hover:bg-white hover:text-primary sm:px-4">
               <svg class="w-4 h-4" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2"><path stroke-linecap="round" stroke-linejoin="round" d="M4 6h16M4 12h8m-8 6h16" /></svg>
               <span>Kategori</span>
               <span id="tab-cat-badge" class="px-2 py-0.5 rounded-full text-xs font-bold bg-slate-200 text-slate-700">0</span>
             </button>
-            <button type="button" id="tab-btn-cities" class="tab-btn px-4 py-2.5 rounded-lg text-sm font-semibold text-slate-600 hover:text-primary hover:bg-accent-bg/50 transition-all cursor-pointer flex items-center gap-2 shrink-0 min-h-[44px]">
+            <button type="button" id="tab-btn-cities" class="tab-btn flex min-h-11 shrink-0 cursor-pointer items-center gap-2 rounded-xl px-3.5 py-2.5 text-sm font-semibold text-slate-600 transition-all hover:bg-white hover:text-primary sm:px-4">
               <svg class="w-4 h-4" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2"><path stroke-linecap="round" stroke-linejoin="round" d="M17.657 16.657L13.414 20.9a1.998 1.998 0 01-2.827 0l-4.244-4.243a8 8 0 1111.314 0z" /><path stroke-linecap="round" stroke-linejoin="round" d="M15 11a3 3 0 11-6 0 3 3 0 016 0z" /></svg>
               <span>Kota</span>
               <span id="tab-city-badge" class="px-2 py-0.5 rounded-full text-xs font-bold bg-slate-200 text-slate-700">0</span>
             </button>
-            <button type="button" id="tab-btn-sizes" class="tab-btn px-4 py-2.5 rounded-lg text-sm font-semibold text-slate-600 hover:text-primary hover:bg-accent-bg/50 transition-all cursor-pointer flex items-center gap-2 shrink-0 min-h-[44px]">
+            <button type="button" id="tab-btn-sizes" class="tab-btn flex min-h-11 shrink-0 cursor-pointer items-center gap-2 rounded-xl px-3.5 py-2.5 text-sm font-semibold text-slate-600 transition-all hover:bg-white hover:text-primary sm:px-4">
               <svg class="w-4 h-4" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2"><path stroke-linecap="round" stroke-linejoin="round" d="M3 6h18M3 12h18M3 18h18" /></svg>
               <span>Ukuran</span>
               <span id="tab-size-badge" class="px-2 py-0.5 rounded-full text-xs font-bold bg-slate-200 text-slate-700">0</span>
@@ -133,7 +141,21 @@ function withBase(path: string): string {
       </nav>
 
       <!-- Content Area -->
-      <main class="flex-1 max-w-7xl w-full mx-auto p-4 sm:p-6 space-y-4">
+      <main class="admin-main mx-auto w-full max-w-7xl flex-1 space-y-5 px-3 py-5 sm:space-y-6 sm:px-6 sm:py-8">
+        <header class="flex flex-col gap-3 sm:flex-row sm:items-end sm:justify-between">
+          <div>
+            <p class="mb-1 text-[0.65rem] font-bold uppercase tracking-[0.2em] text-[#8e5f2b]">Ringkasan Toko</p>
+            <h1 class="text-2xl font-bold tracking-tight text-slate-900 sm:text-3xl">Panel Admin</h1>
+            <p class="mt-1 text-sm text-slate-500">Kelola katalog dan informasi toko dari satu tempat.</p>
+          </div>
+          <div class="inline-flex w-fit items-center gap-2 rounded-full border border-emerald-100 bg-white px-3 py-2 text-xs font-semibold text-slate-600 shadow-sm">
+            <span class="relative flex h-2 w-2">
+              <span class="absolute inline-flex h-full w-full animate-ping rounded-full bg-emerald-400 opacity-50"></span>
+              <span class="relative inline-flex h-2 w-2 rounded-full bg-emerald-500"></span>
+            </span>
+            Terhubung ke Supabase
+          </div>
+        </header>
 
         <!-- ================= TAB 1: DAFTAR PRODUK ================= -->
         <section id="tab-catalog" class="space-y-4 animate-fade-in">
@@ -1557,10 +1579,10 @@ function withBase(path: string): string {
         tabs.forEach(t => {
           if (!t.btn || !t.pane) return;
           if (t.btn === activeTab) {
-            t.btn.className = `tab-btn active px-4 py-2.5 rounded-lg text-sm font-semibold bg-primary text-white transition-all cursor-pointer flex items-center gap-2 shadow-sm shrink-0 min-h-[44px]`;
+            t.btn.className = `tab-btn active flex min-h-11 shrink-0 cursor-pointer items-center gap-2 rounded-xl bg-primary px-3.5 py-2.5 text-sm font-semibold text-white shadow-sm transition-all sm:px-4`;
             t.pane.classList.remove('hidden');
           } else {
-            t.btn.className = `tab-btn px-4 py-2.5 rounded-lg text-sm font-semibold text-slate-600 hover:text-primary hover:bg-accent-bg/50 transition-all cursor-pointer flex items-center gap-2 shrink-0 min-h-[44px]`;
+            t.btn.className = `tab-btn flex min-h-11 shrink-0 cursor-pointer items-center gap-2 rounded-xl px-3.5 py-2.5 text-sm font-semibold text-slate-600 transition-all hover:bg-white hover:text-primary sm:px-4`;
             t.pane.classList.add('hidden');
           }
         });
@@ -4280,6 +4302,103 @@ function withBase(path: string): string {
       .custom-dropdown-menu::-webkit-scrollbar-thumb {
         background: #cbd5e1;
         border-radius: 9999px;
+      }
+
+      .admin-tabs {
+        scrollbar-width: none;
+        -webkit-overflow-scrolling: touch;
+        scroll-padding-inline: 0.75rem;
+      }
+
+      .admin-tabs::-webkit-scrollbar {
+        display: none;
+      }
+
+      .admin-main > section {
+        min-width: 0;
+      }
+
+      .admin-main input:not([type="checkbox"]):not([type="radio"]):not([type="file"]),
+      .admin-main select,
+      .admin-main textarea {
+        max-width: 100%;
+      }
+
+      .admin-main input:not([type="checkbox"]):not([type="radio"]):not([type="file"]):focus,
+      .admin-main select:focus,
+      .admin-main textarea:focus {
+        outline: none;
+        border-color: #893144;
+        box-shadow: 0 0 0 3px rgba(137, 49, 68, 0.11);
+      }
+
+      .admin-main button:focus-visible,
+      .admin-nav button:focus-visible,
+      #login-gate button:focus-visible {
+        outline: 3px solid rgba(142, 95, 43, 0.4);
+        outline-offset: 2px;
+      }
+
+      #catalog-products-grid > * {
+        min-width: 0;
+      }
+
+      #catalog-products-grid > div:not(.col-span-full) {
+        border-color: #e7e5e4;
+        border-radius: 1rem;
+        box-shadow: 0 2px 8px rgba(41, 37, 36, 0.035);
+      }
+
+      #catalog-products-grid > div:not(.col-span-full):hover {
+        border-color: rgba(137, 49, 68, 0.25);
+        box-shadow: 0 12px 28px rgba(41, 37, 36, 0.09);
+        transform: translateY(-2px);
+      }
+
+      #admin-pagination-container {
+        border-radius: 1rem;
+      }
+
+      #admin-pag-controls {
+        max-width: 100%;
+        overflow-x: auto;
+        padding: 2px;
+      }
+
+      #admin-pag-controls button {
+        min-width: 2.5rem;
+        min-height: 2.5rem;
+      }
+
+      @media (min-width: 768px) {
+        .admin-tabs {
+          gap: 0.5rem;
+        }
+      }
+
+      @media (max-width: 639px) {
+        #admin-pagination-container {
+          align-items: stretch;
+        }
+
+        #admin-pag-controls {
+          justify-content: center;
+        }
+
+        #add-product-form {
+          padding-bottom: env(safe-area-inset-bottom);
+        }
+      }
+
+      @media (prefers-reduced-motion: reduce) {
+        .admin-page *,
+        .admin-page *::before,
+        .admin-page *::after {
+          scroll-behavior: auto !important;
+          animation-duration: 0.01ms !important;
+          animation-iteration-count: 1 !important;
+          transition-duration: 0.01ms !important;
+        }
       }
 
     </style>

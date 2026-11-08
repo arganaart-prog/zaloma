@@ -1,8 +1,25 @@
 ---
-import { PRODUCTS } from '../data/products';
 import { withBase } from '../utils/paths';
 
-const categories: any[] = [];
+interface CategoryItem {
+  slug: string;
+  name: string;
+  image: string;
+}
+
+interface Props {
+  categories?: CategoryItem[];
+  productCounts?: Record<string, number>;
+}
+
+const { categories = [], productCounts = {} } = Astro.props;
+const carouselCategories = categories.map((category) => {
+  const itemCount = productCounts[category.slug] ?? 0;
+  return {
+    ...category,
+    itemLabel: `${itemCount} produk`,
+  };
+});
 ---
 
 <div class="category-carousel relative max-w-7xl mx-auto" data-category-carousel>
@@ -23,7 +40,7 @@ const categories: any[] = [];
     tabindex="0"
     aria-label="Daftar kategori bunga"
   >
-    {categories.map((category) => (
+    {carouselCategories.map((category) => (
       <li
         class="category-carousel-item group flex-shrink-0 snap-start flex flex-col items-center w-[5.5rem] sm:w-[7rem] md:w-[7.5rem] text-center"
       >

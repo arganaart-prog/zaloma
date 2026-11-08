@@ -18,10 +18,11 @@ interface Props {
   type?: 'website' | 'product';
   schema?: Record<string, any>;
   robots?: string;
+  canonical?: string;
   showTestimonials?: boolean;
 }
 
-const { title, description, keywords, image, type = 'website', schema, robots, showTestimonials = true } = Astro.props;
+const { title, description, keywords, image, type = 'website', schema, robots, canonical, showTestimonials = true } = Astro.props;
 
 // Default Schema: Florist di Malang
 const defaultSchema = {
@@ -115,6 +116,7 @@ const finalSchema = schema || defaultSchema;
       type={type}
       schema={finalSchema}
       robots={robots}
+      canonical={canonical}
     />
     <!-- Critical Anti-FOUC CSS: guarantees SVGs and icons remain strictly bounded on hard refresh before external styles finish parsing -->
     <style is:inline>

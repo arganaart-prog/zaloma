@@ -2,8 +2,15 @@
 // Footer.astro
 import { WHATSAPP_NUMBER, WHATSAPP_LABEL, INSTAGRAM_URL, INSTAGRAM_HANDLE } from '../data/constants';
 import { withBase } from '../utils/paths';
+import { fetchSupabaseCategories } from '../utils/supabaseCategories';
 
 const currentYear = new Date().getFullYear();
+let footerCategories: Awaited<ReturnType<typeof fetchSupabaseCategories>> = [];
+try {
+  footerCategories = await fetchSupabaseCategories();
+} catch (error) {
+  console.warn('[Zaloma Footer] Failed to load categories from Supabase:', error);
+}
 
 const infoLinks = [
   { label: 'Beranda', href: '/' },
@@ -89,6 +96,21 @@ const paymentMethods = [
           </a>
         </div>
       </div>
+
+      {footerCategories.length > 0 && (
+        <div class="lg:ml-12">
+          <h3 class="text-xl font-bold text-white mb-3">Kategori Produk</h3>
+          <ul class="space-y-1.5 text-lg">
+            {footerCategories.map((category) => (
+              <li>
+                <a href={withBase(`/kategori/${category.slug}/`)} class="text-white/78 hover:text-white transition-colors duration-200 font-medium leading-normal">
+                  {category.name}
+                </a>
+              </li>
+            ))}
+          </ul>
+        </div>
+      )}
 
       <!-- Information -->
       <div>
