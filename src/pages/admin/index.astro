@@ -1,6 +1,7 @@
 ---
 import '../../styles/global.css';
 import { SUPABASE_URL, SUPABASE_ANON_KEY, SUPABASE_BUCKET } from '../../data/supabaseConfig';
+import { DEFAULT_PROMO_BANNERS, PROMO_BANNERS_CONFIG_SLUG } from '../../data/promoBanners';
 
 const title = "Admin — Zaloma Florist";
 
@@ -135,6 +136,11 @@ function withBase(path: string): string {
               <svg class="w-4 h-4" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2"><path stroke-linecap="round" stroke-linejoin="round" d="M3 6h18M3 12h18M3 18h18" /></svg>
               <span>Ukuran</span>
               <span id="tab-size-badge" class="px-2 py-0.5 rounded-full text-xs font-bold bg-slate-200 text-slate-700">0</span>
+            </button>
+            <button type="button" id="tab-btn-banners" class="tab-btn flex min-h-11 shrink-0 cursor-pointer items-center gap-2 rounded-xl px-3.5 py-2.5 text-sm font-semibold text-slate-600 transition-all hover:bg-white hover:text-primary sm:px-4">
+              <svg class="w-4 h-4" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2"><rect x="3" y="4" width="18" height="16" rx="2" /><path stroke-linecap="round" d="M3 14l5-5 4 4 3-3 6 6" /></svg>
+              <span>Banner Promo</span>
+              <span id="tab-banner-badge" class="px-2 py-0.5 rounded-full text-xs font-bold bg-slate-200 text-slate-700">0</span>
             </button>
           </div>
         </div>
@@ -635,6 +641,23 @@ function withBase(path: string): string {
           </div>
         </section>
 
+        <!-- ================= TAB 6: KELOLA BANNER PROMO ================= -->
+        <section id="tab-banners" class="hidden animate-fade-in space-y-4 max-w-5xl mx-auto">
+          <div class="bg-white rounded-2xl p-5 sm:p-6 border border-slate-200 shadow-sm flex flex-col sm:flex-row items-start sm:items-center justify-between gap-4">
+            <div>
+              <h2 class="text-lg font-bold text-slate-900 flex items-center gap-2.5 mb-1">
+                <span class="w-2.5 h-2.5 rounded-full bg-primary"></span>
+                Kelola Banner Promo
+              </h2>
+              <p class="text-sm text-slate-500">Atur banner yang tampil di beranda. Minimal harus ada satu banner.</p>
+            </div>
+            <button type="button" id="open-add-banner-btn" class="bg-primary hover:bg-primary-dark text-white font-semibold py-2.5 px-5 rounded-lg text-sm transition-all active:scale-95 flex items-center gap-2 shadow-sm cursor-pointer shrink-0 min-h-[44px]">
+              + Tambah Banner
+            </button>
+          </div>
+          <div id="promo-banners-grid" class="grid grid-cols-1 md:grid-cols-2 gap-4"></div>
+        </section>
+
       </main>
 
     </div>
@@ -1132,6 +1155,87 @@ function withBase(path: string): string {
       </div>
     </div>
 
+    <!-- ================= ADD / EDIT PROMO BANNER MODAL ================= -->
+    <div id="promo-banner-modal" class="hidden fixed inset-0 z-50 bg-black/40 backdrop-blur-xs flex items-center justify-center p-4 animate-fade-in">
+      <div class="bg-white rounded-2xl max-w-2xl w-full p-5 sm:p-6 shadow-xl border border-slate-200 space-y-4 animate-modal-pop max-h-[92vh] overflow-y-auto">
+        <div class="flex items-center justify-between pb-3 border-b border-slate-100">
+          <h3 id="promo-banner-modal-title" class="text-base font-bold text-slate-900 flex items-center gap-2.5">
+            <span class="w-2.5 h-2.5 rounded-full bg-primary"></span>
+            Tambah Banner Promo
+          </h3>
+          <button id="close-promo-banner-modal-btn" type="button" class="text-slate-400 hover:text-slate-600 text-lg font-bold cursor-pointer min-w-[32px] min-h-[32px]">✕</button>
+        </div>
+        <form id="promo-banner-form" class="space-y-4">
+          <input type="hidden" id="promo-banner-edit-id" />
+          <div class="grid grid-cols-1 sm:grid-cols-2 gap-3">
+            <div>
+              <label for="promo-banner-badge" class="block text-sm font-semibold text-slate-700 mb-1.5">Label promo</label>
+              <input id="promo-banner-badge" type="text" maxlength="80" placeholder="Contoh: Promo Spesial" class="w-full px-3 py-2.5 rounded-lg border border-slate-300 text-sm focus:outline-none focus:border-primary focus:ring-2 focus:ring-primary/20" />
+            </div>
+            <div>
+              <label for="promo-banner-headline" class="block text-sm font-semibold text-slate-700 mb-1.5">Judul <span class="text-rose-500">*</span></label>
+              <input id="promo-banner-headline" type="text" maxlength="140" required placeholder="Judul promo banner" class="w-full px-3 py-2.5 rounded-lg border border-slate-300 text-sm focus:outline-none focus:border-primary focus:ring-2 focus:ring-primary/20" />
+            </div>
+            <div class="sm:col-span-2">
+              <label for="promo-banner-description" class="block text-sm font-semibold text-slate-700 mb-1.5">Keterangan</label>
+              <textarea id="promo-banner-description" rows="2" maxlength="300" placeholder="Keterangan singkat promo" class="w-full px-3 py-2.5 rounded-lg border border-slate-300 text-sm focus:outline-none focus:border-primary focus:ring-2 focus:ring-primary/20 resize-y"></textarea>
+            </div>
+          </div>
+
+          <div class="grid grid-cols-1 sm:grid-cols-2 gap-3">
+            <div class="rounded-xl border border-slate-200 bg-slate-50 p-3">
+              <label for="promo-banner-desktop-file" class="block text-sm font-semibold text-slate-700">Gambar desktop</label>
+              <p class="mt-1 text-xs text-slate-500">Rekomendasi 1080 × 540 px (rasio 2:1). JPG, PNG, atau WebP, maks. 8 MB. Jika hanya versi ini diunggah, banner hanya tampil di desktop.</p>
+              <input id="promo-banner-desktop-file" type="file" accept="image/jpeg,image/png,image/webp" class="mt-2 block w-full text-xs text-slate-600 file:mr-2 file:rounded-lg file:border-0 file:bg-primary file:px-3 file:py-2 file:text-xs file:font-semibold file:text-white" />
+              <img id="promo-banner-desktop-preview" class="hidden mt-2 h-28 w-full rounded-lg border border-slate-200 bg-white object-contain" alt="Preview banner desktop" />
+              <label id="promo-banner-desktop-remove-wrap" class="hidden mt-2 items-center gap-2 text-xs text-rose-600">
+                <input id="promo-banner-desktop-remove" type="checkbox" class="accent-rose-600" />
+                Hapus versi desktop yang tersimpan
+              </label>
+            </div>
+            <div class="rounded-xl border border-slate-200 bg-slate-50 p-3">
+              <label for="promo-banner-mobile-file" class="block text-sm font-semibold text-slate-700">Gambar mobile</label>
+              <p class="mt-1 text-xs text-slate-500">Rekomendasi 1080 × 776 px (rasio sekitar 1,39:1). JPG, PNG, atau WebP, maks. 8 MB. Jika hanya versi ini diunggah, banner hanya tampil di mobile.</p>
+              <input id="promo-banner-mobile-file" type="file" accept="image/jpeg,image/png,image/webp" class="mt-2 block w-full text-xs text-slate-600 file:mr-2 file:rounded-lg file:border-0 file:bg-primary file:px-3 file:py-2 file:text-xs file:font-semibold file:text-white" />
+              <img id="promo-banner-mobile-preview" class="hidden mt-2 h-28 w-full rounded-lg border border-slate-200 bg-white object-contain" alt="Preview banner mobile" />
+              <label id="promo-banner-mobile-remove-wrap" class="hidden mt-2 items-center gap-2 text-xs text-rose-600">
+                <input id="promo-banner-mobile-remove" type="checkbox" class="accent-rose-600" />
+                Hapus versi mobile yang tersimpan
+              </label>
+            </div>
+          </div>
+          <p id="promo-banner-image-note" class="text-xs text-slate-500">Unggah minimal satu versi gambar. Saat edit, gambar yang tidak diganti akan tetap digunakan.</p>
+
+          <details class="rounded-xl border border-slate-200 p-3">
+            <summary class="cursor-pointer text-sm font-semibold text-slate-700">Tombol promo (opsional)</summary>
+            <div class="mt-3 grid grid-cols-1 sm:grid-cols-2 gap-3">
+              <div>
+                <label for="promo-banner-cta1-label" class="block text-xs font-semibold text-slate-600 mb-1">Teks tombol 1</label>
+                <input id="promo-banner-cta1-label" type="text" maxlength="40" class="w-full px-3 py-2 rounded-lg border border-slate-300 text-sm" />
+              </div>
+              <div>
+                <label for="promo-banner-cta1-href" class="block text-xs font-semibold text-slate-600 mb-1">Link tombol 1</label>
+                <input id="promo-banner-cta1-href" type="text" placeholder="https://... atau link internal /katalog/" class="w-full px-3 py-2 rounded-lg border border-slate-300 text-sm" />
+              </div>
+              <div>
+                <label for="promo-banner-cta2-label" class="block text-xs font-semibold text-slate-600 mb-1">Teks tombol 2</label>
+                <input id="promo-banner-cta2-label" type="text" maxlength="40" class="w-full px-3 py-2 rounded-lg border border-slate-300 text-sm" />
+              </div>
+              <div>
+                <label for="promo-banner-cta2-href" class="block text-xs font-semibold text-slate-600 mb-1">Link tombol 2</label>
+                <input id="promo-banner-cta2-href" type="text" placeholder="https://... atau link internal /katalog/" class="w-full px-3 py-2 rounded-lg border border-slate-300 text-sm" />
+              </div>
+            </div>
+          </details>
+
+          <div class="flex items-center justify-end gap-2 border-t border-slate-100 pt-3">
+            <button type="button" id="cancel-promo-banner-btn" class="px-4 py-2.5 rounded-lg text-sm font-semibold text-slate-500 hover:bg-slate-100 cursor-pointer min-h-[44px]">Batal</button>
+            <button type="submit" id="save-promo-banner-btn" class="bg-primary hover:bg-primary-dark text-white font-semibold py-2.5 px-5 rounded-lg text-sm transition-all cursor-pointer shadow-sm min-h-[44px]">Simpan Banner</button>
+          </div>
+        </form>
+      </div>
+    </div>
+
     <!-- ================= ADD / EDIT SIZE MODAL ================= -->
     <div id="size-modal" class="hidden fixed inset-0 z-50 bg-black/40 backdrop-blur-xs flex items-center justify-center p-4 animate-fade-in">
       <div class="bg-white rounded-2xl max-w-md w-full p-5 sm:p-6 shadow-xl border border-slate-200 space-y-4 animate-modal-pop">
@@ -1268,7 +1372,7 @@ function withBase(path: string): string {
       </div>
     </div>
 
-    <script define:vars={{ SUPABASE_URL, SUPABASE_ANON_KEY, SUPABASE_BUCKET }}>
+    <script define:vars={{ SUPABASE_URL, SUPABASE_ANON_KEY, SUPABASE_BUCKET, DEFAULT_PROMO_BANNERS, PROMO_BANNERS_CONFIG_SLUG }}>
       // Initialize Supabase Client
       const supabase = window.supabase.createClient(SUPABASE_URL, SUPABASE_ANON_KEY);
 
@@ -1481,6 +1585,11 @@ function withBase(path: string): string {
 
       let allProductsList = [];
       let pendingDeleteId = null;
+      let promoBanners = DEFAULT_PROMO_BANNERS;
+      let promoBannerDesktopFile = null;
+      let promoBannerMobileFile = null;
+      let promoBannerRemoveDesktop = false;
+      let promoBannerRemoveMobile = false;
 
       // Toast Notification Helper
       function showToast(message, type = 'success') {
@@ -1516,6 +1625,7 @@ function withBase(path: string): string {
           adminDashboard.classList.remove('hidden');
           if (userEmailDisplay) userEmailDisplay.textContent = session.user.email;
           loadAllProducts();
+          loadPromoBanners();
         } else {
           loginGate.classList.remove('hidden');
           adminDashboard.classList.add('hidden');
@@ -1561,11 +1671,13 @@ function withBase(path: string): string {
       const tabBtnCategories = document.getElementById('tab-btn-categories');
       const tabBtnCities = document.getElementById('tab-btn-cities');
       const tabBtnSizes = document.getElementById('tab-btn-sizes');
+      const tabBtnBanners = document.getElementById('tab-btn-banners');
       const tabCatalog = document.getElementById('tab-catalog');
       const tabAdd = document.getElementById('tab-add');
       const tabCategories = document.getElementById('tab-categories');
       const tabCities = document.getElementById('tab-cities');
       const tabSizes = document.getElementById('tab-sizes');
+      const tabBanners = document.getElementById('tab-banners');
 
       function switchTab(activeTab) {
         const tabs = [
@@ -1573,7 +1685,8 @@ function withBase(path: string): string {
           { btn: tabBtnAdd, pane: tabAdd },
           { btn: tabBtnCategories, pane: tabCategories },
           { btn: tabBtnCities, pane: tabCities },
-          { btn: tabBtnSizes, pane: tabSizes }
+          { btn: tabBtnSizes, pane: tabSizes },
+          { btn: tabBtnBanners, pane: tabBanners }
         ];
 
         tabs.forEach(t => {
@@ -1610,6 +1723,320 @@ function withBase(path: string): string {
         switchTab(tabBtnSizes);
         renderSizesCards();
       });
+      tabBtnBanners?.addEventListener('click', () => {
+        switchTab(tabBtnBanners);
+        renderPromoBanners();
+      });
+
+      const promoBannerModal = document.getElementById('promo-banner-modal');
+      const promoBannerForm = document.getElementById('promo-banner-form');
+      const promoBannerGrid = document.getElementById('promo-banners-grid');
+      const promoBannerDesktopInput = document.getElementById('promo-banner-desktop-file');
+      const promoBannerMobileInput = document.getElementById('promo-banner-mobile-file');
+
+      async function loadPromoBanners() {
+        try {
+          const { data, error } = await supabase.from('products')
+            .select('id, description')
+            .eq('slug', PROMO_BANNERS_CONFIG_SLUG)
+            .maybeSingle();
+          if (error) throw error;
+          if (!data) {
+            promoBanners = DEFAULT_PROMO_BANNERS;
+          } else {
+            const parsed = JSON.parse(data.description || '[]');
+            if (!Array.isArray(parsed)) throw new Error('Format konfigurasi banner promo tidak valid.');
+            const validBanners = parsed.filter(banner =>
+              banner && typeof banner.id === 'string'
+              && typeof banner.headline === 'string'
+              && (typeof banner.desktopImage === 'string' || typeof banner.mobileImage === 'string')
+              && (banner.desktopImage || banner.mobileImage)
+            );
+            if (validBanners.length > 0) {
+              promoBanners = validBanners;
+            } else {
+              promoBanners = DEFAULT_PROMO_BANNERS;
+              showToast('Konfigurasi banner kosong atau tidak valid; banner bawaan ditampilkan.', 'error');
+            }
+          }
+          renderPromoBanners();
+        } catch (error) {
+          console.error('[Zaloma Admin] Failed to load promo banners:', error);
+          showToast('Gagal memuat banner promo: ' + (error.message || error), 'error');
+        }
+      }
+
+      function renderPromoBanners() {
+        if (!promoBannerGrid) return;
+        const badge = document.getElementById('tab-banner-badge');
+        if (badge) badge.textContent = String(promoBanners.length);
+        promoBannerGrid.replaceChildren();
+
+        promoBanners.forEach((banner, index) => {
+          const card = document.createElement('article');
+          card.className = 'overflow-hidden rounded-2xl border border-slate-200 bg-white shadow-sm';
+          const image = document.createElement('img');
+          image.src = banner.desktopImage || banner.mobileImage;
+          image.alt = banner.alt || banner.headline;
+          image.className = 'h-40 w-full bg-slate-100 object-cover';
+          card.appendChild(image);
+
+          const content = document.createElement('div');
+          content.className = 'space-y-3 p-4';
+          const title = document.createElement('h3');
+          title.className = 'font-bold text-slate-900';
+          title.textContent = banner.headline;
+          content.appendChild(title);
+          const status = document.createElement('p');
+          status.className = 'text-xs text-slate-500';
+          status.textContent = `Desktop: ${banner.desktopImage ? 'aktif' : 'tidak ditampilkan'} · Mobile: ${banner.mobileImage ? 'aktif' : 'tidak ditampilkan'}`;
+          content.appendChild(status);
+
+          const actions = document.createElement('div');
+          actions.className = 'flex gap-2';
+          const editButton = document.createElement('button');
+          editButton.type = 'button';
+          editButton.className = 'min-h-10 flex-1 rounded-lg border border-slate-200 px-3 py-2 text-sm font-semibold text-slate-700 hover:bg-slate-50';
+          editButton.textContent = 'Edit';
+          editButton.addEventListener('click', () => openPromoBannerModal(banner));
+          actions.appendChild(editButton);
+
+          const deleteButton = document.createElement('button');
+          deleteButton.type = 'button';
+          deleteButton.className = 'min-h-10 rounded-lg border border-rose-100 px-3 py-2 text-sm font-semibold text-rose-600 hover:bg-rose-50 disabled:cursor-not-allowed disabled:opacity-40';
+          deleteButton.textContent = 'Hapus';
+          deleteButton.disabled = promoBanners.length <= 1;
+          deleteButton.title = deleteButton.disabled ? 'Minimal satu banner promo harus tersedia' : 'Hapus banner promo';
+          deleteButton.addEventListener('click', () => deletePromoBanner(banner.id));
+          actions.appendChild(deleteButton);
+
+          content.appendChild(actions);
+          card.appendChild(content);
+          promoBannerGrid.appendChild(card);
+        });
+      }
+
+      function setPromoImagePreview(device, src) {
+        const preview = document.getElementById(`promo-banner-${device}-preview`);
+        if (!(preview instanceof HTMLImageElement)) return;
+        if (src) {
+          preview.src = src;
+          preview.classList.remove('hidden');
+        } else {
+          preview.removeAttribute('src');
+          preview.classList.add('hidden');
+        }
+      }
+
+      function openPromoBannerModal(banner = null) {
+        promoBannerForm.reset();
+        promoBannerDesktopFile = null;
+        promoBannerMobileFile = null;
+        promoBannerRemoveDesktop = false;
+        promoBannerRemoveMobile = false;
+        document.getElementById('promo-banner-edit-id').value = banner?.id || '';
+        document.getElementById('promo-banner-modal-title').innerHTML = `<span class="w-2.5 h-2.5 rounded-full bg-primary"></span>${banner ? ' Edit Banner Promo' : ' Tambah Banner Promo'}`;
+        document.getElementById('promo-banner-headline').value = banner?.headline || '';
+        document.getElementById('promo-banner-badge').value = banner?.badge || '';
+        document.getElementById('promo-banner-description').value = banner?.description || '';
+        document.getElementById('promo-banner-cta1-label').value = banner?.ctaPrimaryLabel || '';
+        document.getElementById('promo-banner-cta1-href').value = banner?.ctaPrimaryHref || '';
+        document.getElementById('promo-banner-cta2-label').value = banner?.ctaSecondaryLabel || '';
+        document.getElementById('promo-banner-cta2-href').value = banner?.ctaSecondaryHref || '';
+        setPromoImagePreview('desktop', banner?.desktopImage || '');
+        setPromoImagePreview('mobile', banner?.mobileImage || '');
+        document.getElementById('promo-banner-desktop-remove-wrap').classList.toggle('hidden', !banner?.desktopImage);
+        document.getElementById('promo-banner-mobile-remove-wrap').classList.toggle('hidden', !banner?.mobileImage);
+        document.getElementById('promo-banner-image-note').textContent = banner
+          ? 'Pilih file untuk mengganti gambar yang ada. Versi gambar yang tidak diganti tetap digunakan.'
+          : 'Unggah minimal satu versi gambar. Versi desktop/mobile yang kosong tidak akan ditampilkan pada perangkat tersebut.';
+        promoBannerModal.classList.remove('hidden');
+      }
+
+      function closePromoBannerModal() {
+        promoBannerModal.classList.add('hidden');
+        promoBannerForm.reset();
+        promoBannerDesktopFile = null;
+        promoBannerMobileFile = null;
+        promoBannerRemoveDesktop = false;
+        promoBannerRemoveMobile = false;
+        setPromoImagePreview('desktop', '');
+        setPromoImagePreview('mobile', '');
+      }
+
+      function bindPromoImageInput(input, device) {
+        input?.addEventListener('change', () => {
+          const file = input.files?.[0] || null;
+          if (file && (!['image/jpeg', 'image/png', 'image/webp'].includes(file.type) || file.size > 8 * 1024 * 1024)) {
+            showToast('Pilih gambar JPG, PNG, atau WebP dengan ukuran maksimal 8 MB.', 'error');
+            input.value = '';
+            const currentBanner = promoBanners.find(banner =>
+              banner.id === document.getElementById('promo-banner-edit-id').value,
+            );
+            const savedImage = device === 'desktop'
+              ? currentBanner?.desktopImage
+              : currentBanner?.mobileImage;
+            if (device === 'desktop') promoBannerDesktopFile = null;
+            else promoBannerMobileFile = null;
+            setPromoImagePreview(device, savedImage || '');
+            return;
+          }
+          if (device === 'desktop') promoBannerDesktopFile = file;
+          else promoBannerMobileFile = file;
+          setPromoImagePreview(device, file ? URL.createObjectURL(file) : '');
+        });
+      }
+
+      bindPromoImageInput(promoBannerDesktopInput, 'desktop');
+      bindPromoImageInput(promoBannerMobileInput, 'mobile');
+      document.getElementById('promo-banner-desktop-remove')?.addEventListener('change', (event) => {
+        promoBannerRemoveDesktop = event.target.checked;
+      });
+      document.getElementById('promo-banner-mobile-remove')?.addEventListener('change', (event) => {
+        promoBannerRemoveMobile = event.target.checked;
+      });
+      document.getElementById('open-add-banner-btn')?.addEventListener('click', () => openPromoBannerModal());
+      document.getElementById('close-promo-banner-modal-btn')?.addEventListener('click', closePromoBannerModal);
+      document.getElementById('cancel-promo-banner-btn')?.addEventListener('click', closePromoBannerModal);
+
+      function validPromoHref(value) {
+        const href = value.trim();
+        if (!href) return '';
+        if (href.startsWith('/') && !href.startsWith('//')) return href;
+        try {
+          const url = new URL(href);
+          return url.protocol === 'https:' || url.protocol === 'http:' ? href : '';
+        } catch {
+          return '';
+        }
+      }
+
+      async function uploadPromoImage(file, bannerId, device) {
+        const extension = file.type === 'image/png' ? 'png' : file.type === 'image/webp' ? 'webp' : 'jpg';
+        const path = `promo-banners/${bannerId}-${device}-${Date.now()}.${extension}`;
+        const { error } = await supabase.storage.from(SUPABASE_BUCKET).upload(path, file, {
+          contentType: file.type,
+          upsert: false,
+        });
+        if (error) throw error;
+        const { data } = supabase.storage.from(SUPABASE_BUCKET).getPublicUrl(path);
+        if (!data?.publicUrl) throw new Error(`URL gambar ${device} gagal dibuat.`);
+        return data.publicUrl;
+      }
+
+      async function persistPromoBanners(banners) {
+        if (!banners.length) throw new Error('Minimal satu banner promo harus tersedia.');
+        const payload = {
+          slug: PROMO_BANNERS_CONFIG_SLUG,
+          name: 'System Promo Banners Config',
+          category_slug: '_system_',
+          category_name: 'System',
+          price_from: 0,
+          price_label: 'Rp 0',
+          image: 'https://zalomaflorist.com/favicon.ico',
+          description: JSON.stringify(banners),
+          featured: false,
+          city: 'Malang',
+        };
+        const { data: existing, error: lookupError } = await supabase.from('products')
+          .select('id').eq('slug', PROMO_BANNERS_CONFIG_SLUG).maybeSingle();
+        if (lookupError) throw lookupError;
+        const result = existing?.id
+          ? await supabase.from('products').update(payload).eq('id', existing.id)
+          : await supabase.from('products').insert([payload]);
+        if (result.error) throw result.error;
+      }
+
+      promoBannerForm?.addEventListener('submit', async (event) => {
+        event.preventDefault();
+        const editId = document.getElementById('promo-banner-edit-id').value;
+        const existing = promoBanners.find(banner => banner.id === editId);
+        if (!existing && !promoBannerDesktopFile && !promoBannerMobileFile) {
+          showToast('Unggah minimal satu gambar desktop atau mobile.', 'error');
+          return;
+        }
+
+        const headline = document.getElementById('promo-banner-headline').value.trim();
+        if (!headline) {
+          showToast('Judul banner wajib diisi.', 'error');
+          return;
+        }
+        const cta1Label = document.getElementById('promo-banner-cta1-label').value.trim();
+        const cta1HrefRaw = document.getElementById('promo-banner-cta1-href').value.trim();
+        const cta2Label = document.getElementById('promo-banner-cta2-label').value.trim();
+        const cta2HrefRaw = document.getElementById('promo-banner-cta2-href').value.trim();
+        const cta1Href = validPromoHref(cta1HrefRaw);
+        const cta2Href = validPromoHref(cta2HrefRaw);
+        if ((cta1Label || cta1HrefRaw) && (!cta1Label || !cta1Href)) {
+          showToast('Tombol promo 1 perlu teks dan URL http(s) atau link internal yang valid.', 'error');
+          return;
+        }
+        if ((cta2Label || cta2HrefRaw) && (!cta2Label || !cta2Href)) {
+          showToast('Tombol promo 2 perlu teks dan URL http(s) atau link internal yang valid.', 'error');
+          return;
+        }
+
+        const id = editId || `promo-${crypto.randomUUID()}`;
+        const saveButton = document.getElementById('save-promo-banner-btn');
+        saveButton.disabled = true;
+        saveButton.textContent = 'Menyimpan...';
+        try {
+          let desktopImage = promoBannerRemoveDesktop ? '' : (existing?.desktopImage || '');
+          let mobileImage = promoBannerRemoveMobile ? '' : (existing?.mobileImage || '');
+          if (promoBannerDesktopFile) desktopImage = await uploadPromoImage(promoBannerDesktopFile, id, 'desktop');
+          if (promoBannerMobileFile) mobileImage = await uploadPromoImage(promoBannerMobileFile, id, 'mobile');
+          if (!desktopImage && !mobileImage) throw new Error('Banner harus memiliki gambar desktop atau mobile.');
+
+          const nextBanner = {
+            id,
+            badge: document.getElementById('promo-banner-badge').value.trim(),
+            headline,
+            description: document.getElementById('promo-banner-description').value.trim(),
+            desktopImage,
+            mobileImage,
+            alt: headline,
+            ctaPrimaryLabel: cta1Label,
+            ctaPrimaryHref: cta1Href,
+            ctaPrimaryExternal: Boolean(cta1Href && !cta1Href.startsWith('/')),
+            ctaSecondaryLabel: cta2Label,
+            ctaSecondaryHref: cta2Href,
+            ctaSecondaryExternal: Boolean(cta2Href && !cta2Href.startsWith('/')),
+          };
+          const nextBanners = existing
+            ? promoBanners.map(banner => banner.id === id ? nextBanner : banner)
+            : [...promoBanners, nextBanner];
+          await persistPromoBanners(nextBanners);
+          promoBanners = nextBanners;
+          renderPromoBanners();
+          closePromoBannerModal();
+          showToast(existing ? 'Banner promo berhasil diperbarui.' : 'Banner promo berhasil ditambahkan.');
+        } catch (error) {
+          console.error('[Zaloma Admin] Failed to save promo banner:', error);
+          showToast('Gagal menyimpan banner: ' + (error.message || error), 'error');
+        } finally {
+          saveButton.disabled = false;
+          saveButton.textContent = 'Simpan Banner';
+        }
+      });
+
+      async function deletePromoBanner(id) {
+        if (promoBanners.length <= 1) {
+          showToast('Minimal satu banner promo harus tersedia.', 'error');
+          return;
+        }
+        const banner = promoBanners.find(item => item.id === id);
+        if (!banner || !window.confirm(`Hapus banner "${banner.headline}"?`)) return;
+        const nextBanners = promoBanners.filter(item => item.id !== id);
+        try {
+          await persistPromoBanners(nextBanners);
+          promoBanners = nextBanners;
+          renderPromoBanners();
+          showToast('Banner promo berhasil dihapus.');
+        } catch (error) {
+          console.error('[Zaloma Admin] Failed to delete promo banner:', error);
+          showToast('Gagal menghapus banner: ' + (error.message || error), 'error');
+        }
+      }
 
       // Helper to safely persist system configuration rows without onConflict failure
       async function saveSystemConfig(slugVal, nameVal, jsonString) {

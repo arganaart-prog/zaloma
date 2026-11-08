@@ -14,7 +14,6 @@ import TanbulampotSection from '../components/TanbulampotSection.astro';
 import CityDeliverySection from '../components/CityDeliverySection.astro';
 import DailyCategoryRotation from '../components/DailyCategoryRotation.astro';
 import { SUPABASE_URL, SUPABASE_ANON_KEY } from '../data/supabaseConfig';
-import { withBase } from '../utils/paths';
 import { getRotatingHomeProducts } from '../utils/rotatingProducts';
 import { getHomeDisplayProducts, getSellableProducts, extractConfigCategories, deriveCategoriesFromProducts, getMomentCategories, mergeCategories } from '../utils/productHelpers';
 
@@ -98,25 +97,6 @@ const description = "Zaloma Florist menyediakan bunga papan, hand bouquet, stand
 <Layout title={title} description={description}>
   <!-- Supabase JS SDK for live home sync -->
   <script is:inline src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
-  <link
-    slot="head"
-    rel="preload"
-    as="image"
-    type="image/webp"
-    href={withBase('/images/banner/promo%20banner/1.webp')}
-    media="(max-width: 1023px)"
-    fetchpriority="high"
-  />
-  <link
-    slot="head"
-    rel="preload"
-    as="image"
-    type="image/webp"
-    imagesrcset={withBase('/images/banner/promo%20banner/2.webp')}
-    media="(min-width: 1024px)"
-    fetchpriority="high"
-  />
-  
   <HomeHero />
 
 

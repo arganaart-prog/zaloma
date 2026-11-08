@@ -1,66 +1,52 @@
 ---
 import { withBase } from '../utils/paths';
-import { WHATSAPP_NUMBER } from '../data/constants';
+import { SUPABASE_ANON_KEY, SUPABASE_URL } from '../data/supabaseConfig';
+import { DEFAULT_PROMO_BANNERS, PROMO_BANNERS_CONFIG_SLUG } from '../data/promoBanners';
 
-// Promo slides configuration
-// Desktop: 2.webp, 3.webp, 4.webp (all 1080x540, 2:1 aspect ratio) â€” CTA buttons sit in the empty space
-// Mobile: 1.webp (1080x776), 3.webp, 4.webp â€” Each slide is an independent rounded card (Image on top + text/buttons on bottom)
-const promoSlides = [
-  {
-    id: 'promo-buka-24-jam',
-    badge: 'Buka 24 Jam Nonstop',
-    headline: 'Toko Bunga Malang Buka 24 Jam Nonstop',
-    description: 'Melayani pemesanan karangan bunga 24 jam sehari, 7 hari seminggu. Respon cepat, bunga segar berkualitas, dan siap kirim ke seluruh Malang.',
+const toPromoSlide = (banner: typeof DEFAULT_PROMO_BANNERS[number]) => ({
+  ...banner,
+  mobileImage: banner.mobileImage ? withBase(banner.mobileImage) : '',
+  desktopImage: banner.desktopImage ? withBase(banner.desktopImage) : '',
+  ctaPrimary: banner.ctaPrimaryLabel && banner.ctaPrimaryHref
+    ? {
+      label: banner.ctaPrimaryLabel,
+      href: banner.ctaPrimaryHref.startsWith('/') ? withBase(banner.ctaPrimaryHref) : banner.ctaPrimaryHref,
+      external: Boolean(banner.ctaPrimaryExternal),
+    }
+    : null,
+  ctaSecondary: banner.ctaSecondaryLabel && banner.ctaSecondaryHref
+    ? {
+      label: banner.ctaSecondaryLabel,
+      href: banner.ctaSecondaryHref.startsWith('/') ? withBase(banner.ctaSecondaryHref) : banner.ctaSecondaryHref,
+      external: Boolean(banner.ctaSecondaryExternal),
+    }
+    : null,
+});
 
-    mobileImage: withBase('/images/banner/promo%20banner/1.webp?v=3'),
-    desktopImage: withBase('/images/banner/promo%20banner/2.webp?v=3'),
-    alt: 'Toko Bunga Malang Buka 24 Jam Nonstop - Zaloma Florist',
-    ctaPrimary: null,
-    ctaSecondary: null,
-  },
-  {
-    id: 'promo-7-bunga-papan',
-    badge: 'Paket Hemat - Acara Besar',
-    headline: 'Pesan 7 Bunga Papan, Gratis Ongkir se-Malang Raya',
-    description: 'Cocok buat pernikahan, wisuda, dan grand opening. Makin banyak pesanan, harga makin hemat.',
+const promoSlides = DEFAULT_PROMO_BANNERS.map(toPromoSlide);
 
-    mobileImage: withBase('/images/banner/promo%20banner/3.webp'),
-    desktopImage: withBase('/images/banner/promo%20banner/3.webp'),
-    alt: 'Promo Spesial Pesan 7 Bunga Papan Gratis Ongkir Seluruh Malang Raya - Zaloma Florist',
-    ctaPrimary: {
-      label: 'Tanya via WhatsApp',
-      href: `https://wa.me/${WHATSAPP_NUMBER}?text=${encodeURIComponent('Halo Zaloma Florist, saya ingin info Promo Pesan 7 Bunga Papan Gratis Ongkir ke Seluruh Malang Raya.')}`,
-      external: true,
-    },
-    ctaSecondary: {
-      label: 'Lihat Bunga Papan',
-      href: withBase('/katalog/?search=bunga%20papan'),
-      external: false,
-    },
-  },
-  {
-    id: 'promo-bunga-papan-400rb',
-    badge: 'Mulai 400 Ribu - Siap 3 Jam',
-    headline: 'Bunga Papan Mulai 400 Ribu, Selesai 3 Jam',
-    description: 'Pernikahan, duka cita, wisuda, hingga grand opening. Pengerjaan cepat, difoto sebelum dikirim.',
+let activePromoSlides = promoSlides;
+try {
+  const response = await fetch(
+    `${SUPABASE_URL}/rest/v1/products?slug=eq.${PROMO_BANNERS_CONFIG_SLUG}&select=description&limit=1`,
+    { headers: { apikey: SUPABASE_ANON_KEY, Authorization: `Bearer ${SUPABASE_ANON_KEY}` } },
+  );
+  if (!response.ok) throw new Error(`Supabase promo banner request failed with status ${response.status}`);
+  const rows = await response.json();
+  const configured = rows?.[0]?.description ? JSON.parse(rows[0].description) : null;
+  if (Array.isArray(configured) && configured.length > 0) {
+    const validBanners = configured.filter((banner) =>
+      banner && typeof banner.id === 'string' && typeof banner.headline === 'string'
+      && (typeof banner.desktopImage === 'string' || typeof banner.mobileImage === 'string')
+      && (banner.desktopImage || banner.mobileImage),
+    );
+    if (validBanners.length > 0) activePromoSlides = validBanners.map(toPromoSlide);
+  }
+} catch (error) {
+  console.warn('[Zaloma Hero Banner] Failed to load promo banners from Supabase:', error);
+}
 
-    mobileImage: withBase('/images/banner/promo%20banner/4.webp'),
-    desktopImage: withBase('/images/banner/promo%20banner/4.webp'),
-    alt: 'Bunga Papan Mulai 400 Ribuan - Zaloma Florist Malang',
-    ctaPrimary: {
-      label: 'Lihat Desain Papan',
-      href: withBase('/katalog/?search=bunga%20papan'),
-      external: false,
-    },
-    ctaSecondary: {
-      label: 'Tanya Harga',
-      href: `https://wa.me/${WHATSAPP_NUMBER}?text=${encodeURIComponent('Halo Zaloma Florist, saya ingin tanya harga bunga papan.')}`,
-      external: true,
-    },
-  },
-];
-
-const displaySlides = promoSlides.map((slide, idx) => ({
+const displaySlides = activePromoSlides.map((slide, idx) => ({
   ...slide,
   realIndex: idx,
   key: `promo-${idx}`,
@@ -77,6 +63,7 @@ const displaySlides = promoSlides.map((slide, idx) => ({
           role="group"
           data-track-index={trackIndex}
           data-real-index={slide.realIndex}
+          data-device={slide.desktopImage && slide.mobileImage ? 'all' : slide.desktopImage ? 'desktop' : 'mobile'}
           aria-roledescription="slide"
           aria-label={slide.headline}
           aria-hidden={trackIndex === 0 ? 'false' : 'true'}
@@ -101,15 +88,17 @@ const displaySlides = promoSlides.map((slide, idx) => ({
                 aria-label={slide.headline}
               >
                 <picture class="hb-picture">
-                  <source
-                    media="(min-width: 1024px)"
-                    srcset={slide.desktopImage}
-                    width="1080"
-                    height="540"
-                  />
+                  {slide.desktopImage && (
+                    <source
+                      media="(min-width: 1024px)"
+                      srcset={slide.desktopImage}
+                      width="1080"
+                      height="540"
+                    />
+                  )}
                   <img
                     class="hb-img"
-                    src={slide.mobileImage}
+                    src={slide.mobileImage || slide.desktopImage}
                     alt={slide.alt}
                     width="1080"
                     height={slide.realIndex === 0 ? '776' : '540'}
@@ -122,23 +111,27 @@ const displaySlides = promoSlides.map((slide, idx) => ({
               </a>
 
               <!-- Desktop CTA Buttons in Empty Space (Desktop only) -->
-              {slide.ctaPrimary && slide.ctaSecondary && (
+              {(slide.ctaPrimary || slide.ctaSecondary) && (
                 <div class="hb-desktop-cta" aria-hidden={trackIndex === 0 ? 'false' : 'true'}>
                   <div class="hb-btn-row">
-                    <a
-                      href={slide.ctaPrimary.href}
-                      target={slide.ctaPrimary.external ? '_blank' : undefined}
-                      rel={slide.ctaPrimary.external ? 'noopener noreferrer' : undefined}
-                      class="hb-btn hb-btn--primary"
-                      tabindex={trackIndex === 0 ? '0' : '-1'}
-                    >{slide.ctaPrimary.label}</a>
-                    <a
-                      href={slide.ctaSecondary.href}
-                      target={slide.ctaSecondary.external ? '_blank' : undefined}
-                      rel={slide.ctaSecondary.external ? 'noopener noreferrer' : undefined}
-                      class="hb-btn hb-btn--secondary"
-                      tabindex={trackIndex === 0 ? '0' : '-1'}
-                    >{slide.ctaSecondary.label}</a>
+                    {slide.ctaPrimary && (
+                      <a
+                        href={slide.ctaPrimary.href}
+                        target={slide.ctaPrimary.external ? '_blank' : undefined}
+                        rel={slide.ctaPrimary.external ? 'noopener noreferrer' : undefined}
+                        class="hb-btn hb-btn--primary"
+                        tabindex={trackIndex === 0 ? '0' : '-1'}
+                      >{slide.ctaPrimary.label}</a>
+                    )}
+                    {slide.ctaSecondary && (
+                      <a
+                        href={slide.ctaSecondary.href}
+                        target={slide.ctaSecondary.external ? '_blank' : undefined}
+                        rel={slide.ctaSecondary.external ? 'noopener noreferrer' : undefined}
+                        class="hb-btn hb-btn--secondary"
+                        tabindex={trackIndex === 0 ? '0' : '-1'}
+                      >{slide.ctaSecondary.label}</a>
+                    )}
                   </div>
                 </div>
               )}
@@ -149,22 +142,26 @@ const displaySlides = promoSlides.map((slide, idx) => ({
               <span class="hb-m-badge">{slide.badge}</span>
               <h2 class="hb-m-title">{slide.headline}</h2>
               <p class="hb-m-desc">{slide.description}</p>
-              {slide.ctaPrimary && slide.ctaSecondary && (
+              {(slide.ctaPrimary || slide.ctaSecondary) && (
                 <div class="hb-m-btns">
-                  <a
-                    href={slide.ctaPrimary.href}
-                    target={slide.ctaPrimary.external ? '_blank' : undefined}
-                    rel={slide.ctaPrimary.external ? 'noopener noreferrer' : undefined}
-                    class="hb-m-btn hb-m-btn--primary"
-                    tabindex={trackIndex === 0 ? '0' : '-1'}
-                  >{slide.ctaPrimary.label}</a>
-                  <a
-                    href={slide.ctaSecondary.href}
-                    target={slide.ctaSecondary.external ? '_blank' : undefined}
-                    rel={slide.ctaSecondary.external ? 'noopener noreferrer' : undefined}
-                    class="hb-m-btn hb-m-btn--ghost"
-                    tabindex={trackIndex === 0 ? '0' : '-1'}
-                  >{slide.ctaSecondary.label}</a>
+                  {slide.ctaPrimary && (
+                    <a
+                      href={slide.ctaPrimary.href}
+                      target={slide.ctaPrimary.external ? '_blank' : undefined}
+                      rel={slide.ctaPrimary.external ? 'noopener noreferrer' : undefined}
+                      class="hb-m-btn hb-m-btn--primary"
+                      tabindex={trackIndex === 0 ? '0' : '-1'}
+                    >{slide.ctaPrimary.label}</a>
+                  )}
+                  {slide.ctaSecondary && (
+                    <a
+                      href={slide.ctaSecondary.href}
+                      target={slide.ctaSecondary.external ? '_blank' : undefined}
+                      rel={slide.ctaSecondary.external ? 'noopener noreferrer' : undefined}
+                      class="hb-m-btn hb-m-btn--ghost"
+                      tabindex={trackIndex === 0 ? '0' : '-1'}
+                    >{slide.ctaSecondary.label}</a>
+                  )}
                 </div>
               )}
             </div>
@@ -176,12 +173,13 @@ const displaySlides = promoSlides.map((slide, idx) => ({
 
   <!-- Dot Indicators -->
   <div class="hb-dots" id="hb-dots" role="tablist" aria-label="Navigasi slide promo">
-    {promoSlides.map((slide, idx) => (
+    {displaySlides.map((slide, idx) => (
       <button
         class={`hb-dot${idx === 0 ? ' is-active' : ''}`}
         type="button"
         role="tab"
         data-real-index={idx}
+        data-device={slide.desktopImage && slide.mobileImage ? 'all' : slide.desktopImage ? 'desktop' : 'mobile'}
         aria-label={`Pindah ke promo: ${slide.headline}`}
         aria-selected={idx === 0 ? 'true' : 'false'}
         id={`hb-dot-${idx}`}
@@ -256,6 +254,20 @@ const displaySlides = promoSlides.map((slide, idx) => ({
     min-width: 100%;
     box-sizing: border-box;
     position: relative;
+  }
+
+  @media (max-width: 1023px) {
+    .hb-slide[data-device="desktop"],
+    .hb-dot[data-device="desktop"] {
+      display: none;
+    }
+  }
+
+  @media (min-width: 1024px) {
+    .hb-slide[data-device="mobile"],
+    .hb-dot[data-device="mobile"] {
+      display: none;
+    }
   }
 
   @media (min-width: 1024px) {
@@ -680,6 +692,125 @@ const displaySlides = promoSlides.map((slide, idx) => ({
 </style>
 
 <script>
+  import { SUPABASE_ANON_KEY, SUPABASE_URL } from '../data/supabaseConfig';
+  import { PROMO_BANNERS_CONFIG_SLUG } from '../data/promoBanners';
+  import { withBase } from '../utils/paths';
+
+  function escapeHtml(value) {
+    return String(value || '').replace(/[&<>"']/g, (character) => ({
+      '&': '&amp;',
+      '<': '&lt;',
+      '>': '&gt;',
+      '"': '&quot;',
+      "'": '&#39;',
+    })[character]);
+  }
+
+  function safePromoLink(value) {
+    const href = String(value || '').trim();
+    if (href.startsWith('/') && !href.startsWith('//')) return withBase(href);
+    try {
+      const url = new URL(href);
+      return url.protocol === 'https:' || url.protocol === 'http:' ? href : '';
+    } catch {
+      return '';
+    }
+  }
+
+  function safePromoImage(value) {
+    const image = String(value || '').trim();
+    if (image.startsWith('/') && !image.startsWith('//')) return withBase(image);
+    try {
+      const url = new URL(image);
+      return url.protocol === 'https:' || url.protocol === 'http:' ? image : '';
+    } catch {
+      return '';
+    }
+  }
+
+  function renderPromoBannerConfig(banners) {
+    const container = document.getElementById('hero-banner');
+    const track = document.getElementById('hb-track');
+    const dotsContainer = document.getElementById('hb-dots');
+    if (!container || !track || !dotsContainer) return;
+
+    const slides = banners.filter((banner) =>
+      banner && typeof banner.headline === 'string'
+      && (safePromoImage(banner.desktopImage) || safePromoImage(banner.mobileImage)),
+    );
+    if (!slides.length) return;
+
+    const ctaMarkup = (banner, which, className) => {
+      const label = banner[`${which}Label`];
+      const href = safePromoLink(banner[`${which}Href`]);
+      if (!label || !href) return '';
+      const external = /^https?:\/\//i.test(href);
+      return `<a href="${escapeHtml(href)}"${external ? ' target="_blank" rel="noopener noreferrer"' : ''} class="${className}">${escapeHtml(label)}</a>`;
+    };
+
+    track.innerHTML = slides.map((banner, index) => {
+      const mobileImage = safePromoImage(banner.mobileImage);
+      const desktopImage = safePromoImage(banner.desktopImage);
+      const src = mobileImage || desktopImage;
+      const device = desktopImage && mobileImage ? 'all' : desktopImage ? 'desktop' : 'mobile';
+      const primary = ctaMarkup(banner, 'ctaPrimary', 'hb-btn hb-btn--primary');
+      const secondary = ctaMarkup(banner, 'ctaSecondary', 'hb-btn hb-btn--secondary');
+      const mobilePrimary = ctaMarkup(banner, 'ctaPrimary', 'hb-m-btn hb-m-btn--primary');
+      const mobileSecondary = ctaMarkup(banner, 'ctaSecondary', 'hb-m-btn hb-m-btn--ghost');
+      const desktopSource = desktopImage
+        ? `<source media="(min-width: 1024px)" srcset="${escapeHtml(desktopImage)}" width="1080" height="540" />`
+        : '';
+      return `<div class="hb-slide" role="group" data-track-index="${index}" data-real-index="${index}" data-device="${device}" aria-roledescription="slide" aria-label="${escapeHtml(banner.headline)}" aria-hidden="${index === 0 ? 'false' : 'true'}">
+        <article class="hb-card">
+          <div class="hb-card-media">
+            <div class="hb-ambient" aria-hidden="true"></div>
+            <a ${banner.ctaPrimaryHref && safePromoLink(banner.ctaPrimaryHref) ? `href="${escapeHtml(safePromoLink(banner.ctaPrimaryHref))}"` : ''} class="hb-media-link${banner.ctaPrimaryHref && safePromoLink(banner.ctaPrimaryHref) ? '' : ' is-static'}" tabindex="${index === 0 ? '0' : '-1'}" aria-label="${escapeHtml(banner.headline)}">
+              <picture class="hb-picture">${desktopSource}<img class="hb-img" src="${escapeHtml(src)}" alt="${escapeHtml(banner.alt || banner.headline)}" width="1080" height="776" loading="${index === 0 ? 'eager' : 'lazy'}" decoding="${index === 0 ? 'sync' : 'async'}" fetchpriority="${index === 0 ? 'high' : 'auto'}" draggable="false" /></picture>
+            </a>
+            ${primary || secondary ? `<div class="hb-desktop-cta" aria-hidden="${index === 0 ? 'false' : 'true'}"><div class="hb-btn-row">${primary}${secondary}</div></div>` : ''}
+          </div>
+          <div class="hb-card-body">
+            ${banner.badge ? `<span class="hb-m-badge">${escapeHtml(banner.badge)}</span>` : ''}
+            <h2 class="hb-m-title">${escapeHtml(banner.headline)}</h2>
+            ${banner.description ? `<p class="hb-m-desc">${escapeHtml(banner.description)}</p>` : ''}
+            ${mobilePrimary || mobileSecondary ? `<div class="hb-m-btns">${mobilePrimary}${mobileSecondary}</div>` : ''}
+          </div>
+        </article>
+      </div>`;
+    }).join('');
+
+    dotsContainer.innerHTML = slides.map((banner, index) => {
+      const desktopImage = safePromoImage(banner.desktopImage);
+      const mobileImage = safePromoImage(banner.mobileImage);
+      const device = desktopImage && mobileImage ? 'all' : desktopImage ? 'desktop' : 'mobile';
+      return `<button class="hb-dot${index === 0 ? ' is-active' : ''}" type="button" role="tab" data-real-index="${index}" data-device="${device}" aria-label="Pindah ke promo: ${escapeHtml(banner.headline)}" aria-selected="${index === 0 ? 'true' : 'false'}" id="hb-dot-${index}"><span class="hb-dot-track"><span class="hb-dot-fill"></span></span></button>`;
+    }).join('');
+
+    track.querySelectorAll('.hb-slide').forEach((slide) => {
+      const image = slide.querySelector('.hb-img');
+      const ambient = slide.querySelector('.hb-ambient');
+      if (image instanceof HTMLImageElement && ambient instanceof HTMLElement) {
+        ambient.style.backgroundImage = `url(${JSON.stringify(image.src)})`;
+      }
+    });
+    container.dataset.hbInit = '';
+  }
+
+  async function refreshPromoBanners() {
+    try {
+      const response = await fetch(
+        `${SUPABASE_URL}/rest/v1/products?slug=eq.${PROMO_BANNERS_CONFIG_SLUG}&select=description&limit=1`,
+        { headers: { apikey: SUPABASE_ANON_KEY, Authorization: `Bearer ${SUPABASE_ANON_KEY}` }, cache: 'no-store' },
+      );
+      if (!response.ok) throw new Error(`Request failed with status ${response.status}`);
+      const rows = await response.json();
+      const banners = rows?.[0]?.description ? JSON.parse(rows[0].description) : [];
+      if (Array.isArray(banners) && banners.length) renderPromoBannerConfig(banners);
+    } catch (error) {
+      console.warn('[Zaloma Hero Banner] Runtime promo sync failed; using prerendered banners:', error);
+    }
+  }
+
   function initHeroBanner() {
     const AUTOPLAY_MS = 5000;
     const TRANSITION_MS = 480;
@@ -690,13 +821,30 @@ const displaySlides = promoSlides.map((slide, idx) => ({
     const track = document.getElementById('hb-track');
     const prevBtn = document.getElementById('hb-arrow-prev');
     const nextBtn = document.getElementById('hb-arrow-next');
-    const dots = Array.from(document.querySelectorAll('.hb-dot'));
+    const allDots = Array.from(document.querySelectorAll('.hb-dot'));
 
     if (!(container instanceof HTMLElement) || !(track instanceof HTMLElement)) return;
     if (container.dataset.hbInit === 'true') return;
     container.dataset.hbInit = 'true';
 
-    const slides = Array.from(track.querySelectorAll('.hb-slide'));
+    const isDesktop = window.matchMedia('(min-width: 1024px)').matches;
+    const isAvailable = (element) => {
+      const device = element.getAttribute('data-device');
+      return device === 'all' || (isDesktop ? device === 'desktop' : device === 'mobile');
+    };
+    const allSlides = Array.from(track.querySelectorAll('.hb-slide'));
+    allSlides.forEach((slide) => {
+      const available = isAvailable(slide);
+      slide.style.display = available ? '' : 'none';
+      if (available) slide.setAttribute('data-track-index', String(allSlides.filter((item) => isAvailable(item) && allSlides.indexOf(item) < allSlides.indexOf(slide)).length));
+    });
+    const slides = allSlides.filter(isAvailable);
+    const dots = allDots.filter(isAvailable);
+    allDots.forEach((dot) => {
+      const available = isAvailable(dot);
+      dot.style.display = available ? '' : 'none';
+      if (available) dot.setAttribute('data-real-index', String(dots.indexOf(dot)));
+    });
     const TOTAL_SLIDES = slides.length;
 
     if (TOTAL_SLIDES < 2) return;
@@ -878,6 +1026,11 @@ const displaySlides = promoSlides.map((slide, idx) => ({
     window.setTimeout(startAutoplay, 4000);
   }
 
-  initHeroBanner();
-  document.addEventListener('astro:page-load', initHeroBanner);
+  async function initializeHeroBanner() {
+    await refreshPromoBanners();
+    initHeroBanner();
+  }
+
+  initializeHeroBanner();
+  document.addEventListener('astro:page-load', initializeHeroBanner);
 </script>
