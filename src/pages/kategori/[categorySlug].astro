@@ -413,7 +413,7 @@ const customCategorySchema = {
       liveCategoryProducts.forEach((p, index) => {
         const productUrl = `/produk/${p.slug}/`;
         const cardShape = p.description?.match(/^\[Bentuk Kartu:\s*(portrait|square|arch)\]/im)?.[1];
-        const aspectClass = cardShape === 'square' ? 'aspect-square' : cardShape ? 'aspect-[4/5]' : isHandBouquet ? 'aspect-[4/5]' : 'aspect-[20/19]';
+        const aspectClass = cardShape === 'square' ? 'aspect-square' : 'aspect-[4/5]';
         const archClass = cardShape === 'arch' ? 'product-card-shape-arch' : '';
 
         const card = document.createElement('article');

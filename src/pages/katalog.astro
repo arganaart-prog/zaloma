@@ -385,7 +385,7 @@ const dynamicCategories = mergeCategories(configCategories, deriveCategoriesFrom
       liveProducts.forEach((p, index) => {
         const productUrl = `/produk/${p.slug}/`;
         const cardShape = p.description?.match(/^\[Bentuk Kartu:\s*(portrait|square|arch)\]/im)?.[1];
-        const imageAspect = cardShape === 'square' ? 'aspect-square' : cardShape ? 'aspect-[4/5]' : 'aspect-[20/19]';
+        const imageAspect = cardShape === 'square' ? 'aspect-square' : 'aspect-[4/5]';
         const archClass = cardShape === 'arch' ? 'product-card-shape-arch' : '';
 
         const wrapper = document.createElement('div');
