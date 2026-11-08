@@ -1,0 +1,91 @@
+---
+import type { Product } from '../data/products';
+import type { DerivedCategory } from '../utils/productHelpers';
+import { getHomeCategoryProducts } from '../utils/productHelpers';
+import { getDailyShuffledProducts } from '../utils/rotatingProducts';
+import { withBase } from '../utils/paths';
+import HomeOrderProductCard from './HomeOrderProductCard.astro';
+
+interface Props {
+  categories?: DerivedCategory[];
+  products?: Product[];
+  cityName?: string;
+  citySlug?: string;
+}
+
+const {
+  categories = [],
+  products = [],
+  cityName = 'Malang',
+  citySlug = '',
+} = Astro.props;
+
+const existingSectionSlugs = new Set([
+  'bunga-papan',
+  'bouquet',
+  'hand-bouquet',
+  'standing-flower',
+  'paper-flower',
+  'bunga-meja',
+  'tabulampot',
+  'tanbulampot',
+]);
+const seenSlugs = new Set<string>();
+
+const extraCategories = categories.flatMap((category, index) => {
+  const normalizedSlug = category.slug.toLowerCase().replace(/-malang$/, '');
+  if (existingSectionSlugs.has(normalizedSlug) || seenSlugs.has(normalizedSlug)) return [];
+  seenSlugs.add(normalizedSlug);
+
+  const categoryProducts = getHomeCategoryProducts(products, [category.slug]);
+  if (!categoryProducts.length) return [];
+
+  const shuffledProducts = getDailyShuffledProducts(categoryProducts, category.slug);
+  const categoryHref = citySlug
+    ? `/kategori/${category.slug}/?city=${citySlug}&refer=city`
+    : `/kategori/${category.slug}/`;
+
+  return [{
+    ...category,
+    title: category.name.toLowerCase().includes(cityName.toLowerCase())
+      ? category.name
+      : `${category.name} ${cityName}`,
+    products: shuffledProducts,
+    categoryHref,
+    backgroundClass: index % 2 === 0 ? 'bg-accent-bg/55' : 'bg-white',
+  }];
+});
+---
+
+{extraCategories.map((category) => (
+  <section class={`border-y border-soft-cream/60 py-20 ${category.backgroundClass}`} id={`kategori-${category.slug}`}>
+    <div class="mx-auto max-w-7xl px-4 sm:px-6 lg:px-8">
+      <div class="mx-auto mb-12 max-w-2xl text-center">
+        <h2 class="font-serif text-3xl font-bold text-slate-800 sm:text-4xl">{category.title}</h2>
+        <p class="mt-3 text-sm leading-relaxed text-slate-500">
+          {category.description || `Pilihan ${category.name.toLowerCase()} dari Zaloma Florist ${cityName}.`}
+        </p>
+      </div>
+
+      <div class="daily-rotate-grid mx-auto grid max-w-4xl grid-cols-2 gap-4 sm:gap-6 md:grid-cols-3 lg:max-w-none lg:grid-cols-4" data-daily-rotate-category={category.slug}>
+        {category.products.slice(0, 8).map((product, productIndex) => (
+          <div class="daily-product-item h-full" data-product-slug={product.slug}>
+            <HomeOrderProductCard product={product} priority={productIndex < 2} />
+          </div>
+        ))}
+      </div>
+
+      <div class="mt-10 text-center">
+        <a
+          href={withBase(category.categoryHref)}
+          class="group inline-flex min-h-[44px] items-center px-4 py-2.5 text-sm font-semibold text-primary transition-colors hover:text-secondary"
+        >
+          Lihat Semua {category.name}
+          <svg class="ml-1.5 h-4 w-4 transform transition-transform group-hover:translate-x-1" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2">
+            <path stroke-linecap="round" stroke-linejoin="round" d="M9 5l7 7-7 7" />
+          </svg>
+        </a>
+      </div>
+    </div>
+  </section>
+))}

@@ -1,6 +1,5 @@
 ---
 import type { Product } from '../data/products';
-import { PRODUCTS } from '../data/products';
 import CategoryProductCard from './CategoryProductCard.astro';
 import { withBase } from '../utils/paths';
 import { getHomeBungaPapanProducts } from '../utils/productHelpers';
@@ -10,6 +9,7 @@ interface Props {
   cityName?: string;
   citySlug?: string;
   hideWhenEmpty?: boolean;
+  categorySlug?: string;
 }
 
 const {
@@ -17,12 +17,12 @@ const {
   cityName = 'Malang',
   citySlug = '',
   hideWhenEmpty = false,
+  categorySlug = 'bunga-papan',
 } = Astro.props;
-const source = allProducts.length > 0 ? allProducts : PRODUCTS;
 
-const dukaCitaProducts = getHomeBungaPapanProducts(source, 'bunga-papan-duka-cita-malang');
-const weddingProducts = getHomeBungaPapanProducts(source, 'bunga-papan-wedding-malang');
-const congratulationsProducts = getHomeBungaPapanProducts(source, 'bunga-papan-congratulations-malang');
+const dukaCitaProducts = getHomeBungaPapanProducts(allProducts, `${categorySlug}--duka-cita`);
+const weddingProducts = getHomeBungaPapanProducts(allProducts, `${categorySlug}--wedding`);
+const congratulationsProducts = getHomeBungaPapanProducts(allProducts, `${categorySlug}--congratulations`);
 const hasAnyProducts =
   dukaCitaProducts.length > 0 || weddingProducts.length > 0 || congratulationsProducts.length > 0;
 
@@ -41,19 +41,19 @@ const tabs: Tab[] = [
     id: 'duka-cita',
     label: 'Duka Cita',
     products: dukaCitaProducts,
-    categoryHref: withCityQuery('/kategori/bunga-papan-duka-cita-malang/'),
+    categoryHref: withCityQuery(`/kategori/${dukaCitaProducts[0]?.categorySlug || `${categorySlug}--duka-cita`}/`),
   },
   {
     id: 'wedding',
     label: 'Wedding',
     products: weddingProducts,
-    categoryHref: withCityQuery('/kategori/bunga-papan-wedding-malang/'),
+    categoryHref: withCityQuery(`/kategori/${weddingProducts[0]?.categorySlug || `${categorySlug}--wedding`}/`),
   },
   {
     id: 'congratulations',
     label: 'Congratulations',
     products: congratulationsProducts,
-    categoryHref: withCityQuery('/kategori/bunga-papan-congratulations-malang/'),
+    categoryHref: withCityQuery(`/kategori/${congratulationsProducts[0]?.categorySlug || `${categorySlug}--congratulations`}/`),
   },
 ];
 

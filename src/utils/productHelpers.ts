@@ -42,7 +42,7 @@ export function getHomeDisplayProducts(products: Product[]): Product[] {
 }
 
 export function getHomeBungaPapanProducts(products: Product[], categorySlug: string): Product[] {
-  return getHomeDisplayProducts(products).filter((p) => p.categorySlug === categorySlug);
+  return getHomeCategoryProducts(getHomeDisplayProducts(products), [categorySlug]);
 }
 
 export function getProductDisplayName(product: ProductName): string {
@@ -57,10 +57,141 @@ export interface DerivedCategory {
   slug: string;
   name: string;
   image: string;
+  subcategories?: DerivedSubcategory[];
   description?: string;
   seoTitle?: string;
   seoDescription?: string;
   seoKeywords?: string;
+}
+
+export interface DerivedSubcategory {
+  id?: string;
+  slug: string;
+  name: string;
+  image?: string;
+}
+
+function normalizeCategorySlug(slug: string): string {
+  return slug.toLowerCase().replace(/-malang$/, '').replace(/--+/g, '-');
+}
+
+export function getSubcategorySlug(
+  parentSlug: string,
+  subcategory: Pick<DerivedSubcategory, 'slug' | 'name'>,
+  categories: Pick<DerivedCategory, 'slug' | 'name'>[],
+): string {
+  const parentKey = normalizeCategorySlug(parentSlug);
+  const childKey = normalizeCategorySlug(subcategory.slug);
+  const matchingCategory = categories.find((category) => {
+    const categoryKey = normalizeCategorySlug(category.slug);
+    return categoryKey.startsWith(parentKey)
+      && (
+        categoryKey.includes(childKey)
+        || category.name.toLowerCase().includes(subcategory.name.toLowerCase())
+      );
+  });
+
+  return matchingCategory?.slug || `${parentSlug}--${subcategory.slug}`;
+}
+
+export function getCategoryImage(category: Pick<DerivedCategory, 'slug' | 'name' | 'image'>): string {
+  if (category.image) return category.image;
+
+  const categoryLabel = `${category.slug} ${category.name}`.toLowerCase();
+  if (categoryLabel.includes('semi-styrofoam') || categoryLabel.includes('semi strefoam')) {
+    return '/images/kategori/semi-styrofoam.webp';
+  }
+  if (categoryLabel.includes('duka-cita') || categoryLabel.includes('duka cita')) {
+    return '/images/kategori/duka-cita.webp';
+  }
+  if (categoryLabel.includes('congratulations') || categoryLabel.includes('selamat')) {
+    return '/images/kategori/congratulations.webp';
+  }
+  if (categoryLabel.includes('wedding') || categoryLabel.includes('pernikahan')) {
+    return '/images/kategori/wedding.webp';
+  }
+  if (categoryLabel.includes('paper-flower') || categoryLabel.includes('paper flower')) {
+    return '/images/kategori/paper-flower.webp';
+  }
+  if (categoryLabel.includes('standing-flower') || categoryLabel.includes('standing flower')) {
+    return '/images/kategori/standing-flower.webp';
+  }
+  if (categoryLabel.includes('tabulampot') || categoryLabel.includes('tanbulampot')) {
+    return '/images/kategori/tanbulampot.webp';
+  }
+  if (categoryLabel.includes('bouquet') || categoryLabel.includes('buket')) {
+    return '/images/kategori/hand-bouquet.webp';
+  }
+  if (categoryLabel.includes('bunga-meja')) {
+    return '/images/kategori/bunga-meja.svg';
+  }
+
+  return '';
+}
+
+export function getMomentCategories(categories: DerivedCategory[]): DerivedCategory[] {
+  const momentCategories: DerivedCategory[] = [];
+  const seen = new Set<string>();
+
+  const addCategory = (category: DerivedCategory) => {
+    const key = normalizeCategorySlug(category.slug);
+    if (seen.has(key)) return;
+    seen.add(key);
+    momentCategories.push({
+      ...category,
+      image: getCategoryImage(category),
+    });
+  };
+
+  for (const category of categories) {
+    const subcategories = category.subcategories ?? [];
+    if (subcategories.length) {
+      for (const subcategory of subcategories) {
+        const matchingProductCategory = categories.find((candidate) =>
+          candidate.slug !== category.slug
+          && normalizeCategorySlug(candidate.slug).startsWith(normalizeCategorySlug(category.slug))
+          && (
+            normalizeCategorySlug(candidate.slug).includes(normalizeCategorySlug(subcategory.slug))
+            || candidate.name.toLowerCase().includes(subcategory.name.toLowerCase())
+          ),
+        );
+        const slug = getSubcategorySlug(category.slug, subcategory, categories);
+        addCategory({
+          slug,
+          name: subcategory.name,
+          image: subcategory.image || matchingProductCategory?.image || category.image || '',
+        });
+      }
+      continue;
+    }
+
+    const isSubcategoryProduct = categories.some((parent) =>
+      (parent.subcategories?.length ?? 0) > 0
+      && normalizeCategorySlug(category.slug).startsWith(normalizeCategorySlug(parent.slug))
+      && parent.subcategories?.some((subcategory) =>
+        normalizeCategorySlug(category.slug).includes(normalizeCategorySlug(subcategory.slug))
+        || category.name.toLowerCase().includes(subcategory.name.toLowerCase()),
+      ),
+    );
+    if (isSubcategoryProduct) continue;
+
+    addCategory(category);
+  }
+
+  return momentCategories;
+}
+
+export function getHomeCategoryProducts<T extends { categorySlug?: string }>(
+  products: T[],
+  categorySlugs: string[],
+): T[] {
+  const normalizedSlugs = new Set(categorySlugs.map(normalizeCategorySlug));
+  return products.filter((product) => {
+    const productSlug = normalizeCategorySlug(product.categorySlug || '');
+    return Array.from(normalizedSlugs).some((categorySlug) =>
+      productSlug === categorySlug || productSlug.startsWith(`${categorySlug}-`),
+    );
+  });
 }
 
 /**
@@ -81,6 +212,16 @@ export function extractConfigCategories(rawProducts: any[]): DerivedCategory[] {
             slug: c.slug,
             name: c.name,
             image: c.image || c.image_url || '',
+            subcategories: Array.isArray(c.subcategories)
+              ? c.subcategories
+                  .filter((subcategory: any) => subcategory && subcategory.slug && subcategory.name)
+                  .map((subcategory: any) => ({
+                    id: subcategory.id || subcategory.slug,
+                    slug: subcategory.slug,
+                    name: subcategory.name,
+                    image: subcategory.image || subcategory.image_url || '',
+                  }))
+              : [],
             description: c.description || '',
             seoTitle: c.seoTitle || '',
             seoDescription: c.seoDescription || '',
@@ -108,6 +249,7 @@ export function deriveCategoriesFromProducts(products: any[]): DerivedCategory[]
           slug: p.categorySlug,
           name: p.categoryName || p.categorySlug,
           image: p.image || '',
+          subcategories: [],
         });
       }
     });
@@ -138,6 +280,9 @@ export function mergeCategories(
       const existing = map.get(c.slug)!;
       if (!existing.image && c.image) {
         existing.image = c.image;
+      }
+      if ((!existing.subcategories || existing.subcategories.length === 0) && c.subcategories?.length) {
+        existing.subcategories = c.subcategories;
       }
     }
   });

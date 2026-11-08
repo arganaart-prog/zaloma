@@ -14,7 +14,8 @@ interface Props {
 
 const { categories = [], productCounts = {} } = Astro.props;
 const carouselCategories = categories.map((category) => {
-  const itemCount = productCounts[category.slug] ?? 0;
+  const normalizedSlug = category.slug.toLowerCase().replace(/-malang$/, '').replace(/--+/g, '-');
+  const itemCount = productCounts[category.slug] ?? productCounts[normalizedSlug] ?? 0;
   return {
     ...category,
     itemLabel: `${itemCount} produk`,

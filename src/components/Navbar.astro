@@ -3,6 +3,7 @@
 import { WHATSAPP_NUMBER } from '../data/constants';
 import { stripBase, withBase } from '../utils/paths';
 import { fetchSupabaseCategories, type SupabaseCategory } from '../utils/supabaseCategories';
+import { getSubcategorySlug } from '../utils/productHelpers';
 
 let navCategories: SupabaseCategory[] = [];
 try {
@@ -19,14 +20,29 @@ const navItems = [
   { href: '/kontak/', label: 'Kontak' }
 ];
 
-const bungaPapanCategories = navCategories.filter(
-  (category) => category.slug.startsWith('bunga-papan-') && category.slug !== 'bunga-papan',
+const bungaPapanCategory = navCategories.find((category) => category.slug === 'bunga-papan');
+const bungaPapanCategories = (bungaPapanCategory?.subcategories ?? []).map((subcategory) => ({
+  ...subcategory,
+  slug: getSubcategorySlug('bunga-papan', subcategory, navCategories),
+}));
+const configuredCategorySlugs = new Set(
+  navCategories.map((category) => category.slug.toLowerCase().replace(/-malang$/, '')),
 );
-const otherCategories = navCategories.filter(
-  (category) => !category.slug.startsWith('bunga-papan-') && category.slug !== 'bunga-papan',
-);
+const otherCategories = navCategories.filter((category, index) => {
+  if (category.slug === bungaPapanCategory?.slug) return false;
+  const normalizedSlug = category.slug.toLowerCase().replace(/-malang$/, '');
+  if (configuredCategorySlugs.has(normalizedSlug) && navCategories.findIndex(
+    (candidate) => candidate.slug.toLowerCase().replace(/-malang$/, '') === normalizedSlug,
+  ) !== index) return false;
+  if (category.slug.startsWith('bunga-papan')) {
+    return !bungaPapanCategories.some((subcategory) =>
+      category.slug.toLowerCase().includes(subcategory.slug.toLowerCase())
+      || category.name.toLowerCase().includes(subcategory.name.toLowerCase()),
+    );
+  }
+  return true;
+});
 const bungaPapanParentHref = '/katalog/?search=bunga%20papan';
-const shortBungaPapanName = (name: string) => name.replace(/^Bunga Papan\s*/, '');
 const currentPath = stripBase(Astro.url.pathname);
 const isMobileHome = currentPath === '/';
 const isMobileKatalog = currentPath.startsWith('/katalog/') || currentPath.startsWith('/kategori/') || currentPath.startsWith('/produk/');
@@ -151,8 +167,8 @@ const isMobileFaq = currentPath.startsWith('/faq/');
                           class="group/item flex items-center justify-between gap-4 rounded-md px-3 py-3 transition-colors hover:bg-primary/10"
                         >
                           <span>
-                            <span class="block font-serif text-base font-bold leading-tight text-primary-dark transition-colors group-hover/item:text-primary">Bunga Papan</span>
-                            <span class="mt-1 block text-[0.68rem] font-semibold uppercase tracking-[0.14em] text-slate-500">Duka cita, wedding, congratulations</span>
+                            <span class="block font-serif text-base font-bold leading-tight text-primary-dark transition-colors group-hover/item:text-primary">{bungaPapanCategory?.name ?? 'Bunga Papan'}</span>
+                            <span class="mt-1 block text-[0.68rem] font-semibold uppercase tracking-[0.14em] text-slate-500">{bungaPapanCategories.map((category) => category.name).join(', ')}</span>
                           </span>
                           <span class="text-sm font-bold text-secondary-dark" aria-hidden="true">&gt;</span>
                         </a>
@@ -163,7 +179,7 @@ const isMobileFaq = currentPath.startsWith('/faq/');
                               href={withBase(`/kategori/${category.slug}/`)}
                               class="block rounded-md px-3 py-2.5 font-serif text-[0.98rem] font-bold leading-tight text-primary-dark transition-colors hover:bg-primary/10 hover:text-primary"
                             >
-                              {shortBungaPapanName(category.name)}
+                              {category.name}
                             </a>
                           ))}
                         </div>
@@ -314,14 +330,14 @@ const isMobileFaq = currentPath.startsWith('/faq/');
 
             <details open={currentPath.startsWith('/kategori/bunga-papan-') || currentPath.startsWith('/produk/bunga-papan-')} class="rounded-md bg-white/55">
               <summary class="cursor-pointer px-3 py-2.5">
-                <span class="block font-serif text-[1rem] font-bold text-slate-700">Bunga Papan</span>
-                <span class="mt-1 block text-[0.58rem] font-bold uppercase tracking-[0.16em] text-slate-500">Duka cita, wedding, congratulations</span>
+                <span class="block font-serif text-[1rem] font-bold text-slate-700">{bungaPapanCategory?.name ?? 'Bunga Papan'}</span>
+                <span class="mt-1 block text-[0.58rem] font-bold uppercase tracking-[0.16em] text-slate-500">{bungaPapanCategories.map((category) => category.name).join(', ')}</span>
               </summary>
 
               <div class="border-t border-soft-cream/80 px-2 py-2">
                 {bungaPapanCategories.map((category) => (
                   <a href={withBase(`/kategori/${category.slug}/`)} class="block rounded-md px-3 py-2 text-[0.9rem] font-semibold text-slate-700 transition-colors hover:bg-primary/10 hover:text-primary">
-                    {shortBungaPapanName(category.name)}
+                    {category.name}
                   </a>
                 ))}
               </div>

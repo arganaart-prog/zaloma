@@ -26,9 +26,3 @@ export interface Category {
   seoKeywords?: string;
   image: string;
 }
-
-// Semua produk sekarang 100% dikelola secara dinamis melalui Supabase Cloud Database & Admin Dashboard
-export const PRODUCTS: Product[] = [];
-
-// Semua kategori sekarang 100% dikelola secara dinamis melalui Supabase Cloud Database & Admin Dashboard
-export const CATEGORIES: Category[] = [];

@@ -1,10 +1,17 @@
 import { SUPABASE_ANON_KEY, SUPABASE_URL } from '../data/supabaseConfig';
-import { deriveCategoriesFromProducts, extractConfigCategories, mergeCategories } from './productHelpers';
+import {
+  deriveCategoriesFromProducts,
+  extractConfigCategories,
+  getCategoryImage,
+  mergeCategories,
+  type DerivedSubcategory,
+} from './productHelpers';
 
 export interface SupabaseCategory {
   slug: string;
   name: string;
   image: string;
+  subcategories: DerivedSubcategory[];
 }
 
 export async function fetchSupabaseCategories(): Promise<SupabaseCategory[]> {
@@ -35,9 +42,10 @@ export async function fetchSupabaseCategories(): Promise<SupabaseCategory[]> {
       })),
   );
 
-  return mergeCategories(configCategories, productCategories).map(({ slug, name, image }) => ({
-    slug,
-    name,
-    image,
+  return mergeCategories(configCategories, productCategories).map((category) => ({
+    slug: category.slug,
+    name: category.name,
+    image: getCategoryImage(category),
+    subcategories: category.subcategories ?? [],
   }));
 }

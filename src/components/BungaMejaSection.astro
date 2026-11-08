@@ -1,14 +1,15 @@
 ---
-import { PRODUCTS } from '../data/products';
 import CategoryProductCard from './CategoryProductCard.astro';
 import { withBase } from '../utils/paths';
 import { getDailyShuffledProducts } from '../utils/rotatingProducts';
+import { getHomeCategoryProducts } from '../utils/productHelpers';
 
 interface Props {
   allProducts?: any[];
   cityName?: string;
   citySlug?: string;
   hideWhenEmpty?: boolean;
+  categorySlug?: string;
 }
 
 const {
@@ -16,18 +17,18 @@ const {
   cityName = 'Malang',
   citySlug = '',
   hideWhenEmpty = false,
+  categorySlug = 'bunga-meja',
 } = Astro.props;
-const source = allProducts.length > 0 ? allProducts : PRODUCTS;
 
-const categorySlug = 'bunga-meja-malang';
 const bungaMejaProducts = getDailyShuffledProducts(
-  source.filter((p) => p.categorySlug === categorySlug),
-  categorySlug
+  getHomeCategoryProducts(allProducts, [categorySlug, 'bunga-meja', 'bunga-meja-malang']),
+  categorySlug,
 );
+const resolvedCategorySlug = bungaMejaProducts[0]?.categorySlug || categorySlug;
 
 const categoryHref = citySlug
-  ? `/kategori/bunga-meja-malang/?city=${citySlug}&refer=city`
-  : '/kategori/bunga-meja-malang/';
+  ? `/kategori/${resolvedCategorySlug}/?city=${citySlug}&refer=city`
+  : `/kategori/${resolvedCategorySlug}/`;
 
 if (hideWhenEmpty && bungaMejaProducts.length === 0) {
   return;
@@ -45,7 +46,7 @@ if (hideWhenEmpty && bungaMejaProducts.length === 0) {
 
     <div
       class="daily-rotate-grid grid grid-cols-2 md:grid-cols-3 lg:grid-cols-4 gap-4 sm:gap-6 max-w-4xl mx-auto lg:max-w-none"
-      data-daily-rotate-category={categorySlug}
+      data-daily-rotate-category={resolvedCategorySlug}
     >
       {bungaMejaProducts.length > 0 ? (
         bungaMejaProducts.slice(0, 8).map((product, index) => (

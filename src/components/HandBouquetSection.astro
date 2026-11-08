@@ -1,13 +1,14 @@
 ---
-import { PRODUCTS } from '../data/products';
 import ProductCard from './ProductCard.astro';
 import { withBase } from '../utils/paths';
+import { getHomeCategoryProducts } from '../utils/productHelpers';
 
 interface Props {
   allProducts?: any[];
   cityName?: string;
   citySlug?: string;
   hideWhenEmpty?: boolean;
+  categorySlug?: string;
 }
 
 const {
@@ -15,15 +16,19 @@ const {
   cityName = 'Malang',
   citySlug = '',
   hideWhenEmpty = false,
+  categorySlug = 'bouquet',
 } = Astro.props;
-const source = allProducts.length > 0 ? allProducts : PRODUCTS;
-const handBouquetProducts = source.filter(
-  (p) => p.categorySlug === 'hand-bouquet-malang'
-);
+const handBouquetProducts = getHomeCategoryProducts(allProducts, [
+  categorySlug,
+  'bouquet',
+  'hand-bouquet',
+  'hand-bouquet-malang',
+]);
+const resolvedCategorySlug = handBouquetProducts[0]?.categorySlug || categorySlug;
 
 const categoryHref = citySlug
-  ? `/kategori/hand-bouquet-malang/?city=${citySlug}&refer=city`
-  : '/kategori/hand-bouquet-malang/';
+  ? `/kategori/${resolvedCategorySlug}/?city=${citySlug}&refer=city`
+  : `/kategori/${resolvedCategorySlug}/`;
 
 if (hideWhenEmpty && handBouquetProducts.length === 0) {
   return;

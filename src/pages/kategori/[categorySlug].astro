@@ -5,7 +5,7 @@ import Breadcrumb from '../../components/Breadcrumb.astro';
 import { WHATSAPP_NUMBER, SITE_DOMAIN } from '../../data/constants';
 import { SUPABASE_URL, SUPABASE_ANON_KEY } from '../../data/supabaseConfig';
 import { withBase } from '../../utils/paths';
-import { extractConfigCategories, deriveCategoriesFromProducts, mergeCategories } from '../../utils/productHelpers';
+import { extractConfigCategories, deriveCategoriesFromProducts, getCategoryImage, getSubcategorySlug, mergeCategories } from '../../utils/productHelpers';
 
 export async function getStaticPaths() {
   function matchCategory(prodCatSlug: string, prodCatName: string, targetSlug: string): boolean {
@@ -76,8 +76,30 @@ export async function getStaticPaths() {
     }))
   );
   const mergedCategories = mergeCategories(configCats, productCats);
+  const routeCategories = [...mergedCategories];
+  const existingRouteSlugs = new Set(routeCategories.map((category) => category.slug));
 
-  return mergedCategories.map(category => {
+  mergedCategories.forEach((parent) => {
+    (parent.subcategories || []).forEach((subcategory) => {
+      const slug = getSubcategorySlug(parent.slug, subcategory, mergedCategories);
+      if (existingRouteSlugs.has(slug)) return;
+      existingRouteSlugs.add(slug);
+      routeCategories.push({
+        slug,
+        name: subcategory.name,
+        image: getCategoryImage({
+          slug,
+          name: subcategory.name,
+          image: subcategory.image || parent.image || '',
+        }),
+        description: parent.description,
+        seoTitle: '',
+        seoDescription: '',
+      });
+    });
+  });
+
+  return routeCategories.map(category => {
     const catName = category.name;
     const fullCategory = {
       slug: category.slug,
@@ -86,7 +108,7 @@ export async function getStaticPaths() {
       seoTitle: category.seoTitle || `${catName} Malang Murah & Berkualitas - Zaloma Florist`,
       seoDescription: category.seoDescription || `Pesan ${catName} di Malang murah dan berkualitas. Bunga segar, pengerjaan cepat 3 jam, difoto sebelum diantar.`,
       seoKeywords: category.seoKeywords || `${catName.toLowerCase()} malang, ${catName.toLowerCase()} murah malang`,
-      image: category.image || '',
+      image: getCategoryImage(category),
     };
 
     const filteredProducts = allLiveProducts

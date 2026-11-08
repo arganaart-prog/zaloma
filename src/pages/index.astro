@@ -3,6 +3,7 @@ import Layout from '../layouts/Layout.astro';
 import HomeHero from '../components/HomeHero.astro';
 import HomeLiveSync from '../components/HomeLiveSync.astro';
 import CategoryCarousel from '../components/CategoryCarousel.astro';
+import HomeDynamicCategorySections from '../components/HomeDynamicCategorySections.astro';
 import FeaturedProductsSection from '../components/FeaturedProductsSection.astro';
 import BungaPapanSection from '../components/BungaPapanSection.astro';
 import HandBouquetSection from '../components/HandBouquetSection.astro';
@@ -15,7 +16,7 @@ import DailyCategoryRotation from '../components/DailyCategoryRotation.astro';
 import { SUPABASE_URL, SUPABASE_ANON_KEY } from '../data/supabaseConfig';
 import { withBase } from '../utils/paths';
 import { getRotatingHomeProducts } from '../utils/rotatingProducts';
-import { getHomeDisplayProducts, getSellableProducts, extractConfigCategories, deriveCategoriesFromProducts, mergeCategories } from '../utils/productHelpers';
+import { getHomeDisplayProducts, getSellableProducts, extractConfigCategories, deriveCategoriesFromProducts, getMomentCategories, mergeCategories } from '../utils/productHelpers';
 
 // Ambil produk live dari Supabase saat build time untuk SEO & instant SSR render
 let homeLiveProducts: any[] = [];
@@ -60,12 +61,34 @@ const { activeProducts } = getRotatingHomeProducts(getHomeDisplayProducts(homeLi
 
 // Derive categories dynamically from Supabase: config + product data (no static code)
 const homeCategories = mergeCategories(configCategories, deriveCategoriesFromProducts(homeLiveProducts));
+const homeMomentCategories = getMomentCategories(homeCategories);
 const homeCategoryProductCounts = homeLiveProducts.reduce<Record<string, number>>((counts, product) => {
   if (product.categorySlug) {
-    counts[product.categorySlug] = (counts[product.categorySlug] ?? 0) + 1;
+    const normalizedSlug = product.categorySlug.toLowerCase().replace(/-malang$/, '');
+    counts[normalizedSlug] = (counts[normalizedSlug] ?? 0) + 1;
   }
   return counts;
 }, {});
+homeMomentCategories.forEach((category) => {
+  const normalizedSlug = category.slug.toLowerCase().replace(/-malang$/, '').replace(/--+/g, '-');
+  if (homeCategoryProductCounts[normalizedSlug] !== undefined) {
+    homeCategoryProductCounts[category.slug] = homeCategoryProductCounts[normalizedSlug];
+  }
+});
+const getHomeCategorySlug = (slugs: string[]) => {
+  const normalize = (slug: string) => slug.toLowerCase().replace(/-malang$/, '');
+  const matches = new Set(slugs.map(normalize));
+  return configCategories.find((category) => matches.has(normalize(category.slug)))?.slug
+    || homeLiveProducts.find((product) => matches.has(normalize(product.categorySlug)))?.categorySlug
+    || slugs[0];
+};
+const homeSectionCategories = {
+  bouquet: getHomeCategorySlug(['bouquet', 'hand-bouquet', 'hand-bouquet-malang']),
+  standingFlower: getHomeCategorySlug(['standing-flower', 'standing-flower-malang']),
+  paperFlower: getHomeCategorySlug(['paper-flower', 'paper-flower-malang']),
+  bungaMeja: getHomeCategorySlug(['bunga-meja', 'bunga-meja-malang']),
+  tabulampot: getHomeCategorySlug(['tabulampot', 'tanbulampot', 'tanbulampot-malang']),
+};
 
 // SEO Meta
 const title = "Toko Bunga Malang Murah & Berkualitas - Florist Cepat";
@@ -103,7 +126,7 @@ const description = "Zaloma Florist menyediakan bunga papan, hand bouquet, stand
         <h2 class="font-serif text-3xl sm:text-4xl font-bold text-slate-800">Pilih Berdasarkan Momen</h2>
         <p class="text-slate-500 text-sm mt-3 leading-relaxed">Tersedia berbagai pilihan desain karangan bunga untuk duka cita, pernikahan, wisuda, ulang tahun, peresmian usaha, dan kebutuhan korporat serta institusi.</p>
       </div>
-      <CategoryCarousel categories={homeCategories} productCounts={homeCategoryProductCounts} />
+      <CategoryCarousel categories={homeMomentCategories} productCounts={homeCategoryProductCounts} />
     </div>
   </section>
   
@@ -610,22 +633,23 @@ const description = "Zaloma Florist menyediakan bunga papan, hand bouquet, stand
   <DailyCategoryRotation />
 
   <!-- Hand Bouquet Section -->
-  <HandBouquetSection allProducts={homeLiveProducts} />
+  <HandBouquetSection allProducts={homeLiveProducts} categorySlug={homeSectionCategories.bouquet} />
 
   <!-- Bunga Papan Section -->
   <BungaPapanSection allProducts={homeLiveProducts} />
 
   <!-- Standing Flower Section -->
-  <StandingFlowerSection allProducts={homeLiveProducts} />
+  <StandingFlowerSection allProducts={homeLiveProducts} categorySlug={homeSectionCategories.standingFlower} />
 
   <!-- Paper Flower Section -->
-  <PaperFlowerSection allProducts={homeLiveProducts} />
+  <PaperFlowerSection allProducts={homeLiveProducts} categorySlug={homeSectionCategories.paperFlower} />
 
   <!-- Bunga Meja Section -->
-  <BungaMejaSection allProducts={homeLiveProducts} />
+  <BungaMejaSection allProducts={homeLiveProducts} categorySlug={homeSectionCategories.bungaMeja} />
 
   <!-- Tanbulampot Section -->
-  <TanbulampotSection allProducts={homeLiveProducts} />
+  <TanbulampotSection allProducts={homeLiveProducts} categorySlug={homeSectionCategories.tabulampot} />
+  <HomeDynamicCategorySections categories={homeCategories} products={homeLiveProducts} />
 
   <!-- Service Area Section (Jawa Timur & Malang Raya) -->
   <CityDeliverySection currentCitySlug="malang-raya" />
