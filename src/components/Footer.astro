@@ -1,32 +1,9 @@
 ---
 // Footer.astro
 import { WHATSAPP_NUMBER, WHATSAPP_LABEL, INSTAGRAM_URL, INSTAGRAM_HANDLE } from '../data/constants';
-import { SUPABASE_URL, SUPABASE_ANON_KEY } from '../data/supabaseConfig';
 import { withBase } from '../utils/paths';
-import { extractConfigCategories, deriveCategoriesFromProducts, mergeCategories } from '../utils/productHelpers';
 
 const currentYear = new Date().getFullYear();
-
-// Fetch categories from Supabase at build time
-let footerCategories: { slug: string; name: string }[] = [];
-try {
-  const res = await fetch(`${SUPABASE_URL}/rest/v1/products?select=*&order=created_at.desc`, {
-    headers: { apikey: SUPABASE_ANON_KEY, Authorization: `Bearer ${SUPABASE_ANON_KEY}` }
-  });
-  if (res.ok) {
-    const data = await res.json();
-    if (Array.isArray(data)) {
-      const configCats = extractConfigCategories(data);
-      const sellable = data.filter((p: any) => p.slug && !String(p.slug).startsWith('_'));
-      const productCats = deriveCategoriesFromProducts(
-        sellable.map((p: any) => ({ categorySlug: p.category_slug, categoryName: p.category_name, image: p.image }))
-      );
-      footerCategories = mergeCategories(configCats, productCats).map(c => ({ slug: c.slug, name: c.name }));
-    }
-  }
-} catch (err) {
-  // Silent fallback
-}
 
 const infoLinks = [
   { label: 'Beranda', href: '/' },
@@ -112,27 +89,6 @@ const paymentMethods = [
           </a>
         </div>
       </div>
-
-      <!-- Kategori (from Supabase) -->
-      {footerCategories.length > 0 && (
-        <div>
-          <h3 class="text-xl font-bold text-white mb-3">Kategori</h3>
-          <ul class="space-y-1.5 text-base">
-            <li>
-              <a href={withBase('/katalog/')} class="text-secondary font-semibold hover:text-white transition-colors duration-200">
-                Semua Kategori →
-              </a>
-            </li>
-            {footerCategories.map((cat) => (
-              <li>
-                <a href={withBase(`/kategori/${cat.slug}/`)} class="text-white/78 hover:text-white transition-colors duration-200 font-medium leading-normal">
-                  {cat.name}
-                </a>
-              </li>
-            ))}
-          </ul>
-        </div>
-      )}
 
       <!-- Information -->
       <div>
