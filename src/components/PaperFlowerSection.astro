@@ -6,9 +6,17 @@ import { getDailyShuffledProducts } from '../utils/rotatingProducts';
 
 interface Props {
   allProducts?: any[];
+  cityName?: string;
+  citySlug?: string;
+  hideWhenEmpty?: boolean;
 }
 
-const { allProducts = [] } = Astro.props;
+const {
+  allProducts = [],
+  cityName = 'Malang',
+  citySlug = '',
+  hideWhenEmpty = false,
+} = Astro.props;
 const source = allProducts.length > 0 ? allProducts : PRODUCTS;
 
 const categorySlug = 'paper-flower-malang';
@@ -17,15 +25,21 @@ const paperFlowerProducts = getDailyShuffledProducts(
   categorySlug
 );
 
-const categoryHref = '/kategori/paper-flower-malang/';
+const categoryHref = citySlug
+  ? `/kategori/paper-flower-malang/?city=${citySlug}&refer=city`
+  : '/kategori/paper-flower-malang/';
+
+if (hideWhenEmpty && paperFlowerProducts.length === 0) {
+  return;
+}
 ---
 
 <section class="py-20 bg-accent-bg/55 border-y border-soft-cream/60" id="paper-flower-malang">
   <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
     <div class="text-center max-w-2xl mx-auto mb-12">
-      <h2 class="font-serif text-3xl sm:text-4xl font-bold text-slate-800">Paper Flower Malang</h2>
+      <h2 class="font-serif text-3xl sm:text-4xl font-bold text-slate-800">Paper Flower {cityName}</h2>
       <p class="text-slate-500 text-sm mt-3 leading-relaxed">
-        Rangkaian bunga kertas tahan lama untuk hadiah wisuda, lamaran, dan hiasan ruangan dari Zaloma Florist Malang.
+        Rangkaian bunga kertas tahan lama untuk hadiah wisuda, lamaran, dan hiasan ruangan dari Zaloma Florist {cityName}.
       </p>
     </div>
 

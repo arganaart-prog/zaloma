@@ -1,21 +1,16 @@
 ---
 // Navbar.astro
 import { WHATSAPP_NUMBER } from '../data/constants';
-import { CATEGORIES } from '../data/products';
 import { stripBase, withBase } from '../utils/paths';
 
 const navItems = [
   { href: '/', label: 'Beranda' },
-  { href: '/katalog/', label: 'Kategori', hasDropdown: true },
+  { href: '/katalog/', label: 'Katalog' },
   { href: '/cara-pesan/', label: 'Cara Pesan' },
   { href: '/tentang/', label: 'Tentang Kami' },
   { href: '/kontak/', label: 'Kontak' }
 ];
 
-const bungaPapanCategories = CATEGORIES.filter((category) => category.slug.startsWith('bunga-papan-'));
-const otherCategories = CATEGORIES.filter((category) => !category.slug.startsWith('bunga-papan-'));
-const bungaPapanParentHref = '/katalog/?search=bunga%20papan';
-const shortBungaPapanName = (name: string) => name.replace('Bunga Papan ', '');
 const currentPath = stripBase(Astro.url.pathname);
 const isMobileHome = currentPath === '/';
 const isMobileKatalog = currentPath.startsWith('/katalog/') || currentPath.startsWith('/kategori/') || currentPath.startsWith('/produk/');
@@ -114,73 +109,11 @@ const isMobileFaq = currentPath.startsWith('/faq/');
           {navItems.map(item => {
             const isHome = item.href === '/' && currentPath === '/';
             const isSubpage = item.href !== '/' && (
-              item.hasDropdown
+              item.href === '/katalog/'
                 ? currentPath.startsWith('/katalog/') || currentPath.startsWith('/kategori/') || currentPath.startsWith('/produk/')
                 : currentPath.startsWith(item.href)
             );
             const isActive = isHome || isSubpage;
-            
-            if (item.hasDropdown) {
-              return (
-                <div class="relative group py-3" id="kategori-dropdown-trigger">
-                  <a
-                    href={withBase(item.href)}
-                    class={`relative inline-flex py-3 text-[0.72rem] font-bold uppercase tracking-[0.22em] transition-colors after:absolute after:inset-x-0 after:-bottom-0.5 after:h-px after:origin-center after:scale-x-0 after:bg-secondary after:transition-transform after:duration-300 group-hover:after:scale-x-100 ${isActive ? 'text-white after:scale-x-100' : 'text-white/78 hover:text-white'}`}
-                  >
-                    {item.label}
-                  </a>
-
-                  <!-- Category Dropdown Menu -->
-                  <div class="absolute left-1/2 top-full z-50 w-[20rem] lg:w-[23rem] -translate-x-1/2 translate-y-3 rounded-lg border border-soft-cream/70 bg-[#FDF7F7] p-3 opacity-0 invisible shadow-[0_22px_60px_rgba(15,23,42,0.18)] transition-all duration-200 group-hover:visible group-hover:translate-y-0 group-hover:opacity-100">
-                    <div class="absolute -top-1.5 left-1/2 h-3 w-3 -translate-x-1/2 rotate-45 border-l border-t border-soft-cream/70 bg-[#FDF7F7]"></div>
-                    <p class="px-3 pb-2 text-[0.62rem] font-bold uppercase tracking-[0.22em] text-secondary-dark">Kategori Produk</p>
-                    <div class="grid gap-1.5">
-                      <div class="relative group/sub">
-                        <a
-                          href={withBase(bungaPapanParentHref)}
-                          class="group/item flex items-center justify-between gap-4 rounded-md px-3 py-3 transition-colors hover:bg-primary/10"
-                        >
-                          <span>
-                            <span class="block font-serif text-base font-bold leading-tight text-primary-dark transition-colors group-hover/item:text-primary">Bunga Papan</span>
-                            <span class="mt-1 block text-[0.68rem] font-semibold uppercase tracking-[0.14em] text-slate-500">Duka cita, wedding, congratulation, semi styrofoam</span>
-                          </span>
-                          <span class="text-sm font-bold text-secondary-dark" aria-hidden="true">&gt;</span>
-                        </a>
-
-                        <div class="absolute left-[calc(100%-1px)] top-0 hidden min-w-[13rem] lg:min-w-[15rem] rounded-lg border border-soft-cream/70 bg-[#FDF7F7] p-2 shadow-[0_20px_54px_rgba(15,23,42,0.16)] group-hover/sub:block">
-                          {bungaPapanCategories.map((category) => (
-                            <a
-                              href={withBase(`/kategori/${category.slug}/`)}
-                              class="block rounded-md px-3 py-2.5 font-serif text-[0.98rem] font-bold leading-tight text-primary-dark transition-colors hover:bg-primary/10 hover:text-primary"
-                            >
-                              {shortBungaPapanName(category.name)}
-                            </a>
-                          ))}
-                        </div>
-                      </div>
-
-                      {otherCategories.map((category) => (
-                        <a
-                          href={withBase(`/kategori/${category.slug}/`)}
-                          class="group/item rounded-md px-3 py-3 transition-colors hover:bg-primary/10"
-                        >
-                          <span class="block font-serif text-base font-bold leading-tight text-primary-dark transition-colors group-hover/item:text-primary">{category.name}</span>
-                          <span class="mt-1 block text-[0.7rem] font-semibold uppercase tracking-[0.16em] text-slate-500">Zaloma Florist Malang</span>
-                        </a>
-                      ))}
-                    </div>
-                    <div class="mt-2 border-t border-soft-cream/70 pt-2">
-                      <a
-                        href={withBase('/katalog/')}
-                        class="block rounded-md px-3 py-2 text-center text-[0.72rem] font-bold uppercase tracking-[0.16em] text-secondary-dark transition-colors hover:bg-secondary/10 hover:text-primary"
-                      >
-                        Lihat Semua Kategori
-                      </a>
-                    </div>
-                  </div>
-                </div>
-              );
-            }
 
             return (
               <a 
@@ -291,39 +224,10 @@ const isMobileFaq = currentPath.startsWith('/faq/');
           <span class="mt-1 block text-[0.66rem] font-bold uppercase tracking-[0.2em] opacity-60">Halaman utama</span>
         </a>
 
-        <details open={isMobileKatalog} class={`rounded-lg border transition-colors ${isMobileKatalog ? 'border-primary/25 bg-primary/10 text-primary shadow-sm' : 'border-transparent text-slate-700 hover:border-soft-cream/70 hover:bg-primary/5 hover:text-primary'}`}>
-          <summary class="cursor-pointer px-4 py-3.5">
-            <span class="block font-serif text-[1.24rem] font-bold leading-tight tracking-wide">Katalog</span>
-            <span class="mt-1 block text-[0.66rem] font-bold uppercase tracking-[0.2em] opacity-60">Semua kategori produk</span>
-          </summary>
-
-          <div class="space-y-2 px-3 pb-3">
-            <a href={withBase('/katalog/')} class="block rounded-md px-3 py-2.5 font-serif text-[1rem] font-bold text-slate-700 transition-colors hover:bg-white/70 hover:text-primary">
-              Semua Produk
-            </a>
-
-            <details open={currentPath.startsWith('/kategori/bunga-papan-') || currentPath.startsWith('/produk/bunga-papan-')} class="rounded-md bg-white/55">
-              <summary class="cursor-pointer px-3 py-2.5">
-                <span class="block font-serif text-[1rem] font-bold text-slate-700">Bunga Papan</span>
-                <span class="mt-1 block text-[0.58rem] font-bold uppercase tracking-[0.16em] text-slate-500">Duka cita, wedding, congratulation, semi styrofoam</span>
-              </summary>
-
-              <div class="border-t border-soft-cream/80 px-2 py-2">
-                {bungaPapanCategories.map((category) => (
-                  <a href={withBase(`/kategori/${category.slug}/`)} class="block rounded-md px-3 py-2 text-[0.9rem] font-semibold text-slate-700 transition-colors hover:bg-primary/10 hover:text-primary">
-                    {shortBungaPapanName(category.name)}
-                  </a>
-                ))}
-              </div>
-            </details>
-
-            {otherCategories.map((category) => (
-              <a href={withBase(`/kategori/${category.slug}/`)} class="block rounded-md px-3 py-2.5 font-serif text-[1rem] font-bold text-slate-700 transition-colors hover:bg-white/70 hover:text-primary">
-                {category.name}
-              </a>
-            ))}
-          </div>
-        </details>
+        <a href={withBase('/katalog/')} class={`block rounded-lg border px-4 py-3.5 transition-colors ${isMobileKatalog ? 'border-primary/25 bg-primary/10 text-primary shadow-sm' : 'border-transparent text-slate-700 hover:border-soft-cream/70 hover:bg-primary/5 hover:text-primary'}`}>
+          <span class="block font-serif text-[1.24rem] font-bold leading-tight tracking-wide">Katalog</span>
+          <span class="mt-1 block text-[0.66rem] font-bold uppercase tracking-[0.2em] opacity-60">Semua kategori produk</span>
+        </a>
 
         <a href={withBase('/cara-pesan/')} class={`block rounded-lg border px-4 py-3.5 transition-colors ${isMobileCaraPesan ? 'border-primary/25 bg-primary/10 text-primary shadow-sm' : 'border-transparent text-slate-700 hover:border-soft-cream/70 hover:bg-primary/5 hover:text-primary'}`}>
           <span class="block font-serif text-[1.24rem] font-bold leading-tight tracking-wide">Cara Pesan</span>

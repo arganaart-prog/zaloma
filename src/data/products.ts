@@ -62,15 +62,6 @@ const RAW_CATEGORIES: Category[] = [
     image: "/images/kategori/congratulations.webp"
   },
   {
-    slug: "bunga-papan-semi-styrofoam",
-    name: "Bunga Papan Semi Styrofoam",
-    description: "Papan bunga semi styrofoam modern dengan perpaduan cetak tajam dan ornamen huruf timbul 3D yang artistik dan mewah.",
-    seoTitle: "Bunga Papan Semi Styrofoam Malang Murah & Berkualitas - Zaloma Florist",
-    seoDescription: "Pesan bunga papan semi styrofoam di Malang murah dan berkualitas. Desain modern, ornamen huruf timbul 3D, bunga segar, pengerjaan cepat 3 jam, dan gratis ongkir Kota Malang.",
-    seoKeywords: "bunga papan semi styrofoam malang, bunga papan semi strefoam, papan semi styrofoam malang, bunga papan printing malang, karangan bunga semi styrofoam malang",
-    image: "/images/kategori/semi-styrofoam.webp"
-  },
-  {
     slug: "bunga-papan-semi-styrofoam-malang",
     name: "Bunga Papan Semi Styrofoam",
     description: "Papan bunga semi styrofoam (semi strefoam) modern dengan perpaduan cetak banner tajam dan ornamen huruf timbul 3D yang artistik dan mewah.",
@@ -78,14 +69,6 @@ const RAW_CATEGORIES: Category[] = [
     seoDescription: "Pesan bunga papan semi styrofoam (semi strefoam) di Malang murah dan berkualitas. Desain modern, ornamen huruf timbul 3D, bunga segar, pengerjaan cepat 3 jam, dan gratis ongkir Kota Malang.",
     seoKeywords: "bunga papan semi styrofoam malang, bunga papan semi strefoam, papan semi styrofoam malang, bunga papan printing malang, papan bunga semi styrofoam, karangan bunga semi styrofoam malang, florist semi styrofoam malang",
     image: "/images/kategori/semi-styrofoam.webp"
-  },
-  {
-    slug: "standing-flower",
-    name: "Standing Flower",
-    description: "Rangkaian bunga standing flower untuk diletakkan di area indoor resepsi, lobby gedung kantor, atau rumah duka.",
-    seoTitle: "Standing Flower Malang Murah & Berkualitas - Zaloma Florist",
-    seoDescription: "Pesan standing flower Malang murah dan berkualitas untuk duka cita, opening, wedding, dan acara formal. Rangkaian segar, elegan, dan pengiriman aman.",
-    image: "/images/kategori/standing-flower.webp"
   },
   {
     slug: "standing-flower-malang",
@@ -113,28 +96,12 @@ const RAW_CATEGORIES: Category[] = [
     image: "/images/kategori/hand-bouquet.webp"
   },
   {
-    slug: "paper-flower",
-    name: "Paper Flower",
-    description: "Rangkaian bunga kertas tahan lama untuk hadiah wisuda, lamaran, dan hiasan ruangan yang estetik.",
-    seoTitle: "Paper Flower Malang Murah & Berkualitas - Zaloma Florist",
-    seoDescription: "Pesan paper flower Malang murah dan berkualitas. Bunga kertas artistik, tahan lama, cantik untuk dekorasi, kado wisuda, lamaran, dan pajangan.",
-    image: "/images/kategori/paper-flower.webp"
-  },
-  {
     slug: "paper-flower-malang",
     name: "Paper Flower",
     description: "Rangkaian bunga kertas tahan lama untuk hadiah wisuda, lamaran, dan hiasan ruangan.",
     seoTitle: "Paper Flower Malang Murah & Berkualitas",
     seoDescription: "Pesan paper flower Malang murah dan berkualitas. Bunga kertas artistik, tahan lama, cantik untuk dekorasi, kado wisuda, lamaran, dan pajangan.",
     image: "/images/kategori/paper-flower.webp"
-  },
-  {
-    slug: "bunga-meja",
-    name: "Bunga Meja",
-    description: "Rangkaian bunga potong segar dalam vas untuk meja resepsi, meja tamu kantor, atau dekorasi acara penting.",
-    seoTitle: "Bunga Meja Malang Murah & Berkualitas - Zaloma Florist",
-    seoDescription: "Pesan bunga meja Malang murah dan berkualitas untuk dekorasi lobby, kantor, ruang tamu, meja resepsi, dan acara formal. Segar, cantik, dan elegan.",
-    image: "/images/kategori/bunga-meja.svg"
   },
   {
     slug: "bunga-meja-malang",

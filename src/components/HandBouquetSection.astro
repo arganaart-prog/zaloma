@@ -5,22 +5,36 @@ import { withBase } from '../utils/paths';
 
 interface Props {
   allProducts?: any[];
+  cityName?: string;
+  citySlug?: string;
+  hideWhenEmpty?: boolean;
 }
 
-const { allProducts = [] } = Astro.props;
+const {
+  allProducts = [],
+  cityName = 'Malang',
+  citySlug = '',
+  hideWhenEmpty = false,
+} = Astro.props;
 const source = allProducts.length > 0 ? allProducts : PRODUCTS;
 const handBouquetProducts = source.filter(
   (p) => p.categorySlug === 'hand-bouquet-malang'
 );
 
-const categoryHref = '/kategori/hand-bouquet-malang/';
+const categoryHref = citySlug
+  ? `/kategori/hand-bouquet-malang/?city=${citySlug}&refer=city`
+  : '/kategori/hand-bouquet-malang/';
+
+if (hideWhenEmpty && handBouquetProducts.length === 0) {
+  return;
+}
 ---
 
 <section class="py-20 bg-white border-y border-soft-cream/60" id="hand-bouquet-malang">
   <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
     <div class="text-center max-w-2xl mx-auto mb-12">
       <span class="text-secondary-dark font-bold text-xs tracking-widest uppercase block mb-1">Pilihan Buket Bunga</span>
-      <h2 class="font-serif text-3xl sm:text-4xl font-bold text-slate-800">Hand Bouquet Malang</h2>
+      <h2 class="font-serif text-3xl sm:text-4xl font-bold text-slate-800">Hand Bouquet {cityName}</h2>
       <p class="text-slate-500 text-sm mt-3 leading-relaxed">
         Buket bunga segar dan snack bouquet untuk wisuda, lamaran, hari ulang tahun, dan kado spesial. Dirangkai rapi dan siap dikirim pada hari yang sama.
       </p>

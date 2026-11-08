@@ -6,9 +6,17 @@ import { getDailyShuffledProducts } from '../utils/rotatingProducts';
 
 interface Props {
   allProducts?: any[];
+  cityName?: string;
+  citySlug?: string;
+  hideWhenEmpty?: boolean;
 }
 
-const { allProducts = [] } = Astro.props;
+const {
+  allProducts = [],
+  cityName = 'Malang',
+  citySlug = '',
+  hideWhenEmpty = false,
+} = Astro.props;
 const source = allProducts.length > 0 ? allProducts : PRODUCTS;
 
 const categorySlug = 'bunga-meja-malang';
@@ -17,13 +25,19 @@ const bungaMejaProducts = getDailyShuffledProducts(
   categorySlug
 );
 
-const categoryHref = '/kategori/bunga-meja-malang/';
+const categoryHref = citySlug
+  ? `/kategori/bunga-meja-malang/?city=${citySlug}&refer=city`
+  : '/kategori/bunga-meja-malang/';
+
+if (hideWhenEmpty && bungaMejaProducts.length === 0) {
+  return;
+}
 ---
 
 <section class="py-20 bg-accent-bg/60 border-y border-soft-cream/60" id="bunga-meja-malang">
   <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
     <div class="text-center max-w-2xl mx-auto mb-12">
-      <h2 class="font-serif text-3xl sm:text-4xl font-bold text-slate-800">Bunga Meja Malang</h2>
+      <h2 class="font-serif text-3xl sm:text-4xl font-bold text-slate-800">Bunga Meja {cityName}</h2>
       <p class="text-slate-500 text-sm mt-3 leading-relaxed">
         Bunga meja segar untuk meja kantor, resepsi, meeting, atau hadiah peresmian. Siap kirim rapi dengan kartu ucapan.
       </p>

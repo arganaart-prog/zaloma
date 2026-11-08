@@ -1,0 +1,527 @@
+---
+import { withBase } from '../utils/paths';
+
+interface Props {
+  products?: any[];
+  cityName?: string;
+  katalogHref?: string;
+}
+
+const {
+  products = [],
+  cityName = 'Malang',
+  katalogHref = '/katalog/',
+} = Astro.props;
+
+if (!products.length) {
+  return;
+}
+---
+
+<section class="featured-products-section py-20 bg-white border-y border-soft-cream/60" data-featured-products-section>
+  <div class="featured-products-mobile-band" aria-hidden="true"></div>
+  <div class="max-w-7xl mx-auto">
+    <div class="featured-products-header flex flex-col md:flex-row md:items-end justify-between mb-12 px-4 sm:px-6 lg:px-8">
+      <div class="max-w-xl">
+        <h2 class="font-serif text-3xl sm:text-4xl font-bold text-slate-800">Produk Terlaris Minggu Ini</h2>
+        <p class="text-slate-500 text-sm mt-3 leading-relaxed">Paling banyak dipesan pelanggan {cityName} minggu ini.</p>
+      </div>
+      <a
+        href={withBase(katalogHref)}
+        class="mt-4 hidden md:mt-0 md:inline-flex items-center text-sm font-semibold text-primary hover:text-secondary transition-colors group"
+      >
+        Lihat Semua Produk
+        <svg class="h-4 w-4 ml-1.5 transform group-hover:translate-x-1 transition-transform" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2">
+          <path stroke-linecap="round" stroke-linejoin="round" d="M9 5l7 7-7 7" />
+        </svg>
+      </a>
+    </div>
+
+    <div class="featured-products-carousel-wrap">
+      <div class="featured-products-fade-hint" aria-hidden="true"></div>
+      <div id="featured-products-slider" data-featured-products-slider class="featured-products-slider grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-6 lg:gap-8 px-4 sm:px-6 lg:px-8">
+        {products.map((p, index) => (
+          <div class="classic-product-card product-card-shell group bg-white rounded-[14px] border border-soft-cream/70 overflow-hidden shadow-[0_1px_4px_rgba(15,23,42,0.03)]">
+            <a href={withBase(`/produk/${p.slug}/`)} class="classic-product-image image-load-shell block relative aspect-[20/22] bg-slate-100 overflow-hidden">
+              <img
+                src={p.image}
+                alt={`Foto ${p.name} Florist ${cityName}`}
+                loading={index < 2 ? 'eager' : 'lazy'}
+                class="relative z-0 object-cover object-top w-full h-full transition-transform duration-700 ease-out group-hover:scale-[1.012]"
+              />
+              <div class="classic-product-badges absolute top-3 left-3 z-10 flex gap-2">
+                <span class="bg-secondary text-primary-dark text-[10px] tracking-wider uppercase font-semibold px-2.5 py-1 rounded-xs shadow-xs">
+                  Terpopuler
+                </span>
+              </div>
+            </a>
+            <div class="classic-product-info p-4.5 sm:p-5 flex flex-col justify-between min-h-[190px] sm:min-h-[200px]">
+              <div>
+                <p class="classic-product-category text-[11px] font-semibold tracking-wider text-slate-500 uppercase mb-1">{p.categoryName}</p>
+                <h3 class="classic-product-title font-serif font-bold text-slate-800 line-clamp-2 leading-snug group-hover:text-primary transition-colors duration-200 text-base sm:text-lg">
+                  <a href={withBase(`/produk/${p.slug}/`)}>{p.name}</a>
+                </h3>
+              </div>
+              <div class="classic-product-price-wrap pt-3.5 sm:pt-4">
+                <div class="classic-product-price-box rounded-md border border-soft-cream/70 bg-accent-bg/70 p-2.5 sm:p-3">
+                  <p class="classic-product-price-label text-[10px] font-bold uppercase tracking-[0.18em] text-secondary-dark">Harga</p>
+                  <div class="classic-product-price-row mt-1.5 flex items-center justify-between gap-2.5 sm:gap-3">
+                    <p class="classic-product-price font-sans text-lg sm:text-xl font-extrabold leading-none text-primary">{p.priceLabel}</p>
+                    <a href={withBase(`/produk/${p.slug}/`)} class="classic-product-detail inline-flex shrink-0 items-center justify-center rounded-full bg-primary px-3.5 py-2 text-[11px] font-bold text-white shadow-xs transition-colors duration-200 group-hover:bg-primary-dark">
+                      Detail
+                    </a>
+                  </div>
+                </div>
+              </div>
+            </div>
+          </div>
+        ))}
+      </div>
+    </div>
+
+    <div class="featured-products-mobile-footer md:hidden px-4">
+      <div id="fp-dots" class="fp-dots" aria-hidden="true"></div>
+      <a
+        href={withBase(katalogHref)}
+        class="fp-lihat-semua"
+        aria-label="Lihat semua produk di katalog"
+      >
+        Lihat Semua
+        <svg class="h-3.5 w-3.5" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2.5" aria-hidden="true">
+          <path stroke-linecap="round" stroke-linejoin="round" d="M9 5l7 7-7 7" />
+        </svg>
+      </a>
+    </div>
+  </div>
+</section>
+
+<style is:global>
+  .featured-products-mobile-band {
+    display: none;
+  }
+
+  @media (min-width: 768px) {
+    .featured-products-slider .classic-product-image {
+      aspect-ratio: 20 / 22;
+    }
+  }
+
+  @media (max-width: 767px) {
+    .featured-products-section {
+      padding-top: 2rem;
+      padding-bottom: 2.5rem;
+      background: linear-gradient(160deg, #FAF0F1 0%, #FDF7F7 100%);
+      border-color: rgba(246, 227, 225, 0.7);
+    }
+
+    .featured-products-mobile-band {
+      display: block;
+      width: 100%;
+      height: 3px;
+      margin-bottom: 1.25rem;
+      background: linear-gradient(90deg, var(--color-primary) 0%, #DFC397 55%, transparent 100%);
+      opacity: 0.5;
+    }
+
+    .featured-products-header {
+      display: block;
+      margin-bottom: 1.25rem;
+      text-align: left;
+    }
+
+    .featured-products-header h2 {
+      font-size: clamp(1.45rem, 6vw, 1.75rem);
+      line-height: 1.12;
+      letter-spacing: -0.01em;
+    }
+
+    .featured-products-header p {
+      max-width: 100%;
+      font-size: 0.81rem;
+      margin-top: 0.35rem;
+      line-height: 1.55;
+      color: #6b7280;
+    }
+
+    .featured-products-carousel-wrap {
+      position: relative;
+    }
+
+    .featured-products-fade-hint {
+      position: absolute;
+      top: 0;
+      right: 0;
+      bottom: 0;
+      width: 52px;
+      background: linear-gradient(to left, #FDF7F7 0%, transparent 100%);
+      pointer-events: none;
+      z-index: 2;
+      border-radius: 0 14px 14px 0;
+    }
+
+    .featured-products-slider {
+      display: flex;
+      flex-direction: row;
+      align-items: stretch;
+      gap: 12px;
+      padding: 6px 1rem 10px;
+      overflow-x: auto;
+      overflow-y: visible;
+      scroll-behavior: smooth;
+      scroll-snap-type: x mandatory;
+      -webkit-overflow-scrolling: touch;
+      scrollbar-width: none;
+      margin-inline: 0;
+    }
+
+    .featured-products-slider::-webkit-scrollbar {
+      display: none;
+    }
+
+    .featured-products-slider .classic-product-card.hidden,
+    .featured-products-slider .classic-product-card[hidden],
+    .classic-product-card.hidden,
+    .classic-product-card[hidden] {
+      display: none !important;
+    }
+
+    .featured-products-slider .classic-product-card {
+      flex: 0 0 72vw;
+      max-width: 280px;
+      min-width: 0;
+      display: flex;
+      flex-direction: column;
+      height: auto;
+      border: 1.5px solid #DFC397;
+      border-radius: 16px;
+      background: #fff;
+      box-shadow:
+        0 2px 12px rgba(15, 23, 42, 0.05),
+        0 10px 28px rgba(85, 101, 75, 0.08);
+      overflow: hidden;
+      scroll-snap-align: start;
+      scroll-snap-stop: always;
+      transition: transform 0.22s ease, box-shadow 0.22s ease;
+      will-change: transform;
+    }
+
+    .featured-products-slider .classic-product-card:active {
+      transform: scale(0.97);
+      box-shadow: 0 2px 8px rgba(15, 23, 42, 0.04);
+    }
+
+    .featured-products-slider .classic-product-image {
+      display: block;
+      width: 100%;
+      aspect-ratio: 4 / 3.8;
+      border-bottom: 1px solid #F6E3E1;
+      overflow: hidden;
+      background: #FAF0F1;
+      flex-shrink: 0;
+    }
+
+    .featured-products-slider .classic-product-image img {
+      transition: transform 0.4s ease;
+    }
+
+    .featured-products-slider .classic-product-badges {
+      top: 8px;
+      left: 8px;
+      right: auto;
+      max-width: calc(100% - 16px);
+      gap: 5px;
+    }
+
+    .featured-products-slider .classic-product-badges span {
+      padding: 3px 8px;
+      border-radius: 999px;
+      font-size: 9.5px;
+      line-height: 1.2;
+      letter-spacing: 0.04em;
+      font-weight: 700;
+    }
+
+    .featured-products-slider .classic-product-info {
+      padding: 0.65rem 0.8rem 0.75rem;
+      text-align: left;
+      display: flex;
+      flex-direction: column;
+      gap: 0;
+      min-height: 0 !important;
+      flex: none;
+    }
+
+    .featured-products-slider .classic-product-category {
+      display: block;
+      font-size: 9.5px;
+      font-weight: 700;
+      letter-spacing: 0.1em;
+      text-transform: uppercase;
+      color: #893144;
+      line-height: 1;
+      white-space: nowrap;
+      overflow: hidden;
+      text-overflow: ellipsis;
+      margin-bottom: 0.25rem;
+    }
+
+    .featured-products-slider .classic-product-title {
+      display: -webkit-box;
+      overflow: hidden;
+      -webkit-box-orient: vertical;
+      -webkit-line-clamp: 2;
+      font-family: var(--font-serif), Georgia, serif;
+      font-size: 13.5px;
+      font-weight: 700;
+      line-height: 1.35;
+      color: #1e293b;
+      letter-spacing: -0.01em;
+      overflow-wrap: break-word;
+      margin-bottom: 0.55rem;
+    }
+
+    .featured-products-slider .classic-product-price-wrap {
+      padding-top: 0;
+      margin-top: 0;
+    }
+
+    .featured-products-slider .classic-product-price-box {
+      padding: 0.4rem 0.6rem;
+      border: 1px solid rgba(234, 219, 198, 0.9);
+      border-radius: 10px;
+      background: linear-gradient(135deg, rgba(249, 246, 240, 0.98) 0%, rgba(244, 238, 228, 0.98) 100%);
+    }
+
+    .featured-products-slider .classic-product-price-label {
+      display: block;
+      font-size: 9px;
+      font-weight: 700;
+      letter-spacing: 0.12em;
+      text-transform: uppercase;
+      color: #671E2F;
+      margin-bottom: 2px;
+      line-height: 1;
+    }
+
+    .featured-products-slider .classic-product-price-row {
+      display: flex;
+      flex-direction: row;
+      align-items: center;
+      justify-content: space-between;
+      gap: 6px;
+    }
+
+    .featured-products-slider .classic-product-price {
+      font-size: 15px;
+      font-weight: 800;
+      color: var(--color-primary);
+      white-space: nowrap;
+      overflow: hidden;
+      text-overflow: ellipsis;
+      line-height: 1.1;
+    }
+
+    .featured-products-slider .classic-product-detail {
+      flex-shrink: 0;
+      width: auto;
+      min-height: 0;
+      padding: 0.38rem 0.8rem;
+      border-radius: 999px;
+      font-size: 11px;
+      font-weight: 700;
+      letter-spacing: 0.02em;
+      box-shadow: 0 4px 12px rgba(85, 101, 75, 0.22);
+      line-height: 1.2;
+    }
+
+    .featured-products-mobile-footer {
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      margin-top: 1rem;
+      gap: 0.75rem;
+    }
+
+    .fp-dots {
+      display: flex;
+      align-items: center;
+      gap: 5px;
+      flex: 1;
+    }
+
+    .fp-dot {
+      width: 6px;
+      height: 6px;
+      border-radius: 999px;
+      background: #DFC397;
+      transition: width 0.28s ease, background 0.28s ease;
+      flex-shrink: 0;
+    }
+
+    .fp-dot.active {
+      width: 18px;
+      background: var(--color-primary);
+    }
+
+    .fp-lihat-semua {
+      display: inline-flex;
+      align-items: center;
+      gap: 0.3rem;
+      font-size: 0.78rem;
+      font-weight: 700;
+      color: var(--color-primary);
+      text-decoration: none;
+      letter-spacing: 0.02em;
+      white-space: nowrap;
+      min-height: 44px;
+      padding: 0.5rem 1rem;
+      border-radius: 999px;
+      border: 1.5px solid var(--color-primary);
+      transition: background 0.18s, color 0.18s;
+    }
+
+    .fp-lihat-semua:active {
+      background: var(--color-primary);
+      color: #fff;
+    }
+  }
+
+  @media (max-width: 380px) {
+    .featured-products-slider .classic-product-card {
+      flex: 0 0 78vw;
+    }
+
+    .featured-products-slider .classic-product-title {
+      font-size: 13px;
+    }
+
+    .featured-products-slider .classic-product-price {
+      font-size: 14px;
+    }
+  }
+</style>
+
+<script>
+  function initFeaturedProductsSlider() {
+    document.querySelectorAll('[data-featured-products-slider]').forEach(function(slider) {
+      if (slider.dataset.featuredSliderReady === 'true') return;
+      slider.dataset.featuredSliderReady = 'true';
+
+      var mobileQuery = window.matchMedia('(max-width: 767px)');
+      var reduceMotionQuery = window.matchMedia('(prefers-reduced-motion: reduce)');
+      var intervalId = 0;
+      var dotsContainer = document.getElementById('fp-dots');
+
+      function getVisibleCards() {
+        return Array.from(slider.querySelectorAll('.classic-product-card'));
+      }
+
+      function buildDots() {
+        if (!dotsContainer || !mobileQuery.matches) return;
+        dotsContainer.innerHTML = '';
+        var cards = getVisibleCards();
+        cards.forEach(function(_, i) {
+          var dot = document.createElement('span');
+          dot.className = 'fp-dot' + (i === 0 ? ' active' : '');
+          dot.setAttribute('aria-hidden', 'true');
+          dotsContainer.appendChild(dot);
+        });
+      }
+
+      function updateActiveDot() {
+        if (!dotsContainer || !mobileQuery.matches) return;
+        var cards = getVisibleCards();
+        if (!cards.length) return;
+
+        var sliderLeft = slider.getBoundingClientRect().left;
+        var sliderWidth = slider.clientWidth;
+        var bestIdx = 0;
+        var bestOverlap = -1;
+
+        cards.forEach(function(card, i) {
+          var rect = card.getBoundingClientRect();
+          var visLeft = Math.max(rect.left, sliderLeft);
+          var visRight = Math.min(rect.right, sliderLeft + sliderWidth);
+          var overlap = Math.max(0, visRight - visLeft);
+          if (overlap > bestOverlap) {
+            bestOverlap = overlap;
+            bestIdx = i;
+          }
+        });
+
+        var dots = dotsContainer.querySelectorAll('.fp-dot');
+        dots.forEach(function(dot, i) {
+          dot.classList.toggle('active', i === bestIdx);
+        });
+      }
+
+      function reinitDots() {
+        buildDots();
+        updateActiveDot();
+      }
+
+      var scrollTicking = false;
+      slider.addEventListener('scroll', function() {
+        if (!scrollTicking) {
+          window.requestAnimationFrame(function() {
+            updateActiveDot();
+            scrollTicking = false;
+          });
+          scrollTicking = true;
+        }
+      }, { passive: true });
+
+      mobileQuery.addEventListener('change', function() {
+        reinitDots();
+        startAutoSlide();
+      });
+
+      function stopAutoSlide() {
+        if (!intervalId) return;
+        window.clearInterval(intervalId);
+        intervalId = 0;
+      }
+
+      function startAutoSlide() {
+        stopAutoSlide();
+        if (!mobileQuery.matches || reduceMotionQuery.matches) return;
+
+        intervalId = window.setInterval(function() {
+          var visibleCards = getVisibleCards();
+          var card = visibleCards[0];
+          if (!card) return;
+
+          var gap = parseFloat(window.getComputedStyle(slider).gap) || 12;
+          var step = card.getBoundingClientRect().width + gap;
+          slider.scrollBy({ left: step, behavior: 'smooth' });
+
+          window.setTimeout(function() {
+            if (slider.scrollLeft + slider.clientWidth >= slider.scrollWidth - 15) {
+              slider.scrollTo({ left: 0, behavior: 'smooth' });
+            }
+          }, 600);
+        }, 3200);
+      }
+
+      slider.addEventListener('mouseenter', stopAutoSlide);
+      slider.addEventListener('mouseleave', startAutoSlide);
+      slider.addEventListener('focusin', stopAutoSlide);
+      slider.addEventListener('focusout', startAutoSlide);
+      slider.addEventListener('touchstart', stopAutoSlide, { passive: true });
+      slider.addEventListener('touchend', function() {
+        window.setTimeout(startAutoSlide, 3000);
+      }, { passive: true });
+      reduceMotionQuery.addEventListener('change', startAutoSlide);
+      document.addEventListener('visibilitychange', function() {
+        if (document.hidden) { stopAutoSlide(); } else { startAutoSlide(); }
+      });
+
+      reinitDots();
+      window.setTimeout(startAutoSlide, 5000);
+    });
+  }
+
+  (window as any).initFeaturedProductsSlider = initFeaturedProductsSlider;
+  initFeaturedProductsSlider();
+  document.addEventListener('astro:page-load', initFeaturedProductsSlider);
+</script>

@@ -1,0 +1,213 @@
+---
+import { SUPABASE_URL, SUPABASE_ANON_KEY } from '../data/supabaseConfig';
+---
+
+<script define:vars={{ SUPABASE_URL, SUPABASE_ANON_KEY }}>
+  function productMatchesCity(productCity, targetCityName) {
+    if (!targetCityName) return true;
+    var tNorm = String(targetCityName).toLowerCase();
+    if (tNorm.indexOf('mana saja') !== -1) return true;
+    var pNorm = String(productCity || 'Malang Raya').toLowerCase();
+    if (pNorm.indexOf('mana saja') !== -1 || pNorm.indexOf('seluruh indonesia') !== -1) return true;
+    if (pNorm === tNorm) return true;
+    if (tNorm.indexOf('malang raya') !== -1 && (pNorm.indexOf('malang') !== -1 || pNorm.indexOf('batu') !== -1)) return true;
+    if (pNorm.indexOf('malang raya') !== -1 && (tNorm.indexOf('malang') !== -1 || tNorm.indexOf('batu') !== -1)) return true;
+    if (pNorm.indexOf(tNorm) !== -1 || tNorm.indexOf(pNorm) !== -1) return true;
+    return false;
+  }
+
+  async function syncHomeProducts() {
+    try {
+      if (!window.supabase) return;
+      const client = window.supabase.createClient(SUPABASE_URL, SUPABASE_ANON_KEY);
+      const { data: allProducts, error } = await client
+        .from('products')
+        .select('*')
+        .order('created_at', { ascending: false });
+
+      if (error || !allProducts || allProducts.length === 0) return;
+
+      const catalogProducts = allProducts.filter(p => p && p.slug && !String(p.slug).startsWith('_'));
+      const pageCityEl = document.querySelector('[data-product-city]');
+      const pageCity = pageCityEl ? pageCityEl.getAttribute('data-product-city') : '';
+      const sellableProducts = pageCity
+        ? catalogProducts.filter(p => productMatchesCity(p.city, pageCity))
+        : catalogProducts;
+      if (sellableProducts.length === 0) {
+        const featuredSection = document.querySelector('.featured-products-section');
+        if (featuredSection) featuredSection.remove();
+        return;
+      }
+
+      const cloudSlugMap = new Map(sellableProducts.map(p => [p.slug, p]));
+
+      // 1. Sinkronisasi seluruh kartu produk di beranda (hapus yang dihapus, update harga & nama yang diedit)
+      document.querySelectorAll('a[href*="/produk/"]').forEach(link => {
+        const match = link.getAttribute('href').match(/\/produk\/([^\/]+)/);
+        if (!match || !match[1]) return;
+        const slug = match[1];
+
+        const card = link.closest('.product-card-shell, .category-product-card, .classic-product-card, article');
+        if (!card) return;
+
+        if (!cloudSlugMap.has(slug)) {
+          // Produk sudah dihapus di Supabase -> langsung buang dari layar!
+          card.remove();
+        } else {
+          // Produk masih aktif -> sinkronkan harga dan nama terkini
+          const p = cloudSlugMap.get(slug);
+          const priceEl = card.querySelector('.text-primary.font-extrabold, .font-extrabold.text-primary, [class*="font-extrabold"]');
+          if (priceEl && p.price_label) priceEl.textContent = p.price_label;
+
+          const titleEl = card.querySelector('h3');
+          if (titleEl && p.name && titleEl.textContent.trim() !== p.name) {
+            const linkInTitle = titleEl.querySelector('a');
+            if (linkInTitle) {
+              linkInTitle.textContent = p.name;
+            } else {
+              titleEl.textContent = p.name;
+            }
+          }
+
+          const imgEl = card.querySelector('img');
+          if (imgEl && p.image && !imgEl.src.includes(p.image)) {
+            imgEl.src = p.image;
+          }
+        }
+      });
+
+      // 2. Sinkronisasi Featured Products Slider di beranda
+      const featuredSlider = document.getElementById('featured-products-slider');
+      const featuredCloud = sellableProducts.filter(p => p.featured);
+      const displayFeatured = featuredCloud.length > 0 ? featuredCloud : sellableProducts;
+      if (featuredSlider && displayFeatured.length > 0) {
+        featuredSlider.innerHTML = displayFeatured.slice(0, 5).map((p, index) => {
+          const prodUrl = `/produk/${p.slug}/`;
+          const detailLabel = 'Detail';
+          return `
+            <div class="classic-product-card product-card-shell group bg-white rounded-[14px] border border-soft-cream/70 overflow-hidden shadow-[0_1px_4px_rgba(15,23,42,0.03)]">
+              <a href="${prodUrl}" class="classic-product-image image-load-shell block relative aspect-[20/22] bg-slate-100 overflow-hidden">
+                <img
+                  src="${p.image}"
+                  alt="Foto ${p.name} Florist Malang"
+                  loading="${index < 2 ? 'eager' : 'lazy'}"
+                  class="relative z-0 object-cover object-top w-full h-full transition-transform duration-700 ease-out group-hover:scale-[1.012]"
+                />
+                <div class="classic-product-badges absolute top-3 left-3 z-10 flex gap-2">
+                  <span class="bg-secondary text-primary-dark text-[10px] tracking-wider uppercase font-semibold px-2.5 py-1 rounded-xs shadow-xs">
+                    Terpopuler
+                  </span>
+                </div>
+              </a>
+              <div class="classic-product-info p-4.5 sm:p-5 flex flex-col justify-between min-h-[190px] sm:min-h-[200px]">
+                <div>
+                  <p class="classic-product-category text-[11px] font-semibold tracking-wider text-slate-500 uppercase mb-1">${p.category_name || ''}</p>
+                  <h3 class="classic-product-title font-serif font-bold text-slate-800 line-clamp-2 leading-snug group-hover:text-primary transition-colors duration-200 text-base sm:text-lg">
+                    <a href="${prodUrl}">${p.name}</a>
+                  </h3>
+                </div>
+                <div class="classic-product-price-wrap pt-3.5 sm:pt-4">
+                  <div class="classic-product-price-box rounded-md border border-soft-cream/70 bg-accent-bg/70 p-2.5 sm:p-3">
+                    <p class="classic-product-price-label text-[10px] font-bold uppercase tracking-[0.18em] text-secondary-dark">Harga</p>
+                    <div class="classic-product-price-row mt-1.5 flex items-center justify-between gap-2.5 sm:gap-3">
+                      <p class="classic-product-price font-sans text-lg sm:text-xl font-extrabold leading-none text-primary">${p.price_label}</p>
+                      <a href="${prodUrl}" class="classic-product-detail inline-flex shrink-0 items-center justify-center rounded-full bg-primary px-3.5 py-2 text-[11px] font-bold text-white shadow-xs transition-colors duration-200 group-hover:bg-primary-dark">
+                        ${detailLabel}
+                      </a>
+                    </div>
+                  </div>
+                </div>
+              </div>
+            </div>
+          `;
+        }).join('');
+
+        delete featuredSlider.dataset.featuredSliderReady;
+        if (typeof window.initFeaturedProductsSlider === 'function') {
+          window.initFeaturedProductsSlider();
+        }
+      }
+
+      // Helper untuk kartu produk kategori di beranda
+      function makeHomeCard(p) {
+        const prodUrl = `/produk/${p.slug}/`;
+        return `
+          <div class="product-item-wrapper h-full">
+            <article class="category-product-card product-card-shell group flex h-full flex-col overflow-hidden rounded-[14px] border border-soft-cream/70 bg-white text-left no-underline shadow-[0_1px_4px_rgba(15,23,42,0.03)] hover-gold-grow">
+              <a href="${prodUrl}" class="flex h-full flex-col no-underline">
+                <div class="image-load-shell relative aspect-[4/5] overflow-hidden bg-clean-ivory">
+                  <img
+                    src="${p.image}"
+                    alt="Foto ${p.name} Zaloma Florist Malang"
+                    loading="lazy"
+                    decoding="async"
+                    class="relative z-0 block h-full w-full object-cover object-top transition-transform duration-700 ease-out group-hover:scale-[1.012]"
+                  />
+                  <div class="absolute inset-x-0 bottom-0 z-10 h-24 bg-gradient-to-t from-primary-dark/45 via-primary-dark/10 to-transparent"></div>
+                </div>
+                <div class="flex min-h-[150px] flex-1 flex-col px-3.5 py-4 sm:min-h-[168px] sm:px-4 sm:py-4.5 justify-between">
+                  <h3 class="font-serif font-bold leading-snug text-slate-800 line-clamp-2 transition-colors duration-200 group-hover:text-primary text-sm sm:text-base">
+                    ${p.name}
+                  </h3>
+                  <div class="mt-auto pt-4">
+                    <div class="rounded-md border border-soft-cream/70 bg-accent-bg/70 px-3 py-2.5">
+                      <p class="text-[9px] font-bold uppercase tracking-[0.18em] text-secondary-dark sm:text-[10px]">Harga</p>
+                      <div class="mt-1 flex items-end justify-between gap-2">
+                        <p class="font-sans text-[1.05rem] font-extrabold leading-none text-primary sm:text-xl">${p.price_label}</p>
+                        <span class="inline-flex h-7 w-7 shrink-0 items-center justify-center rounded-full bg-primary text-white shadow-xs transition-colors duration-200 group-hover:bg-primary-dark" aria-hidden="true">
+                          <svg class="h-3.5 w-3.5" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2.6">
+                            <path stroke-linecap="round" stroke-linejoin="round" d="M9 5l7 7-7 7" />
+                          </svg>
+                        </span>
+                      </div>
+                    </div>
+                  </div>
+                </div>
+              </a>
+            </article>
+          </div>
+        `;
+      }
+
+      // 3. Sinkronisasi Hand Bouquet section
+      const hbGrid = document.querySelector('#hand-bouquet-malang .grid');
+      const hbProducts = sellableProducts.filter(p => p.category_slug === 'hand-bouquet-malang');
+      if (hbGrid && hbProducts.length > 0) {
+        hbGrid.innerHTML = hbProducts.slice(0, 8).map(p => makeHomeCard(p)).join('');
+      }
+
+      // 4. Sinkronisasi Bunga Papan panels
+      const dukaGrid = document.querySelector('[data-panel="duka-cita"] .grid');
+      const dukaProducts = sellableProducts.filter(p => p.category_slug === 'bunga-papan-duka-cita-malang');
+      if (dukaGrid && dukaProducts.length > 0) {
+        dukaGrid.innerHTML = dukaProducts.slice(0, 8).map(p => makeHomeCard(p)).join('');
+      }
+
+      const wedGrid = document.querySelector('[data-panel="wedding"] .grid');
+      const wedProducts = sellableProducts.filter(p => p.category_slug === 'bunga-papan-wedding-malang');
+      if (wedGrid && wedProducts.length > 0) {
+        wedGrid.innerHTML = wedProducts.slice(0, 8).map(p => makeHomeCard(p)).join('');
+      }
+
+      const congGrid = document.querySelector('[data-panel="congratulations"] .grid');
+      const congProducts = sellableProducts.filter(p => p.category_slug === 'bunga-papan-congratulations-malang');
+      if (congGrid && congProducts.length > 0) {
+        congGrid.innerHTML = congProducts.slice(0, 8).map(p => makeHomeCard(p)).join('');
+      }
+
+      // 5. Sinkronisasi sections with data-daily-rotate-category
+      document.querySelectorAll('[data-daily-rotate-category]').forEach(gridEl => {
+        const cat = gridEl.getAttribute('data-daily-rotate-category');
+        const prods = sellableProducts.filter(p => p.category_slug === cat);
+        if (prods.length > 0) {
+          gridEl.innerHTML = prods.slice(0, 8).map(p => makeHomeCard(p)).join('');
+        }
+      });
+
+    } catch (err) {
+      console.warn('Gagal memuat produk beranda live:', err);
+    }
+  }
+
+  syncHomeProducts();
+</script>

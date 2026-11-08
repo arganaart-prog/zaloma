@@ -6,6 +6,16 @@ type PopularProduct = ProductName & Partial<Pick<Product, 'featured'>>;
 /** Produk yang tidak ditampilkan di halaman utama (tetap ada di katalog/kategori). */
 export const HOME_EXCLUDED_PRODUCT_SLUGS = ['bunga-papan-duka-cita-malang-004'] as const;
 
+/** Baris konfigurasi sistem di tabel products (bukan produk jual). */
+export function isSystemProductSlug(slug: string | null | undefined): boolean {
+  return Boolean(slug && String(slug).startsWith('_'));
+}
+
+/** Buang baris config sistem dari hasil fetch Supabase. */
+export function getSellableProducts<T extends { slug?: string | null }>(products: T[]): T[] {
+  return products.filter((product) => !isSystemProductSlug(product.slug));
+}
+
 /** Maksimal produk bunga papan per subkategori di home. */
 export const BUNGA_PAPAN_HOME_MAX_PER_CATEGORY = 8;
 

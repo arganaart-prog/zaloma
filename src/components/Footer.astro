@@ -1,6 +1,5 @@
 ---
 // Footer.astro
-import { CATEGORIES } from '../data/products';
 import { WHATSAPP_NUMBER, WHATSAPP_LABEL, INSTAGRAM_URL, INSTAGRAM_HANDLE } from '../data/constants';
 import { withBase } from '../utils/paths';
 
@@ -17,6 +16,7 @@ const infoLinks = [
   { label: 'Kebijakan Privasi', href: '/kebijakan-privasi/' },
   { label: 'Syarat & Ketentuan', href: '/syarat-ketentuan/' },
 ];
+// Note: "Katalog Produk" tetap di footer sebagai link navigasi utama ke katalog
 
 const paymentMethods = [
   { label: 'BCA', image: '/images/Payment/bca.svg' },
@@ -38,7 +38,7 @@ const paymentMethods = [
   <div class="absolute inset-0 bg-[linear-gradient(120deg,rgba(255,255,255,0.08),transparent_34%,rgba(191,167,122,0.12))]" aria-hidden="true"></div>
 
   <div class="relative max-w-7xl mx-auto px-6 lg:px-8">
-    <div class="grid grid-cols-1 md:grid-cols-4 gap-8 lg:gap-6 mb-10">
+    <div class="grid grid-cols-1 md:grid-cols-3 gap-8 lg:gap-10 mb-10">
       <!-- Brand -->
       <div class="md:pr-4 lg:pr-8">
         <a href={withBase('/')} class="flex items-center gap-4 mb-5 group no-underline">
@@ -92,22 +92,8 @@ const paymentMethods = [
         </div>
       </div>
 
-      <!-- Categories -->
-      <div class="lg:ml-12">
-        <h3 class="text-xl font-bold text-white mb-3">Kategori Produk</h3>
-        <ul class="space-y-1.5 text-lg">
-          {CATEGORIES.map((category) => (
-            <li>
-              <a href={withBase(`/kategori/${category.slug}/`)} class="text-white/78 hover:text-white transition-colors duration-200 font-medium leading-normal">
-                {category.name}
-              </a>
-            </li>
-          ))}
-        </ul>
-      </div>
-
       <!-- Information -->
-      <div class="lg:ml-8">
+      <div>
         <h3 class="text-xl font-bold text-white mb-3">Informasi</h3>
         <ul class="space-y-1.5 text-lg">
           {infoLinks.map((link) => (

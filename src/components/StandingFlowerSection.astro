@@ -6,9 +6,17 @@ import { getDailyShuffledProducts } from '../utils/rotatingProducts';
 
 interface Props {
   allProducts?: any[];
+  cityName?: string;
+  citySlug?: string;
+  hideWhenEmpty?: boolean;
 }
 
-const { allProducts = [] } = Astro.props;
+const {
+  allProducts = [],
+  cityName = 'Malang',
+  citySlug = '',
+  hideWhenEmpty = false,
+} = Astro.props;
 const source = allProducts.length > 0 ? allProducts : PRODUCTS;
 
 const categorySlug = 'standing-flower-malang';
@@ -17,13 +25,19 @@ const standingFlowerProducts = getDailyShuffledProducts(
   categorySlug
 );
 
-const categoryHref = '/kategori/standing-flower-malang/';
+const categoryHref = citySlug
+  ? `/kategori/standing-flower-malang/?city=${citySlug}&refer=city`
+  : '/kategori/standing-flower-malang/';
+
+if (hideWhenEmpty && standingFlowerProducts.length === 0) {
+  return;
+}
 ---
 
 <section class="py-20 bg-white border-y border-soft-cream/60" id="standing-flower-malang">
   <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
     <div class="text-center max-w-2xl mx-auto mb-12">
-      <h2 class="font-serif text-3xl sm:text-4xl font-bold text-slate-800">Standing Flower Malang</h2>
+      <h2 class="font-serif text-3xl sm:text-4xl font-bold text-slate-800">Standing Flower {cityName}</h2>
       <p class="text-slate-500 text-sm mt-3 leading-relaxed">
         Rangkaian bunga berdiri untuk grand opening, ucapan selamat, dan duka cita. Pengerjaan rapi, difoto sebelum dikirim ke lokasi.
       </p>

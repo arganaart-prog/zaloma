@@ -1,0 +1,87 @@
+---
+// DailyCategoryRotation.astro
+// Shared client-side script for daily product shuffling within category sections.
+// Used on both the home page and per-city pages to ensure consistent behavior.
+---
+
+<script>
+  function getWIBDayNumberClient() {
+    var WIB_OFFSET_MS = 7 * 60 * 60 * 1000;
+    return Math.floor((Date.now() + WIB_OFFSET_MS) / (24 * 60 * 60 * 1000));
+  }
+
+  function getCategoryDaySeedClient(categorySlug, dayNumber) {
+    var hash = 0;
+    for (var i = 0; i < categorySlug.length; i++) {
+      hash = (hash << 5) - hash + categorySlug.charCodeAt(i);
+      hash |= 0;
+    }
+    return Math.abs(hash ^ (dayNumber * 2654435761));
+  }
+
+  function mulberry32Client(seed) {
+    return function() {
+      var t = (seed += 0x6d2b79f5);
+      t = Math.imul(t ^ (t >>> 15), t | 1);
+      t ^= t + Math.imul(t ^ (t >>> 7), t | 61);
+      return ((t ^ (t >>> 14)) >>> 0) / 4294967296;
+    };
+  }
+
+  function initDailyCategoryRotation() {
+    var containers = document.querySelectorAll('[data-daily-rotate-category]');
+    if (!containers.length) return;
+
+    var dayNumber = getWIBDayNumberClient();
+
+    containers.forEach(function(container) {
+      var categorySlug = container.getAttribute('data-daily-rotate-category');
+      if (!categorySlug) return;
+
+      if (container.getAttribute('data-daily-rotate-day') === String(dayNumber)) return;
+      container.setAttribute('data-daily-rotate-day', String(dayNumber));
+
+      var items = Array.from(container.querySelectorAll('[data-product-slug]'));
+      if (items.length <= 1) return;
+
+      var slugs = items.map(function(el) { return el.getAttribute('data-product-slug'); });
+      var seed = getCategoryDaySeedClient(categorySlug, dayNumber);
+      var rng = mulberry32Client(seed);
+
+      var shuffledSlugs = slugs.slice();
+      for (var i = shuffledSlugs.length - 1; i > 0; i--) {
+        var j = Math.floor(rng() * (i + 1));
+        var temp = shuffledSlugs[i];
+        shuffledSlugs[i] = shuffledSlugs[j];
+        shuffledSlugs[j] = temp;
+      }
+
+      var itemMap = new Map();
+      items.forEach(function(el) {
+        itemMap.set(el.getAttribute('data-product-slug'), el);
+      });
+
+      shuffledSlugs.forEach(function(slug) {
+        var el = itemMap.get(slug);
+        if (el) {
+          container.appendChild(el);
+        }
+      });
+    });
+  }
+
+  function scheduleDailyCategoryRotation() {
+    if (typeof window !== 'undefined' && 'requestIdleCallback' in window) {
+      (window as any).requestIdleCallback(initDailyCategoryRotation, { timeout: 4000 });
+    } else {
+      window.setTimeout(initDailyCategoryRotation, 2500);
+    }
+  }
+
+  if (document.readyState === 'complete') {
+    scheduleDailyCategoryRotation();
+  } else {
+    window.addEventListener('load', scheduleDailyCategoryRotation, { once: true });
+  }
+  document.addEventListener('astro:page-load', scheduleDailyCategoryRotation);
+</script>

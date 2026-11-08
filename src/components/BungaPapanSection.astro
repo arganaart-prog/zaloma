@@ -7,14 +7,27 @@ import { getHomeBungaPapanProducts } from '../utils/productHelpers';
 
 interface Props {
   allProducts?: any[];
+  cityName?: string;
+  citySlug?: string;
+  hideWhenEmpty?: boolean;
 }
 
-const { allProducts = [] } = Astro.props;
+const {
+  allProducts = [],
+  cityName = 'Malang',
+  citySlug = '',
+  hideWhenEmpty = false,
+} = Astro.props;
 const source = allProducts.length > 0 ? allProducts : PRODUCTS;
 
 const dukaCitaProducts = getHomeBungaPapanProducts(source, 'bunga-papan-duka-cita-malang');
 const weddingProducts = getHomeBungaPapanProducts(source, 'bunga-papan-wedding-malang');
 const congratulationsProducts = getHomeBungaPapanProducts(source, 'bunga-papan-congratulations-malang');
+const hasAnyProducts =
+  dukaCitaProducts.length > 0 || weddingProducts.length > 0 || congratulationsProducts.length > 0;
+
+const withCityQuery = (href: string) =>
+  citySlug ? `${href}?city=${citySlug}&refer=city` : href;
 
 interface Tab {
   id: string;
@@ -28,28 +41,32 @@ const tabs: Tab[] = [
     id: 'duka-cita',
     label: 'Duka Cita',
     products: dukaCitaProducts,
-    categoryHref: '/kategori/bunga-papan-duka-cita-malang/',
+    categoryHref: withCityQuery('/kategori/bunga-papan-duka-cita-malang/'),
   },
   {
     id: 'wedding',
     label: 'Wedding',
     products: weddingProducts,
-    categoryHref: '/kategori/bunga-papan-wedding-malang/',
+    categoryHref: withCityQuery('/kategori/bunga-papan-wedding-malang/'),
   },
   {
     id: 'congratulations',
     label: 'Congratulations',
     products: congratulationsProducts,
-    categoryHref: '/kategori/bunga-papan-congratulations-malang/',
+    categoryHref: withCityQuery('/kategori/bunga-papan-congratulations-malang/'),
   },
 ];
+
+if (hideWhenEmpty && !hasAnyProducts) {
+  return;
+}
 ---
 
 <section class="py-20 bg-accent-bg/40 border-y border-soft-cream/60" id="bunga-papan-ucapan">
   <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
     <!-- Section Header -->
     <div class="text-center max-w-2xl mx-auto mb-10">
-      <h2 class="font-serif text-3xl sm:text-4xl font-bold text-slate-800">Bunga Papan Malang</h2>
+      <h2 class="font-serif text-3xl sm:text-4xl font-bold text-slate-800">Bunga Papan {cityName}</h2>
       <p class="text-slate-500 text-sm mt-3 leading-relaxed">
         Selesai 3–4 jam, difoto sebelum diantar ke lokasi.
       </p>
