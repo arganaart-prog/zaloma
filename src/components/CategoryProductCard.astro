@@ -1,7 +1,7 @@
 ---
 import type { Product } from '../data/products';
 import { withBase } from '../utils/paths';
-import { getProductDisplayName } from '../utils/productHelpers';
+import { getProductCardShape, getProductDisplayName } from '../utils/productHelpers';
 
 interface Props {
   product: Product;
@@ -15,13 +15,15 @@ const imageLoading = priority ? 'eager' : 'lazy';
 const imageFetchPriority = priority ? 'high' : 'low';
 const displayName = getProductDisplayName(product);
 const isBungaPapan = product.categorySlug.startsWith('bunga-papan') || product.categoryName.toLowerCase().includes('bunga papan');
+const cardShape = product.cardShape || getProductCardShape(product.description);
+const cardAspect = cardShape === 'square' ? 'aspect-square' : cardShape ? 'aspect-[4/5]' : aspect;
 ---
 
 <a
   href={productUrl}
-  class="category-product-card product-card-shell group flex h-full flex-col overflow-hidden rounded-[14px] border border-soft-cream/70 bg-white text-left no-underline shadow-[0_1px_4px_rgba(15,23,42,0.03)]"
+  class:list={['category-product-card', 'product-card-shell', 'group', 'flex', 'h-full', 'flex-col', 'overflow-hidden', 'rounded-[14px]', 'border', 'border-soft-cream/70', 'bg-white', 'text-left', 'no-underline', 'shadow-[0_1px_4px_rgba(15,23,42,0.03)]', cardShape === 'arch' && 'product-card-shape-arch']}
 >
-  <div class={`image-load-shell relative ${aspect} overflow-hidden bg-clean-ivory`} data-image-frame>
+  <div class:list={['product-card-image', 'image-load-shell', 'relative', cardAspect, 'overflow-hidden', 'bg-clean-ivory']} data-image-frame>
     <span class="image-skeleton" aria-hidden="true"></span>
 
     <img

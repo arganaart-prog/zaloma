@@ -412,44 +412,15 @@ const customCategorySchema = {
 
       liveCategoryProducts.forEach((p, index) => {
         const productUrl = `/produk/${p.slug}/`;
-        const storedCardVariant = p.description?.match(/^\[Bentuk Kartu:\s*(modern|classic)\]/im)?.[1];
-        const cardVariant = storedCardVariant || 'modern';
-        const aspectClass = storedCardVariant ? 'aspect-[4/3]' : isHandBouquet ? 'aspect-[4/5]' : 'aspect-[20/19]';
+        const cardShape = p.description?.match(/^\[Bentuk Kartu:\s*(portrait|square|arch)\]/im)?.[1];
+        const aspectClass = cardShape === 'square' ? 'aspect-square' : cardShape ? 'aspect-[4/5]' : isHandBouquet ? 'aspect-[4/5]' : 'aspect-[20/19]';
+        const archClass = cardShape === 'arch' ? 'product-card-shape-arch' : '';
 
         const card = document.createElement('article');
-        card.className = cardVariant === 'classic'
-          ? 'classic-product-card product-card-shell group bg-white rounded-[14px] border border-soft-cream/70 overflow-hidden shadow-[0_1px_4px_rgba(15,23,42,0.03)]'
-          : 'product-card-shell group relative h-full overflow-hidden rounded-[14px] border border-soft-cream/70 bg-white shadow-[0_1px_4px_rgba(15,23,42,0.03)] hover-gold-grow';
-        if (cardVariant === 'classic') {
-          card.innerHTML = `
-            <a href="${productUrl}" class="classic-product-image image-load-shell block relative aspect-[4/3] bg-slate-100 overflow-hidden">
-              <img src="${p.image}" alt="Foto ${p.name} Florist Malang" loading="${index < 3 ? 'eager' : 'lazy'}" class="relative z-0 object-cover object-top w-full h-full transition-transform duration-700 ease-out group-hover:scale-[1.012]" />
-              <div class="classic-product-badges absolute top-3 left-3 z-10 flex gap-2">
-                <span class="bg-secondary text-primary-dark text-[10px] tracking-wider uppercase font-semibold px-2.5 py-1 rounded-xs shadow-xs">Terpopuler</span>
-              </div>
-            </a>
-            <div class="classic-product-info p-4.5 sm:p-5 flex flex-col justify-between min-h-[190px] sm:min-h-[200px]">
-              <div>
-                <p class="classic-product-category text-[11px] font-semibold tracking-wider text-slate-500 uppercase mb-1">${p.category_name || ''}</p>
-                <h3 class="classic-product-title font-serif font-bold text-slate-800 line-clamp-2 leading-snug group-hover:text-primary transition-colors duration-200 text-base sm:text-lg"><a href="${productUrl}">${p.name}</a></h3>
-              </div>
-              <div class="classic-product-price-wrap pt-3.5 sm:pt-4">
-                <div class="classic-product-price-box rounded-md border border-soft-cream/70 bg-accent-bg/70 p-2.5 sm:p-3">
-                  <p class="classic-product-price-label text-[10px] font-bold uppercase tracking-[0.18em] text-secondary-dark">Harga</p>
-                  <div class="classic-product-price-row mt-1.5 flex items-center justify-between gap-2.5 sm:gap-3">
-                    <p class="classic-product-price font-sans text-lg sm:text-xl font-extrabold leading-none text-primary">${p.price_label}</p>
-                    <a href="${productUrl}" class="classic-product-detail inline-flex shrink-0 items-center justify-center rounded-full bg-primary px-3.5 py-2 text-[11px] font-bold text-white shadow-xs transition-colors duration-200 group-hover:bg-primary-dark">Detail</a>
-                  </div>
-                </div>
-              </div>
-            </div>
-          `;
-          grid.appendChild(card);
-          return;
-        }
+        card.className = `product-card-shell ${archClass} group relative h-full overflow-hidden rounded-[14px] border border-soft-cream/70 bg-white shadow-[0_1px_4px_rgba(15,23,42,0.03)] hover-gold-grow`;
         card.innerHTML = `
           <a href="${productUrl}" class="flex h-full flex-col no-underline">
-            <div class="image-load-shell relative -mx-px -mt-px ${aspectClass} overflow-hidden bg-clean-ivory">
+            <div class="product-card-image image-load-shell relative -mx-px -mt-px ${aspectClass} overflow-hidden bg-clean-ivory">
               <img
                 src="${p.image}"
                 alt="Foto ${p.name} Florist Malang"

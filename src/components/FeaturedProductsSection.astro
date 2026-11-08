@@ -1,5 +1,6 @@
 ---
 import { withBase } from '../utils/paths';
+import { getProductCardShape } from '../utils/productHelpers';
 
 interface Props {
   products?: any[];
@@ -41,8 +42,8 @@ if (!products.length) {
       <div class="featured-products-fade-hint" aria-hidden="true"></div>
       <div id="featured-products-slider" data-featured-products-slider class="featured-products-slider grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-6 lg:gap-8 px-4 sm:px-6 lg:px-8">
         {products.map((p, index) => (
-          <div class="classic-product-card product-card-shell group bg-white rounded-[14px] border border-soft-cream/70 overflow-hidden shadow-[0_1px_4px_rgba(15,23,42,0.03)]">
-            <a href={withBase(`/produk/${p.slug}/`)} class="classic-product-image image-load-shell block relative aspect-[20/22] bg-slate-100 overflow-hidden">
+          <div class:list={['classic-product-card', 'product-card-shell', 'group', 'bg-white', 'rounded-[14px]', 'border', 'border-soft-cream/70', 'overflow-hidden', 'shadow-[0_1px_4px_rgba(15,23,42,0.03)]', getProductCardShape(p.description) === 'arch' && 'product-card-shape-arch']}>
+            <a href={withBase(`/produk/${p.slug}/`)} class:list={['product-card-image', 'classic-product-image', 'image-load-shell', 'block', 'relative', getProductCardShape(p.description) === 'square' ? 'aspect-square' : getProductCardShape(p.description) ? 'aspect-[4/5]' : 'aspect-[20/22]', 'bg-slate-100', 'overflow-hidden']}>
               <img
                 src={p.image}
                 alt={`Foto ${p.name} Florist ${cityName}`}

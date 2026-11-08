@@ -2,7 +2,7 @@
 // ProductCard.astro
 import type { Product } from '../data/products';
 import { withBase } from '../utils/paths';
-import { getProductCardVariant, getProductDisplayName, isProductPopular } from '../utils/productHelpers';
+import { getProductCardShape, getProductDisplayName, isProductPopular } from '../utils/productHelpers';
 
 interface Props {
   product: Product;
@@ -15,8 +15,7 @@ interface Props {
 }
 
 const { product, variant = 'modern', priority = false, class: className = '', hidden = false, aspect, ...rest } = Astro.props;
-const savedVariant = product.cardVariant || getProductCardVariant(product.description);
-const cardVariant = savedVariant || variant;
+const cardShape = product.cardShape || getProductCardShape(product.description);
 const productUrl = withBase(`/produk/${product.slug}/`);
 const imageUrl = withBase(product.image);
 const imageLoading = priority ? 'eager' : 'lazy';
@@ -30,17 +29,17 @@ const isBungaPapan = product.categorySlug.startsWith('bunga-papan') || product.c
 const isHandBouquet = product.categorySlug === 'hand-bouquet-malang' || product.categoryName.toLowerCase().includes('hand bouquet');
 const isLongTitle = isBungaPapan || displayName.length > 25;
 
-const historicalAspect = savedVariant ? 'aspect-[4/3]' : '';
-const modernAspect = aspect || historicalAspect || (isHandBouquet ? 'aspect-[4/5]' : 'aspect-[20/19]');
-const classicAspect = aspect || historicalAspect || (isHandBouquet ? 'aspect-[4/5]' : 'aspect-[20/19]');
-const compactAspect = aspect || historicalAspect || (isHandBouquet ? 'aspect-[4/5]' : 'aspect-[4/4.5]');
+const shapeAspect = cardShape === 'square' ? 'aspect-square' : cardShape ? 'aspect-[4/5]' : '';
+const modernAspect = shapeAspect || aspect || (isHandBouquet ? 'aspect-[4/5]' : 'aspect-[20/19]');
+const classicAspect = shapeAspect || aspect || (isHandBouquet ? 'aspect-[4/5]' : 'aspect-[20/19]');
+const compactAspect = shapeAspect || aspect || (isHandBouquet ? 'aspect-[4/5]' : 'aspect-[4/4.5]');
 ---
 
-{cardVariant === 'compact' ? (
-  <article class={`product-card-shell compact-product-card group relative h-full flex flex-col overflow-hidden rounded-[14px] border border-soft-cream/70 bg-white shadow-[0_1px_4px_rgba(15,23,42,0.03)] ${className}`} hidden={hidden ? true : undefined} {...rest}>
+{variant === 'compact' ? (
+  <article class:list={['product-card-shell', 'compact-product-card', 'group', 'relative', 'h-full', 'flex', 'flex-col', 'overflow-hidden', 'rounded-[14px]', 'border', 'border-soft-cream/70', 'bg-white', 'shadow-[0_1px_4px_rgba(15,23,42,0.03)]', cardShape === 'arch' && 'product-card-shape-arch', className]} hidden={hidden ? true : undefined} {...rest}>
     <a href={productUrl} class="flex h-full flex-col no-underline">
       <!-- Image frame: full edge-to-edge (no side spaces), naturally proportioned -->
-      <div class={`image-load-shell relative ${compactAspect} overflow-hidden bg-clean-ivory border-b border-soft-cream/40`} data-image-frame>
+      <div class:list={['product-card-image', 'image-load-shell', 'relative', compactAspect, 'overflow-hidden', 'bg-clean-ivory', 'border-b', 'border-soft-cream/40']} data-image-frame>
         <span class="image-skeleton" aria-hidden="true"></span>
         <img
           src={imageUrl}
@@ -86,10 +85,10 @@ const compactAspect = aspect || historicalAspect || (isHandBouquet ? 'aspect-[4/
       </div>
     </a>
   </article>
-) : cardVariant === 'classic' ? (
-  <div class={`classic-product-card product-card-shell group bg-white rounded-[14px] border border-soft-cream/70 overflow-hidden shadow-[0_1px_4px_rgba(15,23,42,0.03)] ${className}`} hidden={hidden ? true : undefined} {...rest}>
+) : variant === 'classic' ? (
+  <div class:list={['classic-product-card', 'product-card-shell', 'group', 'bg-white', 'rounded-[14px]', 'border', 'border-soft-cream/70', 'overflow-hidden', 'shadow-[0_1px_4px_rgba(15,23,42,0.03)]', cardShape === 'arch' && 'product-card-shape-arch', className]} hidden={hidden ? true : undefined} {...rest}>
     <!-- Image Wrapper -->
-    <a href={productUrl} class={`classic-product-image image-load-shell block relative ${classicAspect} bg-slate-100 overflow-hidden`} data-image-frame>
+    <a href={productUrl} class:list={['product-card-image', 'classic-product-image', 'image-load-shell', 'block', 'relative', classicAspect, 'bg-slate-100', 'overflow-hidden']} data-image-frame>
       <span class="image-skeleton" aria-hidden="true"></span>
       <img
         src={imageUrl}
@@ -139,9 +138,9 @@ const compactAspect = aspect || historicalAspect || (isHandBouquet ? 'aspect-[4/
     </div>
   </div>
 ) : (
-  <article class={`product-card-shell group relative h-full overflow-hidden rounded-[14px] border border-soft-cream/70 bg-white shadow-[0_1px_4px_rgba(15,23,42,0.03)] ${className}`} hidden={hidden ? true : undefined} {...rest}>
+  <article class:list={['product-card-shell', 'group', 'relative', 'h-full', 'overflow-hidden', 'rounded-[14px]', 'border', 'border-soft-cream/70', 'bg-white', 'shadow-[0_1px_4px_rgba(15,23,42,0.03)]', cardShape === 'arch' && 'product-card-shape-arch', className]} hidden={hidden ? true : undefined} {...rest}>
     <a href={productUrl} class="flex h-full flex-col no-underline">
-      <div class={`image-load-shell relative -mx-px -mt-px ${modernAspect} overflow-hidden bg-clean-ivory`} data-image-frame>
+      <div class:list={['product-card-image', 'image-load-shell', 'relative', '-mx-px', '-mt-px', modernAspect, 'overflow-hidden', 'bg-clean-ivory']} data-image-frame>
         <span class="image-skeleton" aria-hidden="true"></span>
         <img
           src={imageUrl}

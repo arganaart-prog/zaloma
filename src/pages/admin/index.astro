@@ -441,14 +441,15 @@ function withBase(path: string): string {
                 </div>
 
                 <div>
-                  <label for="prod-card-variant" class="block text-sm font-semibold text-slate-700 mb-2">
-                    Bentuk ProductCard <span class="text-slate-400 font-normal">(Opsional)</span>
+                  <label for="prod-card-shape" class="block text-sm font-semibold text-slate-700 mb-2">
+                    Bentuk ProductCard
                   </label>
-                  <select id="prod-card-variant" class="w-full px-4 py-3 rounded-lg border border-slate-300 text-sm bg-white focus:outline-none focus:border-primary focus:ring-2 focus:ring-primary/20 transition-all cursor-pointer">
-                    <option value="modern" selected>Modern — kartu modern</option>
-                    <option value="classic">Classic — kartu klasik</option>
+                  <select id="prod-card-shape" class="w-full px-4 py-3 rounded-lg border border-slate-300 text-sm bg-white focus:outline-none focus:border-primary focus:ring-2 focus:ring-primary/20 transition-all cursor-pointer">
+                    <option value="portrait" selected>Portrait — tegak (4:5)</option>
+                    <option value="square">Persegi (1:1)</option>
+                    <option value="arch">Arch — lengkung (4:5)</option>
                   </select>
-                  <p class="text-xs text-slate-400 mt-1.5">Mengikuti dua bentuk pada ProductCard versi awal; rasio foto 4:3.</p>
+                  <p class="text-xs text-slate-400 mt-1.5">Rasio gambar mengikuti Floragate 1: portrait dan arch 4:5, persegi 1:1.</p>
                 </div>
 
               </div>
@@ -829,12 +830,13 @@ function withBase(path: string): string {
           </div>
 
           <div>
-            <label for="edit-prod-card-variant" class="block text-sm font-semibold text-slate-700 mb-2">Bentuk ProductCard</label>
-            <select id="edit-prod-card-variant" class="w-full px-4 py-3 rounded-lg border border-slate-300 text-sm bg-white focus:outline-none focus:border-primary focus:ring-2 focus:ring-primary/20 transition-all cursor-pointer">
-              <option value="modern">Modern — kartu modern</option>
-              <option value="classic">Classic — kartu klasik</option>
+            <label for="edit-prod-card-shape" class="block text-sm font-semibold text-slate-700 mb-2">Bentuk ProductCard</label>
+            <select id="edit-prod-card-shape" class="w-full px-4 py-3 rounded-lg border border-slate-300 text-sm bg-white focus:outline-none focus:border-primary focus:ring-2 focus:ring-primary/20 transition-all cursor-pointer">
+              <option value="portrait">Portrait — tegak (4:5)</option>
+              <option value="square">Persegi (1:1)</option>
+              <option value="arch">Arch — lengkung (4:5)</option>
             </select>
-            <p class="text-xs text-slate-400 mt-1.5">Mengikuti dua bentuk pada ProductCard versi awal; rasio foto 4:3.</p>
+            <p class="text-xs text-slate-400 mt-1.5">Rasio gambar mengikuti Floragate 1: portrait dan arch 4:5, persegi 1:1.</p>
           </div>
 
           <div>
@@ -4314,17 +4316,17 @@ function withBase(path: string): string {
       function getProductDescriptionFields(description) {
         const value = description || '';
         const size = value.match(/^\[Ukuran:\s*([^\]]+)\]/im)?.[1]?.trim() || '';
-        const cardVariant = value.match(/^\[Bentuk Kartu:\s*(modern|classic)\]/im)?.[1] || 'modern';
+        const cardShape = value.match(/^\[Bentuk Kartu:\s*(portrait|square|arch)\]/im)?.[1] || 'portrait';
         const cleanDescription = value
           .replace(/^(?:\[(?:Ukuran|Bentuk Kartu):[^\]]+\]\s*\r?\n?)+/i, '')
           .trim();
-        return { size, cardVariant, cleanDescription };
+        return { size, cardShape, cleanDescription };
       }
 
-      function formatProductDescription(description, size, cardVariant) {
+      function formatProductDescription(description, size, cardShape) {
         const cleanDescription = getProductDescriptionFields(description).cleanDescription;
         const metadata = [
-          `[Bentuk Kartu: ${cardVariant}]`,
+          `[Bentuk Kartu: ${cardShape}]`,
           size ? `[Ukuran: ${size}]` : '',
         ].filter(Boolean);
         return [metadata.join('\n'), cleanDescription].filter(Boolean).join('\n\n');
@@ -4391,7 +4393,7 @@ function withBase(path: string): string {
             const descriptionFields = getProductDescriptionFields(p.description);
             const currentSize = descriptionFields.size;
             document.getElementById('edit-prod-desc').value = descriptionFields.cleanDescription;
-            document.getElementById('edit-prod-card-variant').value = descriptionFields.cardVariant;
+            document.getElementById('edit-prod-card-shape').value = descriptionFields.cardShape;
             document.getElementById('edit-prod-featured').checked = Boolean(p.featured);
 
             // Parse category and subcategory
@@ -4559,11 +4561,11 @@ function withBase(path: string): string {
         const editSizeSelect = document.getElementById('edit-prod-size');
         let selectedSize = editSizeSelect ? editSizeSelect.value.trim() : '';
         if (selectedSize === '__ADD_NEW_SIZE__') selectedSize = '';
-        const cardVariant = document.getElementById('edit-prod-card-variant').value;
+        const cardShape = document.getElementById('edit-prod-card-shape').value;
         const description = formatProductDescription(
           document.getElementById('edit-prod-desc').value.trim(),
           selectedSize,
-          cardVariant,
+          cardShape,
         );
         const featured = document.getElementById('edit-prod-featured').checked;
         let imageUrl = document.getElementById('edit-prod-current-image').value;
@@ -4660,11 +4662,11 @@ function withBase(path: string): string {
         const addSizeSelect = document.getElementById('prod-size');
         let selectedSize = addSizeSelect ? addSizeSelect.value.trim() : '';
         if (selectedSize === '__ADD_NEW_SIZE__') selectedSize = '';
-        const cardVariant = document.getElementById('prod-card-variant').value;
+        const cardShape = document.getElementById('prod-card-shape').value;
         const description = formatProductDescription(
           document.getElementById('prod-desc').value.trim(),
           selectedSize,
-          cardVariant,
+          cardShape,
         );
         const featured = document.getElementById('prod-featured').checked;
         

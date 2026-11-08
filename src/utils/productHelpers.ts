@@ -6,12 +6,12 @@ type PopularProduct = ProductName & Partial<Pick<Product, 'featured'>>;
 /** Produk yang tidak ditampilkan di halaman utama (tetap ada di katalog/kategori). */
 export const HOME_EXCLUDED_PRODUCT_SLUGS = ['bunga-papan-duka-cita-malang-004'] as const;
 
-export type ProductCardVariant = 'modern' | 'classic';
+export type ProductCardShape = 'portrait' | 'square' | 'arch';
 
-export function getProductCardVariant(description: string | null | undefined): ProductCardVariant | undefined {
-  const match = description?.match(/^\[Bentuk Kartu:\s*(modern|classic)\]/im);
-  const variant = match?.[1];
-  return variant === 'modern' || variant === 'classic' ? variant : undefined;
+export function getProductCardShape(description: string | null | undefined): ProductCardShape | undefined {
+  const match = description?.match(/^\[Bentuk Kartu:\s*(portrait|square|arch)\]/im);
+  const shape = match?.[1];
+  return shape === 'portrait' || shape === 'square' || shape === 'arch' ? shape : undefined;
 }
 
 export function stripProductMetadata(description: string | null | undefined): string {
