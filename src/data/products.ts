@@ -15,6 +15,7 @@ export interface Product {
   whatsappText: string;
   processingTime: string;
   serviceArea: string[];
+  cardVariant?: 'modern' | 'classic';
 }
 
 export interface Category {

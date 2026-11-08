@@ -6,6 +6,20 @@ type PopularProduct = ProductName & Partial<Pick<Product, 'featured'>>;
 /** Produk yang tidak ditampilkan di halaman utama (tetap ada di katalog/kategori). */
 export const HOME_EXCLUDED_PRODUCT_SLUGS = ['bunga-papan-duka-cita-malang-004'] as const;
 
+export type ProductCardVariant = 'modern' | 'classic';
+
+export function getProductCardVariant(description: string | null | undefined): ProductCardVariant | undefined {
+  const match = description?.match(/^\[Bentuk Kartu:\s*(modern|classic)\]/im);
+  const variant = match?.[1];
+  return variant === 'modern' || variant === 'classic' ? variant : undefined;
+}
+
+export function stripProductMetadata(description: string | null | undefined): string {
+  return (description || '')
+    .replace(/^(?:\[(?:Ukuran|Bentuk Kartu):[^\]]+\]\s*\r?\n?)+/i, '')
+    .trim();
+}
+
 /** Baris konfigurasi sistem di tabel products (bukan produk jual). */
 export function isSystemProductSlug(slug: string | null | undefined): boolean {
   return Boolean(slug && String(slug).startsWith('_'));
