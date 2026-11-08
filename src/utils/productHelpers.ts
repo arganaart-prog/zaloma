@@ -8,6 +8,10 @@ export const HOME_EXCLUDED_PRODUCT_SLUGS = ['bunga-papan-duka-cita-malang-004'] 
 
 export type ProductCardShape = 'portrait' | 'square' | 'arch';
 
+export function getProductSize(description: string | null | undefined): string {
+  return description?.match(/^\[Ukuran:\s*([^\]]+)\]/im)?.[1]?.trim() || '';
+}
+
 export function getProductCardShape(description: string | null | undefined): ProductCardShape | undefined {
   const match = description?.match(/^\[Bentuk Kartu:\s*(portrait|square|arch)\]/im);
   const shape = match?.[1];

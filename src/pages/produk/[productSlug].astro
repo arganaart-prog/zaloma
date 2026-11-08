@@ -4,7 +4,7 @@ import Breadcrumb from '../../components/Breadcrumb.astro';
 import WhatsAppButton from '../../components/WhatsAppButton.astro';
 import ProductCard from '../../components/ProductCard.astro';
 import { stripBase, withBase } from '../../utils/paths';
-import { getProductDisplayName, stripProductMetadata } from '../../utils/productHelpers';
+import { getProductDisplayName, getProductSize, stripProductMetadata } from '../../utils/productHelpers';
 import { SUPABASE_URL, SUPABASE_ANON_KEY } from '../../data/supabaseConfig';
 
 export async function getStaticPaths() {
@@ -98,6 +98,8 @@ export async function getStaticPaths() {
 const { product, relatedProducts = [] } = Astro.props;
 const displayName = getProductDisplayName(product);
 const displayDescription = stripProductMetadata(product.description);
+const productSize = getProductSize(product.description);
+const shippingArea = product.city || 'Malang Raya (Kota Malang, Kab. Malang, Kota Batu)';
 const currentSlug = product.slug;
 const currentCategorySlug = product.categorySlug;
 
@@ -227,9 +229,21 @@ const productSchema = {
             <!-- Description -->
             <div class="pt-2">
               <h2 class="text-sm font-bold text-slate-800 uppercase tracking-wider mb-2">Deskripsi Produk</h2>
-              <p class="text-slate-600 text-sm sm:text-base leading-relaxed">
+              <p id="product-detail-description" class="text-slate-600 text-sm sm:text-base leading-relaxed">
                 {displayDescription}
               </p>
+              <dl class="mt-4 grid grid-cols-1 gap-2 sm:grid-cols-2">
+                <div class="rounded-lg border border-soft-cream/70 bg-clean-ivory/70 px-3.5 py-3">
+                  <dt class="text-[10px] font-bold uppercase tracking-wider text-slate-500">Ukuran Produk</dt>
+                  <dd id="product-detail-size" class="mt-1 text-sm font-semibold text-slate-800">
+                    {productSize || 'Hubungi kami untuk pilihan ukuran'}
+                  </dd>
+                </div>
+                <div class="rounded-lg border border-soft-cream/70 bg-clean-ivory/70 px-3.5 py-3">
+                  <dt class="text-[10px] font-bold uppercase tracking-wider text-slate-500">Area Pengiriman</dt>
+                  <dd id="product-detail-area" class="mt-1 text-sm font-semibold text-slate-800">{shippingArea}</dd>
+                </div>
+              </dl>
             </div>
 
             <!-- Order Instructions -->
@@ -335,6 +349,18 @@ const productSchema = {
 
         const h1El = document.querySelector('h1');
         if (h1El && p.name && h1El.textContent.trim() !== p.name) h1El.textContent = p.name;
+
+        const descriptionValue = String(p.description || '');
+        const descriptionEl = document.getElementById('product-detail-description');
+        const sizeEl = document.getElementById('product-detail-size');
+        const areaEl = document.getElementById('product-detail-area');
+        const cleanDescription = descriptionValue
+          .replace(/^(?:\[(?:Ukuran|Bentuk Kartu):[^\]]+\]\s*\r?\n?)+/i, '')
+          .trim();
+        const size = descriptionValue.match(/^\[Ukuran:\s*([^\]]+)\]/im)?.[1]?.trim();
+        if (descriptionEl) descriptionEl.textContent = cleanDescription;
+        if (sizeEl) sizeEl.textContent = size || 'Hubungi kami untuk pilihan ukuran';
+        if (areaEl) areaEl.textContent = p.city || 'Malang Raya (Kota Malang, Kab. Malang, Kota Batu)';
       }
 
       // 2. Sinkronisasi Related Products

@@ -3,6 +3,11 @@ import { withBase } from '../utils/paths';
 import { SUPABASE_ANON_KEY, SUPABASE_URL } from '../data/supabaseConfig';
 import { DEFAULT_PROMO_BANNERS, PROMO_BANNERS_CONFIG_SLUG } from '../data/promoBanners';
 
+interface Props {
+  citySlug?: string;
+}
+
+const { citySlug = '' } = Astro.props;
 const toPromoSlide = (banner: typeof DEFAULT_PROMO_BANNERS[number]) => ({
   ...banner,
   mobileImage: banner.mobileImage ? withBase(banner.mobileImage) : '',
@@ -23,9 +28,13 @@ const toPromoSlide = (banner: typeof DEFAULT_PROMO_BANNERS[number]) => ({
     : null,
 });
 
-const promoSlides = DEFAULT_PROMO_BANNERS.map(toPromoSlide);
+const selectCityPromoBanners = (banners: typeof DEFAULT_PROMO_BANNERS, slug: string) => {
+  const globalBanners = banners.filter((banner) => !banner.citySlug);
+  const cityBanners = slug ? banners.filter((banner) => banner.citySlug === slug) : [];
+  return slug && cityBanners.length > 0 ? cityBanners : globalBanners;
+};
 
-let activePromoSlides = promoSlides;
+let activePromoSlides = selectCityPromoBanners(DEFAULT_PROMO_BANNERS, citySlug).map(toPromoSlide);
 try {
   const response = await fetch(
     `${SUPABASE_URL}/rest/v1/products?slug=eq.${PROMO_BANNERS_CONFIG_SLUG}&select=description&limit=1`,
@@ -40,7 +49,10 @@ try {
       && (typeof banner.desktopImage === 'string' || typeof banner.mobileImage === 'string')
       && (banner.desktopImage || banner.mobileImage),
     );
-    if (validBanners.length > 0) activePromoSlides = validBanners.map(toPromoSlide);
+    if (validBanners.length > 0) {
+      const selectedBanners = selectCityPromoBanners(validBanners, citySlug);
+      if (selectedBanners.length > 0) activePromoSlides = selectedBanners.map(toPromoSlide);
+    }
   }
 } catch (error) {
   console.warn('[Zaloma Hero Banner] Failed to load promo banners from Supabase:', error);
@@ -53,7 +65,7 @@ const displaySlides = activePromoSlides.map((slide, idx) => ({
 }));
 ---
 
-<section class="hero-banner-wrap" id="hero-banner" role="region" aria-label="Promo Banner Zaloma Florist" aria-roledescription="carousel" tabindex="0">
+<section class="hero-banner-wrap" id="hero-banner" data-city-slug={citySlug} role="region" aria-label="Promo Banner Zaloma Florist" aria-roledescription="carousel" tabindex="0">
 
   <div class="hb-viewport" id="hb-viewport">
     <div class="hb-track" id="hb-track" aria-live="off">
@@ -691,21 +703,64 @@ const displaySlides = activePromoSlides.map((slide, idx) => ({
   }
 </style>
 
-<script>
+<script lang="ts">
   import { SUPABASE_ANON_KEY, SUPABASE_URL } from '../data/supabaseConfig';
   import { PROMO_BANNERS_CONFIG_SLUG } from '../data/promoBanners';
   import { withBase } from '../utils/paths';
 
+  /**
+   * @typedef {object} PromoBanner
+   * @property {string} headline
+   * @property {string} [citySlug]
+   * @property {string} [desktopImage]
+   * @property {string} [mobileImage]
+   * @property {string} [alt]
+   * @property {string} [badge]
+   * @property {string} [description]
+   * @property {string} [ctaPrimaryLabel]
+   * @property {string} [ctaPrimaryHref]
+   * @property {string} [ctaSecondaryLabel]
+   * @property {string} [ctaSecondaryHref]
+   */
+
+  /**
+   * @typedef {object} DragState
+   * @property {number} pointerId
+   * @property {number} startX
+   * @property {number} startY
+   * @property {number} currentX
+   * @property {boolean} isDragging
+   * @property {boolean} isLocked
+   */
+
+  /**
+   * @typedef {object} PromoConfigRow
+   * @property {string | null} [description]
+   */
+
+  /** @param {unknown} value @returns {value is PromoBanner} */
+  function isPromoBanner(value) {
+    if (!value || typeof value !== 'object') return false;
+    const banner = value;
+    return typeof banner.headline === 'string'
+      && (typeof banner.desktopImage === 'string' || typeof banner.mobileImage === 'string')
+      && Boolean(banner.desktopImage || banner.mobileImage);
+  }
+
+  /** @param {string | undefined} value */
   function escapeHtml(value) {
-    return String(value || '').replace(/[&<>"']/g, (character) => ({
+    /** @type {Record<string, string>} */
+    const entities = {
       '&': '&amp;',
       '<': '&lt;',
       '>': '&gt;',
       '"': '&quot;',
       "'": '&#39;',
-    })[character]);
+    };
+    return String(value || '').replace(/[&<>"']/g, (character) => entities[character] || character);
   }
 
+  /** @param {string | undefined} value */
   function safePromoLink(value) {
     const href = String(value || '').trim();
     if (href.startsWith('/') && !href.startsWith('//')) return withBase(href);
@@ -717,6 +772,7 @@ const displaySlides = activePromoSlides.map((slide, idx) => ({
     }
   }
 
+  /** @param {string | undefined} value */
   function safePromoImage(value) {
     const image = String(value || '').trim();
     if (image.startsWith('/') && !image.startsWith('//')) return withBase(image);
@@ -728,21 +784,32 @@ const displaySlides = activePromoSlides.map((slide, idx) => ({
     }
   }
 
-  function renderPromoBannerConfig(banners) {
+  /** @param {unknown[]} banners @param {string} [citySlug] */
+  function renderPromoBannerConfig(banners, citySlug = '') {
     const container = document.getElementById('hero-banner');
     const track = document.getElementById('hb-track');
     const dotsContainer = document.getElementById('hb-dots');
-    if (!container || !track || !dotsContainer) return;
+    if (!(container instanceof HTMLElement) || !(track instanceof HTMLElement) || !(dotsContainer instanceof HTMLElement)) return;
 
-    const slides = banners.filter((banner) =>
-      banner && typeof banner.headline === 'string'
-      && (safePromoImage(banner.desktopImage) || safePromoImage(banner.mobileImage)),
+    const validBanners = banners.filter(isPromoBanner).filter((banner) =>
+      safePromoImage(banner.desktopImage) || safePromoImage(banner.mobileImage),
     );
+    const cityBanners = citySlug
+      ? validBanners.filter((banner) => banner.citySlug === citySlug)
+      : [];
+    const slides = citySlug && cityBanners.length > 0
+      ? cityBanners
+      : validBanners.filter((banner) => !banner.citySlug);
     if (!slides.length) return;
 
+    /**
+     * @param {PromoBanner} banner
+     * @param {'ctaPrimary' | 'ctaSecondary'} which
+     * @param {string} className
+     */
     const ctaMarkup = (banner, which, className) => {
-      const label = banner[`${which}Label`];
-      const href = safePromoLink(banner[`${which}Href`]);
+      const label = which === 'ctaPrimary' ? banner.ctaPrimaryLabel : banner.ctaSecondaryLabel;
+      const href = safePromoLink(which === 'ctaPrimary' ? banner.ctaPrimaryHref : banner.ctaSecondaryHref);
       if (!label || !href) return '';
       const external = /^https?:\/\//i.test(href);
       return `<a href="${escapeHtml(href)}"${external ? ' target="_blank" rel="noopener noreferrer"' : ''} class="${className}">${escapeHtml(label)}</a>`;
@@ -786,7 +853,7 @@ const displaySlides = activePromoSlides.map((slide, idx) => ({
       return `<button class="hb-dot${index === 0 ? ' is-active' : ''}" type="button" role="tab" data-real-index="${index}" data-device="${device}" aria-label="Pindah ke promo: ${escapeHtml(banner.headline)}" aria-selected="${index === 0 ? 'true' : 'false'}" id="hb-dot-${index}"><span class="hb-dot-track"><span class="hb-dot-fill"></span></span></button>`;
     }).join('');
 
-    track.querySelectorAll('.hb-slide').forEach((slide) => {
+    track.querySelectorAll<HTMLElement>('.hb-slide').forEach((slide) => {
       const image = slide.querySelector('.hb-img');
       const ambient = slide.querySelector('.hb-ambient');
       if (image instanceof HTMLImageElement && ambient instanceof HTMLElement) {
@@ -803,9 +870,13 @@ const displaySlides = activePromoSlides.map((slide, idx) => ({
         { headers: { apikey: SUPABASE_ANON_KEY, Authorization: `Bearer ${SUPABASE_ANON_KEY}` }, cache: 'no-store' },
       );
       if (!response.ok) throw new Error(`Request failed with status ${response.status}`);
+      /** @type {PromoConfigRow[]} */
       const rows = await response.json();
       const banners = rows?.[0]?.description ? JSON.parse(rows[0].description) : [];
-      if (Array.isArray(banners) && banners.length) renderPromoBannerConfig(banners);
+      const container = document.getElementById('hero-banner');
+      if (container instanceof HTMLElement && Array.isArray(banners) && banners.length) {
+        renderPromoBannerConfig(banners, container.dataset.citySlug || '');
+      }
     } catch (error) {
       console.warn('[Zaloma Hero Banner] Runtime promo sync failed; using prerendered banners:', error);
     }
@@ -821,18 +892,21 @@ const displaySlides = activePromoSlides.map((slide, idx) => ({
     const track = document.getElementById('hb-track');
     const prevBtn = document.getElementById('hb-arrow-prev');
     const nextBtn = document.getElementById('hb-arrow-next');
-    const allDots = Array.from(document.querySelectorAll('.hb-dot'));
+    const allDots = Array.from(document.querySelectorAll<HTMLButtonElement>('.hb-dot'));
 
     if (!(container instanceof HTMLElement) || !(track instanceof HTMLElement)) return;
+    const heroContainer = container;
+    const heroTrack = track;
     if (container.dataset.hbInit === 'true') return;
     container.dataset.hbInit = 'true';
 
     const isDesktop = window.matchMedia('(min-width: 1024px)').matches;
+    /** @param {HTMLElement} element */
     const isAvailable = (element) => {
       const device = element.getAttribute('data-device');
       return device === 'all' || (isDesktop ? device === 'desktop' : device === 'mobile');
     };
-    const allSlides = Array.from(track.querySelectorAll('.hb-slide'));
+    const allSlides = Array.from(heroTrack.querySelectorAll<HTMLElement>('.hb-slide'));
     allSlides.forEach((slide) => {
       const available = isAvailable(slide);
       slide.style.display = available ? '' : 'none';
@@ -851,16 +925,19 @@ const displaySlides = activePromoSlides.map((slide, idx) => ({
 
     let current = 0;
     let transitioning = false;
+    /** @type {number | null} */
     let autoTimer = null;
     let didDrag = false;
     const prefersReduced = window.matchMedia('(prefers-reduced-motion: reduce)');
 
+    /** @param {number} idx @param {boolean} animate */
     function setTranslate(idx, animate) {
       const dur = prefersReduced.matches ? 0 : (animate ? TRANSITION_MS : 0);
-      track.style.transition = dur > 0 ? `transform ${dur}ms cubic-bezier(0.25, 1, 0.5, 1)` : 'none';
-      track.style.transform = `translateX(calc(-${idx} * (100% + var(--hb-gap, 12px))))`;
+      heroTrack.style.transition = dur > 0 ? `transform ${dur}ms cubic-bezier(0.25, 1, 0.5, 1)` : 'none';
+      heroTrack.style.transform = `translateX(calc(-${idx} * (100% + var(--hb-gap, 12px))))`;
     }
 
+    /** @param {number} idx */
     function updateDots(idx) {
       dots.forEach((dot, i) => {
         const active = i === idx;
@@ -869,6 +946,7 @@ const displaySlides = activePromoSlides.map((slide, idx) => ({
       });
     }
 
+    /** @param {number} idx */
     function updateSlideAria(idx) {
       slides.forEach(function(slide) {
         const slideIdx = Number(slide.getAttribute('data-track-index'));
@@ -880,6 +958,7 @@ const displaySlides = activePromoSlides.map((slide, idx) => ({
       });
     }
 
+    /** @param {number} idx */
     function startDotAnim(idx) {
       if (prefersReduced.matches) return;
       dots.forEach(function(d) { d.classList.remove('is-animating'); });
@@ -896,8 +975,8 @@ const displaySlides = activePromoSlides.map((slide, idx) => ({
       dots.forEach(function(d) { d.classList.remove('is-animating'); });
     }
 
-    function moveTo(targetIdx, animate) {
-      if (animate === undefined) animate = true;
+    /** @param {number} targetIdx @param {boolean} [animate] */
+    function moveTo(targetIdx, animate = true) {
       if (transitioning) return;
       transitioning = true;
       current = (targetIdx + TOTAL_SLIDES) % TOTAL_SLIDES;
@@ -945,30 +1024,31 @@ const displaySlides = activePromoSlides.map((slide, idx) => ({
       });
     });
 
-    container.addEventListener('mouseenter', stopAutoplay);
-    container.addEventListener('mouseleave', startAutoplay);
-    container.addEventListener('focusin', stopAutoplay);
-    container.addEventListener('focusout', startAutoplay);
+    heroContainer.addEventListener('mouseenter', stopAutoplay);
+    heroContainer.addEventListener('mouseleave', startAutoplay);
+    heroContainer.addEventListener('focusin', stopAutoplay);
+    heroContainer.addEventListener('focusout', startAutoplay);
 
-    container.addEventListener('keydown', function(e) {
+    heroContainer.addEventListener('keydown', function(e) {
       if (e.key === 'ArrowLeft') { e.preventDefault(); goPrev(); restartAutoplay(); }
       else if (e.key === 'ArrowRight') { e.preventDefault(); goNext(); restartAutoplay(); }
     });
 
-    container.querySelectorAll('a').forEach(function(link) {
+    heroContainer.querySelectorAll('a').forEach(function(link) {
       link.addEventListener('click', function(e) { if (didDrag) { e.preventDefault(); e.stopPropagation(); } });
     });
 
-    var drag = null;
+    /** @type {DragState | null} */
+    let drag = null;
 
-    container.addEventListener('pointerdown', function(e) {
+    heroContainer.addEventListener('pointerdown', function(e) {
       if (e.button !== 0 || transitioning) return;
       drag = { pointerId: e.pointerId, startX: e.clientX, startY: e.clientY, currentX: e.clientX, isDragging: false, isLocked: false };
-      container.setPointerCapture(e.pointerId);
+      heroContainer.setPointerCapture(e.pointerId);
       stopAutoplay();
     });
 
-    container.addEventListener('pointermove', function(e) {
+    heroContainer.addEventListener('pointermove', function(e) {
       if (!drag || e.pointerId !== drag.pointerId) return;
       var dx = e.clientX - drag.startX;
       var dy = e.clientY - drag.startY;
@@ -978,7 +1058,7 @@ const displaySlides = activePromoSlides.map((slide, idx) => ({
           if (Math.abs(dx) >= Math.abs(dy)) {
             drag.isLocked = true;
             drag.isDragging = true;
-            container.classList.add('is-dragging');
+            heroContainer.classList.add('is-dragging');
           } else {
             drag = null;
             return;
@@ -990,15 +1070,16 @@ const displaySlides = activePromoSlides.map((slide, idx) => ({
       drag.currentX = e.clientX;
 
       var base = `calc(-${current} * (100% + var(--hb-gap, 12px)))`;
-      track.style.transition = 'none';
-      track.style.transform = `translateX(calc(${base} + ${dx}px))`;
+      heroTrack.style.transition = 'none';
+      heroTrack.style.transform = `translateX(calc(${base} + ${dx}px))`;
     });
 
+    /** @param {PointerEvent} e */
     function handlePointerEnd(e) {
       if (!drag || e.pointerId !== drag.pointerId) return;
       var dx = drag.currentX - drag.startX;
       var wasDragging = drag.isDragging;
-      container.classList.remove('is-dragging');
+      heroContainer.classList.remove('is-dragging');
       drag = null;
 
       if (!wasDragging) { startAutoplay(); return; }
@@ -1006,7 +1087,7 @@ const displaySlides = activePromoSlides.map((slide, idx) => ({
       didDrag = true;
       setTimeout(function() { didDrag = false; }, 220);
 
-      var threshold = Math.max(SWIPE_THRESHOLD_PX, (container.offsetWidth || 1) * SWIPE_RATIO);
+      var threshold = Math.max(SWIPE_THRESHOLD_PX, (heroContainer.offsetWidth || 1) * SWIPE_RATIO);
       if (Math.abs(dx) >= threshold) {
         dx < 0 ? goNext() : goPrev();
       } else {
@@ -1015,9 +1096,9 @@ const displaySlides = activePromoSlides.map((slide, idx) => ({
       startAutoplay();
     }
 
-    container.addEventListener('pointerup', handlePointerEnd);
-    container.addEventListener('pointercancel', handlePointerEnd);
-    container.addEventListener('dragstart', function(e) { e.preventDefault(); });
+    heroContainer.addEventListener('pointerup', handlePointerEnd);
+    heroContainer.addEventListener('pointercancel', handlePointerEnd);
+    heroContainer.addEventListener('dragstart', function(e) { e.preventDefault(); });
 
     setTranslate(0, false);
     updateDots(0);

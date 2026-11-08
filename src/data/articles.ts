@@ -22,6 +22,8 @@ export interface Article {
   tags: string[];
 }
 
+export const ARTICLES_CONFIG_SLUG = '_articles_config_';
+
 export const ARTICLES: Article[] = [
   {
     id: 'artikel-1',

@@ -2,6 +2,7 @@ import { WHATSAPP_NUMBER } from './constants';
 
 export interface PromoBanner {
   id: string;
+  citySlug?: string;
   badge: string;
   headline: string;
   description: string;

@@ -1,6 +1,12 @@
 ---
 import HeroBanner from './HeroBanner.astro';
 import HeroArticles from './HeroArticles.astro';
+
+interface Props {
+  citySlug?: string;
+}
+
+const { citySlug } = Astro.props;
 ---
 
   <!-- Hero Section (Desktop 2-column layout: Carousel+CTA on Left, Articles on Right) -->
@@ -8,7 +14,7 @@ import HeroArticles from './HeroArticles.astro';
     <div class="hero-split-grid max-w-7xl mx-auto">
       <!-- Di mobile: HeroBanner sudah include mobile CTA strip di bawah gambar -->
       <div class="hero-carousel-col">
-        <HeroBanner />
+        <HeroBanner citySlug={citySlug} />
       </div>
       <aside class="hero-articles-col" aria-label="Artikel & Panduan Florist">
         <HeroArticles />

@@ -2,15 +2,27 @@
 import Layout from '../../layouts/Layout.astro';
 import Breadcrumb from '../../components/Breadcrumb.astro';
 import { ARTICLES } from '../../data/articles';
+import { ARTICLES_CONFIG_SLUG } from '../../data/articles';
+import '../../styles/blog.css';
 import { withBase } from '../../utils/paths';
 import { WHATSAPP_NUMBER } from '../../data/constants';
+import { SUPABASE_ANON_KEY, SUPABASE_URL } from '../../data/supabaseConfig';
 
 const title = "Artikel & Tips Florist Malang - Panduan Bunga Terlengkap | Zaloma Florist";
 const description = "Kumpulan artikel edukatif, panduan memilih karangan bunga papan, tips merawat bunga segar tahan lama, dan tren kado bunga modern di Malang dari Zaloma Florist.";
+const readingMinutes = (article: typeof ARTICLES[number]) => {
+  const content = article.content;
+  const text = [
+    content.lead,
+    ...content.sections.flatMap((section) => [section.heading, ...section.body, section.tip || '']),
+    content.conclusion,
+  ].join(' ');
+  return Math.max(1, Math.ceil(text.trim().split(/\s+/).length / 200));
+};
 ---
 
 <Layout title={title} description={description}>
-  <div class="bg-clean-ivory min-h-screen py-10 md:py-16">
+  <div id="article-list-view" class="bg-clean-ivory min-h-screen py-10 md:py-16">
     <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
       <!-- Breadcrumb -->
       <div class="mb-6">
@@ -34,15 +46,15 @@ const description = "Kumpulan artikel edukatif, panduan memilih karangan bunga p
       </div>
 
       <!-- Articles Grid -->
-      <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-2 gap-8 lg:gap-10">
+      <div id="articles-grid" class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-6 lg:gap-8">
         {ARTICLES.map((article) => (
-          <article class="bg-white rounded-2xl border border-cream/90 shadow-sm hover:shadow-xl hover:border-secondary/60 transition-all duration-300 overflow-hidden flex flex-col group">
+          <article class="blog-card bg-white rounded-2xl border border-cream/90 shadow-sm hover:shadow-xl hover:border-secondary/60 transition-all duration-300 overflow-hidden flex flex-col group">
             <!-- Article Image -->
-            <a href={withBase(`/artikel/${article.slug}/`)} class="block relative aspect-[16/9] overflow-hidden bg-accent-bg">
+            <a href={withBase(`/artikel/?slug=${encodeURIComponent(article.slug)}`)} class="block relative aspect-[16/9] overflow-hidden bg-accent-bg">
               <img
                 src={withBase(article.image)}
                 alt={article.title}
-                class="w-full h-full object-cover transform group-hover:scale-105 transition-transform duration-500"
+                class="blog-card-image w-full h-full object-cover transform group-hover:scale-105 transition-transform duration-500"
                 loading="lazy"
                 decoding="async"
               />
@@ -52,29 +64,31 @@ const description = "Kumpulan artikel edukatif, panduan memilih karangan bunga p
             </a>
 
             <!-- Article Details -->
-            <div class="p-6 sm:p-7 flex-1 flex flex-col justify-between">
+            <div class="p-5 sm:p-6 flex-1 flex flex-col justify-between">
               <div>
-                <div class="flex items-center gap-3 text-xs text-slate-400 mb-3 font-medium">
+                <div class="flex items-center gap-2 text-[11px] text-slate-400 mb-3 font-medium">
                   <span>{article.date}</span>
+                  <span aria-hidden="true">·</span>
+                  <span>{readingMinutes(article)} menit baca</span>
                 </div>
 
-                <h2 class="font-serif text-xl sm:text-2xl font-bold text-slate-800 group-hover:text-primary transition-colors leading-snug line-clamp-2 mb-3">
-                  <a href={withBase(`/artikel/${article.slug}/`)}>
+                <h2 class="font-serif text-xl font-bold text-slate-800 group-hover:text-primary transition-colors leading-snug line-clamp-2 mb-3">
+                  <a href={withBase(`/artikel/?slug=${encodeURIComponent(article.slug)}`)}>
                     {article.title}
                   </a>
                 </h2>
 
-                <p class="text-slate-500 text-sm leading-relaxed line-clamp-3 mb-6">
+                <p class="text-slate-500 text-sm leading-relaxed line-clamp-3 mb-5">
                   {article.excerpt}
                 </p>
               </div>
 
-              <div class="pt-4 border-t border-slate-100 flex items-center justify-between mt-auto">
-                <div class="text-xs text-slate-500">
+              <div class="pt-4 border-t border-slate-100 flex items-center justify-between gap-3 mt-auto">
+                <div class="text-xs text-slate-500 min-w-0 truncate">
                   Oleh <span class="font-semibold text-slate-700">{article.author}</span>
                 </div>
                 <a
-                  href={withBase(`/artikel/${article.slug}/`)}
+                  href={withBase(`/artikel/?slug=${encodeURIComponent(article.slug)}`)}
                   class="inline-flex items-center gap-1.5 text-xs font-bold text-primary group-hover:text-secondary group-hover:translate-x-1 transition-all"
                   aria-label={`Baca artikel: ${article.title}`}
                 >
@@ -122,4 +136,232 @@ const description = "Kumpulan artikel edukatif, panduan memilih karangan bunga p
       </div>
     </div>
   </div>
+
+  <main id="article-detail-view" class="hidden blog-detail min-h-screen bg-clean-ivory py-8 md:py-12" aria-live="polite"></main>
+
+  <script define:vars={{ DEFAULT_ARTICLES: ARTICLES, ARTICLES_CONFIG_SLUG, SUPABASE_URL, SUPABASE_ANON_KEY, ARTICLES_PATH: withBase('/artikel/') }}>
+    const listView = document.getElementById('article-list-view');
+    const detailView = document.getElementById('article-detail-view');
+    const articlesGrid = document.getElementById('articles-grid');
+    const fallbackArticles = DEFAULT_ARTICLES;
+
+    function validArticle(article) {
+      return article && typeof article.slug === 'string' && typeof article.title === 'string'
+        && typeof article.excerpt === 'string' && typeof article.category === 'string'
+        && typeof article.image === 'string' && typeof article.author === 'string'
+        && (typeof article.content === 'string' || (
+          article.content && typeof article.content === 'object'
+          && (!article.content.sections || Array.isArray(article.content.sections))
+        ));
+    }
+
+    function safeImageUrl(value) {
+      try {
+        const url = new URL(value, window.location.origin);
+        return url.protocol === 'https:' || url.origin === window.location.origin ? url.href : '';
+      } catch {
+        return '';
+      }
+    }
+
+    function articleUrl(slug) {
+      return `${ARTICLES_PATH}?slug=${encodeURIComponent(slug)}`;
+    }
+
+    function readingTime(article) {
+      const words = articleText(article).trim().split(/\s+/).filter(Boolean).length;
+      return Math.max(1, Math.ceil(words / 200));
+    }
+
+    function articleText(article) {
+      if (typeof article.content === 'string') return article.content;
+      const content = article.content || {};
+      return [
+        content.lead || '',
+        ...(content.sections || []).flatMap(section => [section.heading || '', ...(section.body || []), section.tip || '']),
+        content.conclusion || '',
+      ].join('\n\n');
+    }
+
+    function makeElement(tag, className, text) {
+      const element = document.createElement(tag);
+      if (className) element.className = className;
+      if (text !== undefined) element.textContent = text;
+      return element;
+    }
+
+    function renderArticleCards(articles) {
+      if (!articlesGrid) return;
+      articlesGrid.replaceChildren();
+      articles.forEach(article => {
+        const card = makeElement('article', 'blog-card');
+        const imageLink = makeElement('a', 'blog-card-media');
+        imageLink.href = articleUrl(article.slug);
+        const image = document.createElement('img');
+        image.src = safeImageUrl(article.image);
+        image.alt = article.title;
+        image.loading = 'lazy';
+        imageLink.append(image);
+        const category = makeElement('span', 'blog-card-category', article.category);
+        imageLink.append(category);
+        const body = makeElement('div', 'blog-card-body');
+        const meta = makeElement('div', 'blog-card-meta', `${article.date || article.isoDate || ''} · ${readingTime(article)} menit baca`);
+        const heading = makeElement('h2', 'blog-card-title');
+        const titleLink = makeElement('a', '', article.title);
+        titleLink.href = articleUrl(article.slug);
+        heading.append(titleLink);
+        const excerpt = makeElement('p', 'blog-card-excerpt', article.excerpt);
+        const footer = makeElement('div', 'blog-card-footer');
+        footer.append(makeElement('span', 'blog-card-author', `Oleh ${article.author}`));
+        const readLink = makeElement('a', 'blog-card-read', 'Baca artikel →');
+        readLink.href = articleUrl(article.slug);
+        footer.append(readLink);
+        body.append(meta, heading, excerpt, footer);
+        card.append(imageLink, body);
+        articlesGrid.append(card);
+      });
+    }
+
+    function addParagraph(parent, text, className = '') {
+      if (!text) return;
+      const paragraph = makeElement('p', className, text);
+      parent.append(paragraph);
+    }
+
+    function renderArticleDetail(article, allArticles) {
+      if (!detailView || !listView) return;
+      listView.classList.add('hidden');
+      detailView.classList.remove('hidden');
+      detailView.replaceChildren();
+      document.title = `${article.title} | Zaloma Florist`;
+      const progress = makeElement('div', 'blog-reading-progress');
+      const progressBar = makeElement('span', 'blog-reading-progress-bar');
+      progress.append(progressBar);
+      detailView.append(progress);
+
+      const container = makeElement('div', 'blog-detail-container');
+      const breadcrumb = makeElement('nav', 'blog-detail-breadcrumb');
+      breadcrumb.setAttribute('aria-label', 'Breadcrumb');
+      const backLink = makeElement('a', '', 'Artikel & Tips');
+      backLink.href = ARTICLES_PATH;
+      breadcrumb.append(backLink, makeElement('span', '', '/'), makeElement('span', '', article.category));
+
+      const header = makeElement('header', 'blog-detail-header');
+      header.append(makeElement('span', 'blog-detail-category', article.category));
+      header.append(makeElement('h1', 'blog-detail-title', article.title));
+      header.append(makeElement('p', 'blog-detail-excerpt', article.excerpt));
+      const authorRow = makeElement('div', 'blog-detail-byline');
+      const authorInitial = makeElement('span', 'blog-author-initial', (article.author || 'Z').trim().charAt(0).toUpperCase());
+      const authorInfo = makeElement('div', '');
+      authorInfo.append(makeElement('strong', '', article.author || 'Tim Zaloma Florist'));
+      authorInfo.append(makeElement('span', '', article.authorRole || 'Kontributor Zaloma Florist'));
+      authorRow.append(authorInitial, authorInfo, makeElement('span', 'blog-detail-date', `${article.date || article.isoDate || ''} · ${readingTime(article)} menit baca`));
+      header.append(authorRow);
+
+      const hero = makeElement('div', 'blog-detail-hero');
+      const heroImage = document.createElement('img');
+      heroImage.src = safeImageUrl(article.image);
+      heroImage.alt = article.title;
+      heroImage.loading = 'eager';
+      hero.append(heroImage);
+
+      const layout = makeElement('div', 'blog-detail-layout');
+      const contentColumn = makeElement('div', 'blog-detail-main');
+      const content = article.content;
+      if (typeof content === 'string') {
+        content.split(/\n{2,}/).map(part => part.trim()).filter(Boolean).forEach((paragraph, index) => {
+          addParagraph(contentColumn, paragraph, index === 0 ? 'blog-detail-lead' : 'blog-detail-paragraph');
+        });
+      } else {
+        addParagraph(contentColumn, content?.lead || article.excerpt, 'blog-detail-lead');
+        (content?.sections || []).forEach(section => {
+          if (section.heading) contentColumn.append(makeElement('h2', 'blog-detail-heading', section.heading));
+          (section.body || []).forEach(paragraph => addParagraph(contentColumn, paragraph, 'blog-detail-paragraph'));
+          if (section.tip) {
+            const tip = makeElement('aside', 'blog-detail-tip');
+            tip.append(makeElement('strong', '', 'Tips Zaloma Florist'), makeElement('p', '', section.tip));
+            contentColumn.append(tip);
+          }
+        });
+        addParagraph(contentColumn, content?.conclusion || '', 'blog-detail-paragraph');
+      }
+      const share = makeElement('a', 'blog-detail-share', 'Bagikan artikel via WhatsApp');
+      share.href = `https://wa.me/?text=${encodeURIComponent(`${article.title} ${window.location.href}`)}`;
+      share.target = '_blank';
+      share.rel = 'noopener noreferrer';
+      contentColumn.append(share);
+
+      const sidebar = makeElement('aside', 'blog-detail-sidebar');
+      sidebar.append(makeElement('h2', '', 'Artikel lainnya'));
+      allArticles.filter(item => item.slug !== article.slug).slice(0, 4).forEach(item => {
+        const related = makeElement('a', 'blog-related-link');
+        related.href = articleUrl(item.slug);
+        const relatedImage = document.createElement('img');
+        relatedImage.src = safeImageUrl(item.image);
+        relatedImage.alt = '';
+        relatedImage.loading = 'lazy';
+        const relatedText = makeElement('span', '');
+        relatedText.append(makeElement('small', '', item.category), makeElement('strong', '', item.title));
+        related.append(relatedImage, relatedText);
+        sidebar.append(related);
+      });
+      layout.append(contentColumn, sidebar);
+      container.append(breadcrumb, header, hero, layout);
+      detailView.append(container);
+
+      const updateProgress = () => {
+        const scrollable = document.documentElement.scrollHeight - window.innerHeight;
+        const progressValue = scrollable > 0 ? Math.min(100, Math.max(0, window.scrollY / scrollable * 100)) : 0;
+        progressBar.style.width = `${progressValue}%`;
+      };
+      window.addEventListener('scroll', updateProgress, { passive: true });
+      updateProgress();
+    }
+
+    async function initializeArticlePage() {
+      let articles = fallbackArticles.filter(validArticle);
+      const requestedSlug = new URLSearchParams(window.location.search).get('slug');
+      if (requestedSlug && listView && detailView) {
+        listView.classList.add('hidden');
+        detailView.classList.remove('hidden');
+        detailView.textContent = 'Memuat artikel…';
+      }
+      try {
+        const endpoint = new URL('/rest/v1/products', SUPABASE_URL);
+        endpoint.searchParams.set('slug', `eq.${ARTICLES_CONFIG_SLUG}`);
+        endpoint.searchParams.set('select', 'description');
+        endpoint.searchParams.set('limit', '1');
+        const response = await fetch(endpoint, { headers: { apikey: SUPABASE_ANON_KEY }, cache: 'no-store' });
+        if (!response.ok) throw new Error(`Request failed with status ${response.status}`);
+        const rows = await response.json();
+        if (rows[0]?.description) {
+          const configured = JSON.parse(rows[0].description);
+          if (!Array.isArray(configured) || !configured.every(validArticle)) throw new Error('Data artikel tidak valid.');
+          articles = configured;
+        }
+      } catch (error) {
+        console.warn('[Zaloma Articles] Runtime article sync failed; using prerendered articles:', error);
+      }
+
+      if (requestedSlug) {
+        const article = articles.find(item => item.slug === requestedSlug);
+        if (article) {
+          renderArticleDetail(article, articles);
+        } else if (detailView && listView) {
+          listView.classList.add('hidden');
+          detailView.classList.remove('hidden');
+          const notFound = makeElement('p', 'blog-detail-container py-16 text-center', 'Artikel tidak ditemukan atau sudah dihapus.');
+          const backLink = makeElement('a', 'blog-card-read mt-4 inline-flex', 'Kembali ke semua artikel');
+          backLink.href = ARTICLES_PATH;
+          detailView.replaceChildren(notFound, backLink);
+          document.title = 'Artikel tidak ditemukan | Zaloma Florist';
+        }
+      } else {
+        renderArticleCards(articles);
+      }
+    }
+
+    initializeArticlePage();
+  </script>
+
 </Layout>

@@ -45,7 +45,7 @@ const inspirasi = ARTICLES.filter(a =>
     <div class="aw-panel is-active" id="panel-pair-1" role="tabpanel" aria-labelledby="tab-articles-1">
       {panduan.map((article) => (
         <a
-          href={withBase(`/artikel/${article.slug}/`)}
+          href={withBase(`/artikel/?slug=${encodeURIComponent(article.slug)}`)}
           class="aw-item"
           aria-label={`Baca: ${article.title}`}
         >
@@ -79,7 +79,7 @@ const inspirasi = ARTICLES.filter(a =>
     <div class="aw-panel" id="panel-pair-2" role="tabpanel" aria-labelledby="tab-articles-2">
       {inspirasi.map((article) => (
         <a
-          href={withBase(`/artikel/${article.slug}/`)}
+          href={withBase(`/artikel/?slug=${encodeURIComponent(article.slug)}`)}
           class="aw-item"
           aria-label={`Baca: ${article.title}`}
         >

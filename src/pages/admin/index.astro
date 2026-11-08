@@ -2,6 +2,7 @@
 import '../../styles/global.css';
 import { SUPABASE_URL, SUPABASE_ANON_KEY, SUPABASE_BUCKET } from '../../data/supabaseConfig';
 import { DEFAULT_PROMO_BANNERS, PROMO_BANNERS_CONFIG_SLUG } from '../../data/promoBanners';
+import { ARTICLES, ARTICLES_CONFIG_SLUG } from '../../data/articles';
 
 const title = "Admin — Zaloma Florist";
 
@@ -141,6 +142,11 @@ function withBase(path: string): string {
               <svg class="w-4 h-4" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2"><rect x="3" y="4" width="18" height="16" rx="2" /><path stroke-linecap="round" d="M3 14l5-5 4 4 3-3 6 6" /></svg>
               <span>Banner Promo</span>
               <span id="tab-banner-badge" class="px-2 py-0.5 rounded-full text-xs font-bold bg-slate-200 text-slate-700">0</span>
+            </button>
+            <button type="button" id="tab-btn-articles" class="tab-btn flex min-h-11 shrink-0 cursor-pointer items-center gap-2 rounded-xl px-3.5 py-2.5 text-sm font-semibold text-slate-600 transition-all hover:bg-white hover:text-primary sm:px-4">
+              <svg class="w-4 h-4" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2"><path stroke-linecap="round" stroke-linejoin="round" d="M8 6h13M8 12h13M8 18h13M3 6h.01M3 12h.01M3 18h.01" /></svg>
+              <span>Artikel</span>
+              <span id="tab-article-badge" class="px-2 py-0.5 rounded-full text-xs font-bold bg-slate-200 text-slate-700">0</span>
             </button>
           </div>
         </div>
@@ -661,13 +667,36 @@ function withBase(path: string): string {
                 <span class="w-2.5 h-2.5 rounded-full bg-primary"></span>
                 Kelola Banner Promo
               </h2>
-              <p class="text-sm text-slate-500">Atur banner yang tampil di beranda. Minimal harus ada satu banner.</p>
+              <p class="text-sm text-slate-500">Kelola promo umum atau promo khusus kota. Promo khusus tampil di halaman kota tersebut; jika belum ada, banner umum tetap digunakan.</p>
             </div>
             <button type="button" id="open-add-banner-btn" class="bg-primary hover:bg-primary-dark text-white font-semibold py-2.5 px-5 rounded-lg text-sm transition-all active:scale-95 flex items-center gap-2 shadow-sm cursor-pointer shrink-0 min-h-[44px]">
               + Tambah Banner
             </button>
           </div>
+          <div class="flex flex-col gap-2 rounded-xl border border-slate-200 bg-white p-3 sm:flex-row sm:items-center">
+            <label for="promo-banner-city-filter" class="shrink-0 text-xs font-semibold text-slate-600">Tampilkan promo</label>
+            <select id="promo-banner-city-filter" class="min-h-10 w-full rounded-lg border border-slate-200 bg-white px-3 text-sm text-slate-700 sm:w-auto sm:min-w-64">
+              <option value="__all__">Semua kota dan promo umum</option>
+              <option value="">Promo umum</option>
+            </select>
+          </div>
           <div id="promo-banners-grid" class="grid grid-cols-1 md:grid-cols-2 gap-4"></div>
+        </section>
+
+        <section id="tab-articles" class="hidden animate-fade-in space-y-4 max-w-6xl mx-auto">
+          <div class="bg-white rounded-2xl p-5 sm:p-6 border border-slate-200 shadow-sm flex flex-col sm:flex-row items-start sm:items-center justify-between gap-4">
+            <div>
+              <h2 class="text-lg font-bold text-slate-900 flex items-center gap-2.5 mb-1">
+                <span class="w-2.5 h-2.5 rounded-full bg-primary"></span>
+                Kelola Artikel
+              </h2>
+              <p class="text-sm text-slate-500">Artikel yang diterbitkan akan muncul pada halaman blog. Gambar dipotong ke rasio 16:9.</p>
+            </div>
+            <button type="button" id="open-add-article-btn" class="bg-primary hover:bg-primary-dark text-white font-semibold py-2.5 px-5 rounded-lg text-sm transition-all active:scale-95 flex items-center gap-2 shadow-sm cursor-pointer shrink-0 min-h-[44px]">
+              + Tambah Artikel
+            </button>
+          </div>
+          <div id="articles-admin-grid" class="grid grid-cols-1 md:grid-cols-2 gap-4"></div>
         </section>
 
       </main>
@@ -1190,6 +1219,13 @@ function withBase(path: string): string {
         <form id="promo-banner-form" class="space-y-4">
           <input type="hidden" id="promo-banner-edit-id" />
           <div class="grid grid-cols-1 sm:grid-cols-2 gap-3">
+            <div class="sm:col-span-2">
+              <label for="promo-banner-city" class="block text-sm font-semibold text-slate-700">Target kota</label>
+              <select id="promo-banner-city" class="mt-1.5 w-full rounded-lg border border-slate-300 bg-white px-3 py-2.5 text-sm focus:outline-none focus:border-primary focus:ring-2 focus:ring-primary/20">
+                <option value="">Promo umum (semua kota)</option>
+              </select>
+              <p class="mt-1 text-xs text-slate-500">Promo kota hanya tampil pada halaman kota yang dipilih. Jika tidak ada promo khusus, promo umum akan ditampilkan.</p>
+            </div>
             <div>
               <label for="promo-banner-badge" class="block text-sm font-semibold text-slate-700 mb-1.5">Label promo</label>
               <input id="promo-banner-badge" type="text" maxlength="80" placeholder="Contoh: Promo Spesial" class="w-full px-3 py-2.5 rounded-lg border border-slate-300 text-sm focus:outline-none focus:border-primary focus:ring-2 focus:ring-primary/20" />
@@ -1253,6 +1289,63 @@ function withBase(path: string): string {
           <div class="flex items-center justify-end gap-2 border-t border-slate-100 pt-3">
             <button type="button" id="cancel-promo-banner-btn" class="px-4 py-2.5 rounded-lg text-sm font-semibold text-slate-500 hover:bg-slate-100 cursor-pointer min-h-[44px]">Batal</button>
             <button type="submit" id="save-promo-banner-btn" class="bg-primary hover:bg-primary-dark text-white font-semibold py-2.5 px-5 rounded-lg text-sm transition-all cursor-pointer shadow-sm min-h-[44px]">Simpan Banner</button>
+          </div>
+        </form>
+      </div>
+    </div>
+
+    <!-- ================= ADD / EDIT ARTICLE MODAL ================= -->
+    <div id="article-modal" class="hidden fixed inset-0 z-50 bg-black/40 backdrop-blur-xs flex items-center justify-center p-4 animate-fade-in">
+      <div class="bg-white rounded-2xl max-w-2xl w-full p-5 sm:p-6 shadow-xl border border-slate-200 space-y-4 animate-modal-pop max-h-[92vh] overflow-y-auto">
+        <div class="flex items-center justify-between pb-3 border-b border-slate-100">
+          <h3 id="article-modal-title" class="text-base font-bold text-slate-900 flex items-center gap-2.5">
+            <span class="w-2.5 h-2.5 rounded-full bg-primary"></span>
+            Tambah Artikel
+          </h3>
+          <button id="close-article-modal-btn" type="button" class="text-slate-400 hover:text-slate-600 text-lg font-bold cursor-pointer min-w-[32px] min-h-[32px]">✕</button>
+        </div>
+        <form id="article-form" class="space-y-4">
+          <input type="hidden" id="article-edit-id" />
+          <div class="grid grid-cols-1 sm:grid-cols-2 gap-3">
+            <div class="sm:col-span-2">
+              <label for="article-title" class="block text-sm font-semibold text-slate-700 mb-1.5">Judul <span class="text-rose-500">*</span></label>
+              <input id="article-title" type="text" maxlength="180" required class="w-full px-3 py-2.5 rounded-lg border border-slate-300 text-sm focus:outline-none focus:border-primary focus:ring-2 focus:ring-primary/20" />
+            </div>
+            <div>
+              <label for="article-slug" class="block text-sm font-semibold text-slate-700 mb-1.5">Slug URL <span class="text-rose-500">*</span></label>
+              <input id="article-slug" type="text" maxlength="160" required pattern="[a-z0-9]+(-[a-z0-9]+)*" class="w-full px-3 py-2.5 rounded-lg border border-slate-300 text-sm focus:outline-none focus:border-primary focus:ring-2 focus:ring-primary/20" />
+            </div>
+            <div>
+              <label for="article-category" class="block text-sm font-semibold text-slate-700 mb-1.5">Kategori <span class="text-rose-500">*</span></label>
+              <input id="article-category" type="text" maxlength="80" required placeholder="Contoh: Tips Bunga" class="w-full px-3 py-2.5 rounded-lg border border-slate-300 text-sm focus:outline-none focus:border-primary focus:ring-2 focus:ring-primary/20" />
+            </div>
+            <div class="sm:col-span-2">
+              <label for="article-excerpt" class="block text-sm font-semibold text-slate-700 mb-1.5">Ringkasan <span class="text-rose-500">*</span></label>
+              <textarea id="article-excerpt" rows="2" maxlength="300" required class="w-full px-3 py-2.5 rounded-lg border border-slate-300 text-sm focus:outline-none focus:border-primary focus:ring-2 focus:ring-primary/20 resize-y"></textarea>
+            </div>
+            <div>
+              <label for="article-author" class="block text-sm font-semibold text-slate-700 mb-1.5">Penulis <span class="text-rose-500">*</span></label>
+              <input id="article-author" type="text" maxlength="100" required value="Tim Zaloma Florist" class="w-full px-3 py-2.5 rounded-lg border border-slate-300 text-sm focus:outline-none focus:border-primary focus:ring-2 focus:ring-primary/20" />
+            </div>
+            <div>
+              <label for="article-date" class="block text-sm font-semibold text-slate-700 mb-1.5">Tanggal terbit <span class="text-rose-500">*</span></label>
+              <input id="article-date" type="date" required class="w-full px-3 py-2.5 rounded-lg border border-slate-300 text-sm focus:outline-none focus:border-primary focus:ring-2 focus:ring-primary/20" />
+            </div>
+            <div class="sm:col-span-2">
+              <label for="article-content" class="block text-sm font-semibold text-slate-700 mb-1.5">Isi artikel <span class="text-rose-500">*</span></label>
+              <textarea id="article-content" rows="10" required placeholder="Tulis isi artikel. Pisahkan paragraf dengan satu baris kosong." class="w-full px-3 py-2.5 rounded-lg border border-slate-300 text-sm leading-relaxed focus:outline-none focus:border-primary focus:ring-2 focus:ring-primary/20 resize-y"></textarea>
+            </div>
+            <div class="sm:col-span-2">
+              <label for="article-image-file" class="block text-sm font-semibold text-slate-700">Gambar utama <span class="text-rose-500">*</span></label>
+              <p class="mt-1 text-xs text-slate-500">Pilih area tampil pada pratinjau crop 16:9. JPG, PNG, atau WebP, maks. 8 MB.</p>
+              <input id="article-image-file" type="file" accept="image/jpeg,image/png,image/webp" class="mt-2 block w-full text-xs text-slate-600 file:mr-2 file:rounded-lg file:border-0 file:bg-primary file:px-3 file:py-2 file:text-xs file:font-semibold file:text-white" />
+              <img id="article-image-preview" class="hidden mt-2 aspect-video w-full rounded-lg border border-slate-200 bg-slate-50 object-cover" alt="Pratinjau gambar artikel" />
+              <p id="article-image-note" class="mt-1 text-xs text-slate-500">Belum ada gambar. Pilih file untuk mengunggah.</p>
+            </div>
+          </div>
+          <div class="flex items-center justify-end gap-2 border-t border-slate-100 pt-3">
+            <button type="button" id="cancel-article-btn" class="px-4 py-2.5 rounded-lg text-sm font-semibold text-slate-500 hover:bg-slate-100 cursor-pointer min-h-[44px]">Batal</button>
+            <button type="submit" id="save-article-btn" class="bg-primary hover:bg-primary-dark text-white font-semibold py-2.5 px-5 rounded-lg text-sm transition-all cursor-pointer shadow-sm min-h-[44px]">Simpan Artikel</button>
           </div>
         </form>
       </div>
@@ -1430,7 +1523,7 @@ function withBase(path: string): string {
       </div>
     </div>
 
-    <script define:vars={{ SUPABASE_URL, SUPABASE_ANON_KEY, SUPABASE_BUCKET, DEFAULT_PROMO_BANNERS, PROMO_BANNERS_CONFIG_SLUG }}>
+    <script define:vars={{ SUPABASE_URL, SUPABASE_ANON_KEY, SUPABASE_BUCKET, DEFAULT_PROMO_BANNERS, PROMO_BANNERS_CONFIG_SLUG, DEFAULT_ARTICLES: ARTICLES, ARTICLES_CONFIG_SLUG }}>
       // Initialize Supabase Client
       const supabase = window.supabase.createClient(SUPABASE_URL, SUPABASE_ANON_KEY);
 
@@ -1856,12 +1949,14 @@ function withBase(path: string): string {
       const tabBtnCities = document.getElementById('tab-btn-cities');
       const tabBtnSizes = document.getElementById('tab-btn-sizes');
       const tabBtnBanners = document.getElementById('tab-btn-banners');
+      const tabBtnArticles = document.getElementById('tab-btn-articles');
       const tabCatalog = document.getElementById('tab-catalog');
       const tabAdd = document.getElementById('tab-add');
       const tabCategories = document.getElementById('tab-categories');
       const tabCities = document.getElementById('tab-cities');
       const tabSizes = document.getElementById('tab-sizes');
       const tabBanners = document.getElementById('tab-banners');
+      const tabArticles = document.getElementById('tab-articles');
 
       function switchTab(activeTab) {
         const tabs = [
@@ -1870,7 +1965,8 @@ function withBase(path: string): string {
           { btn: tabBtnCategories, pane: tabCategories },
           { btn: tabBtnCities, pane: tabCities },
           { btn: tabBtnSizes, pane: tabSizes },
-          { btn: tabBtnBanners, pane: tabBanners }
+          { btn: tabBtnBanners, pane: tabBanners },
+          { btn: tabBtnArticles, pane: tabArticles }
         ];
 
         tabs.forEach(t => {
@@ -1911,12 +2007,64 @@ function withBase(path: string): string {
         switchTab(tabBtnBanners);
         renderPromoBanners();
       });
+      tabBtnArticles?.addEventListener('click', () => {
+        switchTab(tabBtnArticles);
+        loadArticlesConfig();
+      });
 
       const promoBannerModal = document.getElementById('promo-banner-modal');
       const promoBannerForm = document.getElementById('promo-banner-form');
       const promoBannerGrid = document.getElementById('promo-banners-grid');
       const promoBannerDesktopInput = document.getElementById('promo-banner-desktop-file');
       const promoBannerMobileInput = document.getElementById('promo-banner-mobile-file');
+      const promoBannerCityFilter = document.getElementById('promo-banner-city-filter');
+      const promoBannerCitySelect = document.getElementById('promo-banner-city');
+
+      function getPromoCitySlug(city) {
+        if (typeof city !== 'string' && city?.slug) return city.slug;
+        const name = typeof city === 'string' ? city : city?.name || '';
+        const clean = name.trim().toLowerCase();
+        if (clean.includes('malang raya')) return 'malang-raya';
+        if (clean === 'kota malang') return 'kota-malang';
+        if (clean === 'kota batu') return 'kota-batu';
+        if (clean === 'kabupaten malang' || clean === 'kab. malang') return 'kabupaten-malang';
+        if (clean.includes('mana saja') || clean.includes('seluruh indonesia')) return 'bisa-dikirim-ke-mana-saja';
+        return clean.replace(/[^\w\s-]/g, '').replace(/\s+/g, '-').replace(/--+/g, '-').replace(/^-|-$/g, '');
+      }
+
+      function syncPromoCityOptions() {
+        const currentFilter = promoBannerCityFilter.value;
+        const currentTarget = promoBannerCitySelect.value;
+        const cityOptions = new Map();
+        (citiesList || []).forEach(city => {
+          const name = typeof city === 'string' ? city : city?.name;
+          const slug = getPromoCitySlug(city);
+          if (slug && name) cityOptions.set(slug, name);
+        });
+        promoBanners.forEach(banner => {
+          if (banner.citySlug && !cityOptions.has(banner.citySlug)) {
+            cityOptions.set(banner.citySlug, `${banner.citySlug} (kota tidak terdaftar)`);
+          }
+        });
+
+        promoBannerCitySelect.replaceChildren(new Option('Promo umum (semua kota)', ''));
+        promoBannerCityFilter.replaceChildren(
+          new Option('Semua kota dan promo umum', '__all__'),
+          new Option('Promo umum', ''),
+        );
+        cityOptions.forEach((name, slug) => {
+          promoBannerCitySelect.add(new Option(name, slug));
+          promoBannerCityFilter.add(new Option(`Promo kota: ${name}`, slug));
+        });
+        if ([...promoBannerCityFilter.options].some(option => option.value === currentFilter)) {
+          promoBannerCityFilter.value = currentFilter;
+        } else {
+          promoBannerCityFilter.value = '__all__';
+        }
+        if ([...promoBannerCitySelect.options].some(option => option.value === currentTarget)) {
+          promoBannerCitySelect.value = currentTarget;
+        }
+      }
 
       async function loadPromoBanners() {
         try {
@@ -1952,11 +2100,22 @@ function withBase(path: string): string {
 
       function renderPromoBanners() {
         if (!promoBannerGrid) return;
+        syncPromoCityOptions();
         const badge = document.getElementById('tab-banner-badge');
         if (badge) badge.textContent = String(promoBanners.length);
         promoBannerGrid.replaceChildren();
 
-        promoBanners.forEach((banner, index) => {
+        const visibleBanners = promoBannerCityFilter.value === '__all__'
+          ? promoBanners
+          : promoBanners.filter(banner => (banner.citySlug || '') === promoBannerCityFilter.value);
+        if (!visibleBanners.length) {
+          const empty = document.createElement('p');
+          empty.className = 'col-span-full rounded-xl border border-dashed border-slate-300 bg-white p-8 text-center text-sm text-slate-500';
+          empty.textContent = 'Belum ada banner promo untuk pilihan ini. Klik “Tambah Banner” untuk membuatnya.';
+          promoBannerGrid.appendChild(empty);
+        }
+
+        visibleBanners.forEach((banner, index) => {
           const card = document.createElement('article');
           card.className = 'overflow-hidden rounded-2xl border border-slate-200 bg-white shadow-sm';
           const image = document.createElement('img');
@@ -1971,6 +2130,13 @@ function withBase(path: string): string {
           title.className = 'font-bold text-slate-900';
           title.textContent = banner.headline;
           content.appendChild(title);
+          const cityLabel = banner.citySlug
+            ? ([...promoBannerCitySelect.options].find(option => option.value === banner.citySlug)?.textContent || banner.citySlug)
+            : 'Promo umum · semua kota';
+          const audience = document.createElement('p');
+          audience.className = 'text-xs font-semibold text-primary';
+          audience.textContent = cityLabel;
+          content.appendChild(audience);
           const status = document.createElement('p');
           status.className = 'text-xs text-slate-500';
           status.textContent = `Desktop: ${banner.desktopImage ? 'aktif' : 'tidak ditampilkan'} · Mobile: ${banner.mobileImage ? 'aktif' : 'tidak ditampilkan'}`;
@@ -1989,8 +2155,10 @@ function withBase(path: string): string {
           deleteButton.type = 'button';
           deleteButton.className = 'min-h-10 rounded-lg border border-rose-100 px-3 py-2 text-sm font-semibold text-rose-600 hover:bg-rose-50 disabled:cursor-not-allowed disabled:opacity-40';
           deleteButton.textContent = 'Hapus';
-          deleteButton.disabled = promoBanners.length <= 1;
-          deleteButton.title = deleteButton.disabled ? 'Minimal satu banner promo harus tersedia' : 'Hapus banner promo';
+          const isLastGlobalBanner = !banner.citySlug
+            && promoBanners.filter(item => !item.citySlug).length <= 1;
+          deleteButton.disabled = isLastGlobalBanner;
+          deleteButton.title = deleteButton.disabled ? 'Minimal satu banner promo umum harus tersedia' : 'Hapus banner promo';
           deleteButton.addEventListener('click', () => deletePromoBanner(banner.id));
           actions.appendChild(deleteButton);
 
@@ -2015,11 +2183,15 @@ function withBase(path: string): string {
 
       function openPromoBannerModal(banner = null) {
         promoBannerForm.reset();
+        syncPromoCityOptions();
         promoBannerDesktopFile = null;
         promoBannerMobileFile = null;
         promoBannerRemoveDesktop = false;
         promoBannerRemoveMobile = false;
         document.getElementById('promo-banner-edit-id').value = banner?.id || '';
+        promoBannerCitySelect.value = banner?.citySlug || (
+          !banner && promoBannerCityFilter.value !== '__all__' ? promoBannerCityFilter.value : ''
+        );
         document.getElementById('promo-banner-modal-title').innerHTML = `<span class="w-2.5 h-2.5 rounded-full bg-primary"></span>${banner ? ' Edit Banner Promo' : ' Tambah Banner Promo'}`;
         document.getElementById('promo-banner-headline').value = banner?.headline || '';
         document.getElementById('promo-banner-badge').value = banner?.badge || '';
@@ -2188,6 +2360,7 @@ function withBase(path: string): string {
 
           const nextBanner = {
             id,
+            citySlug: promoBannerCitySelect.value || undefined,
             badge: document.getElementById('promo-banner-badge').value.trim(),
             headline,
             description: document.getElementById('promo-banner-description').value.trim(),
@@ -2204,6 +2377,9 @@ function withBase(path: string): string {
           const nextBanners = existing
             ? promoBanners.map(banner => banner.id === id ? nextBanner : banner)
             : [...promoBanners, nextBanner];
+          if (!nextBanners.some(banner => !banner.citySlug)) {
+            throw new Error('Minimal satu banner promo umum untuk semua kota harus tersedia.');
+          }
           await persistPromoBanners(nextBanners);
           promoBanners = nextBanners;
           renderPromoBanners();
@@ -2219,11 +2395,11 @@ function withBase(path: string): string {
       });
 
       async function deletePromoBanner(id) {
-        if (promoBanners.length <= 1) {
-          showToast('Minimal satu banner promo harus tersedia.', 'error');
+        const banner = promoBanners.find(item => item.id === id);
+        if (banner && !banner.citySlug && promoBanners.filter(item => !item.citySlug).length <= 1) {
+          showToast('Minimal satu banner promo umum untuk semua kota harus tersedia.', 'error');
           return;
         }
-        const banner = promoBanners.find(item => item.id === id);
         if (!banner || !window.confirm(`Hapus banner "${banner.headline}"?`)) return;
         const nextBanners = promoBanners.filter(item => item.id !== id);
         try {
@@ -2234,6 +2410,325 @@ function withBase(path: string): string {
         } catch (error) {
           console.error('[Zaloma Admin] Failed to delete promo banner:', error);
           showToast('Gagal menghapus banner: ' + (error.message || error), 'error');
+        }
+
+        promoBannerCityFilter?.addEventListener('change', renderPromoBanners);
+      }
+
+      // ================= ARTICLE CMS =================
+      const articleModal = document.getElementById('article-modal');
+      const articleForm = document.getElementById('article-form');
+      const articleGrid = document.getElementById('articles-admin-grid');
+      const articleImageInput = document.getElementById('article-image-file');
+      const articleImagePreview = document.getElementById('article-image-preview');
+      const articleImageNote = document.getElementById('article-image-note');
+      let articles = Array.isArray(DEFAULT_ARTICLES) ? [...DEFAULT_ARTICLES] : [];
+      let articlesConfigLoaded = false;
+      let articleImageBlob = null;
+      let articleImagePreviewUrl = '';
+
+      function articleContentText(content) {
+        if (typeof content === 'string') return content;
+        if (!content || typeof content !== 'object') return '';
+        const paragraphs = [];
+        if (content.lead) paragraphs.push(content.lead);
+        (content.sections || []).forEach(section => {
+          if (section.heading) paragraphs.push(section.heading);
+          (section.body || []).forEach(paragraph => paragraphs.push(paragraph));
+          if (section.tip) paragraphs.push(`Tips Zaloma Florist: ${section.tip}`);
+        });
+        if (content.conclusion) paragraphs.push(content.conclusion);
+        return paragraphs.join('\n\n');
+      }
+
+      function renderArticles() {
+        if (!articleGrid) return;
+        articleGrid.replaceChildren();
+        const badge = document.getElementById('tab-article-badge');
+        if (badge) badge.textContent = String(articles.length);
+
+        if (!articles.length) {
+          const empty = document.createElement('p');
+          empty.className = 'md:col-span-2 rounded-xl border border-dashed border-slate-300 bg-white p-8 text-center text-sm text-slate-500';
+          empty.textContent = 'Belum ada artikel. Tambahkan artikel pertama untuk ditampilkan di blog.';
+          articleGrid.append(empty);
+          return;
+        }
+
+        articles.forEach(article => {
+          const card = document.createElement('article');
+          card.className = 'overflow-hidden rounded-2xl border border-slate-200 bg-white shadow-sm sm:flex';
+          const image = document.createElement('img');
+          image.className = 'aspect-video w-full bg-slate-100 object-cover sm:aspect-square sm:w-40';
+          image.src = article.image || '';
+          image.alt = article.title || 'Gambar artikel';
+          image.loading = 'lazy';
+          const body = document.createElement('div');
+          body.className = 'flex min-w-0 flex-1 flex-col p-4';
+          const category = document.createElement('p');
+          category.className = 'text-xs font-bold uppercase tracking-wide text-primary';
+          category.textContent = article.category || 'Artikel';
+          const heading = document.createElement('h3');
+          heading.className = 'mt-1 line-clamp-2 font-semibold text-slate-900';
+          heading.textContent = article.title || 'Tanpa judul';
+          const meta = document.createElement('p');
+          meta.className = 'mt-1 text-xs text-slate-500';
+          meta.textContent = `${article.author || 'Tim Zaloma Florist'} · ${article.date || ''}`;
+          const actions = document.createElement('div');
+          actions.className = 'mt-auto flex flex-wrap gap-2 pt-4';
+          const editButton = document.createElement('button');
+          editButton.type = 'button';
+          editButton.className = 'min-h-9 rounded-lg border border-slate-200 px-3 text-xs font-semibold text-slate-700 hover:bg-slate-50';
+          editButton.textContent = 'Edit';
+          editButton.addEventListener('click', () => openArticleModal(article));
+          const deleteButton = document.createElement('button');
+          deleteButton.type = 'button';
+          deleteButton.className = 'min-h-9 rounded-lg border border-rose-200 px-3 text-xs font-semibold text-rose-600 hover:bg-rose-50';
+          deleteButton.textContent = 'Hapus';
+          deleteButton.addEventListener('click', () => deleteArticle(article.id));
+          actions.append(editButton, deleteButton);
+          body.append(category, heading, meta, actions);
+          card.append(image, body);
+          articleGrid.append(card);
+        });
+      }
+
+      async function loadArticlesConfig() {
+        if (articlesConfigLoaded) {
+          renderArticles();
+          return;
+        }
+        renderArticles();
+        try {
+          const { data, error } = await supabase.from('products')
+            .select('description').eq('slug', ARTICLES_CONFIG_SLUG).maybeSingle();
+          if (error) throw error;
+          if (data?.description) {
+            const parsed = JSON.parse(data.description);
+            if (!Array.isArray(parsed) || parsed.some(article =>
+              !article || typeof article.id !== 'string' || typeof article.slug !== 'string'
+              || typeof article.title !== 'string'
+              || !(typeof article.content === 'string' || (
+                article.content && typeof article.content === 'object'
+                && typeof article.content.lead === 'string'
+                && Array.isArray(article.content.sections)
+              ))
+            )) {
+              throw new Error('Data artikel di Supabase tidak valid.');
+            }
+            articles = parsed;
+          }
+          articlesConfigLoaded = true;
+          renderArticles();
+        } catch (error) {
+          console.error('[Zaloma Admin] Failed to load articles:', error);
+          showToast('Gagal memuat artikel: ' + (error.message || error), 'error');
+        }
+      }
+
+      function setArticleImagePreview(src, note) {
+        if (articleImagePreviewUrl) URL.revokeObjectURL(articleImagePreviewUrl);
+        articleImagePreviewUrl = '';
+        if (articleImagePreview) {
+          if (src) {
+            articleImagePreview.src = src;
+            articleImagePreview.classList.remove('hidden');
+          } else {
+            articleImagePreview.removeAttribute('src');
+            articleImagePreview.classList.add('hidden');
+          }
+        }
+        if (articleImageNote) articleImageNote.textContent = note;
+      }
+
+      function openArticleModal(article = null) {
+        if (!articleForm || !articleModal) return;
+        articleForm.reset();
+        articleImageBlob = null;
+        const editing = Boolean(article);
+        document.getElementById('article-edit-id').value = article?.id || '';
+        document.getElementById('article-modal-title').lastChild.textContent = editing ? ' Edit Artikel' : ' Tambah Artikel';
+        document.getElementById('article-title').value = article?.title || '';
+        document.getElementById('article-slug').value = article?.slug || '';
+        document.getElementById('article-slug').dataset.manual = editing ? 'true' : 'false';
+        document.getElementById('article-category').value = article?.category || '';
+        document.getElementById('article-excerpt').value = article?.excerpt || '';
+        document.getElementById('article-author').value = article?.author || 'Tim Zaloma Florist';
+        document.getElementById('article-date').value = article?.isoDate || new Date().toISOString().slice(0, 10);
+        document.getElementById('article-content').value = articleContentText(article?.content);
+        setArticleImagePreview(article?.image || '', article?.image ? 'Gambar saat ini akan digunakan jika tidak diganti.' : 'Belum ada gambar. Pilih file untuk mengunggah.');
+        if (articleImageInput) articleImageInput.value = '';
+        articleModal.classList.remove('hidden');
+      }
+
+      function closeArticleModal() {
+        articleModal?.classList.add('hidden');
+        articleImageBlob = null;
+        if (articleImageInput) articleImageInput.value = '';
+        setArticleImagePreview('', 'Belum ada gambar. Pilih file untuk mengunggah.');
+      }
+
+      document.getElementById('open-add-article-btn')?.addEventListener('click', () => openArticleModal());
+      document.getElementById('close-article-modal-btn')?.addEventListener('click', closeArticleModal);
+      document.getElementById('cancel-article-btn')?.addEventListener('click', closeArticleModal);
+      articleModal?.addEventListener('click', event => {
+        if (event.target === articleModal) closeArticleModal();
+      });
+
+      document.getElementById('article-title')?.addEventListener('input', event => {
+        const slugInput = document.getElementById('article-slug');
+        if (slugInput.dataset.manual === 'true' || slugInput.value) return;
+        slugInput.value = event.target.value
+          .normalize('NFD').replace(/[\u0300-\u036f]/g, '')
+          .toLowerCase().trim().replace(/[^a-z0-9]+/g, '-').replace(/^-|-$/g, '');
+      });
+      document.getElementById('article-slug')?.addEventListener('input', event => {
+        event.target.dataset.manual = 'true';
+      });
+
+      articleImageInput?.addEventListener('change', async () => {
+        const file = articleImageInput.files?.[0];
+        if (!file) return;
+        if (file.size > 8 * 1024 * 1024) {
+          showToast('Ukuran gambar artikel maksimal 8 MB.', 'error');
+          articleImageInput.value = '';
+          return;
+        }
+        try {
+          const cropped = await openImageCrop(file, { aspect: 16 / 9, title: 'Pilih area gambar artikel (16:9)', maxDimension: 1200 });
+          if (!cropped) {
+            articleImageInput.value = '';
+            return;
+          }
+          articleImageBlob = cropped;
+          if (articleImagePreviewUrl) URL.revokeObjectURL(articleImagePreviewUrl);
+          articleImagePreviewUrl = URL.createObjectURL(cropped);
+          if (articleImagePreview) {
+            articleImagePreview.src = articleImagePreviewUrl;
+            articleImagePreview.classList.remove('hidden');
+          }
+          if (articleImageNote) articleImageNote.textContent = 'Area pratinjau ini yang akan disimpan.';
+        } catch (error) {
+          console.error('[Zaloma Admin] Failed to crop article image:', error);
+          showToast('Gagal memproses gambar artikel: ' + (error.message || error), 'error');
+          articleImageInput.value = '';
+        }
+      });
+
+      async function persistArticles(nextArticles) {
+        const payload = {
+          slug: ARTICLES_CONFIG_SLUG,
+          name: 'System Articles Config',
+          category_slug: '_system_',
+          category_name: 'System',
+          price_from: 0,
+          price_label: 'Rp 0',
+          image: 'https://zalomaflorist.com/favicon.ico',
+          description: JSON.stringify(nextArticles),
+          featured: false,
+          city: 'Malang',
+        };
+        const { data: existing, error: lookupError } = await supabase.from('products')
+          .select('id').eq('slug', ARTICLES_CONFIG_SLUG).maybeSingle();
+        if (lookupError) throw lookupError;
+        const result = existing?.id
+          ? await supabase.from('products').update(payload).eq('id', existing.id)
+          : await supabase.from('products').insert([payload]);
+        if (result.error) throw result.error;
+      }
+
+      async function uploadArticleImage(blob, articleId) {
+        const path = `articles/${articleId}-${Date.now()}.webp`;
+        const { error } = await supabase.storage.from(SUPABASE_BUCKET).upload(path, blob, {
+          contentType: 'image/webp',
+          upsert: false,
+        });
+        if (error) throw error;
+        const { data } = supabase.storage.from(SUPABASE_BUCKET).getPublicUrl(path);
+        if (!data?.publicUrl) throw new Error('URL gambar artikel gagal dibuat.');
+        return data.publicUrl;
+      }
+
+      articleForm?.addEventListener('submit', async event => {
+        event.preventDefault();
+        const editId = document.getElementById('article-edit-id').value;
+        const existing = articles.find(article => article.id === editId);
+        const title = document.getElementById('article-title').value.trim();
+        const slug = document.getElementById('article-slug').value.trim().toLowerCase();
+        const category = document.getElementById('article-category').value.trim();
+        const excerpt = document.getElementById('article-excerpt').value.trim();
+        const author = document.getElementById('article-author').value.trim();
+        const isoDate = document.getElementById('article-date').value;
+        const content = document.getElementById('article-content').value.trim();
+        const slugPattern = /^[a-z0-9]+(?:-[a-z0-9]+)*$/;
+        if (!slugPattern.test(slug)) {
+          showToast('Slug hanya boleh berisi huruf kecil, angka, dan tanda hubung.', 'error');
+          return;
+        }
+        if (articles.some(article => article.slug === slug && article.id !== editId)) {
+          showToast('Slug tersebut sudah digunakan artikel lain.', 'error');
+          return;
+        }
+        if (!existing && !articleImageBlob) {
+          showToast('Pilih dan potong gambar utama artikel terlebih dahulu.', 'error');
+          return;
+        }
+
+        const saveButton = document.getElementById('save-article-btn');
+        saveButton.disabled = true;
+        saveButton.textContent = 'Menyimpan...';
+        try {
+          const id = editId || `article-${crypto.randomUUID()}`;
+          const image = articleImageBlob
+            ? await uploadArticleImage(articleImageBlob, id)
+            : existing.image;
+          const publishedDate = new Date(`${isoDate}T12:00:00`);
+          const nextArticle = {
+            ...existing,
+            id,
+            slug,
+            title,
+            category,
+            excerpt,
+            author,
+            authorRole: existing?.authorRole || 'Kontributor Zaloma Florist',
+            isoDate,
+            date: publishedDate.toLocaleDateString('id-ID', { day: 'numeric', month: 'long', year: 'numeric' }),
+            image,
+            content,
+            tags: existing?.tags || [],
+          };
+          const nextArticles = existing
+            ? articles.map(article => article.id === id ? nextArticle : article)
+            : [nextArticle, ...articles];
+          await persistArticles(nextArticles);
+          articles = nextArticles;
+          articlesConfigLoaded = true;
+          renderArticles();
+          closeArticleModal();
+          showToast(existing ? 'Artikel berhasil diperbarui.' : 'Artikel berhasil ditambahkan.');
+        } catch (error) {
+          console.error('[Zaloma Admin] Failed to save article:', error);
+          showToast('Gagal menyimpan artikel: ' + (error.message || error), 'error');
+        } finally {
+          saveButton.disabled = false;
+          saveButton.textContent = 'Simpan Artikel';
+        }
+      });
+
+      async function deleteArticle(id) {
+        const article = articles.find(item => item.id === id);
+        if (!article || !window.confirm(`Hapus artikel "${article.title}"?`)) return;
+        const nextArticles = articles.filter(item => item.id !== id);
+        try {
+          await persistArticles(nextArticles);
+          articles = nextArticles;
+          articlesConfigLoaded = true;
+          renderArticles();
+          showToast('Artikel berhasil dihapus.');
+        } catch (error) {
+          console.error('[Zaloma Admin] Failed to delete article:', error);
+          showToast('Gagal menghapus artikel: ' + (error.message || error), 'error');
         }
       }
 

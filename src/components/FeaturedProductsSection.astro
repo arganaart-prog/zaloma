@@ -389,7 +389,7 @@ if (!products.length) {
 
   @media (max-width: 380px) {
     .featured-products-slider .classic-product-card {
-      flex: 0 0 78vw;
+      flex: 0 0 72vw;
     }
 
     .featured-products-slider .classic-product-title {
@@ -402,9 +402,10 @@ if (!products.length) {
   }
 </style>
 
-<script>
+<script lang="ts">
   function initFeaturedProductsSlider() {
     document.querySelectorAll('[data-featured-products-slider]').forEach(function(slider) {
+      if (!(slider instanceof HTMLElement)) return;
       if (slider.dataset.featuredSliderReady === 'true') return;
       slider.dataset.featuredSliderReady = 'true';
 
@@ -418,19 +419,21 @@ if (!products.length) {
       }
 
       function buildDots() {
-        if (!dotsContainer || !mobileQuery.matches) return;
-        dotsContainer.innerHTML = '';
+        var currentDotsContainer = document.getElementById('fp-dots');
+        if (!(currentDotsContainer instanceof HTMLElement) || !mobileQuery.matches) return;
+        currentDotsContainer.innerHTML = '';
         var cards = getVisibleCards();
         cards.forEach(function(_, i) {
           var dot = document.createElement('span');
           dot.className = 'fp-dot' + (i === 0 ? ' active' : '');
           dot.setAttribute('aria-hidden', 'true');
-          dotsContainer.appendChild(dot);
+          currentDotsContainer.appendChild(dot);
         });
       }
 
       function updateActiveDot() {
-        if (!dotsContainer || !mobileQuery.matches) return;
+        var currentDotsContainer = document.getElementById('fp-dots');
+        if (!(currentDotsContainer instanceof HTMLElement) || !mobileQuery.matches) return;
         var cards = getVisibleCards();
         if (!cards.length) return;
 
@@ -450,7 +453,7 @@ if (!products.length) {
           }
         });
 
-        var dots = dotsContainer.querySelectorAll('.fp-dot');
+        var dots = currentDotsContainer.querySelectorAll('.fp-dot');
         dots.forEach(function(dot, i) {
           dot.classList.toggle('active', i === bestIdx);
         });
@@ -522,7 +525,7 @@ if (!products.length) {
     });
   }
 
-  (window as any).initFeaturedProductsSlider = initFeaturedProductsSlider;
+  window.initFeaturedProductsSlider = initFeaturedProductsSlider;
   initFeaturedProductsSlider();
   document.addEventListener('astro:page-load', initFeaturedProductsSlider);
 </script>

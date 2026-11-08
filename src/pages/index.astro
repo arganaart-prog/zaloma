@@ -459,7 +459,7 @@ const description = "Zaloma Florist menyediakan bunga papan, hand bouquet, stand
 
     @media (max-width: 380px) {
       .featured-products-slider .classic-product-card {
-        flex: 0 0 78vw;
+        flex: 0 0 72vw;
       }
 
       .featured-products-slider .classic-product-title {
@@ -605,7 +605,7 @@ const description = "Zaloma Florist menyediakan bunga papan, hand bouquet, stand
       });
     }
 
-    (window as any).initFeaturedProductsSlider = initFeaturedProductsSlider;
+    window.initFeaturedProductsSlider = initFeaturedProductsSlider;
     initFeaturedProductsSlider();
     document.addEventListener('astro:page-load', initFeaturedProductsSlider);
   </script>

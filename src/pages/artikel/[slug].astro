@@ -1,7 +1,8 @@
 ---
 import Layout from '../../layouts/Layout.astro';
 import Breadcrumb from '../../components/Breadcrumb.astro';
-import { ARTICLES, getArticleBySlug, getRelatedArticles, type Article } from '../../data/articles';
+import { ARTICLES, getRelatedArticles, type Article } from '../../data/articles';
+import '../../styles/blog.css';
 import { withBase } from '../../utils/paths';
 import { WHATSAPP_NUMBER } from '../../data/constants';
 
@@ -18,16 +19,22 @@ interface Props {
 
 const { article } = Astro.props;
 const relatedArticles = getRelatedArticles(article.slug, 3);
+const articleWords = [
+  article.content.lead,
+  ...article.content.sections.flatMap((section) => [section.heading, ...section.body, section.tip || '']),
+  article.content.conclusion,
+].join(' ').trim().split(/\s+/).filter(Boolean).length;
+const readingMinutes = Math.max(1, Math.ceil(articleWords / 200));
 
 const title = `${article.title} | Zaloma Florist Malang`;
 const description = article.excerpt;
 ---
 
 <Layout title={title} description={description} image={withBase(article.image)}>
-  <article class="bg-clean-ivory min-h-screen py-8 md:py-14">
-    <div class="max-w-4xl mx-auto px-4 sm:px-6 lg:px-8">
+  <article class="blog-detail bg-clean-ivory min-h-screen py-8 md:py-14">
+    <div class="blog-detail-container">
       <!-- Breadcrumb -->
-      <div class="mb-6">
+      <div class="blog-detail-breadcrumb">
         <Breadcrumb items={[
           { label: 'Artikel & Panduan', href: '/artikel/' },
           { label: article.title }
@@ -35,70 +42,56 @@ const description = article.excerpt;
       </div>
 
       <!-- Article Header -->
-      <header class="mb-8 md:mb-10 text-left">
-        <div class="flex flex-wrap items-center gap-3 mb-4">
-          <span class="inline-flex items-center px-3 py-1 rounded-full text-xs font-bold text-white bg-primary">
-            {article.category}
-          </span>
-          <span class="text-xs text-slate-400 font-medium">{article.date}</span>
-        </div>
-
-        <h1 class="font-serif text-2xl sm:text-3xl md:text-4xl lg:text-5xl font-bold text-slate-800 tracking-tight leading-tight mb-6">
+      <header class="blog-detail-header">
+        <span class="blog-detail-category">{article.category}</span>
+        <h1 class="blog-detail-title">
           {article.title}
         </h1>
+        <p class="blog-detail-excerpt">{article.excerpt}</p>
 
         <!-- Author Strip -->
-        <div class="flex items-center gap-3.5 py-4 border-y border-cream/80">
-          <div class="w-10 h-10 rounded-full bg-primary/10 border border-primary/20 flex items-center justify-center text-primary font-bold font-serif text-sm">
-            {article.author.charAt(0)}
-          </div>
+        <div class="blog-detail-byline">
+          <span class="blog-author-initial">{article.author.charAt(0)}</span>
           <div>
-            <div class="text-sm font-bold text-slate-800">{article.author}</div>
-            <div class="text-xs text-slate-500">{article.authorRole}</div>
+            <strong>{article.author}</strong>
+            <span>{article.authorRole}</span>
           </div>
+          <span class="blog-detail-date">{article.date} · {readingMinutes} menit baca</span>
         </div>
       </header>
 
       <!-- Featured Image -->
-      <div class="rounded-2xl overflow-hidden shadow-lg border border-cream/90 mb-10 bg-accent-bg aspect-[16/9] relative">
+      <div class="blog-detail-hero">
         <img
           src={withBase(article.image)}
           alt={article.title}
-          class="w-full h-full object-cover"
           loading="eager"
           decoding="async"
         />
       </div>
 
       <!-- Article Content Body -->
-      <div class="prose prose-slate max-w-none text-slate-700 leading-relaxed space-y-8 text-base md:text-lg">
+      <div class="blog-detail-main max-w-3xl mx-auto mt-10">
         <!-- Lead Paragraph -->
-        <p class="font-serif text-lg md:text-xl text-slate-800 font-medium leading-relaxed italic bg-white p-6 rounded-2xl border-l-4 border-secondary shadow-sm">
-          "{article.content.lead}"
+        <p class="blog-detail-lead">
+          {article.content.lead}
         </p>
 
         <!-- Sections -->
         {article.content.sections.map((section) => (
           <div class="space-y-4 pt-2">
-            <h2 class="font-serif text-xl sm:text-2xl font-bold text-slate-800 tracking-tight mt-6 mb-3">
+            <h2 class="blog-detail-heading">
               {section.heading}
             </h2>
             {section.body.map((para) => (
-              <p class="text-slate-600 text-base leading-relaxed">
+              <p class="blog-detail-paragraph">
                 {para}
               </p>
             ))}
 
             {section.tip && (
-              <div class="my-4 p-4 sm:p-5 rounded-xl bg-accent-bg border border-secondary/40 flex items-start gap-3">
-                <span class="inline-flex p-1 rounded-full bg-secondary text-white flex-shrink-0 mt-0.5">
-                  <svg class="w-4 h-4" fill="currentColor" viewBox="0 0 20 20">
-                    <path fill-rule="evenodd" d="M18 10a8 8 0 11-16 0 8 8 0 0116 0zm-7-4a1 1 0 11-2 0 1 1 0 012 0zM9 9a1 1 0 000 2v3a1 1 0 001 1h1a1 1 0 100-2v-3a1 1 0 00-1-1H9z" clip-rule="evenodd"/>
-                  </svg>
-                </span>
-                <div class="text-xs sm:text-sm text-slate-700 font-medium leading-relaxed">
-                  <strong class="text-primary font-bold">Tips Zaloma Florist:</strong> {section.tip}
-                </div>
+              <div class="blog-detail-tip">
+                <p><strong>Tips Zaloma Florist:</strong> {section.tip}</p>
               </div>
             )}
           </div>
@@ -106,7 +99,7 @@ const description = article.excerpt;
 
         <!-- Conclusion -->
         <div class="pt-6 border-t border-slate-200">
-          <p class="text-slate-700 text-base leading-relaxed font-medium">
+          <p class="blog-detail-paragraph">
             {article.content.conclusion}
           </p>
         </div>
@@ -127,7 +120,7 @@ const description = article.excerpt;
           href={`https://wa.me/?text=${encodeURIComponent(`Baca artikel bermanfaat dari Zaloma Florist: "${article.title}"`)}`}
           target="_blank"
           rel="noopener noreferrer"
-          class="inline-flex items-center gap-1.5 text-xs font-bold text-primary hover:text-secondary transition-colors"
+          class="blog-detail-share"
         >
           <svg class="w-4 h-4" fill="currentColor" viewBox="0 0 24 24">
             <path d="M12.031 6.172c-3.181 0-5.767 2.586-5.768 5.766-.001 1.298.38 2.27 1.019 3.287l-.711 2.598 2.669-.699c.969.54 1.838.847 2.791.848 3.18 0 5.767-2.587 5.768-5.766.001-3.18-2.585-5.834-5.768-5.834zm3.377 8.243c-.147.411-.75.76-1.042.812-.292.052-.663.097-2.072-.49-1.409-.587-2.327-2.016-2.398-2.112-.07-.095-.572-.76-.572-1.45 0-.69.362-1.029.49-1.173.129-.144.281-.18.375-.18.094 0 .188.001.27.006.086.005.201-.033.315.241.114.275.39 1.025.424 1.107.034.082.057.178.002.288-.055.11-.082.179-.164.275-.082.096-.173.214-.247.288-.082.083-.168.172-.072.337.096.165.427.705.916 1.141.63.562 1.161.736 1.326.818.165.082.261.069.358-.041.096-.11.413-.48.523-.645.11-.165.22-.138.371-.082.151.055.955.45 1.12.533.165.082.275.124.316.192.041.069.041.399-.106.81zM12.012 2.002C6.488 2.002 2 6.49 2 12.014c0 1.942.553 3.755 1.517 5.289L2 22l4.821-1.488A9.97 9.97 0 0 0 12.012 22C17.535 22 22 17.51 22 12.014c0-5.524-4.465-10.012-9.988-10.012z"/>
@@ -167,14 +160,14 @@ const description = article.excerpt;
           <div class="grid grid-cols-1 md:grid-cols-3 gap-6">
             {relatedArticles.map((rel) => (
               <a
-                href={withBase(`/artikel/${rel.slug}/`)}
-                class="bg-white rounded-xl border border-cream/90 p-4 shadow-sm hover:shadow-md hover:border-secondary/60 transition-all flex flex-col group"
+                href={withBase(`/artikel/?slug=${encodeURIComponent(rel.slug)}`)}
+                class="blog-card bg-white"
               >
                 <div class="aspect-[16/10] rounded-lg overflow-hidden bg-accent-bg mb-3">
                   <img
                     src={withBase(rel.image)}
                     alt={rel.title}
-                    class="w-full h-full object-cover group-hover:scale-105 transition-transform duration-300"
+                    class="w-full h-full object-cover"
                     loading="lazy"
                   />
                 </div>
@@ -193,5 +186,18 @@ const description = article.excerpt;
         </div>
       )}
     </div>
+    <div class="blog-reading-progress" aria-hidden="true"><span class="blog-reading-progress-bar"></span></div>
   </article>
+  <script lang="ts">
+    const progressBar = document.querySelector('.blog-reading-progress-bar');
+    if (progressBar instanceof HTMLElement) {
+      const updateProgress = () => {
+        const scrollable = document.documentElement.scrollHeight - window.innerHeight;
+        const progress = scrollable > 0 ? Math.min(100, Math.max(0, window.scrollY / scrollable * 100)) : 0;
+        progressBar.style.width = `${progress}%`;
+      };
+      window.addEventListener('scroll', updateProgress, { passive: true });
+      updateProgress();
+    }
+  </script>
 </Layout>

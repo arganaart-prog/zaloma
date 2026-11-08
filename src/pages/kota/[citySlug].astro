@@ -180,7 +180,7 @@ const citySchema = {
   </div>
 
   <div data-product-city={city.name}>
-    <HomeHero />
+    <HomeHero citySlug={city.slug} />
     <HomeKategori categories={cityCategories} cityName={city.name} citySlug={city.slug} />
     <FeaturedProductsSection products={activeProducts} cityName={city.name} />
     <HandBouquetSection allProducts={products} cityName={city.name} citySlug={city.slug} hideWhenEmpty />
