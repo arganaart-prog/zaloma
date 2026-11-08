@@ -18,7 +18,7 @@ import { SUPABASE_URL, SUPABASE_ANON_KEY } from '../../data/supabaseConfig';
 import { DEFAULT_CITIES, cityToSlug, productMatchesCity } from '../../data/cities';
 import { withBase } from '../../utils/paths';
 import { getRotatingHomeProducts } from '../../utils/rotatingProducts';
-import { getHomeDisplayProducts } from '../../utils/productHelpers';
+import { getHomeDisplayProducts, deriveCategoriesFromProducts } from '../../utils/productHelpers';
 
 export async function getStaticPaths() {
   let allLiveProducts: any[] = [];
@@ -121,6 +121,9 @@ export async function getStaticPaths() {
 const { city, products = [], allCities = [] } = Astro.props;
 const { activeProducts } = getRotatingHomeProducts(getHomeDisplayProducts(products), 5);
 
+// Derive categories dynamically from city-filtered Supabase products (no static data)
+const cityCategories = deriveCategoriesFromProducts(products);
+
 const title = city.seoTitle || `Toko Bunga ${city.name} | Buket, Karangan Bunga & Bunga Papan - Zaloma Florist`;
 const description = city.seoDescription || `Pesan buket bunga, karangan bunga, bunga papan, papan ucapan, bunga duka cita, bunga pernikahan, dan standing flower di ${city.name} melalui Zaloma Florist. Pengerjaan cepat 3-5 jam, bunga segar & foto sebelum kirim.`;
 
@@ -178,7 +181,7 @@ const citySchema = {
 
   <div data-product-city={city.name}>
     <HomeHero />
-    <HomeKategori cityName={city.name} citySlug={city.slug} />
+    <HomeKategori categories={cityCategories} cityName={city.name} citySlug={city.slug} />
     <FeaturedProductsSection products={activeProducts} cityName={city.name} />
     <HandBouquetSection allProducts={products} cityName={city.name} citySlug={city.slug} hideWhenEmpty />
     <BungaPapanSection allProducts={products} cityName={city.name} citySlug={city.slug} hideWhenEmpty />

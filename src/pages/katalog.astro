@@ -2,8 +2,7 @@
 import Layout from '../layouts/Layout.astro';
 import ProductCard from '../components/ProductCard.astro';
 import Breadcrumb from '../components/Breadcrumb.astro';
-import { CATEGORIES } from '../data/products';
-import { getProductDisplayName } from '../utils/productHelpers';
+import { getProductDisplayName, extractConfigCategories, deriveCategoriesFromProducts, mergeCategories } from '../utils/productHelpers';
 import { SUPABASE_URL, SUPABASE_ANON_KEY } from '../data/supabaseConfig';
 import { WHATSAPP_NUMBER } from '../data/constants';
 
@@ -13,6 +12,7 @@ const description = "Bunga papan, hand bouquet, standing flower, dan tanaman uca
 
 // Ambil produk live dari Supabase saat build time untuk SEO & instant render
 let initialProducts: any[] = [];
+let configCategories: any[] = [];
 try {
   const res = await fetch(`${SUPABASE_URL}/rest/v1/products?select=*&order=created_at.desc`, {
     headers: {
@@ -23,6 +23,7 @@ try {
   if (res.ok) {
     const data = await res.json();
     if (Array.isArray(data)) {
+      configCategories = extractConfigCategories(data);
       initialProducts = data.map(p => ({
         id: p.id,
         slug: p.slug,
@@ -46,6 +47,9 @@ try {
 } catch (err) {
   console.warn('[Zaloma Build] Katalog fetch warning:', err);
 }
+
+// Derive filter categories dynamically from Supabase config + product data (no static data)
+const dynamicCategories = mergeCategories(configCategories, deriveCategoriesFromProducts(initialProducts));
 ---
 
 <Layout title={title} description={description}>
@@ -74,7 +78,7 @@ try {
         Semua Kategori
       </button>
       
-      {CATEGORIES.map(category => (
+      {dynamicCategories.map(category => (
         <button
           type="button"
           data-filter={category.slug}

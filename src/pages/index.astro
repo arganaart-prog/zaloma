@@ -15,10 +15,11 @@ import DailyCategoryRotation from '../components/DailyCategoryRotation.astro';
 import { SUPABASE_URL, SUPABASE_ANON_KEY } from '../data/supabaseConfig';
 import { withBase } from '../utils/paths';
 import { getRotatingHomeProducts } from '../utils/rotatingProducts';
-import { getHomeDisplayProducts, getSellableProducts } from '../utils/productHelpers';
+import { getHomeDisplayProducts, getSellableProducts, extractConfigCategories, deriveCategoriesFromProducts, mergeCategories } from '../utils/productHelpers';
 
 // Ambil produk live dari Supabase saat build time untuk SEO & instant SSR render
 let homeLiveProducts: any[] = [];
+let configCategories: any[] = [];
 try {
   const res = await fetch(`${SUPABASE_URL}/rest/v1/products?select=*&order=created_at.desc`, {
     headers: {
@@ -29,6 +30,7 @@ try {
   if (res.ok) {
     const data = await res.json();
     if (Array.isArray(data)) {
+      configCategories = extractConfigCategories(data);
       homeLiveProducts = getSellableProducts(data).map(p => ({
         id: p.id,
         slug: p.slug,
@@ -55,6 +57,9 @@ try {
 
 // Batasi 5 produk unggulan; rotasi setiap 3 hari
 const { activeProducts } = getRotatingHomeProducts(getHomeDisplayProducts(homeLiveProducts), 5);
+
+// Derive categories dynamically from Supabase: config + product data (no static code)
+const homeCategories = mergeCategories(configCategories, deriveCategoriesFromProducts(homeLiveProducts));
 
 // SEO Meta
 const title = "Toko Bunga Malang Murah & Berkualitas - Florist Cepat";
@@ -87,7 +92,7 @@ const description = "Zaloma Florist menyediakan bunga papan, hand bouquet, stand
 
 
   <!-- Categories Section -->
-  <HomeKategori />
+  <HomeKategori categories={homeCategories} />
   
 
   <FeaturedProductsSection products={activeProducts} cityName="Malang" />

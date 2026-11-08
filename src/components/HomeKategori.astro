@@ -1,68 +1,29 @@
 ---
-import { CATEGORIES } from '../data/products';
 import { withBase } from '../utils/paths';
+
+interface CategoryItem {
+  name: string;
+  slug: string;
+  image: string;
+}
 
 interface Props {
   cityName?: string;
   citySlug?: string;
+  categories?: CategoryItem[];
 }
 
-const { cityName = '', citySlug = '' } = Astro.props;
-
-// Daftar momen/kategori utama dari data kategori Zaloma
-const momentCategories = [
-  {
-    name: 'Bunga Papan Grand Opening',
-    slug: 'bunga-papan-congratulations-malang',
-    image: '/images/kategori/congratulations.webp',
-  },
-  {
-    name: 'Bunga Papan Duka Cita',
-    slug: 'bunga-papan-duka-cita-malang',
-    image: '/images/kategori/duka-cita.webp',
-  },
-  {
-    name: 'Bunga Papan Wedding',
-    slug: 'bunga-papan-wedding-malang',
-    image: '/images/kategori/wedding.webp',
-  },
-  {
-    name: 'Bunga Papan Semi Styrofoam',
-    slug: 'bunga-papan-semi-styrofoam-malang',
-    image: '/images/kategori/semi-styrofoam.webp',
-  },
-  {
-    name: 'Hand Bouquet',
-    slug: 'hand-bouquet-malang',
-    image: '/images/kategori/hand-bouquet.webp',
-  },
-  {
-    name: 'Standing Flower',
-    slug: 'standing-flower-malang',
-    image: '/images/kategori/standing-flower.webp',
-  },
-  {
-    name: 'Bunga Meja',
-    slug: 'bunga-meja-malang',
-    image: '/images/kategori/bunga-meja.svg',
-  },
-  {
-    name: 'Paper Flower',
-    slug: 'paper-flower-malang',
-    image: '/images/kategori/paper-flower.webp',
-  },
-  {
-    name: 'Tanbulampot',
-    slug: 'tanbulampot-malang',
-    image: '/images/kategori/tanbulampot.webp',
-  }
-];
+const { cityName = '', citySlug = '', categories = [] } = Astro.props;
 
 function getCategoryLink(slug: string) {
   if (citySlug) {
     return withBase(`/kategori/${slug}/?city=${citySlug}&refer=city`);
   }
   return withBase(`/kategori/${slug}/`);
+}
+
+if (!categories.length) {
+  return;
 }
 ---
 
@@ -90,7 +51,7 @@ function getCategoryLink(slug: string) {
     </div>
 
     <div class="kategori-section__grid">
-      {momentCategories.map((item) => (
+      {categories.map((item) => (
         <a href={getCategoryLink(item.slug)} class="kategori-card group">
           <div class="kategori-card__visual">
             <div class="kategori-card__ring"></div>

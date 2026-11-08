@@ -1,13 +1,8 @@
 ---
-import { CATEGORIES, PRODUCTS } from '../data/products';
+import { PRODUCTS } from '../data/products';
 import { withBase } from '../utils/paths';
 
-const categories = CATEGORIES.map((category) => {
-  return {
-    ...category,
-    itemLabel: 'Pilihan Model',
-  };
-});
+const categories: any[] = [];
 ---
 
 <div class="category-carousel relative max-w-7xl mx-auto" data-category-carousel>

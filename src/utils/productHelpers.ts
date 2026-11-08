@@ -52,3 +52,95 @@ export function getProductDisplayName(product: ProductName): string {
 export function isProductPopular(product: PopularProduct): boolean {
   return Boolean(product.featured || product.name.includes('*'));
 }
+
+export interface DerivedCategory {
+  slug: string;
+  name: string;
+  image: string;
+  description?: string;
+  seoTitle?: string;
+  seoDescription?: string;
+  seoKeywords?: string;
+}
+
+/**
+ * Ekstrak daftar kategori dari _categories_config_ system product di Supabase.
+ * Admin dashboard menyimpan konfigurasi kategori sebagai JSON di field description.
+ */
+export function extractConfigCategories(rawProducts: any[]): DerivedCategory[] {
+  const configRow = rawProducts.find(
+    (p) => p && p.slug === '_categories_config_'
+  );
+  if (configRow && configRow.description) {
+    try {
+      const parsed = JSON.parse(configRow.description);
+      if (Array.isArray(parsed)) {
+        return parsed
+          .filter((c: any) => c && c.slug && c.name)
+          .map((c: any) => ({
+            slug: c.slug,
+            name: c.name,
+            image: c.image || c.image_url || '',
+            description: c.description || '',
+            seoTitle: c.seoTitle || '',
+            seoDescription: c.seoDescription || '',
+            seoKeywords: c.seoKeywords || '',
+          }));
+      }
+    } catch (e) {
+      // JSON parse failed, fall through
+    }
+  }
+  return [];
+}
+
+/**
+ * Derive unique categories dynamically from Supabase product data.
+ * Mengelompokkan produk berdasarkan category_slug dan mengambil nama serta gambar dari produk pertama.
+ */
+export function deriveCategoriesFromProducts(products: any[]): DerivedCategory[] {
+  const map = new Map<string, DerivedCategory>();
+  products
+    .filter((p) => p && p.categorySlug)
+    .forEach((p) => {
+      if (!map.has(p.categorySlug)) {
+        map.set(p.categorySlug, {
+          slug: p.categorySlug,
+          name: p.categoryName || p.categorySlug,
+          image: p.image || '',
+        });
+      }
+    });
+  return Array.from(map.values());
+}
+
+/**
+ * Gabungkan kategori dari _categories_config_ dan dari produk Supabase.
+ * Kategori dari config memiliki prioritas (metadata lebih lengkap).
+ */
+export function mergeCategories(
+  configCats: DerivedCategory[],
+  productCats: DerivedCategory[]
+): DerivedCategory[] {
+  const map = new Map<string, DerivedCategory>();
+
+  // Config categories first (they have better metadata)
+  configCats.forEach((c) => {
+    if (c.slug) map.set(c.slug, c);
+  });
+
+  // Product-derived categories fill any gaps
+  productCats.forEach((c) => {
+    if (!map.has(c.slug)) {
+      map.set(c.slug, c);
+    } else {
+      // If config category has no image, use product's image
+      const existing = map.get(c.slug)!;
+      if (!existing.image && c.image) {
+        existing.image = c.image;
+      }
+    }
+  });
+
+  return Array.from(map.values());
+}

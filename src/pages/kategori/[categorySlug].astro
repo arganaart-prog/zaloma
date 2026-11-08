@@ -2,10 +2,10 @@
 import Layout from '../../layouts/Layout.astro';
 import ProductCard from '../../components/ProductCard.astro';
 import Breadcrumb from '../../components/Breadcrumb.astro';
-import { CATEGORIES } from '../../data/products';
 import { WHATSAPP_NUMBER, SITE_DOMAIN } from '../../data/constants';
 import { SUPABASE_URL, SUPABASE_ANON_KEY } from '../../data/supabaseConfig';
 import { withBase } from '../../utils/paths';
+import { extractConfigCategories, deriveCategoriesFromProducts, mergeCategories } from '../../utils/productHelpers';
 
 export async function getStaticPaths() {
   function matchCategory(prodCatSlug: string, prodCatName: string, targetSlug: string): boolean {
@@ -52,7 +52,7 @@ export async function getStaticPaths() {
 
   let allLiveProducts: any[] = [];
   try {
-    const res = await fetch(`${SUPABASE_URL}/rest/v1/products?select=*`, {
+    const res = await fetch(`${SUPABASE_URL}/rest/v1/products?select=*&order=created_at.desc`, {
       headers: {
         apikey: SUPABASE_ANON_KEY,
         Authorization: `Bearer ${SUPABASE_ANON_KEY}`
@@ -65,9 +65,32 @@ export async function getStaticPaths() {
     console.warn('[Zaloma Build] Warning fetching products for category paths:', err);
   }
 
-  return CATEGORIES.map(category => {
+  // Extract categories from Supabase: _categories_config_ + product data (no static code)
+  const configCats = extractConfigCategories(allLiveProducts);
+  const sellableProducts = allLiveProducts.filter(p => p.slug && !String(p.slug).startsWith('_'));
+  const productCats = deriveCategoriesFromProducts(
+    sellableProducts.map(p => ({
+      categorySlug: p.category_slug,
+      categoryName: p.category_name,
+      image: p.image,
+    }))
+  );
+  const mergedCategories = mergeCategories(configCats, productCats);
+
+  return mergedCategories.map(category => {
+    const catName = category.name;
+    const fullCategory = {
+      slug: category.slug,
+      name: catName,
+      description: category.description || `Pesan ${catName} di Malang. Pengerjaan cepat, bunga segar, difoto sebelum dikirim.`,
+      seoTitle: category.seoTitle || `${catName} Malang Murah & Berkualitas - Zaloma Florist`,
+      seoDescription: category.seoDescription || `Pesan ${catName} di Malang murah dan berkualitas. Bunga segar, pengerjaan cepat 3 jam, difoto sebelum diantar.`,
+      seoKeywords: category.seoKeywords || `${catName.toLowerCase()} malang, ${catName.toLowerCase()} murah malang`,
+      image: category.image || '',
+    };
+
     const filteredProducts = allLiveProducts
-      .filter(p => matchCategory(p.category_slug, p.category_name, category.slug))
+      .filter(p => !p.slug.startsWith('_') && matchCategory(p.category_slug, p.category_name, category.slug))
       .map(p => ({
         id: p.id,
         slug: p.slug,
@@ -89,14 +112,14 @@ export async function getStaticPaths() {
 
     return {
       params: { categorySlug: category.slug },
-      props: { category, products: filteredProducts }
+      props: { category: fullCategory, products: filteredProducts }
     };
   });
 }
 
 const { category, products = [] } = Astro.props;
-const isTanbulampot = category.slug === 'tanbulampot-malang' || category.slug === 'tabulampot';
-const isHandBouquet = category.slug === 'hand-bouquet-malang' || category.slug === 'bouquet';
+const isTanbulampot = category.slug.includes('tanbulampot') || category.slug.includes('tabulampot');
+const isHandBouquet = category.slug.includes('bouquet') || category.slug.includes('buket');
 const categorySlug = category.slug;
 
 // Structured Schema untuk Kategori & FAQ
