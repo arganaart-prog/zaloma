@@ -1,13 +1,35 @@
 ---
 // Footer.astro
 import { WHATSAPP_NUMBER, WHATSAPP_LABEL, INSTAGRAM_URL, INSTAGRAM_HANDLE } from '../data/constants';
+import { SUPABASE_URL, SUPABASE_ANON_KEY } from '../data/supabaseConfig';
 import { withBase } from '../utils/paths';
+import { extractConfigCategories, deriveCategoriesFromProducts, mergeCategories } from '../utils/productHelpers';
 
 const currentYear = new Date().getFullYear();
 
+// Fetch categories from Supabase at build time
+let footerCategories: { slug: string; name: string }[] = [];
+try {
+  const res = await fetch(`${SUPABASE_URL}/rest/v1/products?select=*&order=created_at.desc`, {
+    headers: { apikey: SUPABASE_ANON_KEY, Authorization: `Bearer ${SUPABASE_ANON_KEY}` }
+  });
+  if (res.ok) {
+    const data = await res.json();
+    if (Array.isArray(data)) {
+      const configCats = extractConfigCategories(data);
+      const sellable = data.filter((p: any) => p.slug && !String(p.slug).startsWith('_'));
+      const productCats = deriveCategoriesFromProducts(
+        sellable.map((p: any) => ({ categorySlug: p.category_slug, categoryName: p.category_name, image: p.image }))
+      );
+      footerCategories = mergeCategories(configCats, productCats).map(c => ({ slug: c.slug, name: c.name }));
+    }
+  }
+} catch (err) {
+  // Silent fallback
+}
+
 const infoLinks = [
   { label: 'Beranda', href: '/' },
-  { label: 'Katalog Produk', href: '/katalog/' },
   { label: 'Cara Pesan', href: '/cara-pesan/' },
   { label: 'Artikel & Tips', href: '/artikel/' },
   { label: 'FAQ', href: '/faq/' },
@@ -16,7 +38,6 @@ const infoLinks = [
   { label: 'Kebijakan Privasi', href: '/kebijakan-privasi/' },
   { label: 'Syarat & Ketentuan', href: '/syarat-ketentuan/' },
 ];
-// Note: "Katalog Produk" tetap di footer sebagai link navigasi utama ke katalog
 
 const paymentMethods = [
   { label: 'BCA', image: '/images/Payment/bca.svg' },
@@ -38,9 +59,9 @@ const paymentMethods = [
   <div class="absolute inset-0 bg-[linear-gradient(120deg,rgba(255,255,255,0.08),transparent_34%,rgba(191,167,122,0.12))]" aria-hidden="true"></div>
 
   <div class="relative max-w-7xl mx-auto px-6 lg:px-8">
-    <div class="grid grid-cols-1 md:grid-cols-3 gap-8 lg:gap-10 mb-10">
+    <div class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-8 lg:gap-8 mb-10">
       <!-- Brand -->
-      <div class="md:pr-4 lg:pr-8">
+      <div class="lg:pr-4">
         <a href={withBase('/')} class="flex items-center gap-4 mb-5 group no-underline">
           <span class="flex h-20 w-20 shrink-0 items-center justify-center overflow-hidden rounded-lg bg-white shadow-[0_14px_30px_rgba(15,23,42,0.18)]">
             <img
@@ -92,10 +113,31 @@ const paymentMethods = [
         </div>
       </div>
 
+      <!-- Kategori (from Supabase) -->
+      {footerCategories.length > 0 && (
+        <div>
+          <h3 class="text-xl font-bold text-white mb-3">Kategori</h3>
+          <ul class="space-y-1.5 text-base">
+            <li>
+              <a href={withBase('/katalog/')} class="text-secondary font-semibold hover:text-white transition-colors duration-200">
+                Semua Kategori →
+              </a>
+            </li>
+            {footerCategories.map((cat) => (
+              <li>
+                <a href={withBase(`/kategori/${cat.slug}/`)} class="text-white/78 hover:text-white transition-colors duration-200 font-medium leading-normal">
+                  {cat.name}
+                </a>
+              </li>
+            ))}
+          </ul>
+        </div>
+      )}
+
       <!-- Information -->
       <div>
         <h3 class="text-xl font-bold text-white mb-3">Informasi</h3>
-        <ul class="space-y-1.5 text-lg">
+        <ul class="space-y-1.5 text-base">
           {infoLinks.map((link) => (
             <li>
               <a href={withBase(link.href)} class="text-white/78 hover:text-white transition-colors duration-200 font-medium leading-normal">
@@ -156,4 +198,3 @@ const paymentMethods = [
     </div>
   </div>
 </footer>
-

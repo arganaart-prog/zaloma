@@ -1,7 +1,30 @@
 ---
 // Navbar.astro
 import { WHATSAPP_NUMBER } from '../data/constants';
+import { SUPABASE_URL, SUPABASE_ANON_KEY } from '../data/supabaseConfig';
 import { stripBase, withBase } from '../utils/paths';
+import { extractConfigCategories, deriveCategoriesFromProducts, mergeCategories } from '../utils/productHelpers';
+
+// Fetch categories from Supabase at build time
+let navCategories: { slug: string; name: string; image: string }[] = [];
+try {
+  const res = await fetch(`${SUPABASE_URL}/rest/v1/products?select=*&order=created_at.desc`, {
+    headers: { apikey: SUPABASE_ANON_KEY, Authorization: `Bearer ${SUPABASE_ANON_KEY}` }
+  });
+  if (res.ok) {
+    const data = await res.json();
+    if (Array.isArray(data)) {
+      const configCats = extractConfigCategories(data);
+      const sellable = data.filter((p: any) => p.slug && !String(p.slug).startsWith('_'));
+      const productCats = deriveCategoriesFromProducts(
+        sellable.map((p: any) => ({ categorySlug: p.category_slug, categoryName: p.category_name, image: p.image }))
+      );
+      navCategories = mergeCategories(configCats, productCats).map(c => ({ slug: c.slug, name: c.name, image: c.image }));
+    }
+  }
+} catch (err) {
+  // Silent fallback — navCategories stays empty
+}
 
 const navItems = [
   { href: '/', label: 'Beranda' },
@@ -106,24 +129,71 @@ const isMobileFaq = currentPath.startsWith('/faq/');
 <div id="desktop-sticky-nav" class="relative z-40 hidden md:block bg-primary-dark px-4 shadow-md">
       <div class="max-w-7xl mx-auto flex justify-center items-center h-14 relative">
         <nav class="flex items-center gap-10" id="desktop-nav">
-          {navItems.map(item => {
+          {navItems.filter(item => item.href !== '/katalog/').map(item => {
             const isHome = item.href === '/' && currentPath === '/';
-            const isSubpage = item.href !== '/' && (
-              item.href === '/katalog/'
-                ? currentPath.startsWith('/katalog/') || currentPath.startsWith('/kategori/') || currentPath.startsWith('/produk/')
-                : currentPath.startsWith(item.href)
-            );
+            const isSubpage = item.href !== '/' && currentPath.startsWith(item.href);
             const isActive = isHome || isSubpage;
 
             return (
-              <a 
-                href={withBase(item.href)} 
+              <a
+                href={withBase(item.href)}
                 class={`relative py-3 text-[0.72rem] font-bold uppercase tracking-[0.22em] transition-colors after:absolute after:inset-x-0 after:-bottom-0.5 after:h-px after:origin-center after:scale-x-0 after:bg-secondary after:transition-transform after:duration-300 ${isActive ? 'text-white after:scale-x-100' : 'text-white/78 hover:text-white hover:after:scale-x-100'}`}
               >
                 {item.label}
               </a>
             );
           })}
+
+          {navCategories.length > 0 ? (
+            <div class="relative group">
+              <a
+                href={withBase('/katalog/')}
+                class={`relative py-3 text-[0.72rem] font-bold uppercase tracking-[0.22em] transition-colors flex items-center gap-1 after:absolute after:inset-x-0 after:-bottom-0.5 after:h-px after:origin-center after:scale-x-0 after:bg-secondary after:transition-transform after:duration-300 ${isMobileKatalog ? 'text-white after:scale-x-100' : 'text-white/78 hover:text-white hover:after:scale-x-100'}`}
+              >
+                Katalog
+                <svg class="h-3 w-3 transition-transform duration-200 group-hover:rotate-180" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2.5" aria-hidden="true">
+                  <path stroke-linecap="round" stroke-linejoin="round" d="M19 9l-7 7-7-7" />
+                </svg>
+              </a>
+              <div class="absolute top-full left-1/2 -translate-x-1/2 pt-3 z-50 opacity-0 invisible group-hover:opacity-100 group-hover:visible transition-all duration-200">
+                <div class="bg-white rounded-xl shadow-2xl border border-soft-cream/60 p-3 min-w-[300px] max-w-[420px]">
+                  <div class="grid grid-cols-2 gap-0.5">
+                    {navCategories.map((cat) => (
+                      <a
+                        href={withBase(`/kategori/${cat.slug}/`)}
+                        class="flex items-center gap-2.5 rounded-lg px-3 py-2.5 hover:bg-accent-bg/60 transition-colors text-left group/cat"
+                      >
+                        {cat.image && (
+                          <img
+                            src={cat.image}
+                            alt={cat.name}
+                            class="h-9 w-9 rounded-lg object-cover shrink-0 border border-soft-cream/50"
+                            loading="lazy"
+                          />
+                        )}
+                        <span class="text-[0.7rem] font-semibold text-slate-700 group-hover/cat:text-primary transition-colors leading-tight line-clamp-2">
+                          {cat.name}
+                        </span>
+                      </a>
+                    ))}
+                  </div>
+                  <a
+                    href={withBase('/katalog/')}
+                    class="mt-2 block text-center text-[0.7rem] font-bold uppercase tracking-[0.15em] text-primary hover:text-secondary transition-colors pt-2 border-t border-soft-cream/40"
+                  >
+                    Lihat Semua Produk →
+                  </a>
+                </div>
+              </div>
+            </div>
+          ) : (
+            <a
+              href={withBase('/katalog/')}
+              class={`relative py-3 text-[0.72rem] font-bold uppercase tracking-[0.22em] transition-colors after:absolute after:inset-x-0 after:-bottom-0.5 after:h-px after:origin-center after:scale-x-0 after:bg-secondary after:transition-transform after:duration-300 ${isMobileKatalog ? 'text-white after:scale-x-100' : 'text-white/78 hover:text-white hover:after:scale-x-100'}`}
+            >
+              Katalog
+            </a>
+          )}
         </nav>
       </div>
     </div>
@@ -224,10 +294,45 @@ const isMobileFaq = currentPath.startsWith('/faq/');
           <span class="mt-1 block text-[0.66rem] font-bold uppercase tracking-[0.2em] opacity-60">Halaman utama</span>
         </a>
 
-        <a href={withBase('/katalog/')} class={`block rounded-lg border px-4 py-3.5 transition-colors ${isMobileKatalog ? 'border-primary/25 bg-primary/10 text-primary shadow-sm' : 'border-transparent text-slate-700 hover:border-soft-cream/70 hover:bg-primary/5 hover:text-primary'}`}>
-          <span class="block font-serif text-[1.24rem] font-bold leading-tight tracking-wide">Katalog</span>
-          <span class="mt-1 block text-[0.66rem] font-bold uppercase tracking-[0.2em] opacity-60">Semua kategori produk</span>
-        </a>
+        {navCategories.length > 0 ? (
+          <details class={`block rounded-lg border transition-colors ${isMobileKatalog ? 'border-primary/25 bg-primary/10' : 'border-transparent'}`}>
+            <summary class="flex items-center justify-between cursor-pointer px-4 py-3.5 list-none [&::-webkit-details-marker]:hidden">
+              <div>
+                <span class={`block font-serif text-[1.24rem] font-bold leading-tight tracking-wide ${isMobileKatalog ? 'text-primary' : 'text-slate-700'}`}>Katalog</span>
+                <span class="mt-1 block text-[0.66rem] font-bold uppercase tracking-[0.2em] opacity-60">Semua kategori produk</span>
+              </div>
+              <svg class="h-4 w-4 text-slate-400 shrink-0 transition-transform group-open:rotate-180" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2.5" aria-hidden="true">
+                <path stroke-linecap="round" stroke-linejoin="round" d="M19 9l-7 7-7-7" />
+              </svg>
+            </summary>
+            <div class="px-4 pb-2 space-y-0.5">
+              <a href={withBase('/katalog/')} class="block py-2 px-2 text-sm font-bold text-primary rounded-md hover:bg-primary/5 transition-colors">
+                Lihat Semua Produk →
+              </a>
+              {navCategories.map((cat) => (
+                <a
+                  href={withBase(`/kategori/${cat.slug}/`)}
+                  class="flex items-center gap-2.5 py-2 px-2 rounded-md hover:bg-primary/5 transition-colors"
+                >
+                  {cat.image && (
+                    <img
+                      src={cat.image}
+                      alt={cat.name}
+                      class="h-7 w-7 rounded-md object-cover shrink-0 border border-soft-cream/50"
+                      loading="lazy"
+                    />
+                  )}
+                  <span class="text-sm font-medium text-slate-700 leading-tight">{cat.name}</span>
+                </a>
+              ))}
+            </div>
+          </details>
+        ) : (
+          <a href={withBase('/katalog/')} class={`block rounded-lg border px-4 py-3.5 transition-colors ${isMobileKatalog ? 'border-primary/25 bg-primary/10 text-primary shadow-sm' : 'border-transparent text-slate-700 hover:border-soft-cream/70 hover:bg-primary/5 hover:text-primary'}`}>
+            <span class="block font-serif text-[1.24rem] font-bold leading-tight tracking-wide">Katalog</span>
+            <span class="mt-1 block text-[0.66rem] font-bold uppercase tracking-[0.2em] opacity-60">Semua kategori produk</span>
+          </a>
+        )}
 
         <a href={withBase('/cara-pesan/')} class={`block rounded-lg border px-4 py-3.5 transition-colors ${isMobileCaraPesan ? 'border-primary/25 bg-primary/10 text-primary shadow-sm' : 'border-transparent text-slate-700 hover:border-soft-cream/70 hover:bg-primary/5 hover:text-primary'}`}>
           <span class="block font-serif text-[1.24rem] font-bold leading-tight tracking-wide">Cara Pesan</span>
