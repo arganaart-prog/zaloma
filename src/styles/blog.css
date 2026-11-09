@@ -1,3 +1,31 @@
+.blog-list-hero {
+  position: relative;
+}
+.blog-list-hero::after {
+  content: '';
+  display: block;
+  width: 4rem;
+  height: 2px;
+  margin: 1.4rem auto 0;
+  background: linear-gradient(90deg, #893144, #c59253);
+}
+.blog-list-toolbar {
+  display: grid;
+  grid-template-columns: minmax(0, 1fr);
+  gap: 1rem;
+}
+@media (min-width: 720px) {
+  .blog-list-toolbar { grid-template-columns: minmax(0, 1fr) minmax(0, 1.5fr); align-items: center; }
+}
+.blog-list-empty {
+  grid-column: 1 / -1;
+  border: 1px dashed #d9c8c0;
+  border-radius: 16px;
+  background: #fff;
+  color: #716761;
+  padding: 3rem 1rem;
+  text-align: center;
+}
 .blog-card {
   display: flex;
   flex-direction: column;
@@ -80,6 +108,34 @@
 .blog-related-link strong { font: 700 0.78rem/1.35 Georgia, serif; }
 .blog-reading-progress { position: fixed; inset: 0 0 auto; z-index: 40; height: 3px; background: transparent; }
 .blog-reading-progress-bar { display: block; width: 0; height: 100%; background: #b8895c; }
+.blog-detail-actions {
+  display: grid;
+  gap: 1rem;
+  border-top: 1px solid #e8dfd7;
+  margin-top: 2rem;
+  padding-top: 1.25rem;
+}
+.blog-share-actions { display: flex; flex-wrap: wrap; gap: 0.55rem; }
+.blog-share-actions a, .blog-share-actions button {
+  border: 1px solid #e8dfd7;
+  border-radius: 999px;
+  background: #fff;
+  color: #671e2f;
+  cursor: pointer;
+  font-family: inherit;
+  font-size: 0.75rem;
+  font-weight: 700;
+  line-height: 1.2;
+  padding: 0.6rem 0.85rem;
+  text-decoration: none;
+  transition: background 160ms ease, border-color 160ms ease;
+}
+.blog-share-actions a:hover, .blog-share-actions button:hover { border-color: #893144; background: #faf0f1; }
+.blog-copy-status { min-height: 1rem; margin: 0; color: #716761; font-size: 0.75rem; }
+.blog-back-link { display: inline-flex; margin-top: 1.5rem; color: #671e2f; font-size: 0.8rem; font-weight: 700; text-decoration: none; }
+.blog-sidebar-promo { border-top: 1px solid #f0ece8; margin-top: 1rem; padding-top: 1rem; }
+.blog-sidebar-promo p { margin: 0 0 0.65rem; color: #6b625d; font-size: 0.78rem; line-height: 1.5; }
+.blog-sidebar-promo a { color: #671e2f; font-size: 0.76rem; font-weight: 700; text-decoration: none; }
 @media (max-width: 760px) {
   .blog-detail-layout { grid-template-columns: 1fr; gap: 2rem; margin-top: 1.8rem; }
   .blog-detail-sidebar { position: static; }

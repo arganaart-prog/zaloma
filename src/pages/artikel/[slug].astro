@@ -4,7 +4,6 @@ import Breadcrumb from '../../components/Breadcrumb.astro';
 import { ARTICLES, getRelatedArticles, type Article } from '../../data/articles';
 import '../../styles/blog.css';
 import { withBase } from '../../utils/paths';
-import { WHATSAPP_NUMBER } from '../../data/constants';
 
 export function getStaticPaths() {
   return ARTICLES.map((article) => ({
@@ -19,6 +18,7 @@ interface Props {
 
 const { article } = Astro.props;
 const relatedArticles = getRelatedArticles(article.slug, 3);
+const canonicalArticleUrl = new URL(withBase(`/artikel/${article.slug}/`), 'https://zalomaflorist.com').toString();
 const articleWords = [
   article.content.lead,
   ...article.content.sections.flatMap((section) => [section.heading, ...section.body, section.tip || '']),
@@ -26,7 +26,7 @@ const articleWords = [
 ].join(' ').trim().split(/\s+/).filter(Boolean).length;
 const readingMinutes = Math.max(1, Math.ceil(articleWords / 200));
 
-const title = `${article.title} | Zaloma Florist Malang`;
+const title = `${article.title} | Zaloma Florist`;
 const description = article.excerpt;
 ---
 
@@ -71,124 +71,64 @@ const description = article.excerpt;
       </div>
 
       <!-- Article Content Body -->
-      <div class="blog-detail-main max-w-3xl mx-auto mt-10">
-        <!-- Lead Paragraph -->
-        <p class="blog-detail-lead">
-          {article.content.lead}
-        </p>
+      <div class="blog-detail-layout">
+        <div class="blog-detail-main">
+          <p class="blog-detail-lead">{article.content.lead}</p>
 
-        <!-- Sections -->
-        {article.content.sections.map((section) => (
-          <div class="space-y-4 pt-2">
-            <h2 class="blog-detail-heading">
-              {section.heading}
-            </h2>
-            {section.body.map((para) => (
-              <p class="blog-detail-paragraph">
-                {para}
-              </p>
-            ))}
-
-            {section.tip && (
-              <div class="blog-detail-tip">
-                <p><strong>Tips Zaloma Florist:</strong> {section.tip}</p>
-              </div>
-            )}
-          </div>
-        ))}
-
-        <!-- Conclusion -->
-        <div class="pt-6 border-t border-slate-200">
-          <p class="blog-detail-paragraph">
-            {article.content.conclusion}
-          </p>
-        </div>
-      </div>
-
-      <!-- Tags & Share -->
-      <div class="mt-10 pt-6 border-t border-cream/90 flex flex-wrap items-center justify-between gap-4">
-        <div class="flex flex-wrap items-center gap-2">
-          <span class="text-xs font-semibold text-slate-400">Tag:</span>
-          {article.tags.map((tag) => (
-            <span class="px-2.5 py-1 rounded-md bg-white border border-slate-200 text-xs text-slate-600 font-medium">
-              #{tag}
-            </span>
+          {article.content.sections.map((section) => (
+            <div class="space-y-4 pt-2">
+              <h2 class="blog-detail-heading">{section.heading}</h2>
+              {section.body.map((para) => <p class="blog-detail-paragraph">{para}</p>)}
+              {section.tip && (
+                <aside class="blog-detail-tip">
+                  <p><strong>Catatan Florist:</strong> {section.tip}</p>
+                </aside>
+              )}
+            </div>
           ))}
-        </div>
 
-        <a
-          href={`https://wa.me/?text=${encodeURIComponent(`Baca artikel bermanfaat dari Zaloma Florist: "${article.title}"`)}`}
-          target="_blank"
-          rel="noopener noreferrer"
-          class="blog-detail-share"
-        >
-          <svg class="w-4 h-4" fill="currentColor" viewBox="0 0 24 24">
-            <path d="M12.031 6.172c-3.181 0-5.767 2.586-5.768 5.766-.001 1.298.38 2.27 1.019 3.287l-.711 2.598 2.669-.699c.969.54 1.838.847 2.791.848 3.18 0 5.767-2.587 5.768-5.766.001-3.18-2.585-5.834-5.768-5.834zm3.377 8.243c-.147.411-.75.76-1.042.812-.292.052-.663.097-2.072-.49-1.409-.587-2.327-2.016-2.398-2.112-.07-.095-.572-.76-.572-1.45 0-.69.362-1.029.49-1.173.129-.144.281-.18.375-.18.094 0 .188.001.27.006.086.005.201-.033.315.241.114.275.39 1.025.424 1.107.034.082.057.178.002.288-.055.11-.082.179-.164.275-.082.096-.173.214-.247.288-.082.083-.168.172-.072.337.096.165.427.705.916 1.141.63.562 1.161.736 1.326.818.165.082.261.069.358-.041.096-.11.413-.48.523-.645.11-.165.22-.138.371-.082.151.055.955.45 1.12.533.165.082.275.124.316.192.041.069.041.399-.106.81zM12.012 2.002C6.488 2.002 2 6.49 2 12.014c0 1.942.553 3.755 1.517 5.289L2 22l4.821-1.488A9.97 9.97 0 0 0 12.012 22C17.535 22 22 17.51 22 12.014c0-5.524-4.465-10.012-9.988-10.012z"/>
-          </svg>
-          Bagikan ke WhatsApp
-        </a>
-      </div>
-
-      <!-- Action Card -->
-      <div class="mt-12 bg-white rounded-2xl border border-secondary/40 p-6 sm:p-8 shadow-md flex flex-col sm:flex-row items-center justify-between gap-6">
-        <div>
-          <h3 class="font-serif text-xl font-bold text-slate-800">Siap Pesan Karangan Bunga Impian Anda?</h3>
-          <p class="text-xs sm:text-sm text-slate-500 mt-1">Konsultasikan kebutuhan bunga papan, buket, standing flower, atau tanbulampot sekarang.</p>
-        </div>
-        <div class="flex items-center gap-3 w-full sm:w-auto">
-          <a
-            href={withBase('/katalog/')}
-            class="flex-1 sm:flex-initial text-center px-5 py-2.5 rounded-full bg-primary text-white text-xs font-bold hover:bg-primary-dark transition-all"
-          >
-            Lihat Katalog
-          </a>
-          <a
-            href={`https://wa.me/${WHATSAPP_NUMBER}?text=Halo%20Zaloma Florist,%20saya%20tertarik%20dengan%20artikel%20"${encodeURIComponent(article.title)}"%20dan%20ingin%20tanya%20pemesanan%20bunga.`}
-            target="_blank"
-            rel="noopener noreferrer"
-            class="flex-1 sm:flex-initial text-center px-5 py-2.5 rounded-full bg-secondary text-white text-xs font-bold hover:bg-secondary-dark transition-all"
-          >
-            Chat WhatsApp
-          </a>
-        </div>
-      </div>
-
-      <!-- Related Articles -->
-      {relatedArticles.length > 0 && (
-        <div class="mt-16 pt-10 border-t border-slate-200">
-          <h3 class="font-serif text-2xl font-bold text-slate-800 mb-6">Artikel Terkait Lainnya</h3>
-          <div class="grid grid-cols-1 md:grid-cols-3 gap-6">
-            {relatedArticles.map((rel) => (
-              <a
-                href={withBase(`/artikel/?slug=${encodeURIComponent(rel.slug)}`)}
-                class="blog-card bg-white"
-              >
-                <div class="aspect-[16/10] rounded-lg overflow-hidden bg-accent-bg mb-3">
-                  <img
-                    src={withBase(rel.image)}
-                    alt={rel.title}
-                    class="w-full h-full object-cover"
-                    loading="lazy"
-                  />
-                </div>
-                <span class="text-[10px] font-bold uppercase tracking-wider text-secondary mb-1">
-                  {rel.category}
-                </span>
-                <h4 class="font-serif text-sm font-bold text-slate-800 group-hover:text-primary transition-colors line-clamp-2 leading-snug flex-1">
-                  {rel.title}
-                </h4>
-                <span class="text-[11px] text-slate-400 mt-2 font-medium">
-                  {rel.date}
-                </span>
-              </a>
-            ))}
+          <div class="pt-6 border-t border-slate-200">
+            <p class="blog-detail-paragraph">{article.content.conclusion}</p>
           </div>
+
+          <div class="blog-detail-actions">
+            <div class="flex flex-wrap items-center gap-2">
+              {article.tags.map((tag) => (
+                <span class="rounded-full border border-soft-cream bg-white px-3 py-1 text-xs text-slate-600">#{tag}</span>
+              ))}
+            </div>
+            <div class="blog-share-actions">
+              <a href={`https://wa.me/?text=${encodeURIComponent(`${article.title} ${canonicalArticleUrl}`)}`} target="_blank" rel="noopener noreferrer">Bagikan WhatsApp</a>
+              <a href={`https://www.facebook.com/sharer/sharer.php?u=${encodeURIComponent(canonicalArticleUrl)}`} target="_blank" rel="noopener noreferrer">Facebook</a>
+              <button type="button" data-copy-article-link>Salin tautan</button>
+            </div>
+            <p class="blog-copy-status" data-copy-status aria-live="polite"></p>
+          </div>
+
+          <a href={withBase('/artikel/')} class="blog-back-link">← Kembali ke artikel</a>
         </div>
-      )}
+
+        <aside class="blog-detail-sidebar">
+          <h2>Artikel lainnya</h2>
+          {relatedArticles.map((related) => (
+            <a href={withBase(`/artikel/?slug=${encodeURIComponent(related.slug)}`)} class="blog-related-link">
+              <img src={withBase(related.image)} alt="" loading="lazy" decoding="async" />
+              <span>
+                <small>{related.category} · {related.date}</small>
+                <strong>{related.title}</strong>
+              </span>
+            </a>
+          ))}
+          <div class="blog-sidebar-promo">
+            <p>Butuh bantuan memilih rangkaian?</p>
+            <a href={withBase('/katalog/')}>Jelajahi katalog <span aria-hidden="true">→</span></a>
+          </div>
+        </aside>
+      </div>
     </div>
     <div class="blog-reading-progress" aria-hidden="true"><span class="blog-reading-progress-bar"></span></div>
   </article>
-  <script lang="ts">
+  <script>
     const progressBar = document.querySelector('.blog-reading-progress-bar');
     if (progressBar instanceof HTMLElement) {
       const updateProgress = () => {
@@ -198,6 +138,20 @@ const description = article.excerpt;
       };
       window.addEventListener('scroll', updateProgress, { passive: true });
       updateProgress();
+    }
+
+    const copyLinkButton = document.querySelector('[data-copy-article-link]');
+    const copyStatus = document.querySelector('[data-copy-status]');
+    if (copyLinkButton instanceof HTMLButtonElement && copyStatus instanceof HTMLElement) {
+      copyLinkButton.addEventListener('click', async () => {
+        try {
+          await navigator.clipboard.writeText(window.location.href);
+          copyStatus.textContent = 'Tautan artikel berhasil disalin.';
+        } catch (error) {
+          console.error('[Zaloma Articles] Failed to copy article link:', error);
+          copyStatus.textContent = 'Tautan tidak dapat disalin. Silakan salin dari bilah alamat.';
+        }
+      });
     }
   </script>
 </Layout>

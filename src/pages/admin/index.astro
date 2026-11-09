@@ -683,20 +683,44 @@ function withBase(path: string): string {
           <div id="promo-banners-grid" class="grid grid-cols-1 md:grid-cols-2 gap-4"></div>
         </section>
 
-        <section id="tab-articles" class="hidden animate-fade-in space-y-4 max-w-6xl mx-auto">
+        <section id="tab-articles" class="hidden animate-fade-in space-y-5 max-w-6xl mx-auto">
           <div class="bg-white rounded-2xl p-5 sm:p-6 border border-slate-200 shadow-sm flex flex-col sm:flex-row items-start sm:items-center justify-between gap-4">
             <div>
               <h2 class="text-lg font-bold text-slate-900 flex items-center gap-2.5 mb-1">
                 <span class="w-2.5 h-2.5 rounded-full bg-primary"></span>
-                Kelola Artikel
+                Pusat Artikel
               </h2>
-              <p class="text-sm text-slate-500">Artikel yang diterbitkan akan muncul pada halaman blog. Gambar dipotong ke rasio 16:9.</p>
+              <p class="text-sm text-slate-500">Kelola naskah, status publikasi, dan materi editorial Zaloma Florist.</p>
             </div>
             <button type="button" id="open-add-article-btn" class="bg-primary hover:bg-primary-dark text-white font-semibold py-2.5 px-5 rounded-lg text-sm transition-all active:scale-95 flex items-center gap-2 shadow-sm cursor-pointer shrink-0 min-h-[44px]">
-              + Tambah Artikel
+              <span aria-hidden="true">+</span> Tulis Artikel
             </button>
           </div>
-          <div id="articles-admin-grid" class="grid grid-cols-1 md:grid-cols-2 gap-4"></div>
+          <div class="grid grid-cols-2 gap-3 sm:grid-cols-3">
+            <div class="rounded-xl border border-slate-200 bg-white p-4 shadow-sm">
+              <p class="text-[11px] font-bold uppercase tracking-wider text-slate-500">Total Artikel</p>
+              <p id="article-total-count" class="mt-1 text-2xl font-bold text-slate-900">0</p>
+            </div>
+            <div class="rounded-xl border border-slate-200 bg-white p-4 shadow-sm">
+              <p class="text-[11px] font-bold uppercase tracking-wider text-slate-500">Terbit</p>
+              <p id="article-published-count" class="mt-1 text-2xl font-bold text-primary">0</p>
+            </div>
+            <div class="col-span-2 rounded-xl border border-slate-200 bg-white p-4 shadow-sm sm:col-span-1">
+              <p class="text-[11px] font-bold uppercase tracking-wider text-slate-500">Draft</p>
+              <p id="article-draft-count" class="mt-1 text-2xl font-bold text-amber-700">0</p>
+            </div>
+          </div>
+          <div class="flex flex-col gap-3 rounded-2xl border border-slate-200 bg-white p-4 shadow-sm sm:flex-row sm:items-center">
+            <label class="sr-only" for="article-admin-search">Cari artikel</label>
+            <input id="article-admin-search" type="search" placeholder="Cari judul, slug, kategori, atau penulis..." class="min-h-11 w-full rounded-lg border border-slate-200 px-3 text-sm text-slate-700 outline-none focus:border-primary focus:ring-2 focus:ring-primary/10" />
+            <label class="sr-only" for="article-admin-status">Filter status publikasi</label>
+            <select id="article-admin-status" class="min-h-11 rounded-lg border border-slate-200 bg-white px-3 text-sm text-slate-700 outline-none focus:border-primary sm:w-48">
+              <option value="all">Semua status</option>
+              <option value="published">Terbit</option>
+              <option value="draft">Draft</option>
+            </select>
+          </div>
+          <div id="articles-admin-grid" class="space-y-3"></div>
         </section>
 
       </main>
@@ -1330,6 +1354,13 @@ function withBase(path: string): string {
             <div>
               <label for="article-date" class="block text-sm font-semibold text-slate-700 mb-1.5">Tanggal terbit <span class="text-rose-500">*</span></label>
               <input id="article-date" type="date" required class="w-full px-3 py-2.5 rounded-lg border border-slate-300 text-sm focus:outline-none focus:border-primary focus:ring-2 focus:ring-primary/20" />
+            </div>
+            <div>
+              <label for="article-published" class="block text-sm font-semibold text-slate-700 mb-1.5">Status publikasi</label>
+              <select id="article-published" class="w-full rounded-lg border border-slate-300 bg-white px-3 py-2.5 text-sm focus:outline-none focus:border-primary focus:ring-2 focus:ring-primary/20">
+                <option value="published">Terbitkan</option>
+                <option value="draft">Simpan sebagai draft</option>
+              </select>
             </div>
             <div class="sm:col-span-2">
               <label for="article-content" class="block text-sm font-semibold text-slate-700 mb-1.5">Isi artikel <span class="text-rose-500">*</span></label>
@@ -2422,6 +2453,8 @@ function withBase(path: string): string {
       const articleImageInput = document.getElementById('article-image-file');
       const articleImagePreview = document.getElementById('article-image-preview');
       const articleImageNote = document.getElementById('article-image-note');
+      const articleSearchInput = document.getElementById('article-admin-search');
+      const articleStatusFilter = document.getElementById('article-admin-status');
       let articles = Array.isArray(DEFAULT_ARTICLES) ? [...DEFAULT_ARTICLES] : [];
       let articlesConfigLoaded = false;
       let articleImageBlob = null;
@@ -2447,15 +2480,33 @@ function withBase(path: string): string {
         const badge = document.getElementById('tab-article-badge');
         if (badge) badge.textContent = String(articles.length);
 
-        if (!articles.length) {
+        const publishedCount = articles.filter(article => article.published !== false).length;
+        const draftCount = articles.length - publishedCount;
+        document.getElementById('article-total-count').textContent = String(articles.length);
+        document.getElementById('article-published-count').textContent = String(publishedCount);
+        document.getElementById('article-draft-count').textContent = String(draftCount);
+
+        const query = articleSearchInput.value.trim().toLocaleLowerCase('id');
+        const status = articleStatusFilter.value;
+        const visibleArticles = articles.filter(article => {
+          const isPublished = article.published !== false;
+          const searchable = `${article.title || ''} ${article.slug || ''} ${article.category || ''} ${article.author || ''}`
+            .toLocaleLowerCase('id');
+          return (!query || searchable.includes(query))
+            && (status === 'all' || (status === 'published' && isPublished) || (status === 'draft' && !isPublished));
+        });
+
+        if (!visibleArticles.length) {
           const empty = document.createElement('p');
-          empty.className = 'md:col-span-2 rounded-xl border border-dashed border-slate-300 bg-white p-8 text-center text-sm text-slate-500';
-          empty.textContent = 'Belum ada artikel. Tambahkan artikel pertama untuk ditampilkan di blog.';
+          empty.className = 'rounded-xl border border-dashed border-slate-300 bg-white p-8 text-center text-sm text-slate-500';
+          empty.textContent = articles.length
+            ? 'Tidak ada artikel yang sesuai dengan pencarian atau filter ini.'
+            : 'Belum ada artikel. Mulai tulis artikel pertama untuk blog Zaloma.';
           articleGrid.append(empty);
           return;
         }
 
-        articles.forEach(article => {
+        visibleArticles.forEach(article => {
           const card = document.createElement('article');
           card.className = 'overflow-hidden rounded-2xl border border-slate-200 bg-white shadow-sm sm:flex';
           const image = document.createElement('img');
@@ -2468,12 +2519,21 @@ function withBase(path: string): string {
           const category = document.createElement('p');
           category.className = 'text-xs font-bold uppercase tracking-wide text-primary';
           category.textContent = article.category || 'Artikel';
+          const publicationStatus = document.createElement('span');
+          const isPublished = article.published !== false;
+          publicationStatus.className = `inline-flex w-fit rounded-full px-2.5 py-1 text-[10px] font-bold uppercase tracking-wide ${
+            isPublished ? 'bg-emerald-50 text-emerald-700' : 'bg-amber-50 text-amber-700'
+          }`;
+          publicationStatus.textContent = isPublished ? 'Terbit' : 'Draft';
           const heading = document.createElement('h3');
           heading.className = 'mt-1 line-clamp-2 font-semibold text-slate-900';
           heading.textContent = article.title || 'Tanpa judul';
           const meta = document.createElement('p');
           meta.className = 'mt-1 text-xs text-slate-500';
           meta.textContent = `${article.author || 'Tim Zaloma Florist'} · ${article.date || ''}`;
+          const slug = document.createElement('p');
+          slug.className = 'mt-1 truncate text-xs text-slate-400';
+          slug.textContent = `/${article.slug || ''}`;
           const actions = document.createElement('div');
           actions.className = 'mt-auto flex flex-wrap gap-2 pt-4';
           const editButton = document.createElement('button');
@@ -2487,11 +2547,14 @@ function withBase(path: string): string {
           deleteButton.textContent = 'Hapus';
           deleteButton.addEventListener('click', () => deleteArticle(article.id));
           actions.append(editButton, deleteButton);
-          body.append(category, heading, meta, actions);
+          body.append(category, publicationStatus, heading, meta, slug, actions);
           card.append(image, body);
           articleGrid.append(card);
         });
       }
+
+      articleSearchInput?.addEventListener('input', renderArticles);
+      articleStatusFilter?.addEventListener('change', renderArticles);
 
       async function loadArticlesConfig() {
         if (articlesConfigLoaded) {
@@ -2508,6 +2571,7 @@ function withBase(path: string): string {
             if (!Array.isArray(parsed) || parsed.some(article =>
               !article || typeof article.id !== 'string' || typeof article.slug !== 'string'
               || typeof article.title !== 'string'
+              || (article.published !== undefined && typeof article.published !== 'boolean')
               || !(typeof article.content === 'string' || (
                 article.content && typeof article.content === 'object'
                 && typeof article.content.lead === 'string'
@@ -2555,6 +2619,7 @@ function withBase(path: string): string {
         document.getElementById('article-excerpt').value = article?.excerpt || '';
         document.getElementById('article-author').value = article?.author || 'Tim Zaloma Florist';
         document.getElementById('article-date').value = article?.isoDate || new Date().toISOString().slice(0, 10);
+        document.getElementById('article-published').value = article?.published === false ? 'draft' : 'published';
         document.getElementById('article-content').value = articleContentText(article?.content);
         setArticleImagePreview(article?.image || '', article?.image ? 'Gambar saat ini akan digunakan jika tidak diganti.' : 'Belum ada gambar. Pilih file untuk mengunggah.');
         if (articleImageInput) articleImageInput.value = '';
@@ -2659,6 +2724,7 @@ function withBase(path: string): string {
         const excerpt = document.getElementById('article-excerpt').value.trim();
         const author = document.getElementById('article-author').value.trim();
         const isoDate = document.getElementById('article-date').value;
+        const published = document.getElementById('article-published').value === 'published';
         const content = document.getElementById('article-content').value.trim();
         const slugPattern = /^[a-z0-9]+(?:-[a-z0-9]+)*$/;
         if (!slugPattern.test(slug)) {
@@ -2691,6 +2757,7 @@ function withBase(path: string): string {
             category,
             excerpt,
             author,
+            published,
             authorRole: existing?.authorRole || 'Kontributor Zaloma Florist',
             isoDate,
             date: publishedDate.toLocaleDateString('id-ID', { day: 'numeric', month: 'long', year: 'numeric' }),

@@ -83,12 +83,9 @@ import { SUPABASE_URL, SUPABASE_ANON_KEY } from '../data/supabaseConfig';
       if (featuredSlider && displayFeatured.length > 0) {
         featuredSlider.innerHTML = displayFeatured.slice(0, 5).map((p, index) => {
           const prodUrl = `/produk/${p.slug}/`;
-          const cardShape = p.description?.match(/^\[Bentuk Kartu:\s*(portrait|square|arch)\]/im)?.[1];
-          const imageAspect = cardShape === 'square' ? 'aspect-square' : cardShape ? 'aspect-[4/5]' : 'aspect-[20/22]';
-          const archClass = cardShape === 'arch' ? 'product-card-shape-arch' : '';
           return `
-            <div class="classic-product-card product-card-shell ${archClass} group bg-white rounded-[14px] border border-soft-cream/70 overflow-hidden shadow-[0_1px_4px_rgba(15,23,42,0.03)]">
-              <a href="${prodUrl}" class="product-card-image classic-product-image image-load-shell block relative ${imageAspect} bg-slate-100 overflow-hidden">
+            <div class="classic-product-card product-card-shell group bg-white rounded-[14px] border border-soft-cream/70 overflow-hidden shadow-[0_1px_4px_rgba(15,23,42,0.03)]">
+              <a href="${prodUrl}" class="product-card-image classic-product-image image-load-shell block relative aspect-[20/22] bg-slate-100 overflow-hidden">
                 <img
                   src="${p.image}"
                   alt="Foto ${p.name} Florist Malang"

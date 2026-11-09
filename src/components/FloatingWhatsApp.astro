@@ -10,29 +10,9 @@ const {
 } = Astro.props;
 
 const consultWaUrl = `https://wa.me/${WHATSAPP_NUMBER}?text=${encodeURIComponent(consultMessage)}`;
-const papanWaUrl = `https://wa.me/${WHATSAPP_NUMBER}?text=${encodeURIComponent('Halo Zaloma Florist, saya ingin pesan bunga papan.')}`;
 ---
 
 <aside class="pointer-events-none fixed inset-0 z-50" aria-label="Kontak WhatsApp Zaloma Florist">
-  <a
-    href={papanWaUrl}
-    target="_blank"
-    rel="noopener noreferrer"
-    class="pointer-events-auto fixed right-0 bottom-[84px] z-50 flex w-11 flex-col items-center rounded-l-2xl border border-r-0 border-primary/15 bg-white/95 px-1.5 py-3 shadow-[-4px_2px_16px_rgba(63,75,55,0.12)] backdrop-blur-sm transition-all duration-300 hover:w-12 hover:-translate-x-0.5 hover:shadow-[-6px_4px_24px_rgba(63,75,55,0.2)] focus:outline-none focus-visible:ring-2 focus-visible:ring-primary sm:bottom-24 lg:bottom-auto lg:top-[58%] lg:-translate-y-1/2"
-    aria-label="Pesan bunga papan melalui WhatsApp"
-    title="Pesan Bunga Papan via WhatsApp"
-  >
-    <span class="flex h-8 w-8 shrink-0 items-center justify-center rounded-lg bg-gradient-to-br from-primary-light to-primary text-white transition-transform duration-300 group-hover:scale-105">
-      <svg class="h-5 w-5 fill-current" viewBox="0 0 24 24" aria-hidden="true">
-        <path d="M12.031 6.172c-3.181 0-5.767 2.586-5.768 5.766-.001 1.298.38 2.27 1.019 3.287l-.711 2.598 2.669-.699c.969.54 1.838.847 2.791.848 3.18 0 5.767-2.587 5.768-5.766.001-3.18-2.585-5.834-5.768-5.834zm3.377 8.243c-.147.411-.75.76-1.042.812-.292.052-.663.097-2.072-.49-1.409-.587-2.327-2.016-2.398-2.112-.07-.095-.572-.76-.572-1.45 0-.69.362-1.029.49-1.173.129-.144.281-.18.375-.18.094 0 .188.001.27.006.086.005.201-.033.315.241.114.275.39 1.025.424 1.107.034.082.057.178.002.288-.055.11-.082.179-.164.275-.082.096-.173.214-.247.288-.082.083-.168.172-.072.337.096.165.427.705.916 1.141.63.562 1.161.736 1.326.818.165.082.261.069.358-.041.096-.11.413-.48.523-.645.11-.165.22-.138.371-.082.151.055.955.45 1.12.533.165.082.275.124.316.192.041.069.041.399-.106.81zM12.012 2.002C6.488 2.002 2 6.49 2 12.014c0 1.942.553 3.755 1.517 5.289L2 22l4.821-1.488A9.97 9.97 0 0 0 12.012 22C17.535 22 22 17.51 22 12.014c0-5.524-4.465-10.012-9.988-10.012z"/>
-      </svg>
-    </span>
-    <span class="mt-2 [writing-mode:vertical-lr] whitespace-nowrap text-[8px] font-bold uppercase tracking-[0.18em] text-primary">
-      Bunga Papan
-    </span>
-    <span class="mt-2 h-5 w-0.5 rounded-full bg-secondary/60"></span>
-  </a>
-
   <a
     href={consultWaUrl}
     target="_blank"

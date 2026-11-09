@@ -8,8 +8,8 @@ import { withBase } from '../../utils/paths';
 import { WHATSAPP_NUMBER } from '../../data/constants';
 import { SUPABASE_ANON_KEY, SUPABASE_URL } from '../../data/supabaseConfig';
 
-const title = "Artikel & Tips Florist Malang - Panduan Bunga Terlengkap | Zaloma Florist";
-const description = "Kumpulan artikel edukatif, panduan memilih karangan bunga papan, tips merawat bunga segar tahan lama, dan tren kado bunga modern di Malang dari Zaloma Florist.";
+const title = "Artikel & Wawasan Florist | Zaloma Florist";
+const description = "Temukan panduan florist, inspirasi rangkaian, dan tips merawat bunga dari tim Zaloma Florist.";
 const readingMinutes = (article: typeof ARTICLES[number]) => {
   const content = article.content;
   const text = [
@@ -30,7 +30,7 @@ const readingMinutes = (article: typeof ARTICLES[number]) => {
       </div>
 
       <!-- Hero Header -->
-      <div class="text-center max-w-3xl mx-auto mb-14">
+      <div class="blog-list-hero text-center max-w-3xl mx-auto mb-10 md:mb-14">
         <span class="inline-flex items-center gap-1.5 px-3 py-1 rounded-full text-xs font-bold uppercase tracking-wider bg-secondary/15 text-primary border border-secondary/30 mb-3">
           <svg class="w-3.5 h-3.5 text-secondary" fill="currentColor" viewBox="0 0 20 20">
             <path d="M9 4.804A7.968 7.968 0 005.5 4c-1.255 0-2.443.29-3.5.804v10A7.969 7.969 0 015.5 14c1.669 0 3.218.51 4.5 1.385A7.962 7.962 0 0114.5 14c1.255 0 2.443.29 3.5.804v-10A7.968 7.968 0 0014.5 4c-1.255 0-2.443.29-3.5.804V12a1 1 0 11-2 0V4.804z"/>
@@ -38,62 +38,74 @@ const readingMinutes = (article: typeof ARTICLES[number]) => {
           Wawasan & Inspirasi
         </span>
         <h1 class="font-serif text-3xl sm:text-4xl md:text-5xl font-bold text-slate-800 tracking-tight leading-tight">
-          Artikel & Tips Florist Malang
+          Wawasan Bunga & Inspirasi
         </h1>
         <p class="text-slate-600 text-sm sm:text-base mt-4 leading-relaxed">
-          Kumpulan panduan memilih karangan bunga papan, tips merawat bunga segar agar tahan lama, dan referensi hadiah bunga untuk berbagai momen di Malang.
+          Artikel pilihan dari tim florist kami—panduan merangkai, merawat bunga, dan memilih rangkaian yang tepat untuk setiap momen.
         </p>
       </div>
 
+      <div class="blog-list-toolbar mb-8 rounded-2xl border border-soft-cream bg-white p-4 shadow-sm sm:p-5">
+        <div>
+          <p class="text-xs font-bold uppercase tracking-[0.16em] text-secondary-dark">Jelajahi artikel</p>
+          <p id="article-results-count" class="mt-1 text-sm text-slate-500" aria-live="polite">Memuat artikel...</p>
+        </div>
+        <div class="grid gap-3 sm:grid-cols-[minmax(0,1fr)_220px]">
+          <label class="sr-only" for="article-search">Cari artikel</label>
+          <input id="article-search" type="search" placeholder="Cari judul, topik, atau penulis..." class="min-h-11 w-full rounded-xl border border-slate-200 bg-clean-ivory px-4 text-sm text-slate-700 outline-none transition focus:border-primary focus:ring-2 focus:ring-primary/10" />
+          <label class="sr-only" for="article-category-filter">Filter kategori artikel</label>
+          <select id="article-category-filter" class="min-h-11 w-full rounded-xl border border-slate-200 bg-white px-3 text-sm text-slate-700 outline-none transition focus:border-primary focus:ring-2 focus:ring-primary/10">
+            <option value="">Semua topik</option>
+          </select>
+        </div>
+      </div>
+
       <!-- Articles Grid -->
-      <div id="articles-grid" class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-6 lg:gap-8">
+      <div id="articles-grid" class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 2xl:grid-cols-4 gap-5 lg:gap-7">
         {ARTICLES.map((article) => (
-          <article class="blog-card bg-white rounded-2xl border border-cream/90 shadow-sm hover:shadow-xl hover:border-secondary/60 transition-all duration-300 overflow-hidden flex flex-col group">
+          <article class="blog-card group">
             <!-- Article Image -->
-            <a href={withBase(`/artikel/?slug=${encodeURIComponent(article.slug)}`)} class="block relative aspect-[16/9] overflow-hidden bg-accent-bg">
+            <a href={withBase(`/artikel/?slug=${encodeURIComponent(article.slug)}`)} class="blog-card-media">
               <img
                 src={withBase(article.image)}
                 alt={article.title}
-                class="blog-card-image w-full h-full object-cover transform group-hover:scale-105 transition-transform duration-500"
                 loading="lazy"
                 decoding="async"
               />
-              <span class="absolute top-4 left-4 inline-flex items-center px-3 py-1 rounded-full text-xs font-bold text-white bg-primary/90 backdrop-blur-sm shadow-sm">
+              <span class="blog-card-category">
                 {article.category}
               </span>
             </a>
 
             <!-- Article Details -->
-            <div class="p-5 sm:p-6 flex-1 flex flex-col justify-between">
+            <div class="blog-card-body">
               <div>
-                <div class="flex items-center gap-2 text-[11px] text-slate-400 mb-3 font-medium">
+                <div class="blog-card-meta flex items-center gap-2 font-medium">
                   <span>{article.date}</span>
                   <span aria-hidden="true">·</span>
                   <span>{readingMinutes(article)} menit baca</span>
                 </div>
 
-                <h2 class="font-serif text-xl font-bold text-slate-800 group-hover:text-primary transition-colors leading-snug line-clamp-2 mb-3">
+                <h2 class="blog-card-title line-clamp-2">
                   <a href={withBase(`/artikel/?slug=${encodeURIComponent(article.slug)}`)}>
                     {article.title}
                   </a>
                 </h2>
 
-                <p class="text-slate-500 text-sm leading-relaxed line-clamp-3 mb-5">
+                <p class="blog-card-excerpt line-clamp-3">
                   {article.excerpt}
                 </p>
               </div>
 
-              <div class="pt-4 border-t border-slate-100 flex items-center justify-between gap-3 mt-auto">
-                <div class="text-xs text-slate-500 min-w-0 truncate">
-                  Oleh <span class="font-semibold text-slate-700">{article.author}</span>
-                </div>
+              <div class="blog-card-footer">
+                <div class="blog-card-author min-w-0 truncate">Oleh <span class="font-semibold text-slate-700">{article.author}</span></div>
                 <a
                   href={withBase(`/artikel/?slug=${encodeURIComponent(article.slug)}`)}
-                  class="inline-flex items-center gap-1.5 text-xs font-bold text-primary group-hover:text-secondary group-hover:translate-x-1 transition-all"
+                  class="blog-card-read"
                   aria-label={`Baca artikel: ${article.title}`}
                 >
-                  <span>Baca Selengkapnya</span>
-                  <svg class="w-4 h-4" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2.5">
+                  <span>Baca</span>
+                  <svg class="h-4 w-4" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2.5">
                     <path stroke-linecap="round" stroke-linejoin="round" d="M9 5l7 7-7 7" />
                   </svg>
                 </a>
@@ -111,7 +123,7 @@ const readingMinutes = (article: typeof ARTICLES[number]) => {
             Butuh Saran Memilih Karangan Bunga yang Tepat?
           </h2>
           <p class="text-slate-200 text-sm mt-3 leading-relaxed">
-            Admin dan tim florist Zaloma Florist siap membantu Anda menentukan model bunga, menyusun kalimat ucapan, serta mengecek jadwal pengantaran ke lokasi tujuan di Malang Raya.
+            Tim Zaloma Florist siap membantu memilih rangkaian, menyusun ucapan, dan mengecek ketersediaan pengiriman sesuai kota tujuan Anda.
           </p>
           <div class="mt-6 flex flex-wrap gap-4">
             <a
@@ -143,16 +155,25 @@ const readingMinutes = (article: typeof ARTICLES[number]) => {
     const listView = document.getElementById('article-list-view');
     const detailView = document.getElementById('article-detail-view');
     const articlesGrid = document.getElementById('articles-grid');
+    const articleSearch = document.getElementById('article-search');
+    const articleCategoryFilter = document.getElementById('article-category-filter');
+    const articleResultsCount = document.getElementById('article-results-count');
     const fallbackArticles = DEFAULT_ARTICLES;
+    let listingArticles = [];
 
     function validArticle(article) {
       return article && typeof article.slug === 'string' && typeof article.title === 'string'
         && typeof article.excerpt === 'string' && typeof article.category === 'string'
         && typeof article.image === 'string' && typeof article.author === 'string'
+        && (article.published === undefined || typeof article.published === 'boolean')
         && (typeof article.content === 'string' || (
           article.content && typeof article.content === 'object'
           && (!article.content.sections || Array.isArray(article.content.sections))
         ));
+    }
+
+    function isArticlePublished(article) {
+      return article.published !== false;
     }
 
     function safeImageUrl(value) {
@@ -193,7 +214,34 @@ const readingMinutes = (article: typeof ARTICLES[number]) => {
     function renderArticleCards(articles) {
       if (!articlesGrid) return;
       articlesGrid.replaceChildren();
-      articles.forEach(article => {
+      listingArticles = articles.filter(isArticlePublished);
+
+      if (articleCategoryFilter) {
+        const selectedCategory = articleCategoryFilter.value;
+        const categories = [...new Set(listingArticles.map(article => article.category).filter(Boolean))].sort((a, b) => a.localeCompare(b, 'id'));
+        articleCategoryFilter.replaceChildren(new Option('Semua topik', ''));
+        categories.forEach(category => articleCategoryFilter.append(new Option(category, category)));
+        articleCategoryFilter.value = categories.includes(selectedCategory) ? selectedCategory : '';
+      }
+
+      const query = articleSearch?.value.trim().toLocaleLowerCase('id') || '';
+      const category = articleCategoryFilter?.value || '';
+      const visibleArticles = listingArticles.filter(article => {
+        const searchable = `${article.title} ${article.excerpt} ${article.category} ${article.author}`.toLocaleLowerCase('id');
+        return (!query || searchable.includes(query)) && (!category || article.category === category);
+      });
+
+      if (articleResultsCount) {
+        articleResultsCount.textContent = `Menampilkan ${visibleArticles.length} dari ${listingArticles.length} artikel`;
+      }
+
+      if (!visibleArticles.length) {
+        const emptyState = makeElement('div', 'blog-list-empty', 'Artikel tidak ditemukan.');
+        articlesGrid.append(emptyState);
+        return;
+      }
+
+      visibleArticles.forEach(article => {
         const card = makeElement('article', 'blog-card');
         const imageLink = makeElement('a', 'blog-card-media');
         imageLink.href = articleUrl(article.slug);
@@ -221,6 +269,9 @@ const readingMinutes = (article: typeof ARTICLES[number]) => {
         articlesGrid.append(card);
       });
     }
+
+    articleSearch?.addEventListener('input', () => renderArticleCards(listingArticles));
+    articleCategoryFilter?.addEventListener('change', () => renderArticleCards(listingArticles));
 
     function addParagraph(parent, text, className = '') {
       if (!text) return;
@@ -285,11 +336,36 @@ const readingMinutes = (article: typeof ARTICLES[number]) => {
         });
         addParagraph(contentColumn, content?.conclusion || '', 'blog-detail-paragraph');
       }
-      const share = makeElement('a', 'blog-detail-share', 'Bagikan artikel via WhatsApp');
-      share.href = `https://wa.me/?text=${encodeURIComponent(`${article.title} ${window.location.href}`)}`;
-      share.target = '_blank';
-      share.rel = 'noopener noreferrer';
-      contentColumn.append(share);
+      const actions = makeElement('div', 'blog-detail-actions');
+      const tags = makeElement('div', 'flex flex-wrap items-center gap-2');
+      (article.tags || []).forEach(tag => tags.append(makeElement('span', 'rounded-full border border-soft-cream bg-white px-3 py-1 text-xs text-slate-600', `#${tag}`)));
+      const shareActions = makeElement('div', 'blog-share-actions');
+      const whatsappShare = makeElement('a', '', 'Bagikan WhatsApp');
+      whatsappShare.href = `https://wa.me/?text=${encodeURIComponent(`${article.title} ${window.location.href}`)}`;
+      whatsappShare.target = '_blank';
+      whatsappShare.rel = 'noopener noreferrer';
+      const facebookShare = makeElement('a', '', 'Facebook');
+      facebookShare.href = `https://www.facebook.com/sharer/sharer.php?u=${encodeURIComponent(window.location.href)}`;
+      facebookShare.target = '_blank';
+      facebookShare.rel = 'noopener noreferrer';
+      const copyLink = makeElement('button', '', 'Salin tautan');
+      copyLink.type = 'button';
+      const copyStatus = makeElement('p', 'blog-copy-status');
+      copyStatus.setAttribute('aria-live', 'polite');
+      copyLink.addEventListener('click', async () => {
+        try {
+          await navigator.clipboard.writeText(window.location.href);
+          copyStatus.textContent = 'Tautan artikel berhasil disalin.';
+        } catch (error) {
+          console.error('[Zaloma Articles] Failed to copy article link:', error);
+          copyStatus.textContent = 'Tautan tidak dapat disalin. Silakan salin dari bilah alamat.';
+        }
+      });
+      shareActions.append(whatsappShare, facebookShare, copyLink);
+      actions.append(tags, shareActions, copyStatus);
+      const backToListLink = makeElement('a', 'blog-back-link', '← Kembali ke artikel');
+      backToListLink.href = ARTICLES_PATH;
+      contentColumn.append(actions, backToListLink);
 
       const sidebar = makeElement('aside', 'blog-detail-sidebar');
       sidebar.append(makeElement('h2', '', 'Artikel lainnya'));
@@ -305,6 +381,12 @@ const readingMinutes = (article: typeof ARTICLES[number]) => {
         related.append(relatedImage, relatedText);
         sidebar.append(related);
       });
+      const sidebarPromo = makeElement('div', 'blog-sidebar-promo');
+      sidebarPromo.append(makeElement('p', '', 'Butuh bantuan memilih rangkaian?'));
+      const catalogLink = makeElement('a', '', 'Jelajahi katalog →');
+      catalogLink.href = '/katalog/';
+      sidebarPromo.append(catalogLink);
+      sidebar.append(sidebarPromo);
       layout.append(contentColumn, sidebar);
       container.append(breadcrumb, header, hero, layout);
       detailView.append(container);
@@ -344,9 +426,10 @@ const readingMinutes = (article: typeof ARTICLES[number]) => {
       }
 
       if (requestedSlug) {
-        const article = articles.find(item => item.slug === requestedSlug);
+        const publishedArticles = articles.filter(isArticlePublished);
+        const article = publishedArticles.find(item => item.slug === requestedSlug);
         if (article) {
-          renderArticleDetail(article, articles);
+        renderArticleDetail(article, publishedArticles);
         } else if (detailView && listView) {
           listView.classList.add('hidden');
           detailView.classList.remove('hidden');
