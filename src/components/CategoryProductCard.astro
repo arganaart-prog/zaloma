@@ -1,7 +1,7 @@
 ---
 import type { Product } from '../data/products';
 import { withBase } from '../utils/paths';
-import { getProductCardShape, getProductDisplayName } from '../utils/productHelpers';
+import { getProductCardShape, getProductDisplayName, getProductGalleryImages } from '../utils/productHelpers';
 
 interface Props {
   product: Product;
@@ -14,6 +14,10 @@ const productUrl = withBase(`/produk/${product.slug}/`);
 const imageLoading = priority ? 'eager' : 'lazy';
 const imageFetchPriority = priority ? 'high' : 'low';
 const displayName = getProductDisplayName(product);
+const galleryImages = getProductGalleryImages(product.image, product.images);
+const previewImage = product.hoverPreviewIndex && product.hoverPreviewIndex > 1
+  ? galleryImages[product.hoverPreviewIndex - 1]
+  : undefined;
 const isBungaPapan = product.categorySlug.startsWith('bunga-papan') || product.categoryName.toLowerCase().includes('bunga papan');
 const cardShape = product.cardShape || getProductCardShape(product.description);
 const cardAspect = cardShape === 'square' ? 'aspect-square' : cardShape ? 'aspect-[4/5]' : aspect;
@@ -38,6 +42,16 @@ const cardAspect = cardShape === 'square' ? 'aspect-square' : cardShape ? 'aspec
       data-image-loader="true"
       class="relative z-0 block h-full w-full object-cover object-top transition-transform duration-700 ease-out group-hover:scale-[1.012]"
     />
+    {previewImage && (
+      <img
+        src={withBase(previewImage)}
+        alt=""
+        aria-hidden="true"
+        loading="lazy"
+        decoding="async"
+        class="pointer-events-none absolute inset-0 z-[1] h-full w-full object-cover object-top opacity-0 transition-opacity duration-500 ease-in-out group-hover:opacity-100"
+      />
+    )}
 
     <div class="absolute inset-x-0 bottom-0 z-10 h-24 bg-gradient-to-t from-primary-dark/45 via-primary-dark/10 to-transparent"></div>
   </div>

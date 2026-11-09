@@ -67,6 +67,13 @@ export function getProductDisplayName(product: ProductName): string {
   return product.name.replace(/\s*\*\s*/g, ' ').replace(/\s+/g, ' ').trim();
 }
 
+export function getProductGalleryImages(image: string, additionalImages: unknown = []): string[] {
+  const extras = Array.isArray(additionalImages)
+    ? additionalImages.filter((url): url is string => typeof url === 'string' && Boolean(url.trim()))
+    : [];
+  return [...new Set([image, ...extras].filter((url): url is string => typeof url === 'string' && Boolean(url.trim())))].slice(0, 3);
+}
+
 export function isProductPopular(product: PopularProduct): boolean {
   return Boolean(product.featured || product.name.includes('*'));
 }

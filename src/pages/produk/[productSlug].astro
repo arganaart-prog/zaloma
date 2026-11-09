@@ -4,7 +4,7 @@ import Breadcrumb from '../../components/Breadcrumb.astro';
 import WhatsAppButton from '../../components/WhatsAppButton.astro';
 import ProductCard from '../../components/ProductCard.astro';
 import { stripBase, withBase } from '../../utils/paths';
-import { getProductDisplayName, getProductSize, stripProductMetadata } from '../../utils/productHelpers';
+import { getProductDisplayName, getProductGalleryImages, getProductSize, stripProductMetadata } from '../../utils/productHelpers';
 import { SUPABASE_URL, SUPABASE_ANON_KEY } from '../../data/supabaseConfig';
 
 export async function getStaticPaths() {
@@ -31,6 +31,8 @@ export async function getStaticPaths() {
               priceFrom: Number(p.price_from) || 0,
               priceLabel: p.price_label,
               image: p.image,
+              images: p.images || [],
+              hoverPreviewIndex: p.hover_preview_index || undefined,
               imageWidth: 800,
               imageHeight: 800,
               description: p.description || '',
@@ -52,6 +54,8 @@ export async function getStaticPaths() {
                 priceFrom: Number(p2.price_from) || 0,
                 priceLabel: p2.price_label,
                 image: p2.image,
+                images: p2.images || [],
+                hoverPreviewIndex: p2.hover_preview_index || undefined,
                 imageWidth: 800,
                 imageHeight: 800,
                 description: p2.description || '',
@@ -97,6 +101,7 @@ export async function getStaticPaths() {
 
 const { product, relatedProducts = [] } = Astro.props;
 const displayName = getProductDisplayName(product);
+const galleryImages = getProductGalleryImages(product.image, product.images);
 const displayDescription = stripProductMetadata(product.description);
 const productSize = getProductSize(product.description);
 const shippingArea = product.city || 'Malang Raya (Kota Malang, Kab. Malang, Kota Batu)';
@@ -112,7 +117,7 @@ const productSchema = {
   "@context": "https://schema.org/",
   "@type": "Product",
   "name": displayName,
-  "image": new URL(withBase(product.image), Astro.site).toString(),
+  "image": galleryImages.map((image) => new URL(withBase(image), Astro.site).toString()),
   "description": `${displayDescription} Tersedia di Zaloma Florist, toko bunga profesional dengan pengerjaan cepat.`,
   "brand": {
     "@type": "Brand",
@@ -153,8 +158,9 @@ const productSchema = {
         
         <!-- Left: Product Image & Highlights -->
         <div class="lg:col-span-6 flex flex-col gap-6">
-          <div class="relative aspect-square sm:aspect-[4/3] lg:aspect-square rounded-2xl overflow-hidden bg-clean-ivory border border-soft-cream/60">
+          <div id="product-gallery-frame" tabindex="0" aria-label="Galeri foto produk. Gunakan panah kiri atau kanan untuk mengganti foto." class="relative aspect-square sm:aspect-[4/3] lg:aspect-square rounded-2xl overflow-hidden bg-clean-ivory border border-soft-cream/60 touch-pan-y">
             <img
+              id="product-gallery-image"
               src={withBase(product.image)}
               alt={`Foto ${displayName} dari Zaloma Florist Malang`}
               width={product.imageWidth}
@@ -164,6 +170,13 @@ const productSchema = {
               fetchpriority="high"
               class="w-full h-full object-cover object-top"
             />
+            <button type="button" data-gallery-step="-1" aria-label="Lihat foto sebelumnya" class:list={['absolute left-3 top-1/2 z-20 -translate-y-1/2 rounded-full bg-white/90 p-2 text-primary shadow transition hover:bg-white', galleryImages.length <= 1 && 'hidden']}>
+              <svg class="h-5 w-5" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" aria-hidden="true"><path stroke-linecap="round" stroke-linejoin="round" d="m15 18-6-6 6-6" /></svg>
+            </button>
+            <button type="button" data-gallery-step="1" aria-label="Lihat foto berikutnya" class:list={['absolute right-3 top-1/2 z-20 -translate-y-1/2 rounded-full bg-white/90 p-2 text-primary shadow transition hover:bg-white', galleryImages.length <= 1 && 'hidden']}>
+              <svg class="h-5 w-5" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" aria-hidden="true"><path stroke-linecap="round" stroke-linejoin="round" d="m9 18 6-6-6-6" /></svg>
+            </button>
+            <span id="product-gallery-count" class:list={['absolute bottom-3 right-3 z-20 rounded-full bg-black/60 px-2.5 py-1 text-xs font-semibold text-white', galleryImages.length <= 1 && 'hidden']}>1 / {galleryImages.length}</span>
             {product.featured && (
               <div class="absolute top-4 left-4">
                 <span class="bg-secondary text-primary-dark text-xs uppercase tracking-wider font-bold px-3 py-1.5 rounded-full shadow-sm">
@@ -171,6 +184,20 @@ const productSchema = {
                 </span>
               </div>
             )}
+          </div>
+          <div id="product-gallery-thumbnails" class:list={['flex gap-2 overflow-x-auto pb-1', galleryImages.length <= 1 && 'hidden']} role="group" aria-label="Foto produk">
+              {galleryImages.map((image, index) => (
+                <button
+                  type="button"
+                  data-gallery-index={index}
+                  data-gallery-src={withBase(image)}
+                  aria-label={`Tampilkan foto ${index + 1}`}
+                  aria-pressed={index === 0 ? 'true' : 'false'}
+                  class:list={['h-16 w-16 shrink-0 overflow-hidden rounded-lg border-2 transition sm:h-20 sm:w-20', index === 0 ? 'border-primary' : 'border-transparent opacity-70 hover:opacity-100']}
+                >
+                  <img src={withBase(image)} alt="" loading="lazy" class="h-full w-full object-cover" />
+                </button>
+              ))}
           </div>
 
           <!-- Trust Badges Desktop / Tablet -->
@@ -318,7 +345,93 @@ const productSchema = {
   </div>
 </Layout>
 
-<script define:vars={{ SUPABASE_URL, SUPABASE_ANON_KEY, currentSlug, currentCategorySlug }}>
+  <script is:inline>
+      const galleryFrame = document.getElementById('product-gallery-frame');
+      const galleryImage = document.getElementById('product-gallery-image');
+      const galleryCount = document.getElementById('product-gallery-count');
+      const galleryThumbnailContainer = document.getElementById('product-gallery-thumbnails');
+      let galleryThumbnails = Array.from(document.querySelectorAll('[data-gallery-index]'));
+      const galleryNavigation = Array.from(document.querySelectorAll('[data-gallery-step]'));
+      let activeGalleryIndex = 0;
+      let galleryTransitionTimer;
+
+      function updateProductGallery(images) {
+        const validImages = Array.isArray(images) ? [...new Set(images.filter((image) => typeof image === 'string' && image.trim()))].slice(0, 3) : [];
+        if (!validImages.length || !galleryImage || !galleryThumbnailContainer) return;
+
+        galleryImage.src = validImages[0];
+        activeGalleryIndex = 0;
+        galleryThumbnailContainer.replaceChildren(...validImages.map((image, index) => {
+          const button = document.createElement('button');
+          button.type = 'button';
+          button.dataset.galleryIndex = String(index);
+          button.dataset.gallerySrc = image;
+          button.setAttribute('aria-label', `Tampilkan foto ${index + 1}`);
+          button.setAttribute('aria-pressed', String(index === 0));
+          button.className = `h-16 w-16 shrink-0 overflow-hidden rounded-lg border-2 transition sm:h-20 sm:w-20 ${index === 0 ? 'border-primary' : 'border-transparent opacity-70 hover:opacity-100'}`;
+          const thumbnail = document.createElement('img');
+          thumbnail.src = image;
+          thumbnail.alt = '';
+          thumbnail.loading = 'lazy';
+          thumbnail.className = 'h-full w-full object-cover';
+          button.append(thumbnail);
+          return button;
+        }));
+        galleryThumbnails = Array.from(galleryThumbnailContainer.querySelectorAll('[data-gallery-index]'));
+        galleryThumbnailContainer.classList.toggle('hidden', validImages.length <= 1);
+        galleryNavigation.forEach((button) => button.classList.toggle('hidden', validImages.length <= 1));
+        galleryCount?.classList.toggle('hidden', validImages.length <= 1);
+        if (galleryCount) galleryCount.textContent = `1 / ${validImages.length}`;
+      }
+
+      function showGalleryImage(index) {
+        if (!galleryThumbnails.length || !galleryImage) return;
+        activeGalleryIndex = (index + galleryThumbnails.length) % galleryThumbnails.length;
+        const activeThumbnail = galleryThumbnails[activeGalleryIndex];
+        window.clearTimeout(galleryTransitionTimer);
+        galleryImage.style.opacity = '0.35';
+        galleryTransitionTimer = window.setTimeout(() => {
+          galleryImage.src = activeThumbnail.dataset.gallerySrc;
+          galleryImage.style.opacity = '1';
+        }, 100);
+        galleryThumbnails.forEach((thumbnail, thumbnailIndex) => {
+          const isActive = thumbnailIndex === activeGalleryIndex;
+          thumbnail.setAttribute('aria-pressed', String(isActive));
+          thumbnail.classList.toggle('border-primary', isActive);
+          thumbnail.classList.toggle('border-transparent', !isActive);
+          thumbnail.classList.toggle('opacity-70', !isActive);
+        });
+        if (galleryCount) galleryCount.textContent = `${activeGalleryIndex + 1} / ${galleryThumbnails.length}`;
+      }
+
+      galleryThumbnailContainer?.addEventListener('click', (event) => {
+        const thumbnail = event.target.closest('[data-gallery-index]');
+        if (thumbnail) showGalleryImage(Number(thumbnail.dataset.galleryIndex));
+      });
+      galleryNavigation.forEach((button) => {
+        button.addEventListener('click', () => showGalleryImage(activeGalleryIndex + Number(button.dataset.galleryStep)));
+      });
+
+      window.addEventListener('zaloma:product-gallery-updated', (event) => {
+        updateProductGallery(event.detail?.images);
+      });
+
+      let swipeStartX = 0;
+      galleryFrame?.addEventListener('touchstart', (event) => {
+        swipeStartX = event.changedTouches[0].clientX;
+      }, { passive: true });
+      galleryFrame?.addEventListener('touchend', (event) => {
+        const swipeDistance = event.changedTouches[0].clientX - swipeStartX;
+        if (Math.abs(swipeDistance) >= 45) showGalleryImage(activeGalleryIndex + (swipeDistance < 0 ? 1 : -1));
+      }, { passive: true });
+
+      galleryFrame?.addEventListener('keydown', (event) => {
+        if (event.key === 'ArrowRight') showGalleryImage(activeGalleryIndex + 1);
+        if (event.key === 'ArrowLeft') showGalleryImage(activeGalleryIndex - 1);
+      });
+  </script>
+
+  <script define:vars={{ SUPABASE_URL, SUPABASE_ANON_KEY, currentSlug, currentCategorySlug }}>
   async function syncProductDetail() {
     try {
       if (!window.supabase) return;
@@ -344,6 +457,9 @@ const productSchema = {
       } else {
         // Update harga dan nama jika berubah di Supabase
         const p = cloudMap.get(currentSlug);
+        window.dispatchEvent(new CustomEvent('zaloma:product-gallery-updated', {
+          detail: { images: [p.image, ...(Array.isArray(p.images) ? p.images : [])].filter(Boolean).slice(0, 3) }
+        }));
         const priceEl = document.getElementById('product-detail-price');
         if (priceEl && p.price_label) priceEl.textContent = p.price_label;
 

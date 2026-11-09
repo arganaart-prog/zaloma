@@ -90,6 +90,24 @@ import { SUPABASE_URL, SUPABASE_ANON_KEY } from '../data/supabaseConfig';
           if (imgEl && p.image && !imgEl.src.includes(p.image)) {
             imgEl.src = p.image;
           }
+          const galleryImages = [p.image, ...(Array.isArray(p.images) ? p.images : [])].filter(Boolean).slice(0, 3);
+          const hoverImage = p.hover_preview_index > 1 ? galleryImages[p.hover_preview_index - 1] : '';
+          let previewImageEl = card.querySelector('[data-hover-preview-image]');
+          if (hoverImage) {
+            if (!previewImageEl) {
+              previewImageEl = document.createElement('img');
+              previewImageEl.dataset.hoverPreviewImage = 'true';
+              previewImageEl.alt = '';
+              previewImageEl.setAttribute('aria-hidden', 'true');
+              previewImageEl.loading = 'lazy';
+              previewImageEl.decoding = 'async';
+              previewImageEl.className = 'pointer-events-none absolute inset-0 z-[1] h-full w-full object-cover object-top opacity-0 transition-opacity duration-500 ease-in-out group-hover:opacity-100';
+              card.querySelector('[data-image-frame], .image-load-shell')?.append(previewImageEl);
+            }
+            if (previewImageEl) previewImageEl.src = hoverImage;
+          } else {
+            previewImageEl?.remove();
+          }
         }
       });
 
@@ -105,6 +123,8 @@ import { SUPABASE_URL, SUPABASE_ANON_KEY } from '../data/supabaseConfig';
       if (featuredSlider && displayFeatured.length > 0) {
         featuredSlider.innerHTML = displayFeatured.slice(0, 5).map((p, index) => {
           const prodUrl = `/produk/${p.slug}/`;
+          const galleryImages = [p.image, ...(Array.isArray(p.images) ? p.images : [])].filter(Boolean).slice(0, 3);
+          const hoverImage = p.hover_preview_index > 1 ? galleryImages[p.hover_preview_index - 1] : '';
           return `
             <div class="classic-product-card product-card-shell group bg-white rounded-[14px] border border-soft-cream/70 overflow-hidden shadow-[0_1px_4px_rgba(15,23,42,0.03)]">
               <a href="${prodUrl}" class="product-card-image classic-product-image image-load-shell block relative aspect-[20/22] bg-slate-100 overflow-hidden">
@@ -114,6 +134,7 @@ import { SUPABASE_URL, SUPABASE_ANON_KEY } from '../data/supabaseConfig';
                   loading="${index < 2 ? 'eager' : 'lazy'}"
                   class="relative z-0 object-cover object-top w-full h-full transition-transform duration-700 ease-out group-hover:scale-[1.012]"
                 />
+                ${hoverImage ? `<img src="${hoverImage}" alt="" aria-hidden="true" loading="lazy" decoding="async" class="pointer-events-none absolute inset-0 z-[1] h-full w-full object-cover object-top opacity-0 transition-opacity duration-500 ease-in-out group-hover:opacity-100" />` : ''}
                 <div class="classic-product-badges absolute top-3 left-3 z-10 flex gap-2">
                   <span class="bg-secondary text-primary-dark text-[10px] tracking-wider uppercase font-semibold px-2.5 py-1 rounded-xs shadow-xs">
                     Terpopuler
@@ -156,6 +177,8 @@ import { SUPABASE_URL, SUPABASE_ANON_KEY } from '../data/supabaseConfig';
         const cardShape = p.description?.match(/^\[Bentuk Kartu:\s*(portrait|square|arch)\]/im)?.[1];
         const imageAspect = cardShape === 'square' ? 'aspect-square' : cardShape ? 'aspect-[4/5]' : 'aspect-[4/5]';
         const archClass = cardShape === 'arch' ? 'product-card-shape-arch' : '';
+        const galleryImages = [p.image, ...(Array.isArray(p.images) ? p.images : [])].filter(Boolean).slice(0, 3);
+        const hoverImage = p.hover_preview_index > 1 ? galleryImages[p.hover_preview_index - 1] : '';
         return `
           <div class="product-item-wrapper h-full">
             <article class="category-product-card product-card-shell ${archClass} group flex h-full flex-col overflow-hidden rounded-[14px] border border-soft-cream/70 bg-white text-left no-underline shadow-[0_1px_4px_rgba(15,23,42,0.03)] hover-gold-grow">
@@ -168,6 +191,7 @@ import { SUPABASE_URL, SUPABASE_ANON_KEY } from '../data/supabaseConfig';
                     decoding="async"
                     class="relative z-0 block h-full w-full object-cover object-top transition-transform duration-700 ease-out group-hover:scale-[1.012]"
                   />
+                  ${hoverImage ? `<img src="${hoverImage}" alt="" aria-hidden="true" loading="lazy" decoding="async" class="pointer-events-none absolute inset-0 z-[1] h-full w-full object-cover object-top opacity-0 transition-opacity duration-500 ease-in-out group-hover:opacity-100" />` : ''}
                   <div class="absolute inset-x-0 bottom-0 z-10 h-24 bg-gradient-to-t from-primary-dark/45 via-primary-dark/10 to-transparent"></div>
                 </div>
                 <div class="flex min-h-[150px] flex-1 flex-col px-3.5 py-4 sm:min-h-[168px] sm:px-4 sm:py-4.5 justify-between">

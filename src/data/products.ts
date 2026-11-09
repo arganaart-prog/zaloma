@@ -8,6 +8,8 @@ export interface Product {
   priceFrom: number;
   priceLabel: string;
   image: string;
+  images?: string[];
+  hoverPreviewIndex?: number;
   imageWidth: number;
   imageHeight: number;
   description: string;

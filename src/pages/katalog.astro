@@ -34,6 +34,8 @@ try {
         priceFrom: Number(p.price_from) || 0,
         priceLabel: p.price_label,
         image: p.image,
+        images: p.images || [],
+        hoverPreviewIndex: p.hover_preview_index || undefined,
         imageWidth: 800,
         imageHeight: 800,
         description: p.description || '',
