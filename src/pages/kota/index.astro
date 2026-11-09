@@ -1,105 +1,44 @@
 
 ---
 import Layout from '../../layouts/Layout.astro';
-import { DEFAULT_CITIES, cityToSlug } from '../../data/cities';
+import { cityToSlug } from '../../data/cities';
 import { SUPABASE_URL, SUPABASE_ANON_KEY } from '../../data/supabaseConfig';
 import { WHATSAPP_NUMBER } from '../../data/constants';
 import { withBase } from '../../utils/paths';
 
-// Fetch dynamic cities from Supabase if available
+// The admin stores its city list in products._cities_config_.
 let dynamicCities: any[] = [];
 try {
-  const res = await fetch(`${SUPABASE_URL}/rest/v1/cities?select=*&order=name.asc`, {
+  const res = await fetch(`${SUPABASE_URL}/rest/v1/products?slug=eq._cities_config_&select=description&limit=1`, {
     headers: {
       apikey: SUPABASE_ANON_KEY,
       Authorization: `Bearer ${SUPABASE_ANON_KEY}`
     }
   });
-  if (res.ok) {
-    const data = await res.json();
-    if (Array.isArray(data) && data.length > 0) {
-      dynamicCities = data;
-    }
+  if (!res.ok) throw new Error(`Supabase returned ${res.status} ${res.statusText}`);
+  const data = await res.json();
+  if (Array.isArray(data) && typeof data[0]?.description === 'string') {
+    const parsedCities = JSON.parse(data[0].description);
+    if (Array.isArray(parsedCities)) dynamicCities = parsedCities;
   }
-} catch (e) {
-  // Silent fallback
+} catch (err) {
+  console.error('[Zaloma Build] Gagal memuat konfigurasi kota:', err);
+  throw err;
 }
 
-// Fallback to settings if table empty
-if (dynamicCities.length === 0) {
-  try {
-    const res = await fetch(`${SUPABASE_URL}/rest/v1/settings?key=eq.cities&select=value`, {
-      headers: {
-        apikey: SUPABASE_ANON_KEY,
-        Authorization: `Bearer ${SUPABASE_ANON_KEY}`
-      }
-    });
-    if (res.ok) {
-      const data = await res.json();
-      if (Array.isArray(data) && data[0]?.value) {
-        let val = data[0].value;
-        if (typeof val === 'string') val = JSON.parse(val);
-        if (Array.isArray(val)) dynamicCities = val;
-      }
-    }
-  } catch (e) {
-    // Silent fallback
-  }
-}
-
-// Fallback to admin cities config (products._cities_config_)
-if (dynamicCities.length === 0) {
-  try {
-    const res = await fetch(`${SUPABASE_URL}/rest/v1/products?slug=eq._cities_config_&select=description&limit=1`, {
-      headers: {
-        apikey: SUPABASE_ANON_KEY,
-        Authorization: `Bearer ${SUPABASE_ANON_KEY}`
-      }
-    });
-    if (res.ok) {
-      const data = await res.json();
-      if (Array.isArray(data) && data[0]?.description) {
-        let val = data[0].description;
-        if (typeof val === 'string') val = JSON.parse(val);
-        if (Array.isArray(val)) dynamicCities = val;
-      }
-    }
-  } catch (e) {
-    // Silent fallback
-  }
-}
-
-// Merge & deduplicate
 const cityMap = new Map<string, any>();
-DEFAULT_CITIES.forEach(c => {
-  cityMap.set(c.slug, {
-    name: c.name,
-    slug: c.slug,
-    image: c.image || '/images/galeri/gallery-1.webp',
-    description: c.description || 'Pengiriman karangan bunga, buket & standing flower cepat.',
-    isMainArea: Boolean(c.isMainArea),
-    province: c.province_name || (c.isMainArea ? 'Jawa Timur' : 'Indonesia')
-  });
-});
-
 dynamicCities.forEach(c => {
-  const rawName = typeof c === 'string' ? c : (c.name || '');
+  const rawName = typeof c === 'string' ? c : (c && c.name) || '';
   if (!rawName) return;
-  const slug = typeof c === 'object' && c.slug ? c.slug : cityToSlug(rawName);
-  const existing = cityMap.get(slug);
-  const image = (typeof c === 'object' && (c.image || c.image_url))
-    ? (c.image || c.image_url)
-    : (existing?.image || '/images/galeri/gallery-2.webp');
-  const description = (typeof c === 'object' && c.description) ? c.description : (existing?.description || `Florist partner pengiriman karangan bunga & buket segar di ${rawName}.`);
-  const province = (typeof c === 'object' && c.province_name) ? c.province_name : (existing?.province || 'Area Pengiriman');
+  const slug = typeof c === 'object' && c && c.slug ? c.slug : cityToSlug(rawName);
+  if (!slug || cityMap.has(slug)) return;
 
   cityMap.set(slug, {
     name: rawName,
     slug,
-    image,
-    description,
-    isMainArea: existing?.isMainArea || false,
-    province
+    image: (typeof c === 'object' && c && (c.image || c.image_url)) || '/images/galeri/gallery-2.webp',
+    description: (typeof c === 'object' && c && c.description) || `Florist partner pengiriman karangan bunga & buket segar di ${rawName}.`,
+    province: (typeof c === 'object' && c && (c.province_name || c.province)) || 'Area Pengiriman'
   });
 });
 

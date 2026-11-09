@@ -1,5 +1,5 @@
 ---
-import { DEFAULT_CITIES, cityToSlug } from '../data/cities';
+import { cityToSlug } from '../data/cities';
 import { withBase } from '../utils/paths';
 import { WHATSAPP_NUMBER } from '../data/constants';
 
@@ -10,30 +10,9 @@ interface Props {
 
 const { currentCitySlug = 'malang-raya', allCities = [] } = Astro.props;
 
-// Merge provided cities with DEFAULT_CITIES
 const mergedCities: any[] = [];
 const seenSlugs = new Set<string>();
 
-// 1. Prioritaskan DEFAULT_CITIES
-DEFAULT_CITIES.forEach(dc => {
-  if (dc && dc.slug && !seenSlugs.has(dc.slug)) {
-    seenSlugs.add(dc.slug);
-    const dynMatch = (allCities || []).find(c => {
-      const s = typeof c === 'string' ? cityToSlug(c) : (c && (c.slug || cityToSlug(c.name)));
-      return s === dc.slug;
-    });
-    mergedCities.push({
-      ...dc,
-      image: (dynMatch && (dynMatch.image || dynMatch.image_url)) ? (dynMatch.image || dynMatch.image_url) : dc.image,
-      description: (dynMatch && dynMatch.description) ? dynMatch.description : dc.description,
-      province_name: (dynMatch && dynMatch.province_name)
-        ? dynMatch.province_name
-        : (dc.province_name || (dc.isMainArea ? 'Jawa Timur' : 'Indonesia'))
-    });
-  }
-});
-
-// 2. Tambahkan kota kustom dari Supabase bila ada
 (allCities || []).forEach(c => {
   const name = typeof c === 'string' ? c : (c && c.name);
   if (!name) return;
@@ -46,7 +25,7 @@ DEFAULT_CITIES.forEach(dc => {
       image: (c && (c.image || c.image_url)) || '/images/galeri/gallery-1.webp',
       description: (c && c.description) || `Pengiriman karangan bunga & buket area ${name}`,
       tagline: (c && c.tagline) || `Area ${name} & Sekitarnya`,
-      province_name: (c && c.province_name) ? c.province_name : 'Indonesia'
+      province_name: (c && (c.province_name || c.province)) || 'Indonesia'
     });
   }
 });

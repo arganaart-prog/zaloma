@@ -15,7 +15,7 @@ import DailyCategoryRotation from '../../components/DailyCategoryRotation.astro'
 import HomeLiveSync from '../../components/HomeLiveSync.astro';
 import { SITE_DOMAIN } from '../../data/constants';
 import { SUPABASE_URL, SUPABASE_ANON_KEY } from '../../data/supabaseConfig';
-import { DEFAULT_CITIES, cityToSlug, productMatchesCity } from '../../data/cities';
+import { cityToSlug, productMatchesCity } from '../../data/cities';
 import { withBase } from '../../utils/paths';
 import { getRotatingHomeProducts } from '../../utils/rotatingProducts';
 import { getHomeDisplayProducts, deriveCategoriesFromProducts } from '../../utils/productHelpers';
@@ -41,36 +41,26 @@ export async function getStaticPaths() {
           try {
             const parsed = JSON.parse(citiesConfig.description);
             if (Array.isArray(parsed)) dynamicCities = parsed;
-          } catch (e) {}
+          } catch (err) {
+            console.warn('[Zaloma Build] Konfigurasi kota Supabase tidak valid:', err);
+          }
         }
       }
+    } else {
+      throw new Error(`Gagal mengambil konfigurasi kota: ${res.status} ${res.statusText}`);
     }
   } catch (err) {
-    console.warn('[Zaloma Build] Warning fetching products for city paths:', err);
+    console.error('[Zaloma Build] Gagal memuat data untuk halaman kota:', err);
+    throw err;
   }
 
   const combinedCities: any[] = [];
   const seenSlugs = new Set<string>();
 
-  DEFAULT_CITIES.forEach(dc => {
-    if (dc && dc.slug && !seenSlugs.has(dc.slug)) {
-      seenSlugs.add(dc.slug);
-      const dynMatch = dynamicCities.find(c => {
-        const s = typeof c === 'string' ? cityToSlug(c) : (c && (c.slug || cityToSlug(c.name)));
-        return s === dc.slug;
-      });
-      combinedCities.push({
-        ...dc,
-        image: (dynMatch && (dynMatch.image || dynMatch.image_url)) ? (dynMatch.image || dynMatch.image_url) : dc.image,
-        description: (dynMatch && dynMatch.description) ? dynMatch.description : dc.description
-      });
-    }
-  });
-
   dynamicCities.forEach(c => {
     const name = typeof c === 'string' ? c : (c && c.name);
     if (!name) return;
-    const slug = typeof c === 'string' ? cityToSlug(c) : (c.slug || cityToSlug(c.name));
+    const slug = typeof c === 'string' ? cityToSlug(c) : (c.slug || cityToSlug(name));
     if (slug && !seenSlugs.has(slug)) {
       seenSlugs.add(slug);
       combinedCities.push({
@@ -79,8 +69,8 @@ export async function getStaticPaths() {
         image: (c && (c.image || c.image_url)) || '/images/galeri/gallery-1.webp',
         description: (c && c.description) || `Pengiriman karangan bunga & buket area ${name}`,
         tagline: (c && c.tagline) || `Area ${name} & Sekitarnya`,
-        seoTitle: getCitySeoTitle(name),
-        seoDescription: getCitySeoDescription(name)
+        seoTitle: (c && c.seoTitle) || getCitySeoTitle(name),
+        seoDescription: (c && c.seoDescription) || getCitySeoDescription(name)
       });
     }
   });
@@ -127,7 +117,7 @@ const { activeProducts } = getRotatingHomeProducts(getHomeDisplayProducts(produc
 // Derive categories dynamically from city-filtered Supabase products (no static data)
 const cityCategories = deriveCategoriesFromProducts(products);
 
-const title = getCitySeoTitle(city.name);
+const title = city.seoTitle || getCitySeoTitle(city.name);
 const description = city.seoDescription || getCitySeoDescription(city.name);
 const keywords = `Zaloma Florist, toko bunga online 24 jam ${city.name}, florist ${city.name}, bunga papan ${city.name}, buket bunga ${city.name}, standing flower ${city.name}`;
 

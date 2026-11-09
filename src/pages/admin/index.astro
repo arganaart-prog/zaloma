@@ -3470,37 +3470,7 @@ function withBase(path: string): string {
       renderCategoriesCards();
 
       // ================= CITIES STATE MANAGEMENT =================
-      const DEFAULT_CITIES = [
-        { name: "Malang Raya (Kota Malang, Kab. Malang, Kota Batu)", description: "Area utama Malang Raya" },
-        { name: "Bisa Dikirim ke Mana Saja", description: "Pengiriman ke seluruh Indonesia / ekspedisi" },
-        { name: "Kota Malang", description: "Wilayah Kota Malang" },
-        { name: "Kota Batu", description: "Wilayah Kota Batu" },
-        { name: "Kabupaten Malang", description: "Wilayah Kabupaten Malang" },
-        { name: "Surabaya", description: "Kota Surabaya & sekitarnya" },
-        { name: "Sidoarjo", description: "Kabupaten Sidoarjo" },
-        { name: "Gresik", description: "Kabupaten Gresik" },
-        { name: "Pasuruan", description: "Kota & Kab. Pasuruan" },
-        { name: "Kediri", description: "Kota & Kab. Kediri" },
-        { name: "Blitar", description: "Kota & Kab. Blitar" }
-      ];
-
       let citiesList = [];
-      try {
-        const cachedCities = localStorage.getItem('zaloma_admin_cities_v2') || localStorage.getItem('zaloma_admin_cities_v1');
-        if (cachedCities !== null) {
-          citiesList = JSON.parse(cachedCities);
-          if (!Array.isArray(citiesList)) citiesList = [];
-        }
-      } catch (e) {
-        citiesList = [];
-      }
-
-      // Always guarantee all 11 default cities are included
-      const existingCityNames = new Set((citiesList || []).map(c => typeof c === 'string' ? c : c.name));
-      DEFAULT_CITIES.forEach(dc => {
-        if (!existingCityNames.has(dc.name)) citiesList.push(dc);
-      });
-      localStorage.setItem('zaloma_admin_cities_v2', JSON.stringify(citiesList));
 
       function updateCityBadges() {
         const badge = document.getElementById('tab-city-badge');
@@ -5012,23 +4982,20 @@ function withBase(path: string): string {
           if (citiesConfigRow && citiesConfigRow.description) {
             try {
               const cloudCities = JSON.parse(citiesConfigRow.description);
-              if (Array.isArray(cloudCities) && cloudCities.length > 0) {
-                const existingNames = new Set(cloudCities.map(c => typeof c === 'string' ? c : c.name));
-                DEFAULT_CITIES.forEach(dc => {
-                  if (!existingNames.has(dc.name)) cloudCities.push(dc);
-                });
-                citiesList = cloudCities;
-                localStorage.setItem('zaloma_admin_cities_v2', JSON.stringify(citiesList));
-                updateCityDropdowns();
-                renderCitiesCards();
-                updateCityBadges();
-              } else if (citiesList.length > 0) {
-                persistCities();
-              }
-            } catch (e) {}
-          } else if (citiesList.length > 0) {
-            persistCities();
+              if (!Array.isArray(cloudCities)) throw new Error('Daftar kota Supabase bukan array.');
+              citiesList = cloudCities;
+            } catch (err) {
+              console.warn('Gagal membaca konfigurasi kota Supabase:', err);
+              citiesList = [];
+            }
+          } else {
+            citiesList = [];
           }
+          localStorage.setItem('zaloma_admin_cities_v2', JSON.stringify(citiesList));
+          localStorage.setItem('zaloma_admin_cities_v1', JSON.stringify(citiesList));
+          updateCityDropdowns();
+          renderCitiesCards();
+          updateCityBadges();
 
           // Check for sizes configuration record
           const sizesConfigRow = (products || []).find(p => p.slug === '_sizes_config_');
