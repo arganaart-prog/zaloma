@@ -42,7 +42,7 @@ export const TESTIMONIALS: Testimonial[] = [
     location: 'Sukun, Malang',
     product: 'Bunga Papan Congratulations',
     rating: 5,
-    quote: 'Order bunga papan ucapan selamat untuk rekan kantor. Tulisan jelas, rangkaian segar, dan ongkir gratis ke area Malang. Pasti order lagi ke Zaloma Florist.',
+    quote: 'Order bunga papan ucapan selamat untuk rekan kantor. Tulisan jelas, rangkaian segar, dan biaya pengiriman dijelaskan sejak awal. Pasti order lagi ke Zaloma Florist.',
     initials: 'DL',
   },
   {
@@ -69,7 +69,7 @@ export const TESTIMONIALS: Testimonial[] = [
     location: 'Lawang, Malang',
     product: 'Paper Flower',
     rating: 5,
-    quote: 'Paper flower untuk dekorasi ulang tahun anak tahan lama dan warnanya cerah. Pengiriman ke Lawang lancar, kurir telpon dulu sebelum sampai. Mantap!',
+    quote: 'Paper flower untuk dekorasi ulang tahun anak tahan lama dan warnanya cerah. Pengiriman lancar, kurir menghubungi sebelum sampai. Mantap!',
     initials: 'AW',
   },
   {

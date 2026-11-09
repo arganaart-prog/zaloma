@@ -104,8 +104,8 @@ const currentSlug = product.slug;
 const currentCategorySlug = product.categorySlug;
 
 // SEO Meta
-const title = `${displayName} Malang - Murah & Berkualitas`;
-const description = `Beli ${displayName} di Zaloma Florist, toko bunga Malang murah dan berkualitas. ${displayDescription.substring(0, 110)}... Pengerjaan cepat ${product.processingTime}, gratis ongkir area Kota Malang.`;
+const title = `${displayName} — Florist Profesional dan Terbaik`;
+const description = `Pesan ${displayName} melalui Zaloma Florist, layanan toko bunga profesional. ${displayDescription.substring(0, 110)}... Pengerjaan ${product.processingTime}; konfirmasi pengiriman sesuai area tujuan.`;
 
 // JSON-LD Product Schema
 const productSchema = {
@@ -113,7 +113,7 @@ const productSchema = {
   "@type": "Product",
   "name": displayName,
   "image": new URL(withBase(product.image), Astro.site).toString(),
-  "description": `${displayDescription} Tersedia di Zaloma Florist, toko bunga Malang murah dan berkualitas dengan pengerjaan cepat.`,
+  "description": `${displayDescription} Tersedia di Zaloma Florist, toko bunga profesional dengan pengerjaan cepat.`,
   "brand": {
     "@type": "Brand",
     "name": "Zaloma Florist"

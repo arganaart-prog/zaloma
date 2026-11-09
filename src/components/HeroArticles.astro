@@ -2,11 +2,17 @@
 import { ARTICLES } from '../data/articles';
 import { withBase } from '../utils/paths';
 
+const hasCityReference = (text: string) =>
+  /\b(?:malang|batu|surabaya|sidoarjo|gresik|pasuruan|kediri|blitar|mojokerto|jombang|tulungagung)\b/i.test(text);
+const homepageArticles = ARTICLES.filter((article) =>
+  !hasCityReference(`${article.title} ${article.excerpt}`),
+);
+
 // Kelompokkan berdasarkan kategori
-const panduan = ARTICLES.filter(a =>
+const panduan = homepageArticles.filter(a =>
   a.category === 'Panduan Florist' || a.category === 'Tips Perawatan'
 );
-const inspirasi = ARTICLES.filter(a =>
+const inspirasi = homepageArticles.filter(a =>
   a.category === 'Inspirasi Bunga' || a.category === 'Tren Florist'
 );
 ---

@@ -14,7 +14,7 @@ interface Props {
 
 const {
   allProducts = [],
-  cityName = 'Malang',
+  cityName = '',
   citySlug = '',
   hideWhenEmpty = false,
   categorySlug = 'bunga-meja',
@@ -38,7 +38,7 @@ if (hideWhenEmpty && bungaMejaProducts.length === 0) {
 <section class="py-20 bg-accent-bg/60 border-y border-soft-cream/60" id="bunga-meja-malang">
   <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
     <div class="text-center max-w-2xl mx-auto mb-12">
-      <h2 class="font-serif text-3xl sm:text-4xl font-bold text-slate-800">Bunga Meja {cityName}</h2>
+      <h2 class="font-serif text-3xl sm:text-4xl font-bold text-slate-800">Bunga Meja{cityName ? ` ${cityName}` : ''}</h2>
       <p class="text-slate-500 text-sm mt-3 leading-relaxed">
         Bunga meja segar untuk meja kantor, resepsi, meeting, atau hadiah peresmian. Siap kirim rapi dengan kartu ucapan.
       </p>

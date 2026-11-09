@@ -9,6 +9,7 @@ import FloatingWhatsApp from '../components/FloatingWhatsApp.astro';
 import SeoInfoStrip from '../components/SeoInfoStrip.astro';
 import { withBase } from '../utils/paths';
 import { SITE_DOMAIN, WHATSAPP_NUMBER, INSTAGRAM_URL } from '../data/constants';
+import { SUPABASE_ANON_KEY, SUPABASE_URL } from '../data/supabaseConfig';
 
 interface Props {
   title: string;
@@ -24,14 +25,14 @@ interface Props {
 
 const { title, description, keywords, image, type = 'website', schema, robots, canonical, showTestimonials = true } = Astro.props;
 
-// Default Schema: Florist di Malang
+// Default business schema; location landing pages provide their own local SEO.
 const defaultSchema = {
   "@context": "https://schema.org",
   "@type": "Florist",
   "name": "Zaloma Florist",
-  "alternateName": ["Zaloma Florist Malang", "Toko Bunga Malang Murah dan Berkualitas", "Toko Bunga Murah Malang"],
-  "description": "Zaloma Florist adalah toko bunga Malang murah dan berkualitas untuk bunga papan, standing flower, hand bouquet, dan rangkaian bunga segar dengan layanan cepat.",
-  "slogan": "Florist Terbaik di Malang, 11 Tahun Pengalaman",
+  "alternateName": ["Zaloma Florist", "Toko Bunga Profesional Zaloma Florist"],
+  "description": "Zaloma Florist adalah toko bunga profesional untuk bunga papan, standing flower, hand bouquet, dan rangkaian bunga segar dengan layanan cepat.",
+  "slogan": "Florist Profesional dan Terbaik untuk Setiap Momen",
   "image": `${SITE_DOMAIN}/images/logo/zaloma-logo.webp`,
   "logo": `${SITE_DOMAIN}/favicon-192.png`,
   "@id": `${SITE_DOMAIN}/#florist`,
@@ -43,7 +44,7 @@ const defaultSchema = {
     { "@type": "AdministrativeArea", "name": "Kabupaten Malang" },
     { "@type": "City", "name": "Kota Batu" }
   ],
-  "keywords": "Zaloma Florist, Zaloma Florist Malang, toko bunga Zaloma Florist, toko bunga Malang murah, toko bunga Malang berkualitas, florist Malang murah, karangan bunga Malang murah berkualitas",
+  "keywords": "Zaloma Florist, florist profesional, toko bunga terpercaya, bunga papan, standing flower, hand bouquet, rangkaian bunga segar",
   "address": {
     "@type": "PostalAddress",
     "streetAddress": "Kota Malang, Jawa Timur",
@@ -70,7 +71,7 @@ const defaultSchema = {
   ],
   "hasOfferCatalog": {
     "@type": "OfferCatalog",
-    "name": "Katalog bunga murah dan berkualitas Zaloma Florist",
+    "name": "Katalog bunga profesional dan terbaik Zaloma Florist",
     "itemListElement": [
       { "@type": "OfferCatalog", "name": "Bunga papan Malang" },
       { "@type": "OfferCatalog", "name": "Standing flower Malang" },
@@ -171,7 +172,27 @@ const finalSchema = schema || defaultSchema;
     <SeoInfoStrip />
     <Footer />
     <FloatingWhatsApp />
-    <script>
+    <script define:vars={{ SUPABASE_URL, SUPABASE_ANON_KEY }}>
+      document.addEventListener('click', function(event) {
+        const target = event.target instanceof Element ? event.target.closest('a[href*="/produk/"]') : null;
+        if (!(target instanceof HTMLAnchorElement)) return;
+        const slug = target.href.match(/\/produk\/([^/?#]+)/)?.[1];
+        if (!slug) return;
+
+        fetch(`${SUPABASE_URL}/rest/v1/rpc/record_product_click`, {
+          method: 'POST',
+          headers: { apikey: SUPABASE_ANON_KEY, 'Content-Type': 'application/json' },
+          body: JSON.stringify({ p_product_slug: decodeURIComponent(slug) }),
+          keepalive: true,
+        }).then(async function(response) {
+          if (!response.ok) {
+            console.error('[Zaloma] Gagal mencatat klik produk:', await response.text());
+          }
+        }).catch(function(error) {
+          console.error('[Zaloma] Gagal mengirim catatan klik produk:', error);
+        });
+      }, true);
+
       function initImageLoaders() {
         document.querySelectorAll('[data-image-loader]').forEach(function(image) {
           if (!(image instanceof HTMLImageElement)) return;

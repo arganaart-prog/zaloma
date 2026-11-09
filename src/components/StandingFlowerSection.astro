@@ -14,7 +14,7 @@ interface Props {
 
 const {
   allProducts = [],
-  cityName = 'Malang',
+  cityName = '',
   citySlug = '',
   hideWhenEmpty = false,
   categorySlug = 'standing-flower',
@@ -38,7 +38,7 @@ if (hideWhenEmpty && standingFlowerProducts.length === 0) {
 <section class="py-20 bg-white border-y border-soft-cream/60" id="standing-flower-malang">
   <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
     <div class="text-center max-w-2xl mx-auto mb-12">
-      <h2 class="font-serif text-3xl sm:text-4xl font-bold text-slate-800">Standing Flower {cityName}</h2>
+      <h2 class="font-serif text-3xl sm:text-4xl font-bold text-slate-800">Standing Flower{cityName ? ` ${cityName}` : ''}</h2>
       <p class="text-slate-500 text-sm mt-3 leading-relaxed">
         Rangkaian bunga berdiri untuk grand opening, ucapan selamat, dan duka cita. Pengerjaan rapi, difoto sebelum dikirim ke lokasi.
       </p>

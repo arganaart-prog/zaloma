@@ -105,9 +105,9 @@ export async function getStaticPaths() {
       slug: category.slug,
       name: catName,
       description: category.description || `Pesan ${catName} di Malang. Pengerjaan cepat, bunga segar, difoto sebelum dikirim.`,
-      seoTitle: category.seoTitle || `${catName} Malang Murah & Berkualitas - Zaloma Florist`,
-      seoDescription: category.seoDescription || `Pesan ${catName} di Malang murah dan berkualitas. Bunga segar, pengerjaan cepat 3 jam, difoto sebelum diantar.`,
-      seoKeywords: category.seoKeywords || `${catName.toLowerCase()} malang, ${catName.toLowerCase()} murah malang`,
+      seoTitle: category.seoTitle || `${catName} Malang — Florist Profesional dan Terbaik`,
+      seoDescription: category.seoDescription || `Pesan ${catName} di Malang dengan layanan florist profesional. Bunga segar, pengerjaan cepat, dan difoto sebelum diantar.`,
+      seoKeywords: category.seoKeywords || `${catName.toLowerCase()} malang, florist profesional ${catName.toLowerCase()} malang`,
       image: getCategoryImage(category),
     };
 

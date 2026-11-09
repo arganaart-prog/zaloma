@@ -14,7 +14,7 @@ interface Props {
 
 const {
   allProducts = [],
-  cityName = 'Malang',
+  cityName = '',
   citySlug = '',
   hideWhenEmpty = false,
   categorySlug = 'paper-flower',
@@ -38,9 +38,9 @@ if (hideWhenEmpty && paperFlowerProducts.length === 0) {
 <section class="py-20 bg-accent-bg/55 border-y border-soft-cream/60" id="paper-flower-malang">
   <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
     <div class="text-center max-w-2xl mx-auto mb-12">
-      <h2 class="font-serif text-3xl sm:text-4xl font-bold text-slate-800">Paper Flower {cityName}</h2>
+      <h2 class="font-serif text-3xl sm:text-4xl font-bold text-slate-800">Paper Flower{cityName ? ` ${cityName}` : ''}</h2>
       <p class="text-slate-500 text-sm mt-3 leading-relaxed">
-        Rangkaian bunga kertas tahan lama untuk hadiah wisuda, lamaran, dan hiasan ruangan dari Zaloma Florist {cityName}.
+        Rangkaian bunga kertas tahan lama untuk hadiah wisuda, lamaran, dan hiasan ruangan dari Zaloma Florist{cityName ? ` ${cityName}` : ''}.
       </p>
     </div>
 

@@ -13,7 +13,7 @@ interface Props {
 
 const {
   allProducts = [],
-  cityName = 'Malang',
+  cityName = '',
   citySlug = '',
   hideWhenEmpty = false,
   categorySlug = 'bouquet',
@@ -39,7 +39,7 @@ if (hideWhenEmpty && handBouquetProducts.length === 0) {
   <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
     <div class="text-center max-w-2xl mx-auto mb-12">
       <span class="text-secondary-dark font-bold text-xs tracking-widest uppercase block mb-1">Pilihan Buket Bunga</span>
-      <h2 class="font-serif text-3xl sm:text-4xl font-bold text-slate-800">Hand Bouquet {cityName}</h2>
+      <h2 class="font-serif text-3xl sm:text-4xl font-bold text-slate-800">Hand Bouquet{cityName ? ` ${cityName}` : ''}</h2>
       <p class="text-slate-500 text-sm mt-3 leading-relaxed">
         Buket bunga segar dan snack bouquet untuk wisuda, lamaran, hari ulang tahun, dan kado spesial. Dirangkai rapi dan siap dikirim pada hari yang sama.
       </p>

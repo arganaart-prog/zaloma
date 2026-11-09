@@ -9,7 +9,7 @@ interface Props {
 
 const {
   products = [],
-  cityName = 'Malang',
+  cityName = '',
   katalogHref = '/katalog/',
 } = Astro.props;
 
@@ -45,7 +45,7 @@ if (!products.length) {
             <a href={withBase(`/produk/${p.slug}/`)} class="product-card-image classic-product-image image-load-shell block relative aspect-[20/22] bg-slate-100 overflow-hidden">
               <img
                 src={p.image}
-                alt={`Foto ${p.name} Florist ${cityName}`}
+                alt={`Foto ${p.name} Zaloma Florist${cityName ? ` ${cityName}` : ''}`}
                 loading={index < 2 ? 'eager' : 'lazy'}
                 class="relative z-0 object-cover object-top w-full h-full transition-transform duration-700 ease-out group-hover:scale-[1.012]"
               />

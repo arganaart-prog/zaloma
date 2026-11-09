@@ -16,6 +16,10 @@ import { SUPABASE_URL, SUPABASE_ANON_KEY } from '../data/supabaseConfig';
     return false;
   }
 
+  function stripCitySuffix(value) {
+    return String(value || '').replace(/\s+(?:(?:kota|kabupaten)\s+)?(?:malang(?:\s+raya)?|batu|surabaya|sidoarjo|gresik|pasuruan|kediri|blitar|mojokerto|jombang|tulungagung)$/i, '').trim();
+  }
+
   async function syncHomeProducts() {
     try {
       if (!window.supabase) return;
@@ -25,7 +29,11 @@ import { SUPABASE_URL, SUPABASE_ANON_KEY } from '../data/supabaseConfig';
         .select('*')
         .order('created_at', { ascending: false });
 
-      if (error || !allProducts || allProducts.length === 0) return;
+      if (error) {
+        console.error('[Zaloma Homepage] Gagal memuat produk beranda:', error);
+        return;
+      }
+      if (!allProducts || allProducts.length === 0) return;
 
       const catalogProducts = allProducts.filter(p => p && p.slug && !String(p.slug).startsWith('_'));
       const pageCityEl = document.querySelector('[data-product-city]');
@@ -33,6 +41,15 @@ import { SUPABASE_URL, SUPABASE_ANON_KEY } from '../data/supabaseConfig';
       const sellableProducts = pageCity
         ? catalogProducts.filter(p => productMatchesCity(p.city, pageCity))
         : catalogProducts;
+      const { data: clickRows, error: clickRowsError } = await client.rpc('get_weekly_product_clicks');
+      if (clickRowsError) {
+        console.error('[Zaloma Homepage] Gagal memuat peringkat klik produk mingguan. Terapkan migrasi product_click_tracking terlebih dahulu:', clickRowsError);
+      }
+      const weeklyClicks = new Map(
+        (Array.isArray(clickRows) ? clickRows : [])
+          .filter(row => row && typeof row.product_slug === 'string')
+          .map(row => [row.product_slug, Number(row.click_count) || 0])
+      );
       if (sellableProducts.length === 0) {
         const featuredSection = document.querySelector('.featured-products-section');
         if (featuredSection) featuredSection.remove();
@@ -78,8 +95,13 @@ import { SUPABASE_URL, SUPABASE_ANON_KEY } from '../data/supabaseConfig';
 
       // 2. Sinkronisasi Featured Products Slider di beranda
       const featuredSlider = document.getElementById('featured-products-slider');
-      const featuredCloud = sellableProducts.filter(p => p.featured);
-      const displayFeatured = featuredCloud.length > 0 ? featuredCloud : sellableProducts;
+      const displayFeatured = [...sellableProducts]
+        .sort((a, b) => {
+          const clickDifference = (weeklyClicks.get(b.slug) || 0) - (weeklyClicks.get(a.slug) || 0);
+          if (clickDifference) return clickDifference;
+          return Number(Boolean(b.featured)) - Number(Boolean(a.featured));
+        })
+        .slice(0, 5);
       if (featuredSlider && displayFeatured.length > 0) {
         featuredSlider.innerHTML = displayFeatured.slice(0, 5).map((p, index) => {
           const prodUrl = `/produk/${p.slug}/`;
@@ -88,7 +110,7 @@ import { SUPABASE_URL, SUPABASE_ANON_KEY } from '../data/supabaseConfig';
               <a href="${prodUrl}" class="product-card-image classic-product-image image-load-shell block relative aspect-[20/22] bg-slate-100 overflow-hidden">
                 <img
                   src="${p.image}"
-                  alt="Foto ${p.name} Florist Malang"
+                  alt="Foto ${p.name} Zaloma Florist"
                   loading="${index < 2 ? 'eager' : 'lazy'}"
                   class="relative z-0 object-cover object-top w-full h-full transition-transform duration-700 ease-out group-hover:scale-[1.012]"
                 />
@@ -100,7 +122,7 @@ import { SUPABASE_URL, SUPABASE_ANON_KEY } from '../data/supabaseConfig';
               </a>
               <div class="classic-product-info p-4.5 sm:p-5 flex flex-col justify-between min-h-[190px] sm:min-h-[200px]">
                 <div>
-                  <p class="classic-product-category text-[11px] font-semibold tracking-wider text-slate-500 uppercase mb-1">${p.category_name || ''}</p>
+                  <p class="classic-product-category text-[11px] font-semibold tracking-wider text-slate-500 uppercase mb-1">${stripCitySuffix(p.category_name)}</p>
                   <h3 class="classic-product-title font-serif font-bold text-slate-800 line-clamp-2 leading-snug group-hover:text-primary transition-colors duration-200 text-base sm:text-lg">
                     <a href="${prodUrl}">${p.name}</a>
                   </h3>
@@ -125,6 +147,7 @@ import { SUPABASE_URL, SUPABASE_ANON_KEY } from '../data/supabaseConfig';
         if (typeof window.initFeaturedProductsSlider === 'function') {
           window.initFeaturedProductsSlider();
         }
+
       }
 
       // Helper untuk kartu produk kategori di beranda
@@ -140,7 +163,7 @@ import { SUPABASE_URL, SUPABASE_ANON_KEY } from '../data/supabaseConfig';
                 <div class="product-card-image image-load-shell relative ${imageAspect} overflow-hidden bg-clean-ivory">
                   <img
                     src="${p.image}"
-                    alt="Foto ${p.name} Zaloma Florist Malang"
+                    alt="Foto ${p.name} Zaloma Florist"
                     loading="lazy"
                     decoding="async"
                     class="relative z-0 block h-full w-full object-cover object-top transition-transform duration-700 ease-out group-hover:scale-[1.012]"

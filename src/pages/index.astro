@@ -11,9 +11,9 @@ import StandingFlowerSection from '../components/StandingFlowerSection.astro';
 import PaperFlowerSection from '../components/PaperFlowerSection.astro';
 import BungaMejaSection from '../components/BungaMejaSection.astro';
 import TanbulampotSection from '../components/TanbulampotSection.astro';
-import CityDeliverySection from '../components/CityDeliverySection.astro';
 import DailyCategoryRotation from '../components/DailyCategoryRotation.astro';
 import { SUPABASE_URL, SUPABASE_ANON_KEY } from '../data/supabaseConfig';
+import { SITE_DOMAIN, WHATSAPP_NUMBER } from '../data/constants';
 import { getRotatingHomeProducts } from '../utils/rotatingProducts';
 import { getHomeDisplayProducts, getSellableProducts, extractConfigCategories, deriveCategoriesFromProducts, getMomentCategories, mergeCategories } from '../utils/productHelpers';
 
@@ -36,8 +36,8 @@ try {
         slug: p.slug,
         name: p.name,
         categorySlug: p.category_slug,
-        categoryName: p.category_name,
-        city: p.city || 'Malang',
+        categoryName: p.category_name?.replace(/\s+(?:(?:kota|kabupaten)\s+)?(?:malang(?:\s+raya)?|batu|surabaya|sidoarjo|gresik|pasuruan|kediri|blitar|mojokerto|jombang|tulungagung)$/i, '').trim() || '',
+        city: p.city || 'Berbagai Kota',
         priceFrom: Number(p.price_from) || 0,
         priceLabel: p.price_label,
         image: p.image,
@@ -47,7 +47,7 @@ try {
         featured: Boolean(p.featured),
         whatsappText: `Halo Zaloma Florist, saya ingin pesan ${p.name} (${p.price_label}).`,
         processingTime: p.processing_time || '3 - 5 Jam',
-        serviceArea: ['Kota Malang', 'Kabupaten Malang', 'Kota Batu']
+        serviceArea: p.city ? [p.city] : []
       }));
     }
   }
@@ -59,7 +59,17 @@ try {
 const { activeProducts } = getRotatingHomeProducts(getHomeDisplayProducts(homeLiveProducts), 5);
 
 // Derive categories dynamically from Supabase: config + product data (no static code)
-const homeCategories = mergeCategories(configCategories, deriveCategoriesFromProducts(homeLiveProducts));
+const stripCitySuffix = (name: string) =>
+  name.replace(/\s+(?:(?:kota|kabupaten)\s+)?(?:malang(?:\s+raya)?|batu|surabaya|sidoarjo|gresik|pasuruan|kediri|blitar|mojokerto|jombang|tulungagung)$/i, '').trim();
+const homeCategories = mergeCategories(configCategories, deriveCategoriesFromProducts(homeLiveProducts))
+  .map((category) => ({
+    ...category,
+    name: stripCitySuffix(category.name),
+    subcategories: category.subcategories?.map((subcategory) => ({
+      ...subcategory,
+      name: stripCitySuffix(subcategory.name),
+    })),
+  }));
 const homeMomentCategories = getMomentCategories(homeCategories);
 const homeCategoryProductCounts = homeLiveProducts.reduce<Record<string, number>>((counts, product) => {
   if (product.categorySlug) {
@@ -90,11 +100,26 @@ const homeSectionCategories = {
 };
 
 // SEO Meta
-const title = "Toko Bunga Malang Murah & Berkualitas - Florist Cepat";
-const description = "Zaloma Florist menyediakan bunga papan, hand bouquet, standing flower, dan tanaman ucapan di Malang. Pengerjaan 3 jam, difoto sebelum dikirim, gratis ongkir Malang Kota.";
+const title = "Florist Profesional dan Terbaik untuk Setiap Momen | Zaloma Florist";
+const description = "Zaloma Florist menghadirkan bunga papan, hand bouquet, standing flower, dan tanaman ucapan dengan layanan profesional untuk berbagai kota. Produk difoto sebelum dikirim dan ketersediaan pengiriman dikonfirmasi sesuai tujuan.";
+const homepageKeywords = "Zaloma Florist, florist profesional, toko bunga terbaik, bunga papan, hand bouquet, standing flower, bunga meja, tanaman ucapan, pengiriman bunga berbagai kota";
+const homepageSchema = {
+  '@context': 'https://schema.org',
+  '@type': 'Florist',
+  name: 'Zaloma Florist',
+  alternateName: ['Toko Bunga Profesional Zaloma Florist'],
+  description,
+  slogan: 'Florist Profesional dan Terbaik untuk Setiap Momen',
+  image: `${SITE_DOMAIN}/images/logo/zaloma-logo.webp`,
+  logo: `${SITE_DOMAIN}/favicon-192.png`,
+  url: SITE_DOMAIN,
+  telephone: `+${WHATSAPP_NUMBER}`,
+  areaServed: { '@type': 'Country', name: 'Indonesia' },
+  keywords: homepageKeywords,
+};
 ---
 
-<Layout title={title} description={description}>
+<Layout title={title} description={description} keywords={homepageKeywords} schema={homepageSchema}>
   <!-- Supabase JS SDK for live home sync -->
   <script is:inline src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
   <HomeHero />
@@ -111,7 +136,7 @@ const description = "Zaloma Florist menyediakan bunga papan, hand bouquet, stand
   </section>
   
 
-  <FeaturedProductsSection products={activeProducts} cityName="Malang" />
+  <FeaturedProductsSection products={activeProducts} />
 
 
   <style is:global>
@@ -631,7 +656,5 @@ const description = "Zaloma Florist menyediakan bunga papan, hand bouquet, stand
   <TanbulampotSection allProducts={homeLiveProducts} categorySlug={homeSectionCategories.tabulampot} />
   <HomeDynamicCategorySections categories={homeCategories} products={homeLiveProducts} />
 
-  <!-- Service Area Section (Jawa Timur & Malang Raya) -->
-  <CityDeliverySection currentCitySlug="malang-raya" />
   <HomeLiveSync />
 </Layout>

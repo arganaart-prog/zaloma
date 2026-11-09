@@ -28,8 +28,12 @@ const toPromoSlide = (banner: typeof DEFAULT_PROMO_BANNERS[number]) => ({
     : null,
 });
 
+const hasCityReference = (banner: typeof DEFAULT_PROMO_BANNERS[number]) =>
+  /\b(?:malang|batu|surabaya|sidoarjo|gresik|pasuruan|kediri|blitar|mojokerto|jombang|tulungagung)\b/i
+    .test([banner.badge, banner.headline, banner.description, banner.alt, banner.ctaPrimaryLabel, banner.ctaSecondaryLabel].join(' '));
+
 const selectCityPromoBanners = (banners: typeof DEFAULT_PROMO_BANNERS, slug: string) => {
-  const globalBanners = banners.filter((banner) => !banner.citySlug);
+  const globalBanners = banners.filter((banner) => !banner.citySlug && (slug || !hasCityReference(banner)));
   const cityBanners = slug ? banners.filter((banner) => banner.citySlug === slug) : [];
   return slug && cityBanners.length > 0 ? cityBanners : globalBanners;
 };
@@ -797,9 +801,13 @@ const displaySlides = activePromoSlides.map((slide, idx) => ({
     const cityBanners = citySlug
       ? validBanners.filter((banner) => banner.citySlug === citySlug)
       : [];
+    const globalBanners = validBanners.filter((banner) =>
+      !banner.citySlug && (citySlug || !/\b(?:malang|batu|surabaya|sidoarjo|gresik|pasuruan|kediri|blitar|mojokerto|jombang|tulungagung)\b/i
+        .test([banner.badge, banner.headline, banner.description, banner.alt, banner.ctaPrimaryLabel, banner.ctaSecondaryLabel].join(' '))),
+    );
     const slides = citySlug && cityBanners.length > 0
       ? cityBanners
-      : validBanners.filter((banner) => !banner.citySlug);
+      : globalBanners;
     if (!slides.length) return;
 
     /**

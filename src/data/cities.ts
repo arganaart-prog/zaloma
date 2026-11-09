@@ -19,7 +19,7 @@ export const DEFAULT_CITIES: CityItem[] = [
     province_name: "Jawa Timur",
     isMainArea: true,
     tagline: "Area Pusat Workshop Florist",
-    seoTitle: "Toko Bunga Malang Raya & Batu Murah Berkualitas — Zaloma Florist",
+    seoTitle: "Florist Profesional Malang Raya & Batu — Zaloma Florist",
     seoDescription: "Pesan karangan bunga papan, buket bunga, standing flower di Malang Raya & Batu. Pengerjaan cepat 3 jam, bunga segar berkualitas & gratis ongkir Malang Kota."
   },
   {

@@ -12,21 +12,39 @@ const {
 const consultWaUrl = `https://wa.me/${WHATSAPP_NUMBER}?text=${encodeURIComponent(consultMessage)}`;
 ---
 
-<aside class="pointer-events-none fixed inset-0 z-50" aria-label="Kontak WhatsApp Zaloma Florist">
+<aside class="pointer-events-none fixed inset-0 z-[10000]" aria-label="Kontak WhatsApp Zaloma Florist">
   <a
     href={consultWaUrl}
     target="_blank"
     rel="noopener noreferrer"
-    class="pointer-events-auto fixed bottom-5 right-4 z-50 flex items-center gap-3 rounded-full border border-primary/25 bg-white/95 p-2 pr-5 shadow-[0_10px_30px_rgba(63,75,55,0.15)] backdrop-blur-md transition-all duration-300 hover:scale-105 hover:shadow-[0_15px_35px_rgba(85,101,75,0.3)] active:scale-95 focus:outline-none focus-visible:ring-2 focus-visible:ring-primary sm:bottom-6 sm:right-6 sm:pr-6"
+    class="pointer-events-auto fixed right-0 bottom-[84px] z-[10000] flex w-[46px] flex-col items-center rounded-l-2xl border border-r-0 border-primary/15 bg-white/95 px-1.5 py-3 shadow-[-4px_2px_16px_rgba(103,30,47,0.12)] backdrop-blur-sm transition-all duration-300 ease-out hover:w-[50px] hover:-translate-x-0.5 hover:shadow-[-6px_4px_24px_rgba(103,30,47,0.18)] focus:outline-none focus-visible:ring-2 focus-visible:ring-primary lg:bottom-auto lg:top-[58%] lg:-translate-y-1/2"
+    aria-label="Pesan sekarang melalui WhatsApp"
+    title="Pesan sekarang melalui WhatsApp"
+  >
+    <span class="flex h-8 w-8 shrink-0 items-center justify-center rounded-lg bg-gradient-to-br from-secondary to-primary text-white transition-transform duration-300 hover:scale-105">
+      <svg class="h-5 w-5" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" aria-hidden="true">
+        <path stroke-linecap="round" stroke-linejoin="round" d="M20.5 11.5a8.5 8.5 0 0 1-12.6 7.4L3 20l1.2-4.5a8.5 8.5 0 1 1 16.3-4z" />
+        <path stroke-linecap="round" stroke-linejoin="round" d="M8.5 8.5c.3 2.8 2.2 4.7 5 5" />
+      </svg>
+    </span>
+    <span class="mt-2.5 flex flex-col items-center gap-2">
+      <span class="[writing-mode:vertical-lr] whitespace-nowrap text-[7.5px] font-bold uppercase tracking-[0.2em] text-primary/75">Pesan Sekarang</span>
+      <span class="h-5 w-[2px] rounded-full bg-primary/25 transition-all duration-300 hover:h-7 hover:bg-primary/50"></span>
+    </span>
+  </a>
+
+  <a
+    href={consultWaUrl}
+    target="_blank"
+    rel="noopener noreferrer"
+    class="group pointer-events-auto fixed bottom-5 right-4 z-[10001] flex items-center gap-3 rounded-full border border-secondary/30 bg-white p-1.5 pr-5 text-slate-800 shadow-[0_10px_40px_rgba(0,0,0,0.2)] transition-all duration-300 hover:scale-105 hover:bg-rose-50 active:scale-95 focus:outline-none focus-visible:ring-2 focus-visible:ring-primary sm:bottom-6 sm:right-6"
     aria-label="Chat WhatsApp Zaloma Florist"
     title="Chat WhatsApp Zaloma Florist"
   >
-    <span class="relative flex h-11 w-11 shrink-0 items-center justify-center rounded-full border border-secondary/30 bg-gradient-to-tr from-primary-dark via-primary to-primary-light text-white shadow-md transition-transform duration-300 hover:rotate-6 sm:h-12 sm:w-12">
-      <svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" class="h-5 w-5 drop-shadow-xs sm:h-6 sm:w-6" aria-hidden="true">
+    <span class="relative flex h-12 w-12 shrink-0 items-center justify-center rounded-full bg-gradient-to-br from-secondary to-primary text-white shadow-lg transition-transform duration-300 group-hover:rotate-6 sm:h-14 sm:w-14">
+      <svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" class="h-5 w-5 sm:h-6 sm:w-6" aria-hidden="true">
         <path d="M21 15a2 2 0 0 1-2 2H7l-4 4V5a2 2 0 0 1 2-2h14a2 2 0 0 1 2 2z"></path>
-        <path d="M9 10v4"></path>
-        <path d="M12 8v8"></path>
-        <path d="M15 10v4"></path>
+        <path d="M8 12h.01M12 12h.01M16 12h.01"></path>
       </svg>
       <span class="absolute -top-0.5 -right-0.5 flex h-3.5 w-3.5">
         <span class="animate-ping absolute inline-flex h-full w-full rounded-full bg-emerald-400 opacity-75"></span>
@@ -34,12 +52,11 @@ const consultWaUrl = `https://wa.me/${WHATSAPP_NUMBER}?text=${encodeURIComponent
       </span>
     </span>
 
-    <span class="flex flex-col">
-      <span class="flex items-center gap-1 text-[10px] font-bold uppercase tracking-wider text-primary sm:text-[11px]">
-        HUBUNGI KAMI
-        <span class="inline-block h-1.5 w-1.5 rounded-full bg-emerald-500 animate-pulse"></span>
+    <span class="hidden flex-col items-start leading-none md:flex">
+      <span class="mb-0.5 text-[10px] font-bold uppercase tracking-widest text-primary">
+        Hubungi Kami
       </span>
-      <span class="flex items-center gap-1.5 text-sm font-extrabold leading-tight text-slate-800 transition-colors group-hover:text-primary sm:text-[15px]">
+      <span class="flex items-center gap-1.5 text-sm font-bold text-slate-700 transition-colors group-hover:text-primary">
         Chat WhatsApp
         <svg class="h-3.5 w-3.5 shrink-0 fill-current text-emerald-600" viewBox="0 0 24 24" aria-hidden="true">
           <path d="M12.031 6.172c-3.181 0-5.767 2.586-5.768 5.766-.001 1.298.38 2.27 1.019 3.287l-.711 2.598 2.669-.699c.969.54 1.838.847 2.791.848 3.18 0 5.767-2.587 5.768-5.766.001-3.18-2.585-5.834-5.768-5.834zm3.377 8.243c-.147.411-.75.76-1.042.812-.292.052-.663.097-2.072-.49-1.409-.587-2.327-2.016-2.398-2.112-.07-.095-.572-.76-.572-1.45 0-.69.362-1.029.49-1.173.129-.144.281-.18.375-.18.094 0 .188.001.27.006.086.005.201-.033.315.241.114.275.39 1.025.424 1.107.034.082.057.178.002.288-.055.11-.082.179-.164.275-.082.096-.173.214-.247.288-.082.083-.168.172-.072.337.096.165.427.705.916 1.141.63.562 1.161.736 1.326.818.165.082.261.069.358-.041.096-.11.413-.48.523-.645.11-.165.22-.138.371-.082.151.055.955.45 1.12.533.165.082.275.124.316.192.041.069.041.399-.106.81zM12.012 2.002C6.488 2.002 2 6.49 2 12.014c0 1.942.553 3.755 1.517 5.289L2 22l4.821-1.488A9.97 9.97 0 0 0 12.012 22C17.535 22 22 17.51 22 12.014c0-5.524-4.465-10.012-9.988-10.012z"/>

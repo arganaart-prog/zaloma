@@ -46,7 +46,7 @@ const row2 = [...ROW_2, ...ROW_2];
 
     <div class="cg-intro-right">
       <p class="cg-body">
-        Dokumentasi pesanan yang telah kami selesaikan dan kami antarkan untuk para pelanggan di Malang Raya. 
+        Dokumentasi rangkaian pesanan yang telah kami selesaikan dan kirim untuk pelanggan.
         Rangkaian bunga rapi, segar, dan selalu kami fotokan sebelum diberangkatkan ke lokasi tujuan.
       </p>
       <div class="cg-stats">
@@ -78,7 +78,7 @@ const row2 = [...ROW_2, ...ROW_2];
           <div class="cg-tile">
             <img
               src={withBase(src)}
-              alt={`Pesanan pelanggan Zaloma Florist Malang ${(i % ROW_1.length) + 1}`}
+              alt={`Pesanan pelanggan Zaloma Florist ${(i % ROW_1.length) + 1}`}
               loading="lazy"
               decoding="async"
               width="260"
@@ -97,7 +97,7 @@ const row2 = [...ROW_2, ...ROW_2];
           <div class="cg-tile">
             <img
               src={withBase(src)}
-              alt={`Pesanan pelanggan Zaloma Florist Malang ${(i % ROW_2.length) + ROW_1.length + 1}`}
+              alt={`Pesanan pelanggan Zaloma Florist ${(i % ROW_2.length) + ROW_1.length + 1}`}
               loading="lazy"
               decoding="async"
               width="260"
@@ -504,4 +504,3 @@ const row2 = [...ROW_2, ...ROW_2];
   initCustomerGallery();
   document.addEventListener('astro:page-load', initCustomerGallery);
 </script>
-
