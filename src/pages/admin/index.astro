@@ -1778,6 +1778,49 @@ function withBase(path: string): string {
 
       let allProductsList = [];
       let pendingDeleteId = null;
+      function getProductStoragePath(imageUrl) {
+        if (typeof imageUrl !== 'string' || !imageUrl.trim()) return null;
+        if (!/^https?:\/\//i.test(imageUrl.trim())) return null;
+        try {
+          const projectUrl = new URL(SUPABASE_URL);
+          const image = new URL(imageUrl);
+          const bucketPrefix = `/storage/v1/object/public/${SUPABASE_BUCKET}/`;
+          if (image.origin !== projectUrl.origin || !image.pathname.startsWith(bucketPrefix)) return null;
+          const path = decodeURIComponent(image.pathname.slice(bucketPrefix.length));
+          if (!path || path.split('/').some(segment => segment === '.' || segment === '..')) return null;
+          return path;
+        } catch (error) {
+          console.warn('[Zaloma Admin] URL foto Storage tidak valid:', error);
+          return null;
+        }
+      }
+
+      async function removeUnreferencedProductImages(imageUrls) {
+        const candidates = [...new Set((imageUrls || []).map(getProductStoragePath).filter(Boolean))];
+        if (candidates.length === 0) return;
+
+        const { data: products, error: lookupError } = await supabase
+          .from('products')
+          .select('image, images');
+        if (lookupError) throw lookupError;
+
+        const referencedPaths = new Set();
+        (products || []).forEach(product => {
+          [product.image, ...(Array.isArray(product.images) ? product.images : [])]
+            .map(getProductStoragePath)
+            .filter(Boolean)
+            .forEach(path => referencedPaths.add(path));
+        });
+
+        const orphanedPaths = candidates.filter(path => !referencedPaths.has(path));
+        if (orphanedPaths.length === 0) return;
+
+        const { error: removeError } = await supabase.storage
+          .from(SUPABASE_BUCKET)
+          .remove(orphanedPaths);
+        if (removeError) throw removeError;
+      }
+
       let promoBanners = DEFAULT_PROMO_BANNERS;
       let promoBannerDesktopFile = null;
       let promoBannerMobileFile = null;
@@ -1892,7 +1935,7 @@ function withBase(path: string): string {
         canvas.toBlob((blob) => {
           if (blob) finishImageCrop(blob);
           else showToast('Gagal menyiapkan hasil potongan gambar.', 'error');
-        }, 'image/webp', 0.84);
+        }, 'image/webp', 0.91);
       });
       imageCropSelection.addEventListener('pointerdown', (event) => {
         if (!activeCrop) return;
@@ -5407,14 +5450,36 @@ function withBase(path: string): string {
         deleteSpinner.classList.remove('hidden');
 
         try {
+          let productToDelete = allProductsList.find(product => product.id === pendingDeleteId);
+          if (!productToDelete) {
+            const { data, error: lookupError } = await supabase
+              .from('products')
+              .select('id, image, images')
+              .eq('id', pendingDeleteId)
+              .maybeSingle();
+            if (lookupError) throw lookupError;
+            productToDelete = data;
+          }
+          if (!productToDelete) throw new Error('Produk tidak ditemukan.');
+
           const { error } = await supabase.from('products').delete().eq('id', pendingDeleteId);
           if (error) throw error;
 
           deleteModal.classList.add('hidden');
-          showToast('Produk berhasil dihapus.');
+          try {
+            await removeUnreferencedProductImages([
+              productToDelete.image,
+              ...(Array.isArray(productToDelete.images) ? productToDelete.images : [])
+            ]);
+            showToast('Produk dan foto yang tidak dipakai berhasil dihapus.');
+          } catch (cleanupError) {
+            console.error('[Zaloma Admin] Produk terhapus, tetapi foto Storage gagal dibersihkan:', cleanupError);
+            showToast('Produk terhapus, tetapi foto lama belum berhasil dibersihkan dari penyimpanan.', 'warning');
+          }
           loadAllProducts();
         } catch (err) {
-          showToast('Gagal menghapus: ' + err.message, 'error');
+          console.error('[Zaloma Admin] Gagal menghapus produk:', err);
+          showToast('Gagal menghapus produk. Periksa koneksi dan izin Supabase.', 'error');
         } finally {
           confirmDeleteBtn.disabled = false;
           deleteBtnText.textContent = 'Hapus';
@@ -5481,8 +5546,13 @@ function withBase(path: string): string {
         saveBtnText.textContent = 'Menyimpan...';
         saveSpinner.classList.remove('hidden');
 
+        const uploadedGalleryUrls = [];
         try {
           const currentProduct = allProductsList.find(x => x.id === id);
+          const previousGalleryUrls = [
+            currentProduct?.image || document.getElementById('edit-prod-current-image').value,
+            ...(Array.isArray(currentProduct?.images) ? currentProduct.images : [])
+          ];
           const slug = currentProduct ? currentProduct.slug : `prod-${Date.now()}`;
           const finalGalleryUrls = [];
           for (const [index, item] of editGalleryItems.entries()) {
@@ -5495,6 +5565,7 @@ function withBase(path: string): string {
               if (uploadError) throw new Error('Upload foto gagal: ' + uploadError.message);
               const { data: publicUrlData } = supabase.storage.from(SUPABASE_BUCKET).getPublicUrl(fileName);
               finalGalleryUrls.push(publicUrlData.publicUrl);
+              uploadedGalleryUrls.push(publicUrlData.publicUrl);
             } else {
               finalGalleryUrls.push(item.url);
             }
@@ -5523,11 +5594,27 @@ function withBase(path: string): string {
 
           if (error) throw error;
 
+          let cleanupFailed = false;
+          try {
+            await removeUnreferencedProductImages(previousGalleryUrls);
+          } catch (cleanupError) {
+            cleanupFailed = true;
+            console.error('[Zaloma Admin] Produk diperbarui, tetapi foto lama gagal dibersihkan:', cleanupError);
+          }
+
           editModal.classList.add('hidden');
-          showToast('Produk berhasil diperbarui.');
+          showToast(cleanupFailed
+            ? 'Produk diperbarui, tetapi foto lama belum berhasil dibersihkan dari penyimpanan.'
+            : 'Produk dan foto lama yang tidak dipakai berhasil diperbarui.', cleanupFailed ? 'warning' : 'success');
           loadAllProducts();
         } catch (err) {
-          showToast('Gagal menyimpan: ' + err.message, 'error');
+          console.error('[Zaloma Admin] Gagal menyimpan produk:', err);
+          try {
+            await removeUnreferencedProductImages(uploadedGalleryUrls);
+          } catch (cleanupError) {
+            console.error('[Zaloma Admin] Gagal membersihkan foto yang terunggah tetapi tidak tersimpan:', cleanupError);
+          }
+          showToast('Gagal menyimpan produk. Periksa koneksi dan izin Supabase.', 'error');
         } finally {
           saveEditBtn.disabled = false;
           saveBtnText.textContent = 'Simpan';
@@ -5590,6 +5677,7 @@ function withBase(path: string): string {
         btnText.textContent = 'Mengupload & menyimpan...';
         btnSpinner.classList.remove('hidden');
 
+        const uploadedGalleryUrls = [];
         try {
           const galleryUrls = [];
           for (const [index, item] of addGalleryItems.entries()) {
@@ -5601,6 +5689,7 @@ function withBase(path: string): string {
             if (uploadError) throw new Error('Upload foto gagal: ' + uploadError.message);
             const { data: publicUrlData } = supabase.storage.from(SUPABASE_BUCKET).getPublicUrl(fileName);
             galleryUrls.push(publicUrlData.publicUrl);
+            uploadedGalleryUrls.push(publicUrlData.publicUrl);
           }
 
           const { error: insertError } = await supabase.from('products').insert([{
@@ -5640,7 +5729,13 @@ function withBase(path: string): string {
           loadAllProducts();
 
         } catch (err) {
-          showToast('Error: ' + err.message, 'error');
+          console.error('[Zaloma Admin] Gagal menambahkan produk:', err);
+          try {
+            await removeUnreferencedProductImages(uploadedGalleryUrls);
+          } catch (cleanupError) {
+            console.error('[Zaloma Admin] Gagal membersihkan foto produk yang gagal disimpan:', cleanupError);
+          }
+          showToast('Gagal menambahkan produk. Periksa koneksi dan izin Supabase.', 'error');
         } finally {
           submitBtn.disabled = false;
           btnText.textContent = 'Simpan Produk';
