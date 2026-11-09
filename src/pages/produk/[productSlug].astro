@@ -266,9 +266,9 @@ const productSchema = {
           <!-- Call to Action Buttons -->
           <div class="pt-4 border-t border-soft-cream/80 space-y-3">
             <WhatsAppButton 
-              text={product.whatsappText}
-              label={`Pesan Sekarang via WhatsApp`}
-              class="w-full text-center py-4 text-base font-bold shadow-md hover:shadow-lg transition-all"
+              text="Pesan Sekarang via WhatsApp"
+              whatsappText={product.whatsappText}
+              className="w-full rounded-full text-center py-4 text-base font-bold shadow-md hover:shadow-lg transition-all"
             />
             <p class="text-center text-xs text-slate-400">
               Respons cepat 24 jam &bull; Konsultasi gratis &bull; Pembayaran via transfer bank

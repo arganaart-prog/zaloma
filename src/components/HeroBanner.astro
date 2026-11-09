@@ -882,6 +882,8 @@ const displaySlides = activePromoSlides.map((slide, idx) => ({
     }
   }
 
+  let cleanupHeroBanner: (() => void) | null = null;
+
   function initHeroBanner() {
     const AUTOPLAY_MS = 5000;
     const TRANSITION_MS = 480;
@@ -898,7 +900,10 @@ const displaySlides = activePromoSlides.map((slide, idx) => ({
     const heroContainer = container;
     const heroTrack = track;
     if (container.dataset.hbInit === 'true') return;
+    cleanupHeroBanner?.();
+    cleanupHeroBanner = null;
     container.dataset.hbInit = 'true';
+    const eventController = new AbortController();
 
     const isDesktop = window.matchMedia('(min-width: 1024px)').matches;
     /** @param {HTMLElement} element */
@@ -927,6 +932,7 @@ const displaySlides = activePromoSlides.map((slide, idx) => ({
     let transitioning = false;
     /** @type {number | null} */
     let autoTimer = null;
+    let autoStartTimer = 0;
     let didDrag = false;
     const prefersReduced = window.matchMedia('(prefers-reduced-motion: reduce)');
 
@@ -1010,10 +1016,10 @@ const displaySlides = activePromoSlides.map((slide, idx) => ({
     function restartAutoplay() { stopAutoplay(); startAutoplay(); }
 
     if (prevBtn) {
-      prevBtn.addEventListener('click', function(e) { e.stopPropagation(); goPrev(); restartAutoplay(); });
+      prevBtn.addEventListener('click', function(e) { e.stopPropagation(); goPrev(); restartAutoplay(); }, { signal: eventController.signal });
     }
     if (nextBtn) {
-      nextBtn.addEventListener('click', function(e) { e.stopPropagation(); goNext(); restartAutoplay(); });
+      nextBtn.addEventListener('click', function(e) { e.stopPropagation(); goNext(); restartAutoplay(); }, { signal: eventController.signal });
     }
 
     dots.forEach(function(dot, idx) {
@@ -1021,21 +1027,21 @@ const displaySlides = activePromoSlides.map((slide, idx) => ({
         e.stopPropagation();
         if (idx !== current) moveTo(idx, true);
         restartAutoplay();
-      });
+      }, { signal: eventController.signal });
     });
 
-    heroContainer.addEventListener('mouseenter', stopAutoplay);
-    heroContainer.addEventListener('mouseleave', startAutoplay);
-    heroContainer.addEventListener('focusin', stopAutoplay);
-    heroContainer.addEventListener('focusout', startAutoplay);
+    heroContainer.addEventListener('mouseenter', stopAutoplay, { signal: eventController.signal });
+    heroContainer.addEventListener('mouseleave', startAutoplay, { signal: eventController.signal });
+    heroContainer.addEventListener('focusin', stopAutoplay, { signal: eventController.signal });
+    heroContainer.addEventListener('focusout', startAutoplay, { signal: eventController.signal });
 
     heroContainer.addEventListener('keydown', function(e) {
       if (e.key === 'ArrowLeft') { e.preventDefault(); goPrev(); restartAutoplay(); }
       else if (e.key === 'ArrowRight') { e.preventDefault(); goNext(); restartAutoplay(); }
-    });
+    }, { signal: eventController.signal });
 
     heroContainer.querySelectorAll('a').forEach(function(link) {
-      link.addEventListener('click', function(e) { if (didDrag) { e.preventDefault(); e.stopPropagation(); } });
+      link.addEventListener('click', function(e) { if (didDrag) { e.preventDefault(); e.stopPropagation(); } }, { signal: eventController.signal });
     });
 
     /** @type {DragState | null} */
@@ -1046,7 +1052,7 @@ const displaySlides = activePromoSlides.map((slide, idx) => ({
       drag = { pointerId: e.pointerId, startX: e.clientX, startY: e.clientY, currentX: e.clientX, isDragging: false, isLocked: false };
       heroContainer.setPointerCapture(e.pointerId);
       stopAutoplay();
-    });
+    }, { signal: eventController.signal });
 
     heroContainer.addEventListener('pointermove', function(e) {
       if (!drag || e.pointerId !== drag.pointerId) return;
@@ -1072,7 +1078,7 @@ const displaySlides = activePromoSlides.map((slide, idx) => ({
       var base = `calc(-${current} * (100% + var(--hb-gap, 12px)))`;
       heroTrack.style.transition = 'none';
       heroTrack.style.transform = `translateX(calc(${base} + ${dx}px))`;
-    });
+    }, { signal: eventController.signal });
 
     /** @param {PointerEvent} e */
     function handlePointerEnd(e) {
@@ -1096,18 +1102,25 @@ const displaySlides = activePromoSlides.map((slide, idx) => ({
       startAutoplay();
     }
 
-    heroContainer.addEventListener('pointerup', handlePointerEnd);
-    heroContainer.addEventListener('pointercancel', handlePointerEnd);
-    heroContainer.addEventListener('dragstart', function(e) { e.preventDefault(); });
+    heroContainer.addEventListener('pointerup', handlePointerEnd, { signal: eventController.signal });
+    heroContainer.addEventListener('pointercancel', handlePointerEnd, { signal: eventController.signal });
+    heroContainer.addEventListener('dragstart', function(e) { e.preventDefault(); }, { signal: eventController.signal });
+
+    cleanupHeroBanner = function() {
+      eventController.abort();
+      stopAutoplay();
+      if (autoStartTimer) window.clearTimeout(autoStartTimer);
+    };
 
     setTranslate(0, false);
     updateDots(0);
     updateSlideAria(0);
     // Tunda autoplay 4 detik agar trace pengukuran Lighthouse (FCP, LCP, TBT) selesai tanpa interupsi
-    window.setTimeout(startAutoplay, 4000);
+    autoStartTimer = window.setTimeout(startAutoplay, 4000);
   }
 
   async function initializeHeroBanner() {
+    initHeroBanner();
     await refreshPromoBanners();
     initHeroBanner();
   }
