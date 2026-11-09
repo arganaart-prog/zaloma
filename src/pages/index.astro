@@ -11,6 +11,7 @@ import StandingFlowerSection from '../components/StandingFlowerSection.astro';
 import PaperFlowerSection from '../components/PaperFlowerSection.astro';
 import BungaMejaSection from '../components/BungaMejaSection.astro';
 import TanbulampotSection from '../components/TanbulampotSection.astro';
+import CityDeliverySection from '../components/CityDeliverySection.astro';
 import DailyCategoryRotation from '../components/DailyCategoryRotation.astro';
 import { SUPABASE_URL, SUPABASE_ANON_KEY } from '../data/supabaseConfig';
 import { SITE_DOMAIN, WHATSAPP_NUMBER } from '../data/constants';
@@ -21,6 +22,7 @@ import { getHomeDisplayProducts, getSellableProducts, extractConfigCategories, d
 // Ambil produk live dari Supabase saat build time untuk SEO & instant SSR render
 let homeLiveProducts: any[] = [];
 let configCategories: any[] = [];
+let homeCities: any[] = [];
 try {
   const res = await fetch(`${SUPABASE_URL}/rest/v1/products?select=*&order=created_at.desc`, {
     headers: {
@@ -32,6 +34,15 @@ try {
     const data = await res.json();
     if (Array.isArray(data)) {
       configCategories = extractConfigCategories(data);
+      const citiesConfig = data.find(p => p.slug === '_cities_config_');
+      if (typeof citiesConfig?.description === 'string') {
+        try {
+          const parsedCities = JSON.parse(citiesConfig.description);
+          if (Array.isArray(parsedCities)) homeCities = parsedCities;
+        } catch (err) {
+          console.warn('[Zaloma Build] Konfigurasi kota beranda tidak valid:', err);
+        }
+      }
       homeLiveProducts = getSellableProducts(data).map(p => ({
         id: p.id,
         slug: p.slug,
@@ -658,6 +669,7 @@ const homepageSchema = {
   <!-- Tanbulampot Section -->
   <TanbulampotSection allProducts={homeLiveProducts} categorySlug={homeSectionCategories.tabulampot} />
   <HomeDynamicCategorySections categories={homeCategories} products={homeLiveProducts} />
+  <CityDeliverySection allCities={homeCities} />
 
   <HomeLiveSync />
 </Layout>
