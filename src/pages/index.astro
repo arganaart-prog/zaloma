@@ -14,6 +14,7 @@ import TanbulampotSection from '../components/TanbulampotSection.astro';
 import DailyCategoryRotation from '../components/DailyCategoryRotation.astro';
 import { SUPABASE_URL, SUPABASE_ANON_KEY } from '../data/supabaseConfig';
 import { SITE_DOMAIN, WHATSAPP_NUMBER } from '../data/constants';
+import { DEFAULT_SITE_SEO_TITLE } from '../utils/seo';
 import { getRotatingHomeProducts } from '../utils/rotatingProducts';
 import { getHomeDisplayProducts, getSellableProducts, extractConfigCategories, deriveCategoriesFromProducts, getMomentCategories, mergeCategories } from '../utils/productHelpers';
 
@@ -100,8 +101,8 @@ const homeSectionCategories = {
 };
 
 // SEO Meta
-const title = "Florist Profesional dan Terbaik untuk Setiap Momen | Zaloma Florist";
-const description = "Zaloma Florist menghadirkan bunga papan, hand bouquet, standing flower, dan tanaman ucapan dengan layanan profesional untuk berbagai kota. Produk difoto sebelum dikirim dan ketersediaan pengiriman dikonfirmasi sesuai tujuan.";
+const title = DEFAULT_SITE_SEO_TITLE;
+const description = "Zaloma Florist adalah toko bunga online 24 jam yang melayani bunga papan, hand bouquet, standing flower, dan tanaman ucapan ke berbagai kota. Produk difoto sebelum dikirim dan ketersediaan pengiriman dikonfirmasi sesuai tujuan.";
 const homepageKeywords = "Zaloma Florist, florist profesional, toko bunga terbaik, bunga papan, hand bouquet, standing flower, bunga meja, tanaman ucapan, pengiriman bunga berbagai kota";
 const homepageSchema = {
   '@context': 'https://schema.org',
@@ -109,7 +110,7 @@ const homepageSchema = {
   name: 'Zaloma Florist',
   alternateName: ['Toko Bunga Profesional Zaloma Florist'],
   description,
-  slogan: 'Florist Profesional dan Terbaik untuk Setiap Momen',
+  slogan: 'Toko bunga online | Florist 24 jam | Florist Profesional',
   image: `${SITE_DOMAIN}/images/logo/zaloma-logo.webp`,
   logo: `${SITE_DOMAIN}/favicon-192.png`,
   url: SITE_DOMAIN,

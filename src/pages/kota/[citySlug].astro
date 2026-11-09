@@ -19,6 +19,7 @@ import { DEFAULT_CITIES, cityToSlug, productMatchesCity } from '../../data/citie
 import { withBase } from '../../utils/paths';
 import { getRotatingHomeProducts } from '../../utils/rotatingProducts';
 import { getHomeDisplayProducts, deriveCategoriesFromProducts } from '../../utils/productHelpers';
+import { getCitySeoDescription, getCitySeoTitle } from '../../utils/seo';
 
 export async function getStaticPaths() {
   let allLiveProducts: any[] = [];
@@ -78,8 +79,8 @@ export async function getStaticPaths() {
         image: (c && (c.image || c.image_url)) || '/images/galeri/gallery-1.webp',
         description: (c && c.description) || `Pengiriman karangan bunga & buket area ${name}`,
         tagline: (c && c.tagline) || `Area ${name} & Sekitarnya`,
-        seoTitle: `Toko Bunga ${name} | Buket, Karangan Bunga & Bunga Papan - Zaloma Florist`,
-        seoDescription: `Pesan buket bunga, karangan bunga, bunga papan, papan ucapan, bunga duka cita, bunga pernikahan, dan standing flower di ${name} melalui Zaloma Florist. Pengerjaan cepat 3-5 jam, bunga segar & foto sebelum kirim.`
+        seoTitle: getCitySeoTitle(name),
+        seoDescription: getCitySeoDescription(name)
       });
     }
   });
@@ -124,8 +125,9 @@ const { activeProducts } = getRotatingHomeProducts(getHomeDisplayProducts(produc
 // Derive categories dynamically from city-filtered Supabase products (no static data)
 const cityCategories = deriveCategoriesFromProducts(products);
 
-const title = city.seoTitle || `Toko Bunga ${city.name} | Buket, Karangan Bunga & Bunga Papan - Zaloma Florist`;
-const description = city.seoDescription || `Pesan buket bunga, karangan bunga, bunga papan, papan ucapan, bunga duka cita, bunga pernikahan, dan standing flower di ${city.name} melalui Zaloma Florist. Pengerjaan cepat 3-5 jam, bunga segar & foto sebelum kirim.`;
+const title = getCitySeoTitle(city.name);
+const description = city.seoDescription || getCitySeoDescription(city.name);
+const keywords = `Zaloma Florist, toko bunga online 24 jam ${city.name}, florist ${city.name}, bunga papan ${city.name}, buket bunga ${city.name}, standing flower ${city.name}`;
 
 const siteUrl = SITE_DOMAIN;
 const citySchema = {
@@ -165,7 +167,7 @@ const citySchema = {
 };
 ---
 
-<Layout title={title} description={description}>
+<Layout title={title} description={description} keywords={keywords}>
   <script is:inline src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
   <script type="application/ld+json" set:html={JSON.stringify(citySchema)} />
 
