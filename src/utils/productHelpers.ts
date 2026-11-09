@@ -120,8 +120,6 @@ export function getSubcategorySlug(
 }
 
 export function getCategoryImage(category: Pick<DerivedCategory, 'slug' | 'name' | 'image'>): string {
-  if (category.image) return category.image;
-
   const categoryLabel = `${category.slug} ${category.name}`.toLowerCase();
   if (categoryLabel.includes('semi-styrofoam') || categoryLabel.includes('semi strefoam')) {
     return '/images/kategori/semi-styrofoam.webp';
@@ -151,7 +149,7 @@ export function getCategoryImage(category: Pick<DerivedCategory, 'slug' | 'name'
     return '/images/kategori/bunga-meja.svg';
   }
 
-  return '';
+  return category.image || '';
 }
 
 export function getMomentCategories(categories: DerivedCategory[]): DerivedCategory[] {

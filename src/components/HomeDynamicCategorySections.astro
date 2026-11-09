@@ -34,7 +34,11 @@ const seenSlugs = new Set<string>();
 
 const extraCategories = categories.flatMap((category, index) => {
   const normalizedSlug = category.slug.toLowerCase().replace(/-malang$/, '');
-  if (existingSectionSlugs.has(normalizedSlug) || seenSlugs.has(normalizedSlug)) return [];
+  if (
+    existingSectionSlugs.has(normalizedSlug)
+    || normalizedSlug.startsWith('bunga-papan--')
+    || seenSlugs.has(normalizedSlug)
+  ) return [];
   seenSlugs.add(normalizedSlug);
 
   const categoryProducts = getHomeCategoryProducts(products, [category.slug]);
