@@ -5,6 +5,7 @@ import { DEFAULT_PROMO_BANNERS, PROMO_BANNERS_CONFIG_SLUG } from '../../data/pro
 import { ARTICLES, ARTICLES_CONFIG_SLUG } from '../../data/articles';
 
 const title = "Admin — Zaloma Florist";
+const R2_IMAGE_API_URL = 'https://images-api.zalomaflorist.com';
 
 // Helper function for base path
 function withBase(path: string): string {
@@ -1565,7 +1566,7 @@ function withBase(path: string): string {
       </div>
     </div>
 
-    <script define:vars={{ SUPABASE_URL, SUPABASE_ANON_KEY, SUPABASE_BUCKET, DEFAULT_PROMO_BANNERS, PROMO_BANNERS_CONFIG_SLUG, DEFAULT_ARTICLES: ARTICLES, ARTICLES_CONFIG_SLUG }}>
+    <script define:vars={{ SUPABASE_URL, SUPABASE_ANON_KEY, SUPABASE_BUCKET, R2_IMAGE_API_URL, DEFAULT_PROMO_BANNERS, PROMO_BANNERS_CONFIG_SLUG, DEFAULT_ARTICLES: ARTICLES, ARTICLES_CONFIG_SLUG }}>
       // Initialize Supabase Client
       const supabase = window.supabase.createClient(SUPABASE_URL, SUPABASE_ANON_KEY);
 
@@ -1778,25 +1779,81 @@ function withBase(path: string): string {
 
       let allProductsList = [];
       let pendingDeleteId = null;
-      function getProductStoragePath(imageUrl) {
+      function getProductImageRef(imageUrl) {
         if (typeof imageUrl !== 'string' || !imageUrl.trim()) return null;
         if (!/^https?:\/\//i.test(imageUrl.trim())) return null;
         try {
-          const projectUrl = new URL(SUPABASE_URL);
           const image = new URL(imageUrl);
-          const bucketPrefix = `/storage/v1/object/public/${SUPABASE_BUCKET}/`;
-          if (image.origin !== projectUrl.origin || !image.pathname.startsWith(bucketPrefix)) return null;
-          const path = decodeURIComponent(image.pathname.slice(bucketPrefix.length));
-          if (!path || path.split('/').some(segment => segment === '.' || segment === '..')) return null;
-          return path;
+          const projectUrl = new URL(SUPABASE_URL);
+          const supabasePrefix = `/storage/v1/object/public/${SUPABASE_BUCKET}/`;
+          const r2Prefix = '/products/';
+          let provider;
+          let path;
+
+          if (image.origin === projectUrl.origin && image.pathname.startsWith(supabasePrefix)) {
+            provider = 'supabase';
+            path = decodeURIComponent(image.pathname.slice(supabasePrefix.length));
+          } else if (image.hostname === 'cdn.zalomaflorist.com' && image.pathname.startsWith(r2Prefix)) {
+            provider = 'r2';
+            path = decodeURIComponent(image.pathname.slice(1));
+          } else {
+            return null;
+          }
+
+          if (!path || path.split('/').some(segment => !segment || segment === '.' || segment === '..')) return null;
+          return { provider, path, key: `${provider}:${path}` };
         } catch (error) {
-          console.warn('[Zaloma Admin] URL foto Storage tidak valid:', error);
+          console.warn('[Zaloma Admin] URL foto penyimpanan tidak valid:', error);
           return null;
         }
       }
 
+      async function getR2ImageAccessToken() {
+        const { data, error } = await supabase.auth.getSession();
+        if (error) throw new Error(`Gagal memeriksa sesi admin: ${error.message}`);
+        const accessToken = data.session?.access_token;
+        if (!accessToken) throw new Error('Sesi admin berakhir. Silakan masuk kembali.');
+        return accessToken;
+      }
+
+      async function uploadProductImageToR2(slug, blob) {
+        const formData = new FormData();
+        formData.append('slug', slug);
+        formData.append('file', blob, 'product.webp');
+        const response = await fetch(`${R2_IMAGE_API_URL}/upload`, {
+          method: 'POST',
+          headers: { Authorization: `Bearer ${await getR2ImageAccessToken()}` },
+          body: formData,
+        });
+        const result = await response.json().catch(() => ({}));
+        if (!response.ok) throw new Error(result.error || `Upload R2 gagal (${response.status}).`);
+        if (typeof result.url !== 'string' || typeof result.key !== 'string') {
+          throw new Error('Respons upload R2 tidak valid.');
+        }
+        return result;
+      }
+
+      async function deleteProductImagesFromR2(keys) {
+        if (!keys.length) return;
+        const response = await fetch(`${R2_IMAGE_API_URL}/objects`, {
+          method: 'DELETE',
+          headers: {
+            Authorization: `Bearer ${await getR2ImageAccessToken()}`,
+            'Content-Type': 'application/json',
+          },
+          body: JSON.stringify({ keys }),
+        });
+        const result = await response.json().catch(() => ({}));
+        if (!response.ok) throw new Error(result.error || `Penghapusan R2 gagal (${response.status}).`);
+      }
+
       async function removeUnreferencedProductImages(imageUrls) {
-        const candidates = [...new Set((imageUrls || []).map(getProductStoragePath).filter(Boolean))];
+        const candidates = [...new Map(
+          (imageUrls || [])
+            .map(getProductImageRef)
+            .filter(Boolean)
+            .map(ref => [ref.key, ref])
+        ).values()];
         if (candidates.length === 0) return;
 
         const { data: products, error: lookupError } = await supabase
@@ -1807,18 +1864,22 @@ function withBase(path: string): string {
         const referencedPaths = new Set();
         (products || []).forEach(product => {
           [product.image, ...(Array.isArray(product.images) ? product.images : [])]
-            .map(getProductStoragePath)
+            .map(getProductImageRef)
             .filter(Boolean)
-            .forEach(path => referencedPaths.add(path));
+            .forEach(ref => referencedPaths.add(ref.key));
         });
 
-        const orphanedPaths = candidates.filter(path => !referencedPaths.has(path));
-        if (orphanedPaths.length === 0) return;
+        const orphanedImages = candidates.filter(ref => !referencedPaths.has(ref.key));
+        if (orphanedImages.length === 0) return;
 
-        const { error: removeError } = await supabase.storage
-          .from(SUPABASE_BUCKET)
-          .remove(orphanedPaths);
-        if (removeError) throw removeError;
+        const supabasePaths = orphanedImages.filter(ref => ref.provider === 'supabase').map(ref => ref.path);
+        if (supabasePaths.length) {
+          const { error: removeError } = await supabase.storage.from(SUPABASE_BUCKET).remove(supabasePaths);
+          if (removeError) throw removeError;
+        }
+
+        const r2Paths = orphanedImages.filter(ref => ref.provider === 'r2').map(ref => ref.path);
+        if (r2Paths.length) await deleteProductImagesFromR2(r2Paths);
       }
 
       let promoBanners = DEFAULT_PROMO_BANNERS;
@@ -5558,14 +5619,9 @@ function withBase(path: string): string {
           for (const [index, item] of editGalleryItems.entries()) {
             if (item.sourceFile && item.blob) {
               saveBtnText.textContent = `Upload foto ${index + 1}/${editGalleryItems.length}...`;
-              const fileName = `${slug}-${Date.now()}-${index + 1}.webp`;
-              const { error: uploadError } = await supabase.storage
-                .from(SUPABASE_BUCKET)
-                .upload(fileName, item.blob, { contentType: 'image/webp', upsert: true });
-              if (uploadError) throw new Error('Upload foto gagal: ' + uploadError.message);
-              const { data: publicUrlData } = supabase.storage.from(SUPABASE_BUCKET).getPublicUrl(fileName);
-              finalGalleryUrls.push(publicUrlData.publicUrl);
-              uploadedGalleryUrls.push(publicUrlData.publicUrl);
+              const uploadedImage = await uploadProductImageToR2(slug, item.blob);
+              finalGalleryUrls.push(uploadedImage.url);
+              uploadedGalleryUrls.push(uploadedImage.url);
             } else {
               finalGalleryUrls.push(item.url);
             }
@@ -5614,7 +5670,7 @@ function withBase(path: string): string {
           } catch (cleanupError) {
             console.error('[Zaloma Admin] Gagal membersihkan foto yang terunggah tetapi tidak tersimpan:', cleanupError);
           }
-          showToast('Gagal menyimpan produk. Periksa koneksi dan izin Supabase.', 'error');
+          showToast(err instanceof Error ? err.message : 'Gagal menyimpan produk.', 'error');
         } finally {
           saveEditBtn.disabled = false;
           saveBtnText.textContent = 'Simpan';
@@ -5682,14 +5738,9 @@ function withBase(path: string): string {
           const galleryUrls = [];
           for (const [index, item] of addGalleryItems.entries()) {
             btnText.textContent = `Upload foto ${index + 1}/${addGalleryItems.length}...`;
-            const fileName = `${slug}-${Date.now()}-${index + 1}.webp`;
-            const { error: uploadError } = await supabase.storage
-              .from(SUPABASE_BUCKET)
-              .upload(fileName, item.blob, { contentType: 'image/webp', upsert: true });
-            if (uploadError) throw new Error('Upload foto gagal: ' + uploadError.message);
-            const { data: publicUrlData } = supabase.storage.from(SUPABASE_BUCKET).getPublicUrl(fileName);
-            galleryUrls.push(publicUrlData.publicUrl);
-            uploadedGalleryUrls.push(publicUrlData.publicUrl);
+            const uploadedImage = await uploadProductImageToR2(slug, item.blob);
+            galleryUrls.push(uploadedImage.url);
+            uploadedGalleryUrls.push(uploadedImage.url);
           }
 
           const { error: insertError } = await supabase.from('products').insert([{
@@ -5735,7 +5786,7 @@ function withBase(path: string): string {
           } catch (cleanupError) {
             console.error('[Zaloma Admin] Gagal membersihkan foto produk yang gagal disimpan:', cleanupError);
           }
-          showToast('Gagal menambahkan produk. Periksa koneksi dan izin Supabase.', 'error');
+          showToast(err instanceof Error ? err.message : 'Gagal menambahkan produk.', 'error');
         } finally {
           submitBtn.disabled = false;
           btnText.textContent = 'Simpan Produk';

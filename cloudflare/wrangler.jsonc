@@ -1,0 +1,25 @@
+{
+  "$schema": "node_modules/wrangler/config-schema.json",
+  "name": "zaloma-image-api",
+  "main": "worker.js",
+  "compatibility_date": "2026-11-09",
+  "workers_dev": false,
+  "routes": [
+    {
+      "pattern": "images-api.zalomaflorist.com",
+      "custom_domain": true
+    }
+  ],
+  "r2_buckets": [
+    {
+      "binding": "IMAGES",
+      "bucket_name": "zaloma-images"
+    }
+  ],
+  "vars": {
+    "SUPABASE_URL": "https://ypxneegqnmiilsokhqxx.supabase.co",
+    "SUPABASE_ANON_KEY": "sb_publishable_OcW0nGUMh1-LoR7g7-wRMg_2fzjkBZO",
+    "IMAGE_BASE_URL": "https://cdn.zalomaflorist.com",
+    "ALLOWED_ORIGINS": "https://zalomaflorist.com,https://www.zalomaflorist.com,http://localhost:4321,http://127.0.0.1:4321"
+  }
+}
