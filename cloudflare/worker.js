@@ -83,40 +83,78 @@ function bytesToBase64(bytes) {
   return btoa(binary);
 }
 
+function resolveImageModel(env) {
+  const raw = String(env.OPENAI_IMAGE_MODEL || 'gpt-image-1').trim();
+  const normalized = raw.toLowerCase().replace(/\s+/g, '-');
+  // User-facing alias → current OpenAI Images API model id
+  if (
+    normalized === 'gpt-image-2.6-flare'
+    || normalized === 'gpt-image-2-6-flare'
+    || normalized === 'gpt-image-2.6'
+    || normalized === 'flare'
+  ) {
+    // Prefer explicit override if OpenAI later exposes this exact id.
+    // Until then map to gpt-image-1 which supports the same Images API shape.
+    return env.OPENAI_IMAGE_MODEL_STRICT === '1' ? raw : 'gpt-image-1';
+  }
+  return raw;
+}
+
+function buildImageRequestBody(model, prompt, size) {
+  const isGptImage = /^gpt-image/i.test(model);
+  if (isGptImage) {
+    return {
+      model,
+      prompt,
+      size,
+      quality: 'medium',
+      output_format: 'png',
+      n: 1,
+    };
+  }
+  // dall-e-3 and similar
+  return {
+    model,
+    prompt,
+    size: size === '1536x1024' ? '1792x1024' : size,
+    quality: 'standard',
+    response_format: 'b64_json',
+    n: 1,
+  };
+}
+
 async function generateBannerImage(env, prompt, sizeKey) {
   const size = BANNER_SIZES[sizeKey];
-  const model = env.OPENAI_IMAGE_MODEL || 'gpt-image-2.6-flare';
+  const model = resolveImageModel(env);
+  const fullPrompt = `${BRAND_BANNER_GUIDE} ${size.layout} Admin offer: ${prompt}`;
   const response = await fetch('https://api.openai.com/v1/images/generations', {
     method: 'POST',
     headers: {
       Authorization: `Bearer ${env.OPENAI_API_KEY}`,
       'Content-Type': 'application/json',
     },
-    body: JSON.stringify({
-      model,
-      prompt: `${BRAND_BANNER_GUIDE} ${size.layout} Admin offer: ${prompt}`,
-      size: size.openaiSize,
-      quality: 'medium',
-      output_format: 'png',
-      n: 1,
-    }),
+    body: JSON.stringify(buildImageRequestBody(model, fullPrompt, size.openaiSize)),
   });
   const payload = await response.json().catch(() => ({}));
   if (!response.ok) {
-    const message = payload?.error?.message || 'OpenAI menolak permintaan gambar.';
-    throw new Error(message);
+    const message = payload?.error?.message
+      || payload?.error?.code
+      || `OpenAI menolak permintaan gambar (${response.status}).`;
+    const err = new Error(message);
+    err.status = response.status >= 400 && response.status < 600 ? response.status : 502;
+    throw err;
   }
 
   const first = payload?.data?.[0] || {};
   if (typeof first.b64_json === 'string' && first.b64_json) {
-    return { base64: first.b64_json, mime: 'image/png' };
+    return { base64: first.b64_json, mime: 'image/png', model };
   }
   if (typeof first.url === 'string' && first.url) {
     const imageResponse = await fetch(first.url);
     if (!imageResponse.ok) throw new Error('Gambar hasil generate tidak bisa diunduh.');
     const bytes = new Uint8Array(await imageResponse.arrayBuffer());
     const mime = imageResponse.headers.get('Content-Type') || 'image/png';
-    return { base64: bytesToBase64(bytes), mime };
+    return { base64: bytesToBase64(bytes), mime, model };
   }
   throw new Error('OpenAI tidak mengembalikan gambar.');
 }
@@ -182,7 +220,9 @@ export default {
 
       if (request.method === 'POST' && url.pathname === '/generate-banner') {
         if (!env.OPENAI_API_KEY) {
-          return jsonResponse({ error: 'OPENAI_API_KEY belum dipasang di Worker.' }, 500, origin, allowedOrigin);
+          return jsonResponse({
+            error: 'OPENAI_API_KEY belum dipasang di Worker. Tambahkan secret OPENAI_API_KEY lalu deploy ulang.',
+          }, 500, origin, allowedOrigin);
         }
         const body = await request.json().catch(() => null);
         const prompt = typeof body?.prompt === 'string' ? body.prompt.trim() : '';
@@ -199,7 +239,10 @@ export default {
         for (const target of targets) {
           images[target] = await generateBannerImage(env, prompt, target);
         }
-        return jsonResponse({ images }, 200, origin, allowedOrigin);
+        return jsonResponse({
+          images,
+          model: resolveImageModel(env),
+        }, 200, origin, allowedOrigin);
       }
 
       if (request.method === 'DELETE' && url.pathname === '/objects') {
@@ -215,7 +258,13 @@ export default {
       return jsonResponse({ error: 'Endpoint tidak ditemukan.' }, 404, origin, allowedOrigin);
     } catch (error) {
       console.error('[Zaloma Image API] Permintaan gagal:', error);
-      return jsonResponse({ error: 'Permintaan penyimpanan gambar gagal.' }, 500, origin, allowedOrigin);
+      const message = error instanceof Error && error.message
+        ? error.message
+        : 'Permintaan penyimpanan gambar gagal.';
+      const status = Number(error?.status) >= 400 && Number(error?.status) < 600
+        ? Number(error.status)
+        : 500;
+      return jsonResponse({ error: message }, status, origin, allowedOrigin);
     }
   },
 };

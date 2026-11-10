@@ -21,6 +21,6 @@
     "SUPABASE_ANON_KEY": "sb_publishable_OcW0nGUMh1-LoR7g7-wRMg_2fzjkBZO",
     "IMAGE_BASE_URL": "https://cdn.zalomaflorist.com",
     "ALLOWED_ORIGINS": "https://zalomaflorist.com,https://www.zalomaflorist.com,http://localhost:4321,http://127.0.0.1:4321",
-    "OPENAI_IMAGE_MODEL": "gpt-image-2.6-flare"
+    "OPENAI_IMAGE_MODEL": "gpt-image-1"
   }
 }
