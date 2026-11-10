@@ -477,8 +477,8 @@ function withBase(path: string): string {
                   />
                   
                   <div id="upload-prompt" class="space-y-1.5 py-3">
-                    <p class="text-sm font-semibold text-slate-700">Pilih Foto atau Potret dari Kamera</p>
-                    <p class="text-xs text-slate-400">Atur kotak area tampil, lalu gambar dipotong sesuai bentuk kartu dan dikompres ke WebP.</p>
+                    <p id="upload-prompt-title" class="text-sm font-semibold text-slate-700">Pilih Foto atau Potret dari Kamera</p>
+                    <p id="upload-prompt-hint" class="text-xs text-slate-400">Atur kotak area tampil, lalu gambar dipotong sesuai bentuk kartu dan dikompres ke WebP.</p>
                   </div>
 
                   <div id="image-preview-container" class="hidden space-y-2.5 animate-fade-in">
@@ -4740,7 +4740,8 @@ function withBase(path: string): string {
       const imageFileInput = document.getElementById('prod-image-file');
       const previewContainer = document.getElementById('image-preview-container');
       const imagePreviewGallery = document.getElementById('image-preview-gallery');
-      const uploadPrompt = document.getElementById('upload-prompt');
+      const uploadPromptTitle = document.getElementById('upload-prompt-title');
+      const uploadPromptHint = document.getElementById('upload-prompt-hint');
       const origSizeLabel = document.getElementById('orig-size-label');
       const compSizeLabel = document.getElementById('comp-size-label');
       const addProductShapeInput = document.getElementById('prod-card-shape');
@@ -4804,7 +4805,12 @@ function withBase(path: string): string {
       function updateAddGalleryPreview() {
         renderGalleryItems(imagePreviewGallery, addGalleryItems, true);
         const hasImages = addGalleryItems.length > 0;
-        uploadPrompt.classList.toggle('hidden', hasImages);
+        uploadPromptTitle.textContent = hasImages
+          ? (addGalleryItems.length === 3 ? 'Maksimal 3 foto tercapai' : 'Klik untuk menambah foto')
+          : 'Pilih Foto atau Potret dari Kamera';
+        uploadPromptHint.textContent = hasImages
+          ? `${addGalleryItems.length}/3 foto. Foto berikutnya akan ditambahkan ke galeri.`
+          : 'Atur kotak area tampil, lalu gambar dipotong sesuai bentuk kartu dan dikompres ke WebP.';
         previewContainer.classList.toggle('hidden', !hasImages);
         origSizeLabel.textContent = `${(addGalleryItems.reduce((sum, item) => sum + item.sourceFile.size, 0) / 1024).toFixed(0)} KB`;
         compSizeLabel.textContent = `${(addGalleryItems.reduce((sum, item) => sum + item.blob.size, 0) / 1024).toFixed(0)} KB total (WebP)`;
@@ -4835,8 +4841,8 @@ function withBase(path: string): string {
       imageFileInput.addEventListener('change', async (e) => {
         const files = Array.from(e.target.files || []);
         if (!files.length) return;
-        if (files.length > 3) {
-          showToast('Pilih maksimal 3 foto produk.', 'error');
+        if (addGalleryItems.length + files.length > 3) {
+          showToast(`Produk maksimal memiliki 3 foto. Slot tersedia: ${3 - addGalleryItems.length}.`, 'error');
           imageFileInput.value = '';
           return;
         }
@@ -4847,13 +4853,11 @@ function withBase(path: string): string {
             const blob = await cropProductImage(file, addProductShapeInput.value);
             if (!blob) {
               revokeGalleryPreviews(nextItems);
-              imageFileInput.value = '';
               return;
             }
             nextItems.push({ sourceFile: file, blob, previewUrl: URL.createObjectURL(blob) });
           }
-          revokeGalleryPreviews(addGalleryItems);
-          addGalleryItems = nextItems;
+          addGalleryItems.push(...nextItems);
           updateAddGalleryPreview();
           lastProductShape = addProductShapeInput.value;
         } catch (err) {

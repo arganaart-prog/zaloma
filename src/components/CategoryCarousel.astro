@@ -10,9 +10,13 @@ interface CategoryItem {
 interface Props {
   categories?: CategoryItem[];
   productCounts?: Record<string, number>;
+  citySlug?: string;
 }
 
-const { categories = [], productCounts = {} } = Astro.props;
+const { categories = [], productCounts = {}, citySlug = '' } = Astro.props;
+const getCategoryLink = (slug: string) => withBase(citySlug
+  ? `/kategori/${slug}/?city=${encodeURIComponent(citySlug)}&refer=city`
+  : `/kategori/${slug}/`);
 const carouselCategories = categories.map((category) => {
   const normalizedSlug = category.slug.toLowerCase().replace(/-malang$/, '').replace(/--+/g, '-');
   const itemCount = productCounts[category.slug] ?? productCounts[normalizedSlug] ?? 0;
@@ -46,7 +50,7 @@ const carouselCategories = categories.map((category) => {
         class="category-carousel-item group flex-shrink-0 snap-start flex flex-col items-center w-[5.5rem] sm:w-[7rem] md:w-[7.5rem] text-center"
       >
         <a
-          href={withBase(`/kategori/${category.slug}/`)}
+          href={getCategoryLink(category.slug)}
           class="flex flex-col items-center no-underline w-full [&.is-active_h3]:text-primary [&.is-active_.cat-count]:text-primary/70 [&.is-active_.cat-underline]:w-full"
         >
           <!-- Circular product image -->

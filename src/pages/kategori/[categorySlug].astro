@@ -253,7 +253,7 @@ const customCategorySchema = {
     <div id="category-products-grid" class={`grid ${isHandBouquet ? 'grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-6 sm:gap-8' : 'grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-8'}`}>
       {products.length > 0 ? (
         products.map((p, index) => (
-          <ProductCard product={p} priority={index < 3} />
+          <ProductCard product={p} priority={index < 3} data-category-product-city={p.city} />
         ))
       ) : (
         <div class="col-span-full py-16 text-center" id="category-loading">
@@ -346,7 +346,56 @@ const customCategorySchema = {
   </div>
 </Layout>
 
-<script define:vars={{ SUPABASE_URL, SUPABASE_ANON_KEY, categorySlug, isHandBouquet }}>
+<script define:vars={{ SUPABASE_URL, SUPABASE_ANON_KEY, categorySlug, categoryName: category.name, isHandBouquet }}>
+  const cityParams = new URLSearchParams(window.location.search);
+  const selectedCityName = cityParams.get('cityName') || '';
+  const selectedCitySlug = cityParams.get('city') || '';
+
+  function productMatchesSelectedCity(productCity) {
+    if (!selectedCityName) return true;
+    const target = selectedCityName.toLowerCase();
+    if (target.includes('mana saja')) return true;
+    const product = String(productCity || 'Malang Raya').toLowerCase();
+    if (product.includes('mana saja') || product.includes('seluruh indonesia') || product === target) return true;
+    if (target.includes('malang raya') && (product.includes('malang') || product.includes('batu'))) return true;
+    if (product.includes('malang raya') && (target.includes('malang') || target.includes('batu'))) return true;
+    return product.includes(target) || target.includes(product);
+  }
+
+  function applySelectedCityContext(link) {
+    if (!selectedCityName || !selectedCitySlug) return;
+    const destination = new URL(link.href, window.location.href);
+    if (destination.origin !== window.location.origin || !destination.pathname.includes('/produk/')) return;
+    destination.searchParams.set('city', selectedCitySlug);
+    destination.searchParams.set('cityName', selectedCityName);
+    link.href = `${destination.pathname}${destination.search}${destination.hash}`;
+  }
+
+  if (selectedCityName) {
+    const heading = document.querySelector('h1');
+    if (heading) {
+      const baseHeading = heading.textContent
+        .replace(/(?:\s+(?:(?:Kota|Kabupaten)\s+)?Malang(?:\s+Raya)?)+\s*$/i, '')
+        .trim();
+      heading.textContent = `${baseHeading} ${selectedCityName}`;
+    }
+    const description = heading?.parentElement?.querySelector('p');
+    if (description) description.textContent = description.textContent.replace(/Malang(?: Raya)?/gi, selectedCityName);
+
+    const grid = document.getElementById('category-products-grid');
+    grid?.querySelectorAll('[data-category-product-city]').forEach((card) => {
+      card.hidden = !productMatchesSelectedCity(card.getAttribute('data-category-product-city'));
+    });
+    grid?.querySelectorAll('a[href*="/produk/"]').forEach(applySelectedCityContext);
+
+    document.addEventListener('click', (event) => {
+      const target = event.target;
+      if (!(target instanceof Element)) return;
+      const link = target.closest('a[href*="/produk/"]');
+      if (link) applySelectedCityContext(link);
+    }, true);
+  }
+
   async function syncCategoryProducts() {
     try {
       if (!window.supabase) return;
@@ -402,18 +451,31 @@ const customCategorySchema = {
 
       const liveCategoryProducts = cloudProducts.filter(p => {
         if (p.slug.startsWith('_')) return false;
+        if (!productMatchesSelectedCity(p.city)) return false;
         return isMatchingCat(p.category_slug, p.category_name, categorySlug);
       });
-
-      if (liveCategoryProducts.length === 0) return;
 
       const grid = document.getElementById('category-products-grid');
       if (!grid) return;
 
+      if (liveCategoryProducts.length === 0) {
+        if (selectedCityName) {
+          const emptyMessage = document.createElement('p');
+          emptyMessage.className = 'col-span-full py-16 text-center text-sm text-slate-500';
+          emptyMessage.textContent = `Belum ada produk ${categoryName} untuk ${selectedCityName}.`;
+          grid.replaceChildren(emptyMessage);
+        }
+        return;
+      }
+
       grid.innerHTML = '';
 
       liveCategoryProducts.forEach((p, index) => {
-        const productUrl = `/produk/${p.slug}/`;
+        const productUrl = new URL(`/produk/${p.slug}/`, window.location.origin);
+        if (selectedCityName && selectedCitySlug) {
+          productUrl.searchParams.set('city', selectedCitySlug);
+          productUrl.searchParams.set('cityName', selectedCityName);
+        }
         const cardShape = p.description?.match(/^\[Bentuk Kartu:\s*(portrait|square|arch)\]/im)?.[1];
         const aspectClass = cardShape === 'square' ? 'aspect-square' : 'aspect-[4/5]';
         const archClass = cardShape === 'arch' ? 'product-card-shape-arch' : '';
@@ -421,7 +483,7 @@ const customCategorySchema = {
         const card = document.createElement('article');
         card.className = `product-card-shell ${archClass} group relative h-full overflow-hidden rounded-[14px] border border-soft-cream/70 bg-white shadow-[0_1px_4px_rgba(15,23,42,0.03)] hover-gold-grow`;
         card.innerHTML = `
-          <a href="${productUrl}" class="flex h-full flex-col no-underline">
+          <a href="${productUrl.pathname}${productUrl.search}" class="flex h-full flex-col no-underline">
             <div class="product-card-image image-load-shell relative -mx-px -mt-px ${aspectClass} overflow-hidden bg-clean-ivory">
               <img
                 src="${p.image}"

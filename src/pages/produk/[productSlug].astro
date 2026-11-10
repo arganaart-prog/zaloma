@@ -104,7 +104,11 @@ const displayName = getProductDisplayName(product);
 const galleryImages = getProductGalleryImages(product.image, product.images);
 const displayDescription = stripProductMetadata(product.description);
 const productSize = getProductSize(product.description);
-const shippingArea = product.city || 'Malang Raya (Kota Malang, Kab. Malang, Kota Batu)';
+
+// Kota: gunakan city dari produk, normalkan tampilan
+const rawCity = product.city || 'Malang';
+// Tampilkan nama kota yang bersih (hapus prefix "Kota " atau "Kabupaten " bila tidak diperlukan)
+const shippingArea = rawCity;
 const currentSlug = product.slug;
 const currentCategorySlug = product.categorySlug;
 
@@ -141,51 +145,92 @@ const productSchema = {
 <Layout title={title} description={description} schema={productSchema}>
   <!-- Supabase SDK for live sync -->
   <script is:inline src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
-  <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-8">
-    
-    <!-- Breadcrumb -->
-    <Breadcrumb 
-      items={[
-        { label: 'Katalog', href: '/katalog/' },
-        { label: product.categoryName, href: `/kategori/${product.categorySlug}/` },
-        { label: displayName }
-      ]} 
-    />
 
-    <!-- Product Detail Container -->
-    <div class="mt-6 bg-white rounded-2xl sm:rounded-3xl border border-soft-cream/80 overflow-hidden shadow-xs">
-      <div class="grid grid-cols-1 lg:grid-cols-12 gap-8 lg:gap-12 p-5 sm:p-8 lg:p-12">
-        
-        <!-- Left: Product Image & Highlights -->
-        <div class="lg:col-span-6 flex flex-col gap-6">
-          <div id="product-gallery-frame" tabindex="0" aria-label="Galeri foto produk. Gunakan panah kiri atau kanan untuk mengganti foto." class="relative aspect-square sm:aspect-[4/3] lg:aspect-square rounded-2xl overflow-hidden bg-clean-ivory border border-soft-cream/60 touch-pan-y">
-            <img
-              id="product-gallery-image"
-              src={withBase(product.image)}
-              alt={`Foto ${displayName} dari Zaloma Florist Malang`}
-              width={product.imageWidth}
-              height={product.imageHeight}
-              loading="eager"
-              decoding="async"
-              fetchpriority="high"
-              class="w-full h-full object-cover object-top"
-            />
-            <button type="button" data-gallery-step="-1" aria-label="Lihat foto sebelumnya" class:list={['absolute left-3 top-1/2 z-20 -translate-y-1/2 rounded-full bg-white/90 p-2 text-primary shadow transition hover:bg-white', galleryImages.length <= 1 && 'hidden']}>
-              <svg class="h-5 w-5" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" aria-hidden="true"><path stroke-linecap="round" stroke-linejoin="round" d="m15 18-6-6 6-6" /></svg>
-            </button>
-            <button type="button" data-gallery-step="1" aria-label="Lihat foto berikutnya" class:list={['absolute right-3 top-1/2 z-20 -translate-y-1/2 rounded-full bg-white/90 p-2 text-primary shadow transition hover:bg-white', galleryImages.length <= 1 && 'hidden']}>
-              <svg class="h-5 w-5" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" aria-hidden="true"><path stroke-linecap="round" stroke-linejoin="round" d="m9 18 6-6-6-6" /></svg>
-            </button>
-            <span id="product-gallery-count" class:list={['absolute bottom-3 right-3 z-20 rounded-full bg-black/60 px-2.5 py-1 text-xs font-semibold text-white', galleryImages.length <= 1 && 'hidden']}>1 / {galleryImages.length}</span>
-            {product.featured && (
-              <div class="absolute top-4 left-4">
-                <span class="bg-secondary text-primary-dark text-xs uppercase tracking-wider font-bold px-3 py-1.5 rounded-full shadow-sm">
-                  Populer &amp; Terlaris
-                </span>
-              </div>
-            )}
-          </div>
-          <div id="product-gallery-thumbnails" class:list={['flex gap-2 overflow-x-auto pb-1', galleryImages.length <= 1 && 'hidden']} role="group" aria-label="Foto produk">
+  <div class="product-page-root">
+
+    <!-- Breadcrumb -->
+    <div class="product-breadcrumb-wrap">
+      <div class="product-container">
+        <Breadcrumb
+          items={[
+            { label: 'Katalog', href: '/katalog/' },
+            { label: product.categoryName, href: `/kategori/${product.categorySlug}/` },
+            { label: displayName }
+          ]}
+        />
+      </div>
+    </div>
+
+    <!-- Product Detail Main Card -->
+    <div class="product-container product-container--main">
+      <div class="product-detail-card">
+        <div class="product-detail-grid">
+
+          <!-- ===== LEFT: Gallery ===== -->
+          <div class="product-gallery-col">
+
+            <!-- Main Gallery Frame -->
+            <div
+              id="product-gallery-frame"
+              tabindex="0"
+              aria-label="Galeri foto produk. Gunakan panah kiri atau kanan untuk mengganti foto."
+              class="product-gallery-frame"
+            >
+              <img
+                id="product-gallery-image"
+                src={withBase(product.image)}
+                alt={`Foto ${displayName} dari Zaloma Florist`}
+                width={product.imageWidth}
+                height={product.imageHeight}
+                loading="eager"
+                decoding="async"
+                fetchpriority="high"
+                class="product-gallery-img"
+              />
+              <!-- Nav Prev -->
+              <button
+                type="button"
+                data-gallery-step="-1"
+                aria-label="Lihat foto sebelumnya"
+                class:list={['gallery-nav-btn gallery-nav-btn--prev', galleryImages.length <= 1 && 'hidden']}
+              >
+                <svg class="gallery-nav-icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" aria-hidden="true">
+                  <path stroke-linecap="round" stroke-linejoin="round" d="m15 18-6-6 6-6" />
+                </svg>
+              </button>
+              <!-- Nav Next -->
+              <button
+                type="button"
+                data-gallery-step="1"
+                aria-label="Lihat foto berikutnya"
+                class:list={['gallery-nav-btn gallery-nav-btn--next', galleryImages.length <= 1 && 'hidden']}
+              >
+                <svg class="gallery-nav-icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" aria-hidden="true">
+                  <path stroke-linecap="round" stroke-linejoin="round" d="m9 18 6-6-6-6" />
+                </svg>
+              </button>
+              <!-- Counter -->
+              <span
+                id="product-gallery-count"
+                class:list={['gallery-count-badge', galleryImages.length <= 1 && 'hidden']}
+              >
+                1 / {galleryImages.length}
+              </span>
+              <!-- Featured Badge -->
+              {product.featured && (
+                <div class="gallery-featured-badge">
+                  <span>Populer &amp; Terlaris</span>
+                </div>
+              )}
+            </div>
+
+            <!-- Thumbnails -->
+            <div
+              id="product-gallery-thumbnails"
+              class:list={['gallery-thumbs', galleryImages.length <= 1 && 'hidden']}
+              role="group"
+              aria-label="Foto produk"
+            >
               {galleryImages.map((image, index) => (
                 <button
                   type="button"
@@ -193,333 +238,1043 @@ const productSchema = {
                   data-gallery-src={withBase(image)}
                   aria-label={`Tampilkan foto ${index + 1}`}
                   aria-pressed={index === 0 ? 'true' : 'false'}
-                  class:list={['h-16 w-16 shrink-0 overflow-hidden rounded-lg border-2 transition sm:h-20 sm:w-20', index === 0 ? 'border-primary' : 'border-transparent opacity-70 hover:opacity-100']}
+                  class:list={['gallery-thumb-btn', index === 0 ? 'active' : '']}
                 >
-                  <img src={withBase(image)} alt="" loading="lazy" class="h-full w-full object-cover" />
+                  <img src={withBase(image)} alt="" loading="lazy" class="gallery-thumb-img" />
                 </button>
               ))}
-          </div>
-
-          <!-- Trust Badges Desktop / Tablet -->
-          <div class="grid grid-cols-3 gap-3 p-4 rounded-xl bg-accent-bg/60 border border-soft-cream/60 text-center">
-            <div>
-              <span class="block text-primary font-bold text-xs sm:text-sm">3 - 5 Jam</span>
-              <span class="text-[11px] text-slate-500">Pengerjaan</span>
-            </div>
-            <div class="border-x border-soft-cream/80">
-              <span class="block text-primary font-bold text-xs sm:text-sm">Difoto</span>
-              <span class="text-[11px] text-slate-500">Sebelum Kirim</span>
-            </div>
-            <div>
-              <span class="block text-primary font-bold text-xs sm:text-sm">Gratis Ongkir</span>
-              <span class="text-[11px] text-slate-500">Malang Kota</span>
-            </div>
-          </div>
-        </div>
-
-        <!-- Right: Product Information & Order Actions -->
-        <div class="lg:col-span-6 flex flex-col justify-between space-y-6">
-          <div class="space-y-4">
-            
-            <!-- Category & Location Badge -->
-            <div class="flex items-center gap-2 flex-wrap">
-              <a 
-                href={withBase(`/kategori/${product.categorySlug}/`)}
-                class="inline-block text-xs font-semibold text-secondary hover:text-secondary-dark uppercase tracking-wider bg-accent-bg px-2.5 py-1 rounded-md border border-soft-cream transition-colors"
-              >
-                {product.categoryName}
-              </a>
-              <span class="text-xs text-slate-400">&bull;</span>
-              <span class="text-xs font-medium text-slate-500">Toko Bunga Malang</span>
             </div>
 
-            <!-- Product Title -->
-            <h1 class="font-serif text-2xl sm:text-3xl lg:text-4xl font-bold text-slate-900 leading-tight">
-              {displayName}
-            </h1>
-
-            <!-- Price Card -->
-            <div class="p-4 sm:p-5 rounded-2xl bg-gradient-to-br from-clean-ivory to-accent-bg border border-soft-cream">
-              <span class="text-xs font-semibold uppercase tracking-wider text-slate-500 block mb-1">
-                Estimasi Harga
-              </span>
-              <div class="flex items-baseline gap-3">
-                <span id="product-detail-price" class="font-sans text-3xl sm:text-4xl font-extrabold text-primary">
-                  {product.priceLabel}
-                </span>
-                <span class="text-xs text-slate-500 font-medium">
-                  (Bisa kustom sesuai budget)
-                </span>
+            <!-- Trust Badges -->
+            <div class="trust-badges">
+              <div class="trust-badge-item">
+                <div class="trust-badge-icon">⚡</div>
+                <span class="trust-badge-value">{product.processingTime}</span>
+                <span class="trust-badge-label">Pengerjaan</span>
+              </div>
+              <div class="trust-badge-divider"></div>
+              <div class="trust-badge-item">
+                <div class="trust-badge-icon">📸</div>
+                <span class="trust-badge-value">Difoto</span>
+                <span class="trust-badge-label">Sebelum Kirim</span>
+              </div>
+              <div class="trust-badge-divider"></div>
+              <div class="trust-badge-item">
+                <div class="trust-badge-icon">🚚</div>
+                <span class="trust-badge-value">Area Tujuan</span>
+                <span id="trust-badge-city" class="trust-badge-label">{shippingArea}</span>
               </div>
             </div>
 
-            <!-- Description -->
-            <div class="pt-2">
-              <h2 class="text-sm font-bold text-slate-800 uppercase tracking-wider mb-2">Deskripsi Produk</h2>
-              <p id="product-detail-description" class="text-slate-600 text-sm sm:text-base leading-relaxed">
+          </div>
+
+          <!-- ===== RIGHT: Info + CTA ===== -->
+          <div class="product-info-col">
+
+            <!-- Category + Store Badge -->
+            <div class="product-meta-badges">
+              <a
+                href={withBase(`/kategori/${product.categorySlug}/`)}
+                class="product-category-badge"
+              >
+                {product.categoryName}
+              </a>
+              <span class="product-meta-sep" aria-hidden="true">•</span>
+              <span id="product-store-location" class="product-store-location">
+                Toko Bunga {shippingArea}
+              </span>
+            </div>
+
+            <!-- Product Title -->
+            <h1 class="product-title">{displayName}</h1>
+
+            <!-- Price Card -->
+            <div class="product-price-card">
+              <span class="product-price-label-text">Estimasi Harga</span>
+              <div class="product-price-row">
+                <span id="product-detail-price" class="product-price-value">
+                  {product.priceLabel}
+                </span>
+                <span class="product-price-note">(Bisa kustom sesuai budget)</span>
+              </div>
+            </div>
+
+            <!-- Description + Specs -->
+            <div class="product-desc-section">
+              <h2 class="product-section-title">Deskripsi Produk</h2>
+              <p id="product-detail-description" class="product-desc-text">
                 {displayDescription}
               </p>
-              <dl class="mt-4 grid grid-cols-1 gap-2 sm:grid-cols-2">
-                <div class="rounded-lg border border-soft-cream/70 bg-clean-ivory/70 px-3.5 py-3">
-                  <dt class="text-[10px] font-bold uppercase tracking-wider text-slate-500">Ukuran Produk</dt>
-                  <dd id="product-detail-size" class="mt-1 text-sm font-semibold text-slate-800">
+              <dl class="product-specs-grid">
+                <div class="product-spec-item">
+                  <dt class="product-spec-label">Ukuran Produk</dt>
+                  <dd id="product-detail-size" class="product-spec-value">
                     {productSize || 'Hubungi kami untuk pilihan ukuran'}
                   </dd>
                 </div>
-                <div class="rounded-lg border border-soft-cream/70 bg-clean-ivory/70 px-3.5 py-3">
-                  <dt class="text-[10px] font-bold uppercase tracking-wider text-slate-500">Area Pengiriman</dt>
-                  <dd id="product-detail-area" class="mt-1 text-sm font-semibold text-slate-800">{shippingArea}</dd>
+                <div class="product-spec-item">
+                  <dt class="product-spec-label">Area Pengiriman</dt>
+                  <dd id="product-detail-area" class="product-spec-value">{shippingArea}</dd>
                 </div>
               </dl>
             </div>
 
-            <!-- Order Instructions -->
-            <div class="p-4 rounded-xl bg-slate-50 border border-slate-200/60 space-y-2 text-xs sm:text-sm text-slate-600">
-              <p class="font-semibold text-slate-800 flex items-center gap-2">
-                <svg class="w-4 h-4 text-emerald-600 shrink-0" fill="currentColor" viewBox="0 0 20 20">
+            <!-- Order Steps -->
+            <div class="product-order-steps">
+              <p class="order-steps-title">
+                <svg class="order-steps-icon" fill="currentColor" viewBox="0 0 20 20" aria-hidden="true">
                   <path fill-rule="evenodd" d="M10 18a8 8 0 100-16 8 8 0 000 16zm3.707-9.293a1 1 0 00-1.414-1.414L9 10.586 7.707 9.293a1 1 0 00-1.414 1.414l2 2a1 1 0 001.414 0l4-4z" clip-rule="evenodd" />
                 </svg>
                 Cara Pemesanan Cepat via WhatsApp:
               </p>
-              <ol class="list-decimal list-inside space-y-1 pl-1 text-slate-500">
+              <ol class="order-steps-list">
                 <li>Klik tombol WhatsApp di bawah ini untuk konsultasi format ucapan.</li>
                 <li>Kirim teks ucapan, nama pengirim, dan alamat tujuan pengiriman.</li>
                 <li>Rangkaian bunga dikerjakan &amp; difotokan sebelum kurir berangkat.</li>
               </ol>
             </div>
 
-          </div>
+            <!-- CTA -->
+            <div class="product-cta-wrap">
+              <WhatsAppButton
+                text="Pesan Sekarang via WhatsApp"
+                whatsappText={product.whatsappText}
+                className="product-wa-btn"
+              />
+              <p class="product-cta-footnote">
+                Respons cepat 24 jam &bull; Konsultasi gratis &bull; Pembayaran via transfer bank
+              </p>
+            </div>
 
-          <!-- Call to Action Buttons -->
-          <div class="pt-4 border-t border-soft-cream/80 space-y-3">
-            <WhatsAppButton 
-              text="Pesan Sekarang via WhatsApp"
-              whatsappText={product.whatsappText}
-              className="w-full rounded-full text-center py-4 text-base font-bold shadow-md hover:shadow-lg transition-all"
-            />
-            <p class="text-center text-xs text-slate-400">
-              Respons cepat 24 jam &bull; Konsultasi gratis &bull; Pembayaran via transfer bank
-            </p>
           </div>
 
         </div>
-
-      </div>
-    </div>
-
-    <!-- Related Products -->
-    <section class="mt-16 sm:mt-20 pt-10 border-t border-soft-cream/60" id="related-products-section" aria-labelledby="related-products-heading">
-      <div class="flex flex-col sm:flex-row sm:items-end justify-between gap-3 mb-6 sm:mb-8">
-        <div>
-          <span class="text-secondary font-semibold text-xs tracking-widest uppercase block mb-1">Pilihan Lainnya</span>
-          <h2 id="related-products-heading" class="font-serif text-2xl sm:text-3xl font-bold text-slate-800">Produk Serupa Lainnya</h2>
-        </div>
-        <a 
-          href={withBase(`/kategori/${product.categorySlug}/`)} 
-          class="inline-flex items-center gap-1.5 text-xs sm:text-sm font-semibold text-primary hover:text-secondary transition-colors group"
-        >
-          Lihat Semua {product.categoryName}
-          <svg class="w-4 h-4 transition-transform duration-200 group-hover:translate-x-0.5" fill="none" viewBox="0 0 24 24" stroke="currentColor">
-            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 5l7 7-7 7"/>
-          </svg>
-        </a>
       </div>
 
-      <div id="related-products-grid" class="grid grid-cols-2 sm:grid-cols-3 lg:grid-cols-4 gap-4 sm:gap-6">
-        {relatedProducts.length > 0 ? (
-          relatedProducts.map(prod => (
-            <ProductCard product={prod} variant="compact" />
-          ))
-        ) : (
-          <div class="col-span-full py-10 text-center text-slate-400 text-xs">
-            <svg class="w-6 h-6 animate-spin mx-auto text-primary mb-2 opacity-80" fill="none" viewBox="0 0 24 24">
-              <circle class="opacity-25" cx="12" cy="12" r="10" stroke="currentColor" stroke-width="4"></circle>
-              <path class="opacity-75" fill="currentColor" d="M4 12a8 8 0 018-8v8H4z"></path>
+      <!-- ===== Related Products ===== -->
+      <section class="related-products-section" id="related-products-section" aria-labelledby="related-products-heading">
+        <div class="related-products-header">
+          <div>
+            <span class="related-products-eyebrow">Pilihan Lainnya</span>
+            <h2 id="related-products-heading" class="related-products-title">Produk Serupa Lainnya</h2>
+          </div>
+          <a
+            href={withBase(`/kategori/${product.categorySlug}/`)}
+            class="related-products-link"
+          >
+            Lihat Semua {product.categoryName}
+            <svg class="related-products-link-icon" fill="none" viewBox="0 0 24 24" stroke="currentColor" aria-hidden="true">
+              <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 5l7 7-7 7"/>
             </svg>
-            Memuat produk serupa...
-          </div>
-        )}
-      </div>
-    </section>
+          </a>
+        </div>
 
+        <div id="related-products-grid" class="related-products-grid">
+          {relatedProducts.length > 0 ? (
+            relatedProducts.map(prod => (
+              <ProductCard product={prod} variant="compact" />
+            ))
+          ) : (
+            <div class="related-loading">
+              <svg class="related-loading-spinner" fill="none" viewBox="0 0 24 24" aria-hidden="true">
+                <circle class="opacity-25" cx="12" cy="12" r="10" stroke="currentColor" stroke-width="4"></circle>
+                <path class="opacity-75" fill="currentColor" d="M4 12a8 8 0 018-8v8H4z"></path>
+              </svg>
+              Memuat produk serupa...
+            </div>
+          )}
+        </div>
+      </section>
+
+    </div>
   </div>
 </Layout>
 
-  <script is:inline>
-      const galleryFrame = document.getElementById('product-gallery-frame');
-      const galleryImage = document.getElementById('product-gallery-image');
-      const galleryCount = document.getElementById('product-gallery-count');
-      const galleryThumbnailContainer = document.getElementById('product-gallery-thumbnails');
-      let galleryThumbnails = Array.from(document.querySelectorAll('[data-gallery-index]'));
-      const galleryNavigation = Array.from(document.querySelectorAll('[data-gallery-step]'));
-      let activeGalleryIndex = 0;
-      let galleryTransitionTimer;
+<!-- ============================================================
+     SCOPED STYLES — Fully Responsive, Zoom-Proof (20%–500%)
+     ============================================================ -->
+<style>
+  /* ── Root wrapper ───────────────────────────────────────── */
+  .product-page-root {
+    width: 100%;
+    overflow-x: hidden;
+  }
 
-      function updateProductGallery(images) {
-        const validImages = Array.isArray(images) ? [...new Set(images.filter((image) => typeof image === 'string' && image.trim()))].slice(0, 3) : [];
-        if (!validImages.length || !galleryImage || !galleryThumbnailContainer) return;
+  /* ── Container ──────────────────────────────────────────── */
+  .product-container {
+    width: 100%;
+    max-width: 1440px;
+    margin-inline: auto;
+    padding-inline: clamp(0.75rem, 4vw, 2rem);
+    box-sizing: border-box;
+  }
 
-        galleryImage.src = validImages[0];
-        activeGalleryIndex = 0;
-        galleryThumbnailContainer.replaceChildren(...validImages.map((image, index) => {
-          const button = document.createElement('button');
-          button.type = 'button';
-          button.dataset.galleryIndex = String(index);
-          button.dataset.gallerySrc = image;
-          button.setAttribute('aria-label', `Tampilkan foto ${index + 1}`);
-          button.setAttribute('aria-pressed', String(index === 0));
-          button.className = `h-16 w-16 shrink-0 overflow-hidden rounded-lg border-2 transition sm:h-20 sm:w-20 ${index === 0 ? 'border-primary' : 'border-transparent opacity-70 hover:opacity-100'}`;
-          const thumbnail = document.createElement('img');
-          thumbnail.src = image;
-          thumbnail.alt = '';
-          thumbnail.loading = 'lazy';
-          thumbnail.className = 'h-full w-full object-cover';
-          button.append(thumbnail);
-          return button;
-        }));
-        galleryThumbnails = Array.from(galleryThumbnailContainer.querySelectorAll('[data-gallery-index]'));
-        galleryThumbnailContainer.classList.toggle('hidden', validImages.length <= 1);
-        galleryNavigation.forEach((button) => button.classList.toggle('hidden', validImages.length <= 1));
-        galleryCount?.classList.toggle('hidden', validImages.length <= 1);
-        if (galleryCount) galleryCount.textContent = `1 / ${validImages.length}`;
-      }
+  .product-breadcrumb-wrap {
+    padding-block: 0.75rem;
+  }
 
-      function showGalleryImage(index) {
-        if (!galleryThumbnails.length || !galleryImage) return;
-        activeGalleryIndex = (index + galleryThumbnails.length) % galleryThumbnails.length;
-        const activeThumbnail = galleryThumbnails[activeGalleryIndex];
-        window.clearTimeout(galleryTransitionTimer);
-        galleryImage.style.opacity = '0.35';
-        galleryTransitionTimer = window.setTimeout(() => {
-          galleryImage.src = activeThumbnail.dataset.gallerySrc;
-          galleryImage.style.opacity = '1';
-        }, 100);
-        galleryThumbnails.forEach((thumbnail, thumbnailIndex) => {
-          const isActive = thumbnailIndex === activeGalleryIndex;
-          thumbnail.setAttribute('aria-pressed', String(isActive));
-          thumbnail.classList.toggle('border-primary', isActive);
-          thumbnail.classList.toggle('border-transparent', !isActive);
-          thumbnail.classList.toggle('opacity-70', !isActive);
-        });
-        if (galleryCount) galleryCount.textContent = `${activeGalleryIndex + 1} / ${galleryThumbnails.length}`;
-      }
+  .product-container--main {
+    padding-block: clamp(1rem, 3vw, 2rem);
+  }
 
-      galleryThumbnailContainer?.addEventListener('click', (event) => {
-        const thumbnail = event.target.closest('[data-gallery-index]');
-        if (thumbnail) showGalleryImage(Number(thumbnail.dataset.galleryIndex));
-      });
-      galleryNavigation.forEach((button) => {
-        button.addEventListener('click', () => showGalleryImage(activeGalleryIndex + Number(button.dataset.galleryStep)));
-      });
+  /* ── Product Detail Card ────────────────────────────────── */
+  .product-detail-card {
+    background: #fff;
+    border-radius: clamp(12px, 2vw, 24px);
+    border: 1px solid rgba(246, 227, 225, 0.8);
+    box-shadow: 0 1px 3px rgba(15, 23, 42, 0.04);
+    overflow: hidden;
+  }
 
-      window.addEventListener('zaloma:product-gallery-updated', (event) => {
-        updateProductGallery(event.detail?.images);
-      });
+  /* ── Product Detail Grid ────────────────────────────────── */
+  .product-detail-grid {
+    display: grid;
+    grid-template-columns: 1fr;
+    gap: clamp(1.25rem, 4vw, 3rem);
+    padding: clamp(1rem, 4vw, 3rem);
+  }
 
-      let swipeStartX = 0;
-      galleryFrame?.addEventListener('touchstart', (event) => {
-        swipeStartX = event.changedTouches[0].clientX;
-      }, { passive: true });
-      galleryFrame?.addEventListener('touchend', (event) => {
-        const swipeDistance = event.changedTouches[0].clientX - swipeStartX;
-        if (Math.abs(swipeDistance) >= 45) showGalleryImage(activeGalleryIndex + (swipeDistance < 0 ? 1 : -1));
-      }, { passive: true });
-
-      galleryFrame?.addEventListener('keydown', (event) => {
-        if (event.key === 'ArrowRight') showGalleryImage(activeGalleryIndex + 1);
-        if (event.key === 'ArrowLeft') showGalleryImage(activeGalleryIndex - 1);
-      });
-  </script>
-
-  <script define:vars={{ SUPABASE_URL, SUPABASE_ANON_KEY, currentSlug, currentCategorySlug }}>
-  async function syncProductDetail() {
-    try {
-      if (!window.supabase) return;
-      const client = window.supabase.createClient(SUPABASE_URL, SUPABASE_ANON_KEY);
-      const { data: cloudProducts, error } = await client.from('products').select('*');
-      if (error || !cloudProducts || cloudProducts.length === 0) return;
-
-      const cloudMap = new Map(cloudProducts.map(p => [p.slug, p]));
-
-      // 1. Cek jika produk utama sudah dihapus di Supabase
-      if (!cloudMap.has(currentSlug)) {
-        const alertBanner = document.createElement('div');
-        alertBanner.className = 'mb-6 p-4 rounded-xl bg-amber-50 border border-amber-300 text-amber-900 text-sm flex items-center justify-between gap-4';
-        alertBanner.innerHTML = `
-          <div class="flex items-center gap-2">
-            <svg class="w-5 h-5 text-amber-600 shrink-0" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2"><path stroke-linecap="round" stroke-linejoin="round" d="M12 9v2m0 4h.01m-6.938 4h13.856c1.54 0 2.502-1.667 1.732-3L13.732 4c-.77-1.333-2.694-1.333-3.464 0L3.34 16c-.77 1.333.192 3 1.732 3z" /></svg>
-            <span>Produk ini sedang tidak tersedia atau telah diarsipkan.</span>
-          </div>
-          <a href="/katalog/" class="px-4 py-1.5 rounded-lg bg-amber-600 text-white font-bold text-xs hover:bg-amber-700 transition-colors shrink-0">Lihat Katalog</a>
-        `;
-        const container = document.querySelector('.bg-white.rounded-2xl, .bg-white.rounded-xl');
-        if (container) container.parentElement?.insertBefore(alertBanner, container);
-      } else {
-        // Update harga dan nama jika berubah di Supabase
-        const p = cloudMap.get(currentSlug);
-        window.dispatchEvent(new CustomEvent('zaloma:product-gallery-updated', {
-          detail: { images: [p.image, ...(Array.isArray(p.images) ? p.images : [])].filter(Boolean).slice(0, 3) }
-        }));
-        const priceEl = document.getElementById('product-detail-price');
-        if (priceEl && p.price_label) priceEl.textContent = p.price_label;
-
-        const h1El = document.querySelector('h1');
-        if (h1El && p.name && h1El.textContent.trim() !== p.name) h1El.textContent = p.name;
-
-        const descriptionValue = String(p.description || '');
-        const descriptionEl = document.getElementById('product-detail-description');
-        const sizeEl = document.getElementById('product-detail-size');
-        const areaEl = document.getElementById('product-detail-area');
-        const cleanDescription = descriptionValue
-          .replace(/^(?:\[(?:Ukuran|Bentuk Kartu):[^\]]+\]\s*\r?\n?)+/i, '')
-          .trim();
-        const size = descriptionValue.match(/^\[Ukuran:\s*([^\]]+)\]/im)?.[1]?.trim();
-        if (descriptionEl) descriptionEl.textContent = cleanDescription;
-        if (sizeEl) sizeEl.textContent = size || 'Hubungi kami untuk pilihan ukuran';
-        if (areaEl) areaEl.textContent = p.city || 'Malang Raya (Kota Malang, Kab. Malang, Kota Batu)';
-      }
-
-      // 2. Sinkronisasi Related Products
-      const relatedGrid = document.getElementById('related-products-grid');
-      if (relatedGrid) {
-        const matchingRel = cloudProducts.filter(p => p.category_slug === currentCategorySlug && p.slug !== currentSlug);
-        if (matchingRel.length > 0) {
-          relatedGrid.innerHTML = matchingRel.slice(0, 8).map(relP => `
-            <article class="product-card-shell compact-product-card group relative h-full flex flex-col overflow-hidden rounded-[14px] border border-soft-cream/70 bg-white shadow-[0_1px_4px_rgba(15,23,42,0.03)] hover-gold-grow">
-              <a href="/produk/${relP.slug}/" class="flex h-full flex-col no-underline">
-                <div class="image-load-shell relative aspect-[4/4.5] overflow-hidden bg-clean-ivory border-b border-soft-cream/40">
-                  <img
-                    src="${relP.image}"
-                    alt="Foto ${relP.name} Florist Malang"
-                    loading="lazy"
-                    decoding="async"
-                    class="relative z-0 h-full w-full object-cover object-top transition-transform duration-700 ease-out group-hover:scale-[1.012]"
-                  />
-                  <div class="pointer-events-none absolute inset-x-0 bottom-0 z-10 h-16 bg-gradient-to-t from-primary-dark/30 via-transparent to-transparent"></div>
-                </div>
-                <div class="flex flex-1 flex-col justify-between p-3 sm:p-3.5">
-                  <h3 class="font-serif font-bold text-slate-800 line-clamp-2 transition-colors duration-200 group-hover:text-primary text-xs sm:text-sm">
-                    ${relP.name}
-                  </h3>
-                  <div class="mt-2 pt-2 border-t border-soft-cream/60 flex items-center justify-between">
-                    <span class="font-sans font-extrabold text-primary text-xs sm:text-sm">${relP.price_label}</span>
-                    <span class="inline-flex h-6 w-6 items-center justify-center rounded-full bg-primary text-white text-[10px]">
-                      <svg class="h-3 w-3" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2.5">
-                        <path stroke-linecap="round" stroke-linejoin="round" d="M9 5l7 7-7 7" />
-                      </svg>
-                    </span>
-                  </div>
-                </div>
-              </a>
-            </article>
-          `).join('');
-        }
-      }
-
-    } catch (err) {
-      console.warn('Gagal sinkronisasi detail produk:', err);
+  @media (min-width: 900px) {
+    .product-detail-grid {
+      grid-template-columns: 1fr 1fr;
+      align-items: start;
     }
   }
 
-  syncProductDetail();
+  /* ── Gallery Column ─────────────────────────────────────── */
+  .product-gallery-col {
+    display: flex;
+    flex-direction: column;
+    gap: clamp(0.75rem, 2vw, 1.25rem);
+    min-width: 0;
+  }
+
+  /* ── Gallery Frame ──────────────────────────────────────── */
+  .product-gallery-frame {
+    position: relative;
+    aspect-ratio: 1 / 1;
+    border-radius: clamp(10px, 1.5vw, 18px);
+    overflow: hidden;
+    background: #FDF7F7;
+    border: 1px solid rgba(246, 227, 225, 0.6);
+    touch-action: pan-y;
+    outline: none;
+    width: 100%;
+  }
+
+  .product-gallery-frame:focus-visible {
+    box-shadow: 0 0 0 3px rgba(137, 49, 68, 0.3);
+  }
+
+  .product-gallery-img {
+    width: 100%;
+    height: 100%;
+    object-fit: cover;
+    object-position: top;
+    display: block;
+    transition: opacity 0.15s ease;
+  }
+
+  /* ── Gallery Nav Buttons ────────────────────────────────── */
+  .gallery-nav-btn {
+    position: absolute;
+    top: 50%;
+    z-index: 20;
+    transform: translateY(-50%);
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    width: clamp(2rem, 5vw, 2.5rem);
+    height: clamp(2rem, 5vw, 2.5rem);
+    border-radius: 50%;
+    background: rgba(255, 255, 255, 0.92);
+    border: none;
+    cursor: pointer;
+    color: #893144;
+    box-shadow: 0 2px 8px rgba(0,0,0,0.12);
+    transition: background 0.2s, box-shadow 0.2s;
+  }
+
+  .gallery-nav-btn:hover {
+    background: #fff;
+    box-shadow: 0 4px 12px rgba(0,0,0,0.16);
+  }
+
+  .gallery-nav-btn--prev { left: clamp(0.5rem, 2vw, 0.75rem); }
+  .gallery-nav-btn--next { right: clamp(0.5rem, 2vw, 0.75rem); }
+
+  .gallery-nav-icon {
+    width: clamp(0.9rem, 2vw, 1.25rem);
+    height: clamp(0.9rem, 2vw, 1.25rem);
+    flex-shrink: 0;
+  }
+
+  /* ── Gallery Count Badge ────────────────────────────────── */
+  .gallery-count-badge {
+    position: absolute;
+    bottom: clamp(0.5rem, 2vw, 0.75rem);
+    right: clamp(0.5rem, 2vw, 0.75rem);
+    z-index: 20;
+    background: rgba(0,0,0,0.6);
+    color: #fff;
+    font-size: clamp(0.6rem, 1.2vw, 0.75rem);
+    font-weight: 600;
+    padding: 0.2em 0.6em;
+    border-radius: 999px;
+    line-height: 1.4;
+  }
+
+  /* ── Featured Badge ─────────────────────────────────────── */
+  .gallery-featured-badge {
+    position: absolute;
+    top: clamp(0.5rem, 2vw, 1rem);
+    left: clamp(0.5rem, 2vw, 1rem);
+    z-index: 20;
+  }
+
+  .gallery-featured-badge span {
+    display: inline-block;
+    background: #C59253;
+    color: #3D1A09;
+    font-size: clamp(0.55rem, 1.1vw, 0.7rem);
+    font-weight: 700;
+    text-transform: uppercase;
+    letter-spacing: 0.08em;
+    padding: 0.3em 0.75em;
+    border-radius: 999px;
+    box-shadow: 0 1px 4px rgba(0,0,0,0.15);
+  }
+
+  /* ── Thumbnails ─────────────────────────────────────────── */
+  .gallery-thumbs {
+    display: flex;
+    gap: clamp(0.4rem, 1.5vw, 0.6rem);
+    overflow-x: auto;
+    padding-bottom: 0.25rem;
+    scrollbar-width: thin;
+    scrollbar-color: rgba(197,146,83,0.4) transparent;
+  }
+
+  .gallery-thumb-btn {
+    flex-shrink: 0;
+    width: clamp(3.5rem, 8vw, 5rem);
+    height: clamp(3.5rem, 8vw, 5rem);
+    overflow: hidden;
+    border-radius: clamp(6px, 1vw, 10px);
+    border: 2px solid transparent;
+    opacity: 0.65;
+    cursor: pointer;
+    transition: border-color 0.2s, opacity 0.2s;
+    background: none;
+    padding: 0;
+  }
+
+  .gallery-thumb-btn:hover,
+  .gallery-thumb-btn.active {
+    border-color: #893144;
+    opacity: 1;
+  }
+
+  .gallery-thumb-img {
+    width: 100%;
+    height: 100%;
+    object-fit: cover;
+    display: block;
+  }
+
+  /* ── Trust Badges ───────────────────────────────────────── */
+  .trust-badges {
+    display: grid;
+    grid-template-columns: repeat(3, minmax(0, 1fr));
+    align-items: stretch;
+    padding: clamp(0.75rem, 2vw, 1.25rem) clamp(0.75rem, 2vw, 1.5rem);
+    background: rgba(250, 240, 241, 0.6);
+    border: 1px solid rgba(246, 227, 225, 0.6);
+    border-radius: clamp(10px, 1.5vw, 16px);
+    gap: clamp(0.5rem, 1.5vw, 1rem);
+    text-align: center;
+  }
+
+  .trust-badge-item {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    gap: 0.15rem;
+    flex: 1;
+    min-width: 0;
+  }
+
+  .trust-badge-icon {
+    font-size: clamp(1rem, 2.5vw, 1.4rem);
+    line-height: 1;
+    margin-bottom: 0.1rem;
+  }
+
+  .trust-badge-value {
+    display: block;
+    font-weight: 700;
+    font-size: clamp(0.6rem, 1.4vw, 0.85rem);
+    color: #893144;
+    overflow-wrap: anywhere;
+    overflow: hidden;
+    text-overflow: ellipsis;
+    max-width: 100%;
+    line-height: 1.3;
+  }
+
+  .trust-badge-label {
+    display: block;
+    font-size: clamp(0.55rem, 1.1vw, 0.7rem);
+    color: #64748b;
+    overflow-wrap: anywhere;
+    overflow: hidden;
+    text-overflow: ellipsis;
+    max-width: 100%;
+    line-height: 1.3;
+  }
+
+  .trust-badge-divider {
+    display: none;
+  }
+
+  /* ── Info Column ────────────────────────────────────────── */
+  .product-info-col {
+    display: flex;
+    flex-direction: column;
+    gap: clamp(1rem, 2.5vw, 1.5rem);
+    min-width: 0;
+  }
+
+  /* ── Meta Badges ────────────────────────────────────────── */
+  .product-meta-badges {
+    display: flex;
+    align-items: center;
+    gap: 0.5rem;
+    flex-wrap: wrap;
+  }
+
+  .product-category-badge {
+    display: inline-block;
+    font-size: clamp(0.6rem, 1.2vw, 0.72rem);
+    font-weight: 700;
+    color: #C59253;
+    text-transform: uppercase;
+    letter-spacing: 0.08em;
+    background: rgba(250, 240, 241, 0.9);
+    padding: 0.3em 0.75em;
+    border-radius: 6px;
+    border: 1px solid rgba(246, 227, 225, 0.8);
+    text-decoration: none;
+    transition: color 0.2s, background 0.2s;
+    white-space: nowrap;
+  }
+
+  .product-category-badge:hover {
+    color: #8E5F2B;
+    background: rgba(197, 146, 83, 0.12);
+  }
+
+  .product-meta-sep {
+    color: #cbd5e1;
+    font-size: 0.75rem;
+    flex-shrink: 0;
+  }
+
+  .product-store-location {
+    font-size: clamp(0.65rem, 1.3vw, 0.78rem);
+    font-weight: 500;
+    color: #64748b;
+    white-space: normal;
+    overflow-wrap: anywhere;
+    overflow: hidden;
+    text-overflow: ellipsis;
+  }
+
+  /* ── Product Title ──────────────────────────────────────── */
+  .product-title {
+    font-family: "Playfair Display", Georgia, serif;
+    font-size: clamp(1.3rem, 4vw, 2.4rem);
+    font-weight: 700;
+    color: #0f172a;
+    line-height: 1.25;
+    margin: 0;
+    word-break: break-word;
+  }
+
+  /* ── Price Card ─────────────────────────────────────────── */
+  .product-price-card {
+    padding: clamp(0.875rem, 2.5vw, 1.25rem) clamp(1rem, 3vw, 1.5rem);
+    border-radius: clamp(10px, 1.5vw, 18px);
+    background: linear-gradient(135deg, #FDF7F7, rgba(250, 240, 241, 0.6));
+    border: 1px solid rgba(246, 227, 225, 0.8);
+  }
+
+  .product-price-label-text {
+    display: block;
+    font-size: clamp(0.6rem, 1.2vw, 0.72rem);
+    font-weight: 700;
+    text-transform: uppercase;
+    letter-spacing: 0.08em;
+    color: #64748b;
+    margin-bottom: 0.4rem;
+  }
+
+  .product-price-row {
+    display: flex;
+    align-items: baseline;
+    gap: clamp(0.4rem, 1.5vw, 0.75rem);
+    flex-wrap: wrap;
+  }
+
+  .product-price-value {
+    font-family: "Inter", system-ui, -apple-system, sans-serif;
+    font-size: clamp(1.4rem, 4vw, 2.4rem);
+    font-weight: 800;
+    color: #893144;
+    line-height: 1;
+    white-space: normal;
+    overflow-wrap: anywhere;
+  }
+
+  .product-price-note {
+    font-size: clamp(0.6rem, 1.2vw, 0.75rem);
+    color: #64748b;
+    font-weight: 500;
+    overflow-wrap: anywhere;
+  }
+
+  /* ── Description Section ────────────────────────────────── */
+  .product-desc-section {
+    display: flex;
+    flex-direction: column;
+    gap: 0.75rem;
+  }
+
+  .product-section-title {
+    font-size: clamp(0.65rem, 1.3vw, 0.78rem);
+    font-weight: 700;
+    text-transform: uppercase;
+    letter-spacing: 0.1em;
+    color: #1e293b;
+    margin: 0;
+  }
+
+  .product-desc-text {
+    font-size: clamp(0.8rem, 1.6vw, 0.9375rem);
+    color: #475569;
+    line-height: 1.65;
+    margin: 0;
+    word-break: break-word;
+  }
+
+  /* ── Specs Grid ─────────────────────────────────────────── */
+  .product-specs-grid {
+    display: grid;
+    grid-template-columns: 1fr 1fr;
+    gap: clamp(0.5rem, 1.5vw, 0.75rem);
+    margin: 0;
+  }
+
+  @media (max-width: 400px) {
+    .product-specs-grid {
+      grid-template-columns: 1fr;
+    }
+  }
+
+  .product-spec-item {
+    padding: clamp(0.6rem, 1.5vw, 0.875rem) clamp(0.75rem, 2vw, 1rem);
+    border-radius: clamp(8px, 1vw, 12px);
+    border: 1px solid rgba(246, 227, 225, 0.7);
+    background: rgba(253, 247, 247, 0.7);
+  }
+
+  .product-spec-label {
+    display: block;
+    font-size: clamp(0.55rem, 1.1vw, 0.65rem);
+    font-weight: 700;
+    text-transform: uppercase;
+    letter-spacing: 0.1em;
+    color: #64748b;
+    margin-bottom: 0.3rem;
+  }
+
+  .product-spec-value {
+    display: block;
+    font-size: clamp(0.75rem, 1.5vw, 0.875rem);
+    font-weight: 600;
+    color: #1e293b;
+    word-break: break-word;
+  }
+
+  /* ── Order Steps ────────────────────────────────────────── */
+  .product-order-steps {
+    padding: clamp(0.875rem, 2vw, 1.25rem);
+    border-radius: clamp(10px, 1.5vw, 14px);
+    background: #f8fafc;
+    border: 1px solid rgba(226, 232, 240, 0.6);
+    display: flex;
+    flex-direction: column;
+    gap: 0.5rem;
+  }
+
+  .order-steps-title {
+    display: flex;
+    align-items: center;
+    gap: 0.5rem;
+    font-size: clamp(0.75rem, 1.5vw, 0.875rem);
+    font-weight: 700;
+    color: #1e293b;
+    margin: 0;
+    flex-wrap: wrap;
+  }
+
+  .order-steps-icon {
+    width: clamp(0.9rem, 1.8vw, 1.1rem);
+    height: clamp(0.9rem, 1.8vw, 1.1rem);
+    color: #059669;
+    flex-shrink: 0;
+  }
+
+  .order-steps-list {
+    list-style: decimal;
+    padding-left: 1.25em;
+    margin: 0;
+    display: flex;
+    flex-direction: column;
+    gap: 0.3rem;
+    color: #64748b;
+    font-size: clamp(0.7rem, 1.4vw, 0.8125rem);
+    line-height: 1.55;
+  }
+
+  /* ── CTA Section ────────────────────────────────────────── */
+  .product-cta-wrap {
+    padding-top: clamp(0.75rem, 2vw, 1.25rem);
+    border-top: 1px solid rgba(246, 227, 225, 0.8);
+    display: flex;
+    flex-direction: column;
+    gap: 0.6rem;
+  }
+
+  /* Override WhatsAppButton styles so it fills full width cleanly */
+  :global(.product-wa-btn) {
+    width: 100% !important;
+    border-radius: 999px !important;
+    text-align: center !important;
+    padding: clamp(0.75rem, 2vw, 1rem) !important;
+    font-size: clamp(0.8rem, 1.6vw, 1rem) !important;
+    font-weight: 700 !important;
+    box-shadow: 0 4px 14px rgba(5, 150, 105, 0.3) !important;
+    transition: box-shadow 0.2s, transform 0.2s !important;
+    white-space: normal !important;
+    overflow-wrap: anywhere;
+    line-height: 1.4;
+  }
+
+  :global(.product-wa-btn:hover) {
+    box-shadow: 0 6px 20px rgba(5, 150, 105, 0.4) !important;
+    transform: translateY(-1px) !important;
+  }
+
+  .product-cta-footnote {
+    text-align: center;
+    font-size: clamp(0.6rem, 1.2vw, 0.72rem);
+    color: #94a3b8;
+    margin: 0;
+    line-height: 1.4;
+  }
+
+  /* ── Related Products ───────────────────────────────────── */
+  .related-products-section {
+    margin-top: clamp(2rem, 5vw, 4rem);
+    padding-top: clamp(1.5rem, 3vw, 2.5rem);
+    border-top: 1px solid rgba(246, 227, 225, 0.6);
+  }
+
+  .related-products-header {
+    display: flex;
+    flex-direction: column;
+    gap: 0.75rem;
+    margin-bottom: clamp(1.25rem, 3vw, 2rem);
+  }
+
+  @media (min-width: 600px) {
+    .related-products-header {
+      flex-direction: row;
+      align-items: flex-end;
+      justify-content: space-between;
+    }
+  }
+
+  .related-products-eyebrow {
+    display: block;
+    font-size: clamp(0.6rem, 1.2vw, 0.72rem);
+    font-weight: 600;
+    text-transform: uppercase;
+    letter-spacing: 0.12em;
+    color: #C59253;
+    margin-bottom: 0.25rem;
+  }
+
+  .related-products-title {
+    font-family: "Playfair Display", Georgia, serif;
+    font-size: clamp(1.1rem, 3vw, 1.75rem);
+    font-weight: 700;
+    color: #1e293b;
+    margin: 0;
+  }
+
+  .related-products-link {
+    display: inline-flex;
+    align-items: center;
+    gap: 0.35rem;
+    font-size: clamp(0.7rem, 1.4vw, 0.85rem);
+    font-weight: 600;
+    color: #893144;
+    text-decoration: none;
+    white-space: nowrap;
+    transition: color 0.2s, gap 0.2s;
+    flex-shrink: 0;
+  }
+
+  .related-products-link:hover {
+    color: #C59253;
+    gap: 0.5rem;
+  }
+
+  .related-products-link-icon {
+    width: clamp(0.8rem, 1.5vw, 1rem);
+    height: clamp(0.8rem, 1.5vw, 1rem);
+    flex-shrink: 0;
+  }
+
+  .related-products-grid {
+    display: grid;
+    grid-template-columns: repeat(auto-fit, minmax(min(100%, 14rem), 1fr));
+    gap: clamp(0.75rem, 2vw, 1.5rem);
+  }
+
+  @media (max-width: 480px) {
+    .product-container {
+      padding-inline: 0.75rem;
+    }
+
+    .product-detail-grid {
+      gap: 1rem;
+      padding: 0.75rem;
+    }
+
+    .trust-badges {
+      grid-template-columns: minmax(0, 1fr);
+      gap: 0.75rem;
+      padding: 0.875rem;
+      text-align: left;
+    }
+
+    .trust-badge-item {
+      display: grid;
+      grid-template-columns: 1.5rem minmax(0, 1fr);
+      grid-template-rows: auto auto;
+      column-gap: 0.5rem;
+      align-items: center;
+      justify-items: start;
+    }
+
+    .trust-badge-icon {
+      grid-row: 1 / 3;
+      margin: 0;
+    }
+
+    .trust-badge-value,
+    .trust-badge-label {
+      white-space: normal;
+      text-overflow: clip;
+    }
+
+    .product-meta-badges {
+      align-items: flex-start;
+    }
+
+    .product-category-badge {
+      white-space: normal;
+      overflow-wrap: anywhere;
+    }
+
+    .product-price-value {
+      overflow-wrap: anywhere;
+    }
+
+    .product-price-note {
+      flex-basis: 100%;
+    }
+
+    .product-specs-grid {
+      grid-template-columns: minmax(0, 1fr);
+    }
+  }
+
+  .related-loading {
+    grid-column: 1 / -1;
+    padding: 2.5rem 0;
+    text-align: center;
+    color: #94a3b8;
+    font-size: 0.75rem;
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    gap: 0.5rem;
+  }
+
+  .related-loading-spinner {
+    width: 1.5rem;
+    height: 1.5rem;
+    animation: spin 1s linear infinite;
+    color: #893144;
+  }
+
+  @keyframes spin {
+    to { transform: rotate(360deg); }
+  }
+
+  /* ── Hidden utility ─────────────────────────────────────── */
+  .hidden {
+    display: none !important;
+  }
+</style>
+
+<script is:inline>
+  const requestedCity = new URLSearchParams(window.location.search).get('cityName')?.trim();
+  const selectedCityName = requestedCity && requestedCity.length <= 120 ? requestedCity : '';
+
+  window.applySelectedCityContext = (productName, priceLabel) => {
+    if (!selectedCityName) return;
+
+    const areaLabel = document.getElementById('product-detail-area');
+    const badgeLabel = document.getElementById('trust-badge-city');
+    const storeLocation = document.getElementById('product-store-location');
+    if (areaLabel) areaLabel.textContent = selectedCityName;
+    if (badgeLabel) badgeLabel.textContent = selectedCityName;
+    if (storeLocation) storeLocation.textContent = `Toko Bunga ${selectedCityName}`;
+
+    const whatsappButton = document.querySelector('.product-wa-btn');
+    if (whatsappButton) {
+      const currentUrl = new URL(whatsappButton.href);
+      const name = productName || document.querySelector('.product-title')?.textContent?.trim() || 'bunga';
+      const price = priceLabel || document.getElementById('product-detail-price')?.textContent?.trim() || '';
+      currentUrl.searchParams.set(
+        'text',
+        `Halo Zaloma Florist, saya ingin pesan ${name}${price ? ` (${price})` : ''}. Mohon info ketersediaan dan format pemesanannya untuk pengiriman ke ${selectedCityName}.`,
+      );
+      whatsappButton.href = currentUrl.toString();
+    }
+  };
+
+  window.applySelectedCityContext();
+
+  document.addEventListener('click', (event) => {
+    if (!selectedCityName || !(event.target instanceof Element)) return;
+    const link = event.target.closest('a[href]');
+    if (!link) return;
+
+    const destination = new URL(link.href, window.location.href);
+    if (destination.origin !== window.location.origin) return;
+    if (destination.pathname.includes('/produk/')) {
+      destination.searchParams.set('cityName', selectedCityName);
+    }
+    if (destination.pathname.includes('/kategori/')) {
+      const citySlug = new URLSearchParams(window.location.search).get('city');
+      destination.searchParams.set('cityName', selectedCityName);
+      if (citySlug) {
+        destination.searchParams.set('city', citySlug);
+        destination.searchParams.set('refer', 'city');
+      }
+    }
+    link.href = `${destination.pathname}${destination.search}${destination.hash}`;
+  }, true);
+</script>
+
+<script is:inline>
+    const galleryFrame = document.getElementById('product-gallery-frame');
+    const galleryImage = document.getElementById('product-gallery-image');
+    const galleryCount = document.getElementById('product-gallery-count');
+    const galleryThumbnailContainer = document.getElementById('product-gallery-thumbnails');
+    let galleryThumbnails = Array.from(document.querySelectorAll('[data-gallery-index]'));
+    const galleryNavigation = Array.from(document.querySelectorAll('[data-gallery-step]'));
+    let activeGalleryIndex = 0;
+    let galleryTransitionTimer;
+
+    function updateProductGallery(images) {
+      const validImages = Array.isArray(images) ? [...new Set(images.filter((image) => typeof image === 'string' && image.trim()))].slice(0, 3) : [];
+      if (!validImages.length || !galleryImage || !galleryThumbnailContainer) return;
+
+      galleryImage.src = validImages[0];
+      activeGalleryIndex = 0;
+      galleryThumbnailContainer.replaceChildren(...validImages.map((image, index) => {
+        const button = document.createElement('button');
+        button.type = 'button';
+        button.dataset.galleryIndex = String(index);
+        button.dataset.gallerySrc = image;
+        button.setAttribute('aria-label', `Tampilkan foto ${index + 1}`);
+        button.setAttribute('aria-pressed', String(index === 0));
+        button.className = `gallery-thumb-btn ${index === 0 ? 'active' : ''}`;
+        const thumbnail = document.createElement('img');
+        thumbnail.src = image;
+        thumbnail.alt = '';
+        thumbnail.loading = 'lazy';
+        thumbnail.className = 'gallery-thumb-img';
+        button.append(thumbnail);
+        return button;
+      }));
+      galleryThumbnails = Array.from(galleryThumbnailContainer.querySelectorAll('[data-gallery-index]'));
+      galleryThumbnailContainer.classList.toggle('hidden', validImages.length <= 1);
+      galleryNavigation.forEach((button) => button.classList.toggle('hidden', validImages.length <= 1));
+      galleryCount?.classList.toggle('hidden', validImages.length <= 1);
+      if (galleryCount) galleryCount.textContent = `1 / ${validImages.length}`;
+    }
+
+    function showGalleryImage(index) {
+      if (!galleryThumbnails.length || !galleryImage) return;
+      activeGalleryIndex = (index + galleryThumbnails.length) % galleryThumbnails.length;
+      const activeThumbnail = galleryThumbnails[activeGalleryIndex];
+      window.clearTimeout(galleryTransitionTimer);
+      galleryImage.style.opacity = '0.35';
+      galleryTransitionTimer = window.setTimeout(() => {
+        galleryImage.src = activeThumbnail.dataset.gallerySrc;
+        galleryImage.style.opacity = '1';
+      }, 100);
+      galleryThumbnails.forEach((thumbnail, thumbnailIndex) => {
+        const isActive = thumbnailIndex === activeGalleryIndex;
+        thumbnail.setAttribute('aria-pressed', String(isActive));
+        thumbnail.classList.toggle('active', isActive);
+      });
+      if (galleryCount) galleryCount.textContent = `${activeGalleryIndex + 1} / ${galleryThumbnails.length}`;
+    }
+
+    galleryThumbnailContainer?.addEventListener('click', (event) => {
+      const thumbnail = event.target.closest('[data-gallery-index]');
+      if (thumbnail) showGalleryImage(Number(thumbnail.dataset.galleryIndex));
+    });
+    galleryNavigation.forEach((button) => {
+      button.addEventListener('click', () => showGalleryImage(activeGalleryIndex + Number(button.dataset.galleryStep)));
+    });
+
+    window.addEventListener('zaloma:product-gallery-updated', (event) => {
+      updateProductGallery(event.detail?.images);
+    });
+
+    let swipeStartX = 0;
+    galleryFrame?.addEventListener('touchstart', (event) => {
+      swipeStartX = event.changedTouches[0].clientX;
+    }, { passive: true });
+    galleryFrame?.addEventListener('touchend', (event) => {
+      const swipeDistance = event.changedTouches[0].clientX - swipeStartX;
+      if (Math.abs(swipeDistance) >= 45) showGalleryImage(activeGalleryIndex + (swipeDistance < 0 ? 1 : -1));
+    }, { passive: true });
+
+    galleryFrame?.addEventListener('keydown', (event) => {
+      if (event.key === 'ArrowRight') showGalleryImage(activeGalleryIndex + 1);
+      if (event.key === 'ArrowLeft') showGalleryImage(activeGalleryIndex - 1);
+    });
+</script>
+
+<script define:vars={{ SUPABASE_URL, SUPABASE_ANON_KEY, currentSlug, currentCategorySlug }}>
+async function syncProductDetail() {
+  try {
+    if (!window.supabase) return;
+    const client = window.supabase.createClient(SUPABASE_URL, SUPABASE_ANON_KEY);
+    const { data: cloudProducts, error } = await client.from('products').select('*');
+    if (error || !cloudProducts || cloudProducts.length === 0) return;
+
+    const cloudMap = new Map(cloudProducts.map(p => [p.slug, p]));
+
+    // 1. Cek jika produk utama sudah dihapus di Supabase
+    if (!cloudMap.has(currentSlug)) {
+      const alertBanner = document.createElement('div');
+      alertBanner.style.cssText = 'margin-bottom:1.5rem;padding:1rem 1.25rem;border-radius:12px;background:#fffbeb;border:1px solid #fcd34d;color:#78350f;font-size:0.875rem;display:flex;align-items:center;justify-content:space-between;gap:1rem;';
+      alertBanner.innerHTML = `
+        <div style="display:flex;align-items:center;gap:0.5rem;">
+          <svg style="width:1.25rem;height:1.25rem;color:#d97706;flex-shrink:0;" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2"><path stroke-linecap="round" stroke-linejoin="round" d="M12 9v2m0 4h.01m-6.938 4h13.856c1.54 0 2.502-1.667 1.732-3L13.732 4c-.77-1.333-2.694-1.333-3.464 0L3.34 16c-.77 1.333.192 3 1.732 3z" /></svg>
+          <span>Produk ini sedang tidak tersedia atau telah diarsipkan.</span>
+        </div>
+        <a href="/katalog/" style="padding:0.375rem 1rem;border-radius:8px;background:#d97706;color:#fff;font-weight:700;font-size:0.75rem;text-decoration:none;white-space:nowrap;">Lihat Katalog</a>
+      `;
+      const container = document.querySelector('.product-detail-card');
+      if (container) container.parentElement?.insertBefore(alertBanner, container);
+    } else {
+      // Update harga, nama, dan data kota jika berubah di Supabase
+      const p = cloudMap.get(currentSlug);
+      window.dispatchEvent(new CustomEvent('zaloma:product-gallery-updated', {
+        detail: { images: [p.image, ...(Array.isArray(p.images) ? p.images : [])].filter(Boolean).slice(0, 3) }
+      }));
+      const priceEl = document.getElementById('product-detail-price');
+      if (priceEl && p.price_label) priceEl.textContent = p.price_label;
+
+      const h1El = document.querySelector('h1');
+      if (h1El && p.name && h1El.textContent.trim() !== p.name) h1El.textContent = p.name;
+
+      const descriptionValue = String(p.description || '');
+      const descriptionEl = document.getElementById('product-detail-description');
+      const sizeEl = document.getElementById('product-detail-size');
+      const areaEl = document.getElementById('product-detail-area');
+      const storeLocationEl = document.getElementById('product-store-location');
+      const trustCityEl = document.getElementById('trust-badge-city');
+
+      const cleanDescription = descriptionValue
+        .replace(/^(?:\[(?:Ukuran|Bentuk Kartu):[^\]]+\]\s*\r?\n?)+/i, '')
+        .trim();
+      const size = descriptionValue.match(/^\[Ukuran:\s*([^\]]+)\]/im)?.[1]?.trim();
+      const requestedCityName = new URLSearchParams(window.location.search).get('cityName')?.trim();
+      const city = requestedCityName && requestedCityName.length <= 120 ? requestedCityName : (p.city || 'Malang');
+
+      if (descriptionEl) descriptionEl.textContent = cleanDescription;
+      if (sizeEl) sizeEl.textContent = size || 'Hubungi kami untuk pilihan ukuran';
+      if (areaEl) areaEl.textContent = city;
+      if (storeLocationEl) storeLocationEl.textContent = `Toko Bunga ${city}`;
+      if (trustCityEl) trustCityEl.textContent = city;
+      window.applySelectedCityContext?.(p.name, p.price_label);
+    }
+
+    // 2. Sinkronisasi Related Products
+    const relatedGrid = document.getElementById('related-products-grid');
+    if (relatedGrid) {
+      const matchingRel = cloudProducts.filter(p => p.category_slug === currentCategorySlug && p.slug !== currentSlug);
+      if (matchingRel.length > 0) {
+        relatedGrid.innerHTML = matchingRel.slice(0, 8).map(relP => `
+          <article class="product-card-shell compact-product-card group relative h-full flex flex-col overflow-hidden rounded-[14px] border border-soft-cream/70 bg-white shadow-[0_1px_4px_rgba(15,23,42,0.03)] hover-gold-grow">
+            <a href="/produk/${relP.slug}/" class="flex h-full flex-col no-underline">
+              <div class="image-load-shell relative aspect-[4/4.5] overflow-hidden bg-clean-ivory border-b border-soft-cream/40">
+                <img
+                  src="${relP.image}"
+                  alt="Foto ${relP.name} Florist"
+                  loading="lazy"
+                  decoding="async"
+                  class="relative z-0 h-full w-full object-cover object-top transition-transform duration-700 ease-out group-hover:scale-[1.012]"
+                />
+                <div class="pointer-events-none absolute inset-x-0 bottom-0 z-10 h-16 bg-gradient-to-t from-primary-dark/30 via-transparent to-transparent"></div>
+              </div>
+              <div class="flex flex-1 flex-col justify-between p-3 sm:p-3.5">
+                <h3 class="font-serif font-bold text-slate-800 line-clamp-2 transition-colors duration-200 group-hover:text-primary text-xs sm:text-sm">
+                  ${relP.name}
+                </h3>
+                <div class="mt-2 pt-2 border-t border-soft-cream/60 flex items-center justify-between">
+                  <span class="font-sans font-extrabold text-primary text-xs sm:text-sm">${relP.price_label}</span>
+                  <span class="inline-flex h-6 w-6 items-center justify-center rounded-full bg-primary text-white text-[10px]">
+                    <svg class="h-3 w-3" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2.5">
+                      <path stroke-linecap="round" stroke-linejoin="round" d="M9 5l7 7-7 7" />
+                    </svg>
+                  </span>
+                </div>
+              </div>
+            </a>
+          </article>
+        `).join('');
+      }
+    }
+
+  } catch (err) {
+    console.warn('Gagal sinkronisasi detail produk:', err);
+  }
+}
+
+syncProductDetail();
 </script>

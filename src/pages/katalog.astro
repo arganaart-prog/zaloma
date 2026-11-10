@@ -98,6 +98,7 @@ const dynamicCategories = mergeCategories(configCategories, deriveCategoriesFrom
           <div 
             class="product-item-wrapper" 
             data-category={p.categorySlug} 
+            data-city={p.city}
             data-name={p.name.toLowerCase()} 
             data-description={p.description.toLowerCase()}
           >
@@ -145,6 +146,29 @@ const dynamicCategories = mergeCategories(configCategories, deriveCategoriesFrom
   // Read URL query parameters
   const urlParams = new URLSearchParams(window.location.search);
   const searchParam = (urlParams.get('search') || '').toLowerCase().slice(0, 80);
+  const selectedCityName = (urlParams.get('cityName') || '').trim();
+  const selectedCitySlug = urlParams.get('city') || '';
+
+  function productMatchesSelectedCity(productCity) {
+    if (!selectedCityName) return true;
+    const target = selectedCityName.toLowerCase();
+    if (target.includes('mana saja')) return true;
+    const product = String(productCity || 'Malang Raya').toLowerCase();
+    if (product.includes('mana saja') || product.includes('seluruh indonesia') || product === target) return true;
+    if (target.includes('malang raya') && (product.includes('malang') || product.includes('batu'))) return true;
+    if (product.includes('malang raya') && (target.includes('malang') || target.includes('batu'))) return true;
+    return product.includes(target) || target.includes(product);
+  }
+
+  if (selectedCityName) {
+    const heading = document.querySelector('h1');
+    if (heading) {
+      heading.textContent = heading.textContent.replace(/(?:\s+(?:(?:Kota|Kabupaten)\s+)?Malang(?:\s+Raya)?)+\s*$/i, '').trim() + ` ${selectedCityName}`;
+    }
+    const description = heading?.parentElement?.querySelector('p');
+    if (description) description.textContent = description.textContent.replace(/Malang(?: Raya)?/gi, selectedCityName);
+    document.title = document.title.replace(/Malang(?: Raya)?/gi, selectedCityName);
+  }
 
   // Store active filters state
   let currentCategory = 'all';
@@ -210,6 +234,7 @@ const dynamicCategories = mergeCategories(configCategories, deriveCategoriesFrom
       if (!(item instanceof HTMLElement)) return;
 
       const itemCategory = item.getAttribute('data-category') || '';
+      const itemCity = item.getAttribute('data-city') || '';
       const itemName = item.getAttribute('data-name') || '';
       const itemDesc = item.getAttribute('data-description') || '';
 
@@ -220,8 +245,9 @@ const dynamicCategories = mergeCategories(configCategories, deriveCategoriesFrom
       const matchesSearch = currentSearch === '' || 
                             itemName.includes(currentSearch) || 
                             itemDesc.includes(currentSearch);
+      const matchesCity = productMatchesSelectedCity(itemCity);
 
-      if (matchesCategory && matchesSearch) {
+      if (matchesCategory && matchesSearch && matchesCity) {
         matchedItems.push(item);
       } else {
         item.classList.add('hidden');
@@ -385,7 +411,11 @@ const dynamicCategories = mergeCategories(configCategories, deriveCategoriesFrom
       grid.innerHTML = '';
 
       liveProducts.forEach((p, index) => {
-        const productUrl = `/produk/${p.slug}/`;
+        const productUrl = new URL(`/produk/${p.slug}/`, window.location.origin);
+        if (selectedCityName && selectedCitySlug) {
+          productUrl.searchParams.set('city', selectedCitySlug);
+          productUrl.searchParams.set('cityName', selectedCityName);
+        }
         const cardShape = p.description?.match(/^\[Bentuk Kartu:\s*(portrait|square|arch)\]/im)?.[1];
         const imageAspect = cardShape === 'square' ? 'aspect-square' : 'aspect-[4/5]';
         const archClass = cardShape === 'arch' ? 'product-card-shape-arch' : '';
@@ -393,12 +423,13 @@ const dynamicCategories = mergeCategories(configCategories, deriveCategoriesFrom
         const wrapper = document.createElement('div');
         wrapper.className = 'product-item-wrapper';
         wrapper.setAttribute('data-category', p.category_slug || '');
+        wrapper.setAttribute('data-city', p.city || 'Malang');
         wrapper.setAttribute('data-name', (p.name || '').toLowerCase());
         wrapper.setAttribute('data-description', (p.description || '').toLowerCase());
 
         wrapper.innerHTML = `
           <article class="product-card-shell ${archClass} group relative h-full overflow-hidden rounded-[14px] border border-soft-cream/70 bg-white shadow-[0_1px_4px_rgba(15,23,42,0.03)] hover-gold-grow">
-            <a href="${productUrl}" class="flex h-full flex-col no-underline">
+            <a href="${productUrl.pathname}${productUrl.search}" class="flex h-full flex-col no-underline">
               <div class="product-card-image image-load-shell relative -mx-px -mt-px ${imageAspect} overflow-hidden bg-clean-ivory">
                 <img
                   src="${p.image}"

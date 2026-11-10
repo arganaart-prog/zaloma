@@ -2,7 +2,8 @@
 import Layout from '../../layouts/Layout.astro';
 import Breadcrumb from '../../components/Breadcrumb.astro';
 import HomeHero from '../../components/HomeHero.astro';
-import HomeKategori from '../../components/HomeKategori.astro';
+import CategoryCarousel from '../../components/CategoryCarousel.astro';
+import HomeDynamicCategorySections from '../../components/HomeDynamicCategorySections.astro';
 import FeaturedProductsSection from '../../components/FeaturedProductsSection.astro';
 import HandBouquetSection from '../../components/HandBouquetSection.astro';
 import BungaPapanSection from '../../components/BungaPapanSection.astro';
@@ -18,12 +19,19 @@ import { SUPABASE_URL, SUPABASE_ANON_KEY } from '../../data/supabaseConfig';
 import { cityToSlug, productMatchesCity } from '../../data/cities';
 import { withBase } from '../../utils/paths';
 import { getRotatingHomeProducts } from '../../utils/rotatingProducts';
-import { getHomeDisplayProducts, deriveCategoriesFromProducts } from '../../utils/productHelpers';
+import {
+  getHomeDisplayProducts,
+  deriveCategoriesFromProducts,
+  extractConfigCategories,
+  getMomentCategories,
+  mergeCategories,
+} from '../../utils/productHelpers';
 import { getCitySeoDescription, getCitySeoTitle } from '../../utils/seo';
 
 export async function getStaticPaths() {
   let allLiveProducts: any[] = [];
   let dynamicCities: any[] = [];
+  let configCategories: any[] = [];
 
   try {
     const res = await fetch(`${SUPABASE_URL}/rest/v1/products?select=*&order=created_at.desc`, {
@@ -36,6 +44,7 @@ export async function getStaticPaths() {
       const data = await res.json();
       if (Array.isArray(data)) {
         allLiveProducts = data.filter(p => !p.slug.startsWith('_'));
+        configCategories = extractConfigCategories(data);
         const citiesConfig = data.find(p => p.slug === '_cities_config_');
         if (citiesConfig && citiesConfig.description) {
           try {
@@ -83,8 +92,8 @@ export async function getStaticPaths() {
         slug: p.slug,
         name: p.name,
         categorySlug: p.category_slug,
-        categoryName: p.category_name,
-        city: p.city || 'Malang',
+        categoryName: p.category_name || p.category_slug,
+        city: city.name,
         priceFrom: Number(p.price_from) || 0,
         priceLabel: p.price_label,
         promoPrice: p.promo_price ? Number(p.promo_price) : null,
@@ -104,17 +113,39 @@ export async function getStaticPaths() {
       params: { citySlug: city.slug },
       props: {
         city,
-        products: filteredProducts
+        products: filteredProducts,
+        configCategories
       }
     };
   });
 }
 
-const { city, products = [] } = Astro.props;
+const { city, products = [], configCategories = [] } = Astro.props;
 const { activeProducts } = getRotatingHomeProducts(getHomeDisplayProducts(products), 5);
 
-// Derive categories dynamically from city-filtered Supabase products (no static data)
-const cityCategories = deriveCategoriesFromProducts(products);
+const stripCitySuffix = (value: string) =>
+  value.replace(/\s+(?:(?:kota|kabupaten)\s+)?(?:malang(?:\s+raya)?|batu|surabaya|sidoarjo|gresik|pasuruan|kediri|blitar|mojokerto|jombang|tulungagung)$/i, '').trim();
+const cityCategories = mergeCategories(configCategories, deriveCategoriesFromProducts(products))
+  .map((category) => ({
+    ...category,
+    name: stripCitySuffix(category.name),
+    subcategories: category.subcategories?.map((subcategory) => ({
+      ...subcategory,
+      name: stripCitySuffix(subcategory.name),
+    })),
+  }));
+const cityMomentCategories = getMomentCategories(cityCategories);
+const cityCategoryProductCounts = products.reduce<Record<string, number>>((counts, product) => {
+  const normalizedSlug = product.categorySlug.toLowerCase().replace(/-malang$/, '');
+  counts[normalizedSlug] = (counts[normalizedSlug] ?? 0) + 1;
+  return counts;
+}, {});
+cityMomentCategories.forEach((category) => {
+  const normalizedSlug = category.slug.toLowerCase().replace(/-malang$/, '').replace(/--+/g, '-');
+  if (cityCategoryProductCounts[normalizedSlug] !== undefined) {
+    cityCategoryProductCounts[category.slug] = cityCategoryProductCounts[normalizedSlug];
+  }
+});
 
 const title = city.seoTitle || getCitySeoTitle(city.name);
 const description = city.seoDescription || getCitySeoDescription(city.name);
@@ -172,19 +203,75 @@ const citySchema = {
     </div>
   </div>
 
-  <div data-product-city={city.name}>
+  <div data-product-city={city.name} data-product-city-slug={city.slug}>
     <HomeHero citySlug={city.slug} />
-    <HomeKategori categories={cityCategories} cityName={city.name} citySlug={city.slug} />
+    <section class="category-transition-section relative py-20 bg-white">
+      <div class="relative z-10 max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
+        <div class="text-center max-w-2xl mx-auto mb-16">
+          <h2 class="font-serif text-3xl sm:text-4xl font-bold text-slate-800">Pilih Berdasarkan Momen</h2>
+          <p class="text-slate-500 text-sm mt-3 leading-relaxed">Tersedia berbagai pilihan desain karangan bunga untuk duka cita, pernikahan, wisuda, ulang tahun, peresmian usaha, dan kebutuhan korporat serta institusi.</p>
+        </div>
+        <CategoryCarousel
+          categories={cityMomentCategories}
+          productCounts={cityCategoryProductCounts}
+          citySlug={city.slug}
+        />
+      </div>
+    </section>
     <FeaturedProductsSection products={activeProducts} cityName={city.name} />
+    <DailyCategoryRotation />
     <HandBouquetSection allProducts={products} cityName={city.name} citySlug={city.slug} hideWhenEmpty />
     <BungaPapanSection allProducts={products} cityName={city.name} citySlug={city.slug} hideWhenEmpty />
     <StandingFlowerSection allProducts={products} cityName={city.name} citySlug={city.slug} hideWhenEmpty />
     <PaperFlowerSection allProducts={products} cityName={city.name} citySlug={city.slug} hideWhenEmpty />
     <BungaMejaSection allProducts={products} cityName={city.name} citySlug={city.slug} hideWhenEmpty />
     <TanbulampotSection allProducts={products} cityName={city.name} citySlug={city.slug} hideWhenEmpty />
+    <HomeDynamicCategorySections categories={cityCategories} products={products} cityName={city.name} citySlug={city.slug} />
     <CityDeliverySection currentCitySlug={city.slug} />
   </div>
 
   <HomeLiveSync />
-  <DailyCategoryRotation />
+
+  <script define:vars={{ cityName: city.name, citySlug: city.slug }}>
+    document.addEventListener('click', (event) => {
+      const target = event.target;
+      if (!(target instanceof Element)) return;
+      const link = target.closest('a[href]');
+      if (!link) return;
+
+      const destination = new URL(link.href, window.location.href);
+      if (destination.origin !== window.location.origin) return;
+      if (destination.pathname.includes('/produk/')) {
+        destination.searchParams.set('city', citySlug);
+        destination.searchParams.set('cityName', cityName);
+      } else if (destination.pathname.includes('/kategori/')) {
+        destination.searchParams.set('city', citySlug);
+        destination.searchParams.set('cityName', cityName);
+        destination.searchParams.set('refer', 'city');
+      } else if (destination.pathname.includes('/katalog/')) {
+        destination.searchParams.set('city', citySlug);
+        destination.searchParams.set('cityName', cityName);
+      } else {
+        return;
+      }
+      link.href = `${destination.pathname}${destination.search}${destination.hash}`;
+    }, true);
+
+    document.addEventListener('submit', (event) => {
+      const form = event.target;
+      if (!(form instanceof HTMLFormElement)) return;
+      const destination = new URL(form.action, window.location.href);
+      if (destination.origin !== window.location.origin || !destination.pathname.includes('/katalog/')) return;
+      ['city', 'cityName'].forEach((name) => {
+        let input = form.querySelector(`input[name="${name}"]`);
+        if (!input) {
+          input = document.createElement('input');
+          input.type = 'hidden';
+          input.name = name;
+          form.appendChild(input);
+        }
+        input.value = name === 'city' ? citySlug : cityName;
+      });
+    }, true);
+  </script>
 </Layout>
