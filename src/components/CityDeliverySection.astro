@@ -260,7 +260,7 @@ const waMainLink = `https://wa.me/${WHATSAPP_NUMBER}?text=${encodeURIComponent('
   margin-top: 32px;
 }
 
-.city-destination-card.is-hidden,
+:global(.city-destination-card.is-hidden),
 .city-showcase__empty.is-hidden,
 .hidden {
   display: none !important;
@@ -310,7 +310,7 @@ const waMainLink = `https://wa.me/${WHATSAPP_NUMBER}?text=${encodeURIComponent('
 }
 
 /* Kartu Kota Zaloma */
-.city-destination-card {
+:global(.city-destination-card) {
   position: relative;
   display: block;
   aspect-ratio: 372 / 232;
@@ -326,12 +326,12 @@ const waMainLink = `https://wa.me/${WHATSAPP_NUMBER}?text=${encodeURIComponent('
 }
 
 /* Hover halus tanpa scale zoom gambar atau rotate lebay */
-.city-destination-card:hover {
+:global(.city-destination-card:hover) {
   transform: translateY(-2px);
   box-shadow: 0 8px 18px rgba(103, 30, 47, 0.22);
 }
 
-.city-destination-card__image {
+:global(.city-destination-card__image) {
   position: absolute;
   inset: 0;
   width: 100%;
@@ -340,26 +340,26 @@ const waMainLink = `https://wa.me/${WHATSAPP_NUMBER}?text=${encodeURIComponent('
   transition: opacity 0.28s ease;
 }
 
-.city-destination-card__shade {
+:global(.city-destination-card__shade) {
   position: absolute;
   inset: 0;
   background: linear-gradient(180deg, rgba(0,0,0,0.05) 25%, rgba(20, 5, 10, 0.88) 100%);
 }
 
-.city-destination-card__content {
+:global(.city-destination-card__content) {
   position: absolute;
   inset: auto 20px 16px;
   z-index: 1;
 }
 
-.city-destination-card__title-row {
+:global(.city-destination-card__title-row) {
   display: flex;
   align-items: center;
   justify-content: space-between;
   gap: 10px;
 }
 
-.city-destination-card h3 {
+:global(.city-destination-card h3) {
   margin: 0;
   font-family: 'Playfair Display', Georgia, serif;
   font-size: clamp(20px, 2.2vw, 26px);
@@ -368,7 +368,7 @@ const waMainLink = `https://wa.me/${WHATSAPP_NUMBER}?text=${encodeURIComponent('
   text-shadow: 0 2px 8px rgba(0,0,0,0.5);
 }
 
-.city-destination-card__arrow {
+:global(.city-destination-card__arrow) {
   display: inline-flex;
   align-items: center;
   justify-content: center;
@@ -384,13 +384,13 @@ const waMainLink = `https://wa.me/${WHATSAPP_NUMBER}?text=${encodeURIComponent('
   transition: background 0.2s ease, transform 0.2s ease;
 }
 
-.city-destination-card:hover .city-destination-card__arrow {
+:global(.city-destination-card:hover .city-destination-card__arrow) {
   background: #C59253;
   border-color: #C59253;
   transform: translateX(2px);
 }
 
-.city-destination-card p {
+:global(.city-destination-card p) {
   display: flex;
   align-items: center;
   gap: 6px;
@@ -493,7 +493,7 @@ const waMainLink = `https://wa.me/${WHATSAPP_NUMBER}?text=${encodeURIComponent('
   .city-showcase__grid {
     grid-template-columns: 1fr;
   }
-  .city-destination-card {
+  :global(.city-destination-card) {
     aspect-ratio: 16 / 9;
   }
   .city-showcase__cta {

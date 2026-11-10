@@ -549,7 +549,7 @@ const collectionSchema = {
 }
 
 /* ── City Card Sekarsari Style ── */
-.city-card {
+:global(.city-card) {
   position: relative;
   display: block;
   height: 200px;
@@ -566,12 +566,12 @@ const collectionSchema = {
 }
 
 /* Hover Halus tanpa animasi lebay */
-.city-card:hover {
+:global(.city-card:hover) {
   transform: translateY(-3px);
   box-shadow: 0 10px 22px rgba(103, 30, 47, 0.2);
 }
 
-.city-card__image {
+:global(.city-card__image) {
   position: absolute;
   inset: 0;
   width: 100%;
@@ -580,13 +580,13 @@ const collectionSchema = {
   transition: opacity 0.3s ease;
 }
 
-.city-card__overlay {
+:global(.city-card__overlay) {
   position: absolute;
   inset: 0;
   background: linear-gradient(180deg, rgba(0, 0, 0, 0.05) 25%, rgba(20, 5, 10, 0.88) 100%);
 }
 
-.city-card__content {
+:global(.city-card__content) {
   position: absolute;
   inset: 0;
   display: flex;
@@ -596,7 +596,7 @@ const collectionSchema = {
   z-index: 2;
 }
 
-.city-card__title {
+:global(.city-card__title) {
   margin: 0 0 4px;
   font-family: 'Playfair Display', Georgia, serif;
   font-size: 20px;
@@ -606,7 +606,7 @@ const collectionSchema = {
   text-shadow: 0 2px 6px rgba(0,0,0,0.5);
 }
 
-.city-card__province {
+:global(.city-card__province) {
   display: flex;
   align-items: center;
   gap: 6px;
@@ -616,7 +616,7 @@ const collectionSchema = {
   font-weight: 500;
 }
 
-.city-card__arrow {
+:global(.city-card__arrow) {
   width: 32px;
   height: 32px;
   border-radius: 50%;
@@ -632,64 +632,12 @@ const collectionSchema = {
   transition: background 0.2s ease, transform 0.2s ease;
 }
 
-.city-card:hover .city-card__arrow {
+:global(.city-card:hover .city-card__arrow) {
   background: #C59253;
   border-color: #C59253;
   transform: translateX(2px);
 }
 </style>
-
-<script is:inline>
-(function() {
-  const searchInput = document.getElementById('searchAllCitiesInput');
-  const cityCards = Array.from(document.querySelectorAll('[data-city-card]'));
-  const provinceSections = Array.from(document.querySelectorAll('[data-province-section]'));
-  const emptyState = document.getElementById('allCitiesEmptyState');
-
-  if (!searchInput) return;
-
-  function handleSearch() {
-    const q = searchInput.value.trim().toLowerCase();
-    let totalVisible = 0;
-
-    provinceSections.forEach(section => {
-      const cards = Array.from(section.querySelectorAll('[data-city-card]'));
-      let sectionVisibleCount = 0;
-
-      cards.forEach(card => {
-        const name = card.getAttribute('data-city-name') || '';
-        const prov = card.getAttribute('data-province-name') || '';
-        const matches = !q || name.includes(q) || prov.includes(q);
-
-        if (matches) {
-          card.style.display = '';
-          sectionVisibleCount++;
-          totalVisible++;
-        } else {
-          card.style.display = 'none';
-        }
-      });
-
-      // Sembunyikan section provinsi jika seluruh kota di dalamnya tersembunyi
-      if (sectionVisibleCount === 0) {
-        section.style.display = 'none';
-      } else {
-        section.style.display = '';
-      }
-    });
-
-    if (emptyState) {
-      if (totalVisible === 0) {
-        emptyState.classList.remove('hidden');
-      } else {
-        emptyState.classList.add('hidden');
-      }
-    }
-  }
-
-  searchInput.addEventListener('input', handleSearch);
-})();
-</script>
 
 <script>
 import type { CityItem } from '../../data/cities';
@@ -788,13 +736,21 @@ if (wrapper) {
       const section = document.createElement('div');
       section.className = 'province-group mb-16 last:mb-0';
       section.dataset.provinceSection = '';
+      const provinceHeader = document.createElement('div');
+      provinceHeader.className = 'flex items-center gap-4 mb-8';
+      const locationIcon = document.createElement('div');
+      locationIcon.className = 'w-12 h-12 rounded-2xl bg-white border border-[#f0d5db] shadow-sm flex items-center justify-center text-[#893144] text-xl shrink-0';
+      locationIcon.innerHTML = '<svg class="w-6 h-6 fill-current" viewBox="0 0 24 24" aria-hidden="true"><path d="M12 2C8.13 2 5 5.13 5 9c0 5.25 7 13 7 13s7-7.75 7-13c0-3.87-3.13-7-7-7zm0 9.5A2.5 2.5 0 1 1 12 6.5a2.5 2.5 0 0 1 0 5z"/></svg>';
       const heading = document.createElement('h2');
-      heading.className = 'text-2xl sm:text-3xl lg:text-4xl font-bold text-[#671E2F] font-serif mb-8';
+      heading.className = 'text-2xl sm:text-3xl lg:text-4xl font-bold text-[#671E2F] font-serif';
       heading.textContent = provinceName;
+      const divider = document.createElement('div');
+      divider.className = 'h-px bg-[#f0d5db] flex-1 ml-4 mt-2';
+      provinceHeader.append(locationIcon, heading, divider);
       const grid = document.createElement('div');
       grid.className = 'grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 gap-6';
       (grouped.get(provinceName) || []).forEach((city) => grid.append(createCityCard(city)));
-      section.append(heading, grid);
+      section.append(provinceHeader, grid);
       wrapper.append(section);
     });
 

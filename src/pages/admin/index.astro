@@ -1858,7 +1858,7 @@ function withBase(path: string): string {
 
         const { data: products, error: lookupError } = await supabase
           .from('products')
-          .select('image, images');
+          .select('slug, description, image, images');
         if (lookupError) throw lookupError;
 
         const referencedPaths = new Set();
@@ -1867,6 +1867,25 @@ function withBase(path: string): string {
             .map(getProductImageRef)
             .filter(Boolean)
             .forEach(ref => referencedPaths.add(ref.key));
+
+          if (product.slug === '_cities_config_' && product.description) {
+            let cities;
+            try {
+              cities = JSON.parse(product.description);
+            } catch (error) {
+              throw new Error('Konfigurasi kota tidak valid; foto tidak dihapus untuk mencegah kehilangan gambar yang masih digunakan.');
+            }
+            if (!Array.isArray(cities)) {
+              throw new Error('Konfigurasi kota tidak valid; foto tidak dihapus untuk mencegah kehilangan gambar yang masih digunakan.');
+            }
+            cities.forEach(city => {
+              const cityImage = typeof city === 'object' && city
+                ? (city.image || city.image_url)
+                : '';
+              const ref = getProductImageRef(cityImage);
+              if (ref) referencedPaths.add(ref.key);
+            });
+          }
         });
 
         const orphanedImages = candidates.filter(ref => !referencedPaths.has(ref.key));
@@ -3637,18 +3656,27 @@ function withBase(path: string): string {
             const c = citiesList[idx];
             if (!c) return;
             const name = typeof c === 'string' ? c : c.name;
+            const imageUrl = typeof c === 'object' && c ? (c.image || c.image_url || '') : '';
 
             if (confirm(`Hapus wilayah/kota "${name}" dari pilihan?`)) {
               const previousCities = citiesList;
               citiesList = citiesList.filter((_, cityIndex) => cityIndex !== idx);
               try {
                 await persistCities();
-                showToast(`Wilayah "${name}" berhasil dihapus.`);
               } catch (err) {
                 citiesList = previousCities;
                 updateCityDropdowns();
                 renderCitiesCards();
                 showToast('Gagal menghapus kota: ' + (err.message || err), 'error');
+                return;
+              }
+
+              try {
+                await removeUnreferencedProductImages([imageUrl]);
+                showToast(`Wilayah "${name}" dan foto yang tidak dipakai berhasil dihapus.`);
+              } catch (cleanupError) {
+                console.error('[Zaloma Admin] Kota terhapus, tetapi foto Storage gagal dibersihkan:', cleanupError);
+                showToast('Kota terhapus, tetapi foto belum berhasil dibersihkan dari penyimpanan.', 'warning');
               }
             }
           });
@@ -3927,6 +3955,10 @@ function withBase(path: string): string {
         const name = (cityRegencySelect?.value || '').trim();
         const desc = document.getElementById('city-desc-input').value.trim();
         let finalImageUrl = cityImageUrlInput.value.trim();
+        const previousCity = editIdx >= 0 ? citiesList[editIdx] : null;
+        const previousImageUrl = typeof previousCity === 'object' && previousCity
+          ? (previousCity.image || previousCity.image_url || '')
+          : '';
 
         if (!selectedProvinceName) {
           showToast('Pilih provinsi terlebih dahulu.', 'error');
@@ -3968,7 +4000,7 @@ function withBase(path: string): string {
             name,
             province_name: selectedProvinceName,
             description: desc,
-            image: finalImageUrl || (editIdx >= 0 && citiesList[editIdx]?.image ? citiesList[editIdx].image : '')
+            image: finalImageUrl
           };
 
           let successMessage;
@@ -3987,7 +4019,18 @@ function withBase(path: string): string {
 
           await persistCities();
           cityModal.classList.add('hidden');
-          showToast(successMessage);
+          const imageChanged = previousImageUrl && previousImageUrl !== cityRecord.image;
+          if (imageChanged) {
+            try {
+              await removeUnreferencedProductImages([previousImageUrl]);
+              showToast(`${successMessage} Foto lama yang tidak dipakai berhasil dihapus.`);
+            } catch (cleanupError) {
+              console.error('[Zaloma Admin] Kota tersimpan, tetapi foto lama gagal dibersihkan:', cleanupError);
+              showToast(`${successMessage} Namun foto lama belum berhasil dibersihkan dari penyimpanan.`, 'warning');
+            }
+          } else {
+            showToast(successMessage);
+          }
 
           // Automatically select newly created city in active form
           const prodCitySelectEl = document.getElementById('prod-city');
