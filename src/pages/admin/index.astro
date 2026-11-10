@@ -2916,34 +2916,30 @@ function withBase(path: string): string {
 
       // Helper to safely persist system configuration rows without onConflict failure
       async function saveSystemConfig(slugVal, nameVal, jsonString) {
-        try {
-          const payload = {
-            slug: slugVal,
-            name: nameVal,
-            category_slug: '_system_',
-            category_name: 'System',
-            price_from: 0,
-            price_label: 'Rp 0',
-            image: 'https://zalomaflorist.com/favicon.ico',
-            description: jsonString,
-            featured: false,
-            city: 'Malang'
-          };
+        const payload = {
+          slug: slugVal,
+          name: nameVal,
+          category_slug: '_system_',
+          category_name: 'System',
+          price_from: 0,
+          price_label: 'Rp 0',
+          image: 'https://zalomaflorist.com/favicon.ico',
+          description: jsonString,
+          featured: false,
+          city: 'Malang'
+        };
 
-          const { data: existing } = await supabase
-            .from('products')
-            .select('id')
-            .eq('slug', slugVal)
-            .maybeSingle();
+        const { data: existing, error: lookupError } = await supabase
+          .from('products')
+          .select('id')
+          .eq('slug', slugVal)
+          .maybeSingle();
+        if (lookupError) throw lookupError;
 
-          if (existing && existing.id) {
-            await supabase.from('products').update(payload).eq('id', existing.id);
-          } else {
-            await supabase.from('products').insert([payload]);
-          }
-        } catch (err) {
-          console.warn(`Sync system config notice (${slugVal}):`, err);
-        }
+        const { error: saveError } = existing?.id
+          ? await supabase.from('products').update(payload).eq('id', existing.id)
+          : await supabase.from('products').insert([payload]);
+        if (saveError) throw saveError;
       }
 
       // Categories State Management (v4)
@@ -3478,16 +3474,12 @@ function withBase(path: string): string {
       }
 
       async function persistCities() {
-        try {
-          localStorage.setItem('zaloma_admin_cities_v2', JSON.stringify(citiesList));
-          localStorage.setItem('zaloma_admin_cities_v1', JSON.stringify(citiesList));
-          updateCityDropdowns();
-          renderCitiesCards();
-          updateCityBadges();
-          await saveSystemConfig('_cities_config_', 'System Cities Config', JSON.stringify(citiesList));
-        } catch (err) {
-          console.warn('Sync cities notice:', err);
-        }
+        await saveSystemConfig('_cities_config_', 'System Cities Config', JSON.stringify(citiesList));
+        localStorage.setItem('zaloma_admin_cities_v2', JSON.stringify(citiesList));
+        localStorage.setItem('zaloma_admin_cities_v1', JSON.stringify(citiesList));
+        updateCityDropdowns();
+        renderCitiesCards();
+        updateCityBadges();
       }
 
       function updateCityDropdowns() {
@@ -3647,9 +3639,17 @@ function withBase(path: string): string {
             const name = typeof c === 'string' ? c : c.name;
 
             if (confirm(`Hapus wilayah/kota "${name}" dari pilihan?`)) {
-              citiesList.splice(idx, 1);
-              await persistCities();
-              showToast(`Wilayah "${name}" berhasil dihapus.`);
+              const previousCities = citiesList;
+              citiesList = citiesList.filter((_, cityIndex) => cityIndex !== idx);
+              try {
+                await persistCities();
+                showToast(`Wilayah "${name}" berhasil dihapus.`);
+              } catch (err) {
+                citiesList = previousCities;
+                updateCityDropdowns();
+                renderCitiesCards();
+                showToast('Gagal menghapus kota: ' + (err.message || err), 'error');
+              }
             }
           });
         });
@@ -3941,6 +3941,7 @@ function withBase(path: string): string {
         saveBtnText.textContent = 'Menyimpan...';
         saveSpinner?.classList.remove('hidden');
 
+        const previousCities = citiesList.slice();
         try {
           // If a file was uploaded, send to Supabase Storage
           if (citySelectedImageBlob) {
@@ -3970,9 +3971,10 @@ function withBase(path: string): string {
             image: finalImageUrl || (editIdx >= 0 && citiesList[editIdx]?.image ? citiesList[editIdx].image : '')
           };
 
+          let successMessage;
           if (editIdx >= 0 && editIdx < citiesList.length) {
             citiesList[editIdx] = cityRecord;
-            showToast(`Wilayah "${name}" berhasil diperbarui.`);
+            successMessage = `Wilayah "${name}" berhasil diperbarui.`;
           } else {
             const exists = citiesList.some(c => (typeof c === 'string' ? c : c.name).toLowerCase() === name.toLowerCase());
             if (exists) {
@@ -3980,11 +3982,12 @@ function withBase(path: string): string {
               return;
             }
             citiesList.push(cityRecord);
-            showToast(`Wilayah "${name}" berhasil ditambahkan.`);
+            successMessage = `Wilayah "${name}" berhasil ditambahkan.`;
           }
 
-          cityModal.classList.add('hidden');
           await persistCities();
+          cityModal.classList.add('hidden');
+          showToast(successMessage);
 
           // Automatically select newly created city in active form
           const prodCitySelectEl = document.getElementById('prod-city');
@@ -3994,6 +3997,9 @@ function withBase(path: string): string {
             editCitySelectEl.value = name;
           }
         } catch (err) {
+          citiesList = previousCities;
+          updateCityDropdowns();
+          renderCitiesCards();
           showToast('Terjadi kesalahan: ' + (err.message || err), 'error');
         } finally {
           saveBtn.disabled = false;
