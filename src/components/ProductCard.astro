@@ -40,7 +40,7 @@ const compactAspect = shapeAspect || aspect || (isHandBouquet ? 'aspect-[4/5]' :
 ---
 
 {variant === 'compact' ? (
-  <article class:list={['product-card-shell', 'compact-product-card', 'group', 'relative', 'h-full', 'flex', 'flex-col', 'overflow-hidden', 'rounded-[14px]', 'border', 'border-soft-cream/70', 'bg-white', 'shadow-[0_1px_4px_rgba(15,23,42,0.03)]', cardShape === 'arch' && 'product-card-shape-arch', className]} hidden={hidden ? true : undefined} {...rest}>
+  <article class:list={['product-card-shell', 'compact-product-card', 'group', 'relative', 'h-full', 'min-w-0', 'max-w-full', 'flex', 'flex-col', 'overflow-hidden', 'rounded-[14px]', 'border', 'border-soft-cream/70', 'bg-white', 'shadow-[0_1px_4px_rgba(15,23,42,0.03)]', cardShape === 'arch' && 'product-card-shape-arch', className]} hidden={hidden ? true : undefined} {...rest}>
     <a href={productUrl} class="flex h-full flex-col no-underline">
       <!-- Image frame: full edge-to-edge (no side spaces), naturally proportioned -->
       <div class:list={['product-card-image', 'image-load-shell', 'relative', compactAspect, 'overflow-hidden', 'bg-clean-ivory', 'border-b', 'border-soft-cream/40']} data-image-frame>

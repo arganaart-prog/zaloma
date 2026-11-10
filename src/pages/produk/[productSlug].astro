@@ -959,8 +959,29 @@ const productSchema = {
 
   .related-products-grid {
     display: grid;
-    grid-template-columns: repeat(auto-fit, minmax(min(100%, 10rem), 1fr));
+    grid-template-columns: repeat(2, minmax(0, 1fr));
     gap: clamp(0.75rem, 2vw, 1.5rem);
+  }
+
+  .related-products-grid > :global(*) {
+    min-width: 0;
+    max-width: 100%;
+  }
+
+  .related-products-grid :global(img) {
+    max-width: 100%;
+  }
+
+  @media (min-width: 640px) {
+    .related-products-grid {
+      grid-template-columns: repeat(3, minmax(0, 1fr));
+    }
+  }
+
+  @media (min-width: 1024px) {
+    .related-products-grid {
+      grid-template-columns: repeat(4, minmax(0, 1fr));
+    }
   }
 
   @media (max-width: 480px) {
@@ -1249,7 +1270,7 @@ async function syncProductDetail() {
       const matchingRel = cloudProducts.filter(p => p.category_slug === currentCategorySlug && p.slug !== currentSlug);
       if (matchingRel.length > 0) {
         relatedGrid.innerHTML = matchingRel.slice(0, 8).map(relP => `
-          <article class="product-card-shell compact-product-card group relative h-full flex flex-col overflow-hidden rounded-[14px] border border-soft-cream/70 bg-white shadow-[0_1px_4px_rgba(15,23,42,0.03)] hover-gold-grow">
+          <article class="product-card-shell compact-product-card group relative h-full min-w-0 max-w-full flex flex-col overflow-hidden rounded-[14px] border border-soft-cream/70 bg-white shadow-[0_1px_4px_rgba(15,23,42,0.03)] hover-gold-grow">
             <a href="/produk/${relP.slug}/" class="flex h-full flex-col no-underline">
               <div class="image-load-shell relative aspect-[4/4.5] overflow-hidden bg-clean-ivory border-b border-soft-cream/40">
                 <img
