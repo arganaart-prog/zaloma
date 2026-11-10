@@ -3,6 +3,7 @@ import '../../styles/global.css';
 import { SUPABASE_URL, SUPABASE_ANON_KEY, SUPABASE_BUCKET } from '../../data/supabaseConfig';
 import { DEFAULT_PROMO_BANNERS, PROMO_BANNERS_CONFIG_SLUG } from '../../data/promoBanners';
 import { ARTICLES, ARTICLES_CONFIG_SLUG } from '../../data/articles';
+import { IMPORTANT_DATES, IMPORTANT_DATE_CATEGORY_LABELS, IMPORTANT_DATE_PRIORITY_LABELS } from '../../data/importantDates';
 
 const title = "Admin — Zaloma Florist";
 const R2_IMAGE_API_URL = 'https://images-api.zalomaflorist.com';
@@ -23,6 +24,7 @@ function withBase(path: string): string {
     <meta name="robots" content="noindex, nofollow" />
     <link rel="icon" type="image/x-icon" href={withBase('/favicon.ico')} />
     <script is:inline src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
+    <script is:inline src="https://cdn.jsdelivr.net/npm/xlsx@0.18.5/dist/xlsx.full.min.js"></script>
   </head>
   <body class="admin-page bg-[#f7f5f2] text-slate-800 font-sans antialiased min-h-screen flex flex-col">
 
@@ -148,6 +150,15 @@ function withBase(path: string): string {
               <svg class="w-4 h-4" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2"><path stroke-linecap="round" stroke-linejoin="round" d="M8 6h13M8 12h13M8 18h13M3 6h.01M3 12h.01M3 18h.01" /></svg>
               <span>Artikel</span>
               <span id="tab-article-badge" class="px-2 py-0.5 rounded-full text-xs font-bold bg-slate-200 text-slate-700">0</span>
+            </button>
+            <button type="button" id="tab-btn-calendar" class="tab-btn flex min-h-11 shrink-0 cursor-pointer items-center gap-2 rounded-xl px-3.5 py-2.5 text-sm font-semibold text-slate-600 transition-all hover:bg-white hover:text-primary sm:px-4">
+              <svg class="w-4 h-4" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2"><path stroke-linecap="round" stroke-linejoin="round" d="M8 7V3m8 4V3m-9 8h10M5 21h14a2 2 0 002-2V7a2 2 0 00-2-2H5a2 2 0 00-2 2v12a2 2 0 002 2z" /></svg>
+              <span>Kalender</span>
+              <span id="tab-calendar-badge" class="px-2 py-0.5 rounded-full text-xs font-bold bg-slate-200 text-slate-700">0</span>
+            </button>
+            <button type="button" id="tab-btn-finance" class="tab-btn flex min-h-11 shrink-0 cursor-pointer items-center gap-2 rounded-xl px-3.5 py-2.5 text-sm font-semibold text-slate-600 transition-all hover:bg-white hover:text-primary sm:px-4">
+              <svg class="w-4 h-4" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2"><path stroke-linecap="round" stroke-linejoin="round" d="M9 7h6m-6 4h6m-7 8h8a2 2 0 002-2V7a2 2 0 00-2-2H8a2 2 0 00-2 2v10a2 2 0 002 2z" /></svg>
+              <span>Keuangan</span>
             </button>
           </div>
         </div>
@@ -731,6 +742,159 @@ function withBase(path: string): string {
           <div id="articles-admin-grid" class="space-y-3"></div>
         </section>
 
+        <!-- ================= TAB: KALENDER HARI PENTING ================= -->
+        <section id="tab-calendar" class="hidden animate-fade-in space-y-5 max-w-6xl mx-auto">
+          <div class="bg-white rounded-2xl p-5 sm:p-6 border border-slate-200 shadow-sm flex flex-col sm:flex-row items-start sm:items-center justify-between gap-4">
+            <div>
+              <h2 class="text-lg font-bold text-slate-900 flex items-center gap-2.5 mb-1">
+                <span class="w-2.5 h-2.5 rounded-full bg-primary"></span>
+                Kalender Peluang Penjualan
+              </h2>
+              <p class="text-sm text-slate-500">HUT perusahaan dan dies natalis berulang tiap tahun. Wisuda, pengukuhan, dan pelantikan hanya muncul di tahun jadwalnya dan harus dicek ulang.</p>
+            </div>
+            <label class="w-full sm:w-56">
+              <span class="mb-1 block text-[11px] font-bold uppercase tracking-wider text-slate-500">Filter kategori</span>
+              <select id="calendar-category-filter" class="min-h-11 w-full rounded-lg border border-slate-200 bg-white px-3 text-sm text-slate-700 outline-none focus:border-primary">
+                <option value="all">Semua kategori</option>
+                <option value="hut-perusahaan">HUT perusahaan</option>
+                <option value="dies-natalis">Dies natalis</option>
+                <option value="wisuda">Wisuda</option>
+                <option value="pengukuhan">Pengukuhan</option>
+                <option value="pelantikan">Pelantikan</option>
+                <option value="tni-polri">TNI / Polri</option>
+                <option value="nasional">Nasional</option>
+                <option value="florist">Florist</option>
+              </select>
+            </label>
+          </div>
+
+          <div class="grid grid-cols-1 gap-4 lg:grid-cols-[minmax(0,1.6fr)_minmax(0,1fr)]">
+            <div class="rounded-2xl border border-slate-200 bg-white p-4 sm:p-5 shadow-sm">
+              <div class="mb-4 flex flex-col gap-3 sm:flex-row sm:items-center sm:justify-between">
+                <div>
+                  <p id="calendar-month-label" class="font-serif text-xl font-bold text-slate-900 sm:text-2xl">—</p>
+                  <p id="calendar-nearest-label" class="mt-1 text-sm text-slate-500">Memuat event terdekat…</p>
+                </div>
+                <div class="flex items-center gap-2">
+                  <button type="button" id="calendar-prev-btn" class="inline-flex min-h-11 min-w-11 items-center justify-center rounded-xl border border-slate-200 bg-white text-slate-700 transition hover:border-primary/40 hover:text-primary" aria-label="Bulan sebelumnya">
+                    <svg class="h-4 w-4" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2.2"><path stroke-linecap="round" stroke-linejoin="round" d="M15 19l-7-7 7-7" /></svg>
+                  </button>
+                  <button type="button" id="calendar-today-btn" class="min-h-11 rounded-xl border border-slate-200 bg-slate-50 px-3.5 text-sm font-semibold text-slate-700 transition hover:border-primary/40 hover:text-primary">Hari ini</button>
+                  <button type="button" id="calendar-next-btn" class="inline-flex min-h-11 min-w-11 items-center justify-center rounded-xl border border-slate-200 bg-white text-slate-700 transition hover:border-primary/40 hover:text-primary" aria-label="Bulan berikutnya">
+                    <svg class="h-4 w-4" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2.2"><path stroke-linecap="round" stroke-linejoin="round" d="M9 5l7 7-7 7" /></svg>
+                  </button>
+                </div>
+              </div>
+
+              <div class="grid grid-cols-7 gap-1 text-center text-[11px] font-bold uppercase tracking-wider text-slate-500 sm:gap-1.5 sm:text-xs">
+                <span class="py-2">Sen</span>
+                <span class="py-2">Sel</span>
+                <span class="py-2">Rab</span>
+                <span class="py-2">Kam</span>
+                <span class="py-2">Jum</span>
+                <span class="py-2">Sab</span>
+                <span class="py-2">Min</span>
+              </div>
+              <div id="calendar-grid" class="mt-1 grid grid-cols-7 gap-1 sm:gap-1.5" aria-live="polite"></div>
+            </div>
+
+            <div class="space-y-4">
+              <div class="rounded-2xl border border-slate-200 bg-white p-4 sm:p-5 shadow-sm">
+                <div class="mb-3 flex items-center justify-between gap-3">
+                  <h3 class="text-sm font-bold text-slate-900">Hari penting bulan ini</h3>
+                  <span id="calendar-month-event-count" class="rounded-full bg-primary/10 px-2.5 py-1 text-xs font-bold text-primary">0</span>
+                </div>
+                <div id="calendar-month-events" class="max-h-[32rem] space-y-2.5 overflow-y-auto pr-1"></div>
+              </div>
+
+              <div class="rounded-2xl border border-slate-200 bg-white p-4 sm:p-5 shadow-sm">
+                <h3 class="mb-3 text-sm font-bold text-slate-900">Event terdekat</h3>
+                <div id="calendar-upcoming-events" class="space-y-2.5"></div>
+              </div>
+            </div>
+          </div>
+        </section>
+
+        <!-- ================= TAB: KEUANGAN (EXCEL) ================= -->
+        <section id="tab-finance" class="hidden animate-fade-in space-y-5 max-w-6xl mx-auto">
+          <div class="bg-white rounded-2xl p-5 sm:p-6 border border-slate-200 shadow-sm flex flex-col gap-4 lg:flex-row lg:items-center lg:justify-between">
+            <div>
+              <h2 class="text-lg font-bold text-slate-900 flex items-center gap-2.5 mb-1">
+                <span class="w-2.5 h-2.5 rounded-full bg-primary"></span>
+                Catatan Keuangan
+              </h2>
+              <p class="text-sm text-slate-500">Catat bunga yang terjual, lalu simpan lewat file Excel. Impor file yang sama untuk melanjutkan catatan.</p>
+            </div>
+            <div class="flex flex-wrap gap-2">
+              <button type="button" id="finance-export-btn" class="min-h-11 rounded-lg bg-primary px-4 text-sm font-semibold text-white hover:bg-primary-dark">Unduh Excel</button>
+              <label class="inline-flex min-h-11 cursor-pointer items-center rounded-lg border border-slate-200 bg-white px-4 text-sm font-semibold text-slate-700 hover:border-primary/40 hover:text-primary">
+                Impor Excel
+                <input id="finance-import-input" type="file" accept=".xlsx,.xls,.csv" class="sr-only" />
+              </label>
+            </div>
+          </div>
+
+          <div class="grid grid-cols-1 gap-3 sm:grid-cols-3">
+            <div class="rounded-xl border border-slate-200 bg-white p-4 shadow-sm">
+              <p class="text-[11px] font-bold uppercase tracking-wider text-slate-500">Hari ini</p>
+              <p id="finance-total-today" class="mt-1 text-2xl font-bold text-slate-900">Rp 0</p>
+            </div>
+            <div class="rounded-xl border border-slate-200 bg-white p-4 shadow-sm">
+              <p class="text-[11px] font-bold uppercase tracking-wider text-slate-500">7 hari terakhir</p>
+              <p id="finance-total-week" class="mt-1 text-2xl font-bold text-primary">Rp 0</p>
+            </div>
+            <div class="rounded-xl border border-slate-200 bg-white p-4 shadow-sm">
+              <p class="text-[11px] font-bold uppercase tracking-wider text-slate-500">Bulan ini</p>
+              <p id="finance-total-month" class="mt-1 text-2xl font-bold text-slate-900">Rp 0</p>
+            </div>
+          </div>
+
+          <form id="finance-form" class="grid grid-cols-1 gap-3 rounded-2xl border border-slate-200 bg-white p-4 shadow-sm sm:grid-cols-2 lg:grid-cols-6">
+            <label class="lg:col-span-1">
+              <span class="mb-1 block text-xs font-semibold text-slate-600">Tanggal</span>
+              <input id="finance-date" type="date" required class="min-h-11 w-full rounded-lg border border-slate-200 px-3 text-sm outline-none focus:border-primary" />
+            </label>
+            <label class="sm:col-span-2 lg:col-span-2">
+              <span class="mb-1 block text-xs font-semibold text-slate-600">Produk</span>
+              <input id="finance-product" type="text" required maxlength="140" placeholder="Contoh: Bunga papan duka cita" class="min-h-11 w-full rounded-lg border border-slate-200 px-3 text-sm outline-none focus:border-primary" />
+            </label>
+            <label>
+              <span class="mb-1 block text-xs font-semibold text-slate-600">Harga</span>
+              <input id="finance-amount" type="number" required min="0" step="1000" placeholder="400000" class="min-h-11 w-full rounded-lg border border-slate-200 px-3 text-sm outline-none focus:border-primary" />
+            </label>
+            <label>
+              <span class="mb-1 block text-xs font-semibold text-slate-600">Jumlah</span>
+              <input id="finance-qty" type="number" required min="1" step="1" value="1" class="min-h-11 w-full rounded-lg border border-slate-200 px-3 text-sm outline-none focus:border-primary" />
+            </label>
+            <div class="flex items-end">
+              <button type="submit" class="min-h-11 w-full rounded-lg bg-primary px-4 text-sm font-semibold text-white hover:bg-primary-dark">Tambah</button>
+            </div>
+            <label class="sm:col-span-2 lg:col-span-6">
+              <span class="mb-1 block text-xs font-semibold text-slate-600">Catatan</span>
+              <input id="finance-note" type="text" maxlength="240" placeholder="Opsional: nama pemesan atau kota" class="min-h-11 w-full rounded-lg border border-slate-200 px-3 text-sm outline-none focus:border-primary" />
+            </label>
+          </form>
+
+          <div class="overflow-hidden rounded-2xl border border-slate-200 bg-white shadow-sm">
+            <div class="overflow-x-auto">
+              <table class="min-w-full text-left text-sm">
+                <thead class="bg-slate-50 text-xs font-bold uppercase tracking-wider text-slate-500">
+                  <tr>
+                    <th class="px-4 py-3">Tanggal</th>
+                    <th class="px-4 py-3">Produk</th>
+                    <th class="px-4 py-3">Harga</th>
+                    <th class="px-4 py-3">Jumlah</th>
+                    <th class="px-4 py-3">Total</th>
+                    <th class="px-4 py-3">Catatan</th>
+                    <th class="px-4 py-3"></th>
+                  </tr>
+                </thead>
+                <tbody id="finance-table-body"></tbody>
+              </table>
+            </div>
+          </div>
+        </section>
+
       </main>
 
     </div>
@@ -1276,6 +1440,24 @@ function withBase(path: string): string {
             </div>
           </div>
 
+          <div class="space-y-3 rounded-xl border border-primary/20 bg-clean-ivory p-3">
+            <div>
+              <label for="promo-banner-ai-prompt" class="block text-sm font-semibold text-slate-700">Generate gambar dengan AI</label>
+              <p class="mt-1 text-xs text-slate-500">Tulis isi promo saja. Warna, gaya, dan suasana mengikuti panduan brand Zaloma. API key tidak disimpan di browser.</p>
+              <textarea id="promo-banner-ai-prompt" rows="3" maxlength="600" placeholder="Contoh: promo beli 5 bunga papan khusus Natal, diskon 20 persen" class="mt-2 w-full rounded-lg border border-slate-300 px-3 py-2.5 text-sm focus:border-primary focus:outline-none focus:ring-2 focus:ring-primary/20"></textarea>
+            </div>
+            <fieldset class="flex flex-wrap gap-3 text-sm text-slate-700">
+              <legend class="sr-only">Ukuran gambar</legend>
+              <label class="inline-flex min-h-10 items-center gap-2"><input type="radio" name="promo-banner-ai-size" value="desktop" class="accent-primary" checked /> Desktop (2:1)</label>
+              <label class="inline-flex min-h-10 items-center gap-2"><input type="radio" name="promo-banner-ai-size" value="mobile" class="accent-primary" /> Mobile (1080:776)</label>
+              <label class="inline-flex min-h-10 items-center gap-2"><input type="radio" name="promo-banner-ai-size" value="both" class="accent-primary" /> Keduanya</label>
+            </fieldset>
+            <div class="flex flex-wrap items-center gap-3">
+              <button type="button" id="promo-banner-generate-btn" class="min-h-11 rounded-lg bg-secondary px-4 text-sm font-semibold text-primary-dark hover:bg-secondary-light">Generate gambar</button>
+              <p id="promo-banner-ai-status" class="text-xs text-slate-500"></p>
+            </div>
+          </div>
+
           <div class="grid grid-cols-1 sm:grid-cols-2 gap-3">
             <div class="rounded-xl border border-slate-200 bg-slate-50 p-3">
               <label for="promo-banner-desktop-file" class="block text-sm font-semibold text-slate-700">Gambar desktop</label>
@@ -1566,7 +1748,7 @@ function withBase(path: string): string {
       </div>
     </div>
 
-    <script define:vars={{ SUPABASE_URL, SUPABASE_ANON_KEY, SUPABASE_BUCKET, R2_IMAGE_API_URL, DEFAULT_PROMO_BANNERS, PROMO_BANNERS_CONFIG_SLUG, DEFAULT_ARTICLES: ARTICLES, ARTICLES_CONFIG_SLUG }}>
+    <script define:vars={{ SUPABASE_URL, SUPABASE_ANON_KEY, SUPABASE_BUCKET, R2_IMAGE_API_URL, DEFAULT_PROMO_BANNERS, PROMO_BANNERS_CONFIG_SLUG, DEFAULT_ARTICLES: ARTICLES, ARTICLES_CONFIG_SLUG, IMPORTANT_DATES, IMPORTANT_DATE_CATEGORY_LABELS, IMPORTANT_DATE_PRIORITY_LABELS }}>
       // Initialize Supabase Client
       const supabase = window.supabase.createClient(SUPABASE_URL, SUPABASE_ANON_KEY);
 
@@ -2115,6 +2297,8 @@ function withBase(path: string): string {
       const tabBtnSizes = document.getElementById('tab-btn-sizes');
       const tabBtnBanners = document.getElementById('tab-btn-banners');
       const tabBtnArticles = document.getElementById('tab-btn-articles');
+      const tabBtnCalendar = document.getElementById('tab-btn-calendar');
+      const tabBtnFinance = document.getElementById('tab-btn-finance');
       const tabCatalog = document.getElementById('tab-catalog');
       const tabAdd = document.getElementById('tab-add');
       const tabCategories = document.getElementById('tab-categories');
@@ -2122,6 +2306,8 @@ function withBase(path: string): string {
       const tabSizes = document.getElementById('tab-sizes');
       const tabBanners = document.getElementById('tab-banners');
       const tabArticles = document.getElementById('tab-articles');
+      const tabCalendar = document.getElementById('tab-calendar');
+      const tabFinance = document.getElementById('tab-finance');
 
       function switchTab(activeTab) {
         const tabs = [
@@ -2131,7 +2317,9 @@ function withBase(path: string): string {
           { btn: tabBtnCities, pane: tabCities },
           { btn: tabBtnSizes, pane: tabSizes },
           { btn: tabBtnBanners, pane: tabBanners },
-          { btn: tabBtnArticles, pane: tabArticles }
+          { btn: tabBtnArticles, pane: tabArticles },
+          { btn: tabBtnCalendar, pane: tabCalendar },
+          { btn: tabBtnFinance, pane: tabFinance }
         ];
 
         tabs.forEach(t => {
@@ -2176,6 +2364,505 @@ function withBase(path: string): string {
         switchTab(tabBtnArticles);
         loadArticlesConfig();
       });
+      tabBtnCalendar?.addEventListener('click', () => {
+        switchTab(tabBtnCalendar);
+        renderImportantDatesCalendar();
+      });
+      tabBtnFinance?.addEventListener('click', () => {
+        switchTab(tabBtnFinance);
+        renderFinanceLedger();
+      });
+
+      // ==========================================
+      // KALENDER HARI PENTING (ADMIN ONLY)
+      // ==========================================
+      const calendarGrid = document.getElementById('calendar-grid');
+      const calendarMonthLabel = document.getElementById('calendar-month-label');
+      const calendarNearestLabel = document.getElementById('calendar-nearest-label');
+      const calendarMonthEvents = document.getElementById('calendar-month-events');
+      const calendarUpcomingEvents = document.getElementById('calendar-upcoming-events');
+      const calendarMonthEventCount = document.getElementById('calendar-month-event-count');
+      const calendarPrevBtn = document.getElementById('calendar-prev-btn');
+      const calendarNextBtn = document.getElementById('calendar-next-btn');
+      const calendarTodayBtn = document.getElementById('calendar-today-btn');
+      const calendarCategoryFilter = document.getElementById('calendar-category-filter');
+      const calendarBadge = document.getElementById('tab-calendar-badge');
+
+      const calendarMonthNames = [
+        'Januari', 'Februari', 'Maret', 'April', 'Mei', 'Juni',
+        'Juli', 'Agustus', 'September', 'Oktober', 'November', 'Desember'
+      ];
+
+      const calendarCategoryDot = {
+        nasional: 'bg-primary',
+        'tni-polri': 'bg-secondary',
+        florist: 'bg-dusty-rose',
+        'hut-perusahaan': 'bg-primary-dark',
+        'dies-natalis': 'bg-secondary-dark',
+        wisuda: 'bg-emerald-600',
+        pengukuhan: 'bg-sky-700',
+        pelantikan: 'bg-amber-600'
+      };
+
+      const calendarCategoryChip = {
+        nasional: 'bg-primary/10 text-primary',
+        'tni-polri': 'bg-secondary/15 text-secondary-dark',
+        florist: 'bg-dusty-rose/15 text-[#8a3d45]',
+        'hut-perusahaan': 'bg-primary/10 text-primary-dark',
+        'dies-natalis': 'bg-secondary/15 text-secondary-dark',
+        wisuda: 'bg-emerald-50 text-emerald-800',
+        pengukuhan: 'bg-sky-50 text-sky-800',
+        pelantikan: 'bg-amber-50 text-amber-800'
+      };
+
+      let calendarView = {
+        year: new Date().getFullYear(),
+        month: new Date().getMonth() // 0-based
+      };
+
+      if (calendarBadge) {
+        calendarBadge.textContent = String(IMPORTANT_DATES.length);
+      }
+
+      function startOfLocalDay(date) {
+        return new Date(date.getFullYear(), date.getMonth(), date.getDate());
+      }
+
+      function calendarEscape(value) {
+        return String(value ?? '')
+          .replace(/&/g, '&amp;')
+          .replace(/</g, '&lt;')
+          .replace(/>/g, '&gt;')
+          .replace(/"/g, '&quot;');
+      }
+
+      function calendarCategoryAllowed(item) {
+        const selected = calendarCategoryFilter?.value || 'all';
+        return selected === 'all' || item.category === selected;
+      }
+
+      function calendarOccursInYear(item, year) {
+        return !item.year || item.year === year;
+      }
+
+      function calendarCoversDay(item, day) {
+        if (item.day == null) return false;
+        const end = item.endDay || item.day;
+        return day >= item.day && day <= end;
+      }
+
+      function getImportantDatesForDay(year, month1Based, day) {
+        return IMPORTANT_DATES.filter((item) => (
+          calendarCategoryAllowed(item)
+          && item.month === month1Based
+          && calendarOccursInYear(item, year)
+          && calendarCoversDay(item, day)
+        ));
+      }
+
+      function getImportantDatesForMonth(year, month1Based) {
+        return IMPORTANT_DATES
+          .filter((item) => calendarCategoryAllowed(item) && item.month === month1Based && calendarOccursInYear(item, year))
+          .slice()
+          .sort((a, b) => (a.day ?? 32) - (b.day ?? 32) || a.institutionName.localeCompare(b.institutionName, 'id'));
+      }
+
+      function getUpcomingImportantDates(fromDate = new Date(), limit = 5) {
+        const base = startOfLocalDay(fromDate);
+        const year = base.getFullYear();
+        const candidates = [];
+
+        IMPORTANT_DATES.forEach((item) => {
+          if (!calendarCategoryAllowed(item)) return;
+          const years = item.year ? [item.year] : [year, year + 1];
+          years.forEach((y) => {
+            const startDay = item.day || 1;
+            const lastDayOfMonth = new Date(y, item.month, 0).getDate();
+            const endDay = item.day == null ? lastDayOfMonth : (item.endDay || item.day);
+            const eventDate = new Date(y, item.month - 1, startDay);
+            const eventEnd = new Date(y, item.month - 1, endDay);
+            if (eventEnd < base) return;
+            candidates.push({
+              ...item,
+              eventDate,
+              monthWatch: item.day == null,
+              daysUntil: eventDate >= base ? Math.round((eventDate - base) / 86400000) : 0
+            });
+          });
+        });
+
+        return candidates
+          .sort((a, b) => a.eventDate - b.eventDate || a.institutionName.localeCompare(b.institutionName, 'id'))
+          .slice(0, limit);
+      }
+
+      function formatCountdown(daysUntil, monthWatch = false) {
+        if (monthWatch && daysUntil === 0) return 'Sepanjang bulan ini';
+        if (daysUntil === 0) return 'Hari ini';
+        if (daysUntil === 1) return 'Besok';
+        return `${daysUntil} hari lagi`;
+      }
+
+      function formatMarketingWindow(daysUntil) {
+        if (typeof daysUntil !== 'number') return '';
+        if (daysUntil === 0) return 'Hari H: produksi dan kirim';
+        if (daysUntil <= 3) return 'H-3: konfirmasi desain dan alamat';
+        if (daysUntil <= 7) return 'H-7: follow-up pesanan';
+        if (daysUntil <= 14) return 'H-14: promosi katalog';
+        if (daysUntil <= 30) return 'H-30: cari kontak panitia';
+        return '';
+      }
+
+      function formatCalendarDate(item, year) {
+        const monthName = calendarMonthNames[item.month - 1];
+        if (item.day == null) {
+          return year ? `${monthName} ${year}` : monthName;
+        }
+        const dayText = item.endDay && item.endDay !== item.day ? `${item.day}–${item.endDay}` : String(item.day);
+        return year ? `${dayText} ${monthName} ${year}` : `${dayText} ${monthName}`;
+      }
+
+      function renderImportantDateCard(item, { showYear = false, daysUntil = null } = {}) {
+        const categoryLabel = IMPORTANT_DATE_CATEGORY_LABELS[item.category] || item.category;
+        const priorityLabel = IMPORTANT_DATE_PRIORITY_LABELS[item.priority] || item.priority;
+        const chipClass = calendarCategoryChip[item.category] || 'bg-slate-100 text-slate-600';
+        const yearLabel = showYear && item.eventDate ? item.eventDate.getFullYear() : item.year;
+        const dateText = formatCalendarDate(item, yearLabel);
+        const countdown = typeof daysUntil === 'number'
+          ? `<span class="text-xs font-semibold text-primary">${formatCountdown(daysUntil, item.monthWatch)}</span>`
+          : '';
+        const marketing = item.monthWatch && daysUntil === 0
+          ? 'Cek pengumuman resmi bulan ini'
+          : formatMarketingWindow(daysUntil);
+        const verifyLabel = item.verificationStatus === 'verified' ? 'Terverifikasi' : 'Perlu verifikasi';
+        const verifyClass = item.verificationStatus === 'verified' ? 'text-emerald-700' : 'text-amber-700';
+        const roleLabel = item.dateRole === 'historical'
+          ? 'Tanggal historis'
+          : item.dateRole === 'execution'
+            ? 'Jadwal pelaksanaan'
+            : 'Tanggal perayaan';
+
+        return `
+          <article class="rounded-xl border border-slate-200 bg-slate-50/70 p-3.5">
+            <div class="flex items-start justify-between gap-3">
+              <div class="min-w-0">
+                <p class="text-sm font-bold text-slate-900">${calendarEscape(item.eventName)}</p>
+                <p class="mt-0.5 text-xs font-semibold text-slate-500">${calendarEscape(item.institutionName)} · ${calendarEscape(dateText)}</p>
+              </div>
+              <span class="shrink-0 rounded-full px-2 py-0.5 text-[10px] font-bold uppercase tracking-wider ${chipClass}">${calendarEscape(categoryLabel)}</span>
+            </div>
+            <p class="mt-2 text-xs leading-relaxed text-slate-600">${calendarEscape(item.note)}</p>
+            <p class="mt-2 text-[11px] leading-relaxed text-slate-500">${calendarEscape(item.productOpportunity)} · ${calendarEscape(item.location)} · Prioritas ${calendarEscape(priorityLabel)}</p>
+            <p class="mt-1 text-[11px] font-semibold ${verifyClass}">${roleLabel} · ${verifyLabel}${item.frequency === 'incidental' ? ' · bukan jadwal tetap' : ''}</p>
+            ${countdown || marketing ? `<div class="mt-2 flex flex-wrap items-center gap-2">${countdown}${marketing ? `<span class="text-xs font-semibold text-slate-700">${calendarEscape(marketing)}</span>` : ''}</div>` : ''}
+          </article>
+        `;
+      }
+
+      function renderImportantDatesCalendar() {
+        if (!calendarGrid || !calendarMonthLabel) return;
+
+        const year = calendarView.year;
+        const month = calendarView.month; // 0-based
+        const month1Based = month + 1;
+        const today = startOfLocalDay(new Date());
+        const firstDay = new Date(year, month, 1);
+        const daysInMonth = new Date(year, month + 1, 0).getDate();
+        // Convert JS Sunday=0..Saturday=6 to Monday-first index 0..6
+        const startOffset = (firstDay.getDay() + 6) % 7;
+
+        calendarMonthLabel.textContent = `${calendarMonthNames[month]} ${year}`;
+
+        const monthEvents = getImportantDatesForMonth(year, month1Based);
+        if (calendarMonthEventCount) calendarMonthEventCount.textContent = String(monthEvents.length);
+        if (calendarMonthEvents) {
+          calendarMonthEvents.innerHTML = monthEvents.length
+            ? monthEvents.map((item) => renderImportantDateCard(item)).join('')
+            : `<p class="rounded-xl border border-dashed border-slate-200 bg-slate-50 px-3 py-4 text-sm text-slate-500">Tidak ada hari penting di bulan ini.</p>`;
+        }
+
+        const upcoming = getUpcomingImportantDates(today, 4);
+        if (calendarNearestLabel) {
+          if (upcoming[0]) {
+            calendarNearestLabel.textContent = `Terdekat: ${upcoming[0].eventName} · ${formatCountdown(upcoming[0].daysUntil, upcoming[0].monthWatch)}`;
+          } else {
+            calendarNearestLabel.textContent = 'Belum ada event terdekat.';
+          }
+        }
+        if (calendarUpcomingEvents) {
+          calendarUpcomingEvents.innerHTML = upcoming.length
+            ? upcoming.map((item) => renderImportantDateCard(item, { showYear: true, daysUntil: item.daysUntil })).join('')
+            : `<p class="rounded-xl border border-dashed border-slate-200 bg-slate-50 px-3 py-4 text-sm text-slate-500">Tidak ada event terjadwal.</p>`;
+        }
+
+        const cells = [];
+        for (let i = 0; i < startOffset; i += 1) {
+          cells.push('<div class="min-h-14 rounded-xl bg-transparent sm:min-h-16" aria-hidden="true"></div>');
+        }
+
+        for (let day = 1; day <= daysInMonth; day += 1) {
+          const events = getImportantDatesForDay(year, month1Based, day);
+          const isToday = today.getFullYear() === year && today.getMonth() === month && today.getDate() === day;
+          const title = events.length
+            ? events.map((item) => item.eventName).join(', ')
+            : `Tanggal ${day}`;
+          const markers = events.slice(0, 3).map((item) => {
+            const dot = calendarCategoryDot[item.category] || 'bg-slate-400';
+            return `<span class="h-1.5 w-1.5 rounded-full ${dot}"></span>`;
+          }).join('');
+          const extra = events.length > 3
+            ? `<span class="text-[9px] font-bold text-slate-400">+${events.length - 3}</span>`
+            : '';
+
+          cells.push(`
+            <div
+              class="min-h-14 rounded-xl border p-1.5 sm:min-h-16 sm:p-2 ${isToday ? 'border-primary bg-primary/5 shadow-sm' : events.length ? 'border-soft-cream bg-clean-ivory/80' : 'border-slate-100 bg-white'}"
+              title="${calendarEscape(title)}"
+            >
+              <div class="flex items-start justify-between gap-1">
+                <span class="text-xs font-bold sm:text-sm ${isToday ? 'text-primary' : 'text-slate-700'}">${day}</span>
+                ${events.length ? `<span class="rounded-full bg-primary/10 px-1.5 py-0.5 text-[9px] font-bold text-primary">${events.length}</span>` : ''}
+              </div>
+              ${events.length ? `<div class="mt-1.5 flex flex-wrap items-center gap-1">${markers}${extra}</div>` : ''}
+              ${events[0] ? `<p class="mt-1 hidden text-[10px] font-semibold leading-tight text-slate-600 line-clamp-2 sm:block">${calendarEscape(events[0].institutionName)}</p>` : ''}
+            </div>
+          `);
+        }
+
+        calendarGrid.innerHTML = cells.join('');
+      }
+
+      calendarPrevBtn?.addEventListener('click', () => {
+        calendarView.month -= 1;
+        if (calendarView.month < 0) {
+          calendarView.month = 11;
+          calendarView.year -= 1;
+        }
+        renderImportantDatesCalendar();
+      });
+
+      calendarNextBtn?.addEventListener('click', () => {
+        calendarView.month += 1;
+        if (calendarView.month > 11) {
+          calendarView.month = 0;
+          calendarView.year += 1;
+        }
+        renderImportantDatesCalendar();
+      });
+
+      calendarTodayBtn?.addEventListener('click', () => {
+        const now = new Date();
+        calendarView.year = now.getFullYear();
+        calendarView.month = now.getMonth();
+        renderImportantDatesCalendar();
+      });
+      calendarCategoryFilter?.addEventListener('change', () => renderImportantDatesCalendar());
+
+      // ==========================================
+      // CATATAN KEUANGAN — FILE EXCEL
+      // ==========================================
+      const FINANCE_STORAGE_KEY = 'zaloma-finance-ledger-v1';
+      const financeForm = document.getElementById('finance-form');
+      const financeDateInput = document.getElementById('finance-date');
+      const financeProductInput = document.getElementById('finance-product');
+      const financeAmountInput = document.getElementById('finance-amount');
+      const financeQtyInput = document.getElementById('finance-qty');
+      const financeNoteInput = document.getElementById('finance-note');
+      const financeTableBody = document.getElementById('finance-table-body');
+      const financeExportBtn = document.getElementById('finance-export-btn');
+      const financeImportInput = document.getElementById('finance-import-input');
+      const financeTotalToday = document.getElementById('finance-total-today');
+      const financeTotalWeek = document.getElementById('finance-total-week');
+      const financeTotalMonth = document.getElementById('finance-total-month');
+      let financeRows = [];
+
+      function financeTodayIso() {
+        const now = new Date();
+        const month = String(now.getMonth() + 1).padStart(2, '0');
+        const day = String(now.getDate()).padStart(2, '0');
+        return `${now.getFullYear()}-${month}-${day}`;
+      }
+
+      function formatRupiah(value) {
+        return new Intl.NumberFormat('id-ID', {
+          style: 'currency',
+          currency: 'IDR',
+          maximumFractionDigits: 0
+        }).format(value || 0);
+      }
+
+      function loadFinanceRows() {
+        try {
+          const parsed = JSON.parse(localStorage.getItem(FINANCE_STORAGE_KEY) || '[]');
+          financeRows = Array.isArray(parsed) ? parsed : [];
+        } catch {
+          financeRows = [];
+        }
+      }
+
+      function saveFinanceRows() {
+        localStorage.setItem(FINANCE_STORAGE_KEY, JSON.stringify(financeRows));
+      }
+
+      function financeRowTotal(row) {
+        return Number(row.amount || 0) * Number(row.qty || 0);
+      }
+
+      function sumFinanceBetween(startIso, endIso) {
+        return financeRows.reduce((sum, row) => {
+          if (row.date >= startIso && row.date <= endIso) return sum + financeRowTotal(row);
+          return sum;
+        }, 0);
+      }
+
+      function renderFinanceLedger() {
+        if (!financeTableBody) return;
+        const sorted = financeRows.slice().sort((a, b) => String(b.date).localeCompare(String(a.date)));
+        financeTableBody.innerHTML = sorted.length
+          ? sorted.map((row) => `
+            <tr class="border-t border-slate-100">
+              <td class="px-4 py-3 whitespace-nowrap text-slate-700">${calendarEscape(row.date)}</td>
+              <td class="px-4 py-3 font-semibold text-slate-900">${calendarEscape(row.product)}</td>
+              <td class="px-4 py-3 whitespace-nowrap">${formatRupiah(row.amount)}</td>
+              <td class="px-4 py-3">${Number(row.qty) || 0}</td>
+              <td class="px-4 py-3 whitespace-nowrap font-semibold text-primary">${formatRupiah(financeRowTotal(row))}</td>
+              <td class="px-4 py-3 text-slate-500">${calendarEscape(row.note || '—')}</td>
+              <td class="px-4 py-3 text-right">
+                <button type="button" data-finance-delete="${calendarEscape(row.id)}" class="text-xs font-semibold text-rose-600 hover:text-rose-700">Hapus</button>
+              </td>
+            </tr>
+          `).join('')
+          : `<tr><td colspan="7" class="px-4 py-8 text-center text-sm text-slate-500">Belum ada pemasukan. Tambah baris, atau impor file Excel.</td></tr>`;
+
+        const today = financeTodayIso();
+        const weekStart = new Date();
+        weekStart.setDate(weekStart.getDate() - 6);
+        const weekIso = `${weekStart.getFullYear()}-${String(weekStart.getMonth() + 1).padStart(2, '0')}-${String(weekStart.getDate()).padStart(2, '0')}`;
+        const monthStart = `${today.slice(0, 8)}01`;
+        if (financeTotalToday) financeTotalToday.textContent = formatRupiah(sumFinanceBetween(today, today));
+        if (financeTotalWeek) financeTotalWeek.textContent = formatRupiah(sumFinanceBetween(weekIso, today));
+        if (financeTotalMonth) financeTotalMonth.textContent = formatRupiah(sumFinanceBetween(monthStart, today));
+      }
+
+      function financeWorkbookRows() {
+        return financeRows
+          .slice()
+          .sort((a, b) => String(a.date).localeCompare(String(b.date)))
+          .map((row) => ({
+            Tanggal: row.date,
+            Produk: row.product,
+            Harga: Number(row.amount) || 0,
+            Jumlah: Number(row.qty) || 0,
+            Total: financeRowTotal(row),
+            Catatan: row.note || ''
+          }));
+      }
+
+      financeForm?.addEventListener('submit', (event) => {
+        event.preventDefault();
+        const product = financeProductInput.value.trim();
+        const amount = Number(financeAmountInput.value);
+        const qty = Number(financeQtyInput.value);
+        if (!financeDateInput.value || !product || !Number.isFinite(amount) || amount < 0 || !Number.isFinite(qty) || qty < 1) {
+          showToast('Lengkapi tanggal, produk, harga, dan jumlah.', 'error');
+          return;
+        }
+        financeRows.push({
+          id: crypto.randomUUID(),
+          date: financeDateInput.value,
+          product,
+          amount,
+          qty,
+          note: financeNoteInput.value.trim()
+        });
+        saveFinanceRows();
+        financeProductInput.value = '';
+        financeAmountInput.value = '';
+        financeQtyInput.value = '1';
+        financeNoteInput.value = '';
+        renderFinanceLedger();
+        showToast('Pemasukan ditambahkan. Unduh Excel untuk menyimpan salinan file.');
+      });
+
+      financeTableBody?.addEventListener('click', (event) => {
+        const button = event.target.closest('[data-finance-delete]');
+        if (!button) return;
+        financeRows = financeRows.filter((row) => row.id !== button.dataset.financeDelete);
+        saveFinanceRows();
+        renderFinanceLedger();
+      });
+
+      financeExportBtn?.addEventListener('click', () => {
+        if (!window.XLSX) {
+          showToast('Pustaka Excel belum termuat. Muat ulang halaman.', 'error');
+          return;
+        }
+        const sheet = window.XLSX.utils.json_to_sheet(financeWorkbookRows().length ? financeWorkbookRows() : [{
+          Tanggal: '',
+          Produk: '',
+          Harga: '',
+          Jumlah: '',
+          Total: '',
+          Catatan: ''
+        }]);
+        const book = window.XLSX.utils.book_new();
+        window.XLSX.utils.book_append_sheet(book, sheet, 'Pemasukan');
+        window.XLSX.writeFile(book, `zaloma-pemasukan-${financeTodayIso()}.xlsx`);
+      });
+
+      financeImportInput?.addEventListener('change', async () => {
+        const file = financeImportInput.files?.[0];
+        financeImportInput.value = '';
+        if (!file) return;
+        if (!window.XLSX) {
+          showToast('Pustaka Excel belum termuat. Muat ulang halaman.', 'error');
+          return;
+        }
+        try {
+          const buffer = await file.arrayBuffer();
+          const book = window.XLSX.read(buffer, { type: 'array', cellDates: true });
+          const sheet = book.Sheets[book.SheetNames[0]];
+          const records = window.XLSX.utils.sheet_to_json(sheet, { defval: '' });
+          const imported = records.map((record) => {
+            const rawDate = record.Tanggal ?? record.tanggal ?? record.Date ?? '';
+            let date = '';
+            if (rawDate instanceof Date && !Number.isNaN(rawDate.getTime())) {
+              date = `${rawDate.getUTCFullYear()}-${String(rawDate.getUTCMonth() + 1).padStart(2, '0')}-${String(rawDate.getUTCDate()).padStart(2, '0')}`;
+            } else if (typeof rawDate === 'number' && window.XLSX?.SSF?.parse_date_code) {
+              const parsedCode = window.XLSX.SSF.parse_date_code(rawDate);
+              if (parsedCode) {
+                date = `${parsedCode.y}-${String(parsedCode.m).padStart(2, '0')}-${String(parsedCode.d).padStart(2, '0')}`;
+              }
+            } else {
+              const text = String(rawDate).trim();
+              const parsed = text.match(/^(\d{4})-(\d{2})-(\d{2})/) || text.match(/^(\d{1,2})[/-](\d{1,2})[/-](\d{4})/);
+              if (parsed && parsed[1].length === 4) date = `${parsed[1]}-${parsed[2]}-${parsed[3]}`;
+              else if (parsed) date = `${parsed[3]}-${String(parsed[2]).padStart(2, '0')}-${String(parsed[1]).padStart(2, '0')}`;
+            }
+            const product = String(record.Produk ?? record.produk ?? record.Product ?? '').trim();
+            const amount = Number(String(record.Harga ?? record.harga ?? record.Amount ?? '').replace(/[^\d.-]/g, ''));
+            const qty = Number(record.Jumlah ?? record.jumlah ?? record.Qty ?? 1) || 1;
+            const note = String(record.Catatan ?? record.catatan ?? record.Note ?? '').trim();
+            if (!date || !product || !Number.isFinite(amount)) return null;
+            return { id: crypto.randomUUID(), date, product, amount, qty, note };
+          }).filter(Boolean);
+
+          if (!imported.length) {
+            showToast('File tidak punya baris Tanggal, Produk, dan Harga yang valid.', 'error');
+            return;
+          }
+          financeRows = imported;
+          saveFinanceRows();
+          renderFinanceLedger();
+          showToast(`${imported.length} baris pemasukan diimpor dari Excel.`);
+        } catch (error) {
+          console.error('[Zaloma Admin] Gagal impor Excel:', error);
+          showToast('File Excel tidak bisa dibaca.', 'error');
+        }
+      });
+
+      if (financeDateInput && !financeDateInput.value) financeDateInput.value = financeTodayIso();
+      loadFinanceRows();
 
       const promoBannerModal = document.getElementById('promo-banner-modal');
       const promoBannerForm = document.getElementById('promo-banner-form');
@@ -2372,6 +3059,12 @@ function withBase(path: string): string {
         document.getElementById('promo-banner-image-note').textContent = banner
           ? 'Pilih file untuk mengganti gambar yang ada. Versi gambar yang tidak diganti tetap digunakan.'
           : 'Unggah minimal satu versi gambar. Versi desktop/mobile yang kosong tidak akan ditampilkan pada perangkat tersebut.';
+        const aiPrompt = document.getElementById('promo-banner-ai-prompt');
+        if (aiPrompt) aiPrompt.value = '';
+        const aiStatus = document.getElementById('promo-banner-ai-status');
+        if (aiStatus) aiStatus.textContent = '';
+        const desktopSize = document.querySelector('input[name="promo-banner-ai-size"][value="desktop"]');
+        if (desktopSize) desktopSize.checked = true;
         promoBannerModal.classList.remove('hidden');
       }
 
@@ -2384,6 +3077,8 @@ function withBase(path: string): string {
         promoBannerRemoveMobile = false;
         setPromoImagePreview('desktop', '');
         setPromoImagePreview('mobile', '');
+        const aiStatus = document.getElementById('promo-banner-ai-status');
+        if (aiStatus) aiStatus.textContent = '';
       }
 
       function bindPromoImageInput(input, device) {
@@ -2435,6 +3130,110 @@ function withBase(path: string): string {
       document.getElementById('open-add-banner-btn')?.addEventListener('click', () => openPromoBannerModal());
       document.getElementById('close-promo-banner-modal-btn')?.addEventListener('click', closePromoBannerModal);
       document.getElementById('cancel-promo-banner-btn')?.addEventListener('click', closePromoBannerModal);
+
+      const promoBannerAiPrompt = document.getElementById('promo-banner-ai-prompt');
+      const promoBannerGenerateBtn = document.getElementById('promo-banner-generate-btn');
+      const promoBannerAiStatus = document.getElementById('promo-banner-ai-status');
+
+      function base64ToFile(base64, mime, filename) {
+        const binary = atob(base64);
+        const bytes = new Uint8Array(binary.length);
+        for (let index = 0; index < binary.length; index += 1) bytes[index] = binary.charCodeAt(index);
+        return new File([bytes], filename, { type: mime || 'image/png' });
+      }
+
+      async function applyGeneratedPromoImage(device, imagePayload) {
+        if (!imagePayload?.base64) throw new Error(`Gambar ${device} kosong.`);
+        const file = base64ToFile(
+          imagePayload.base64,
+          imagePayload.mime || 'image/png',
+          `promo-ai-${device}.png`,
+        );
+        const blob = await openImageCrop(file, {
+          aspect: device === 'desktop' ? 2 : 1080 / 776,
+          title: `Atur area gambar AI ${device === 'desktop' ? 'desktop' : 'mobile'}`,
+          maxDimension: 1600,
+        });
+        if (!blob) return false;
+        if (device === 'desktop') {
+          promoBannerDesktopFile = blob;
+          promoBannerRemoveDesktop = false;
+          const removeDesktop = document.getElementById('promo-banner-desktop-remove');
+          if (removeDesktop) removeDesktop.checked = false;
+        } else {
+          promoBannerMobileFile = blob;
+          promoBannerRemoveMobile = false;
+          const removeMobile = document.getElementById('promo-banner-mobile-remove');
+          if (removeMobile) removeMobile.checked = false;
+        }
+        setPromoImagePreview(device, URL.createObjectURL(blob));
+        if (promoBannerDesktopInput) promoBannerDesktopInput.value = '';
+        if (promoBannerMobileInput) promoBannerMobileInput.value = '';
+        return true;
+      }
+
+      async function generatePromoBannerImages() {
+        const prompt = promoBannerAiPrompt?.value.trim() || '';
+        const size = document.querySelector('input[name="promo-banner-ai-size"]:checked')?.value || 'desktop';
+        if (prompt.length < 8) {
+          showToast('Prompt AI minimal 8 karakter.', 'error');
+          return;
+        }
+
+        promoBannerGenerateBtn.disabled = true;
+        promoBannerGenerateBtn.textContent = 'Menggenerate...';
+        if (promoBannerAiStatus) promoBannerAiStatus.textContent = 'Mengirim prompt ke OpenAI lewat Worker...';
+
+        try {
+          const response = await fetch(`${R2_IMAGE_API_URL}/generate-banner`, {
+            method: 'POST',
+            headers: {
+              Authorization: `Bearer ${await getR2ImageAccessToken()}`,
+              'Content-Type': 'application/json',
+            },
+            body: JSON.stringify({ prompt, size }),
+          });
+          const result = await response.json().catch(() => ({}));
+          if (!response.ok) throw new Error(result.error || `Generate gagal (${response.status}).`);
+          if (!result.images || typeof result.images !== 'object') {
+            throw new Error('Respons generate tidak valid.');
+          }
+
+          const targets = size === 'both' ? ['desktop', 'mobile'] : [size];
+          let applied = 0;
+          for (const device of targets) {
+            if (promoBannerAiStatus) {
+              promoBannerAiStatus.textContent = `Atur crop gambar ${device}...`;
+            }
+            const ok = await applyGeneratedPromoImage(device, result.images[device]);
+            if (ok) applied += 1;
+          }
+
+          if (!applied) {
+            showToast('Generate dibatalkan sebelum gambar dipakai.', 'error');
+            if (promoBannerAiStatus) promoBannerAiStatus.textContent = 'Dibatalkan.';
+            return;
+          }
+
+          document.getElementById('promo-banner-image-note').textContent =
+            'Gambar AI sudah masuk pratinjau. Simpan banner untuk mengunggahnya, atau generate ulang.';
+          if (promoBannerAiStatus) {
+            promoBannerAiStatus.textContent = `${applied} gambar AI siap di pratinjau.`;
+          }
+          showToast('Gambar AI siap. Periksa pratinjau, lalu simpan banner.');
+        } catch (error) {
+          console.error('[Zaloma Admin] Generate banner AI gagal:', error);
+          if (promoBannerAiStatus) promoBannerAiStatus.textContent = error.message || 'Generate gagal.';
+          showToast(error.message || 'Generate banner AI gagal.', 'error');
+        } finally {
+          promoBannerGenerateBtn.disabled = false;
+          promoBannerGenerateBtn.textContent = 'Generate gambar';
+        }
+      }
+
+      promoBannerGenerateBtn?.addEventListener('click', () => {
+        generatePromoBannerImages();
+      });
 
       function validPromoHref(value) {
         const href = value.trim();

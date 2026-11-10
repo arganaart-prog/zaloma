@@ -54,6 +54,73 @@ function publicImageUrl(baseUrl, key) {
   return `${baseUrl.replace(/\/+$/, '')}/${key.split('/').map(encodeURIComponent).join('/')}`;
 }
 
+const BRAND_BANNER_GUIDE = [
+  'Design a premium florist promotional banner for Zaloma Florist in Malang, Indonesia.',
+  'Use only this palette: burgundy #893144, deep burgundy #671E2F, gold #C59253, cream #F6E3E1, ivory #FDF7F7, dusty rose #D87B84.',
+  'Style: elegant boutique florist, refined serif headline, real flowers, generous quiet space, warm and formal.',
+  'Do not use neon colors, cartoons, clip-art, watermarks, extra logos, or cluttered layouts.',
+  'Render the offer text from the admin prompt in clear Indonesian, large enough to read at a glance.',
+  'Do not invent discounts, prices, or products that the prompt did not mention.',
+].join(' ');
+
+const BANNER_SIZES = {
+  desktop: {
+    openaiSize: '1536x1024',
+    layout: 'Wide desktop hero, exact visual ratio 2:1. Keep the offer text in the center safe area.',
+  },
+  mobile: {
+    openaiSize: '1536x1024',
+    layout: 'Mobile banner, visual ratio about 1080:776. Keep the offer text large and inside the center safe area.',
+  },
+};
+
+function bytesToBase64(bytes) {
+  let binary = '';
+  const chunk = 0x8000;
+  for (let index = 0; index < bytes.length; index += chunk) {
+    binary += String.fromCharCode(...bytes.subarray(index, index + chunk));
+  }
+  return btoa(binary);
+}
+
+async function generateBannerImage(env, prompt, sizeKey) {
+  const size = BANNER_SIZES[sizeKey];
+  const model = env.OPENAI_IMAGE_MODEL || 'gpt-image-2.6-flare';
+  const response = await fetch('https://api.openai.com/v1/images/generations', {
+    method: 'POST',
+    headers: {
+      Authorization: `Bearer ${env.OPENAI_API_KEY}`,
+      'Content-Type': 'application/json',
+    },
+    body: JSON.stringify({
+      model,
+      prompt: `${BRAND_BANNER_GUIDE} ${size.layout} Admin offer: ${prompt}`,
+      size: size.openaiSize,
+      quality: 'medium',
+      output_format: 'png',
+      n: 1,
+    }),
+  });
+  const payload = await response.json().catch(() => ({}));
+  if (!response.ok) {
+    const message = payload?.error?.message || 'OpenAI menolak permintaan gambar.';
+    throw new Error(message);
+  }
+
+  const first = payload?.data?.[0] || {};
+  if (typeof first.b64_json === 'string' && first.b64_json) {
+    return { base64: first.b64_json, mime: 'image/png' };
+  }
+  if (typeof first.url === 'string' && first.url) {
+    const imageResponse = await fetch(first.url);
+    if (!imageResponse.ok) throw new Error('Gambar hasil generate tidak bisa diunduh.');
+    const bytes = new Uint8Array(await imageResponse.arrayBuffer());
+    const mime = imageResponse.headers.get('Content-Type') || 'image/png';
+    return { base64: bytesToBase64(bytes), mime };
+  }
+  throw new Error('OpenAI tidak mengembalikan gambar.');
+}
+
 export default {
   async fetch(request, env) {
     const origin = request.headers.get('Origin');
@@ -111,6 +178,28 @@ export default {
           key,
           url: publicImageUrl(env.IMAGE_BASE_URL, key),
         }, 201, origin, allowedOrigin);
+      }
+
+      if (request.method === 'POST' && url.pathname === '/generate-banner') {
+        if (!env.OPENAI_API_KEY) {
+          return jsonResponse({ error: 'OPENAI_API_KEY belum dipasang di Worker.' }, 500, origin, allowedOrigin);
+        }
+        const body = await request.json().catch(() => null);
+        const prompt = typeof body?.prompt === 'string' ? body.prompt.trim() : '';
+        const size = body?.size;
+        if (prompt.length < 8 || prompt.length > 600) {
+          return jsonResponse({ error: 'Prompt harus 8–600 karakter.' }, 400, origin, allowedOrigin);
+        }
+        if (size !== 'desktop' && size !== 'mobile' && size !== 'both') {
+          return jsonResponse({ error: 'Pilih ukuran desktop, mobile, atau keduanya.' }, 400, origin, allowedOrigin);
+        }
+
+        const targets = size === 'both' ? ['desktop', 'mobile'] : [size];
+        const images = {};
+        for (const target of targets) {
+          images[target] = await generateBannerImage(env, prompt, target);
+        }
+        return jsonResponse({ images }, 200, origin, allowedOrigin);
       }
 
       if (request.method === 'DELETE' && url.pathname === '/objects') {

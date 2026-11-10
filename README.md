@@ -120,6 +120,19 @@ Produk dikelola dalam array `PRODUCTS`. Anda bisa menambahkan objek produk baru 
 
 ---
 
+## Brand visual banner promo
+
+Generate gambar banner di admin memakai panduan ini supaya warna dan gaya tetap sama:
+
+* **Primary** `#893144`, **primary dark** `#671E2F`
+* **Secondary / emas** `#C59253`, **secondary light** `#DFC397`, **secondary dark** `#8E5F2B`
+* **Soft cream** `#F6E3E1`, **clean ivory** `#FDF7F7`, **dusty rose** `#D87B84`
+* Gaya: florist premium, elegan, headline serif, bunga asli, ruang kosong yang tenang
+* Teks promo hanya mengikuti prompt admin. Jangan menambah diskon atau produk yang tidak diminta
+* Ukuran desktop ditata untuk rasio 2:1. Ukuran mobile ditata untuk rasio 1080:776
+
+---
+
 ## 🚀 Panduan Deployment
 
 Karena Zaloma Florist merupakan website statis (*static site*), Anda dapat mendeploy-nya secara **100% gratis** menggunakan layanan CDN modern.
