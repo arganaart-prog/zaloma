@@ -104,14 +104,13 @@ export async function getStaticPaths() {
       params: { citySlug: city.slug },
       props: {
         city,
-        products: filteredProducts,
-        allCities: combinedCities
+        products: filteredProducts
       }
     };
   });
 }
 
-const { city, products = [], allCities = [] } = Astro.props;
+const { city, products = [] } = Astro.props;
 const { activeProducts } = getRotatingHomeProducts(getHomeDisplayProducts(products), 5);
 
 // Derive categories dynamically from city-filtered Supabase products (no static data)
@@ -183,7 +182,7 @@ const citySchema = {
     <PaperFlowerSection allProducts={products} cityName={city.name} citySlug={city.slug} hideWhenEmpty />
     <BungaMejaSection allProducts={products} cityName={city.name} citySlug={city.slug} hideWhenEmpty />
     <TanbulampotSection allProducts={products} cityName={city.name} citySlug={city.slug} hideWhenEmpty />
-    <CityDeliverySection currentCitySlug={city.slug} allCities={allCities} />
+    <CityDeliverySection currentCitySlug={city.slug} />
   </div>
 
   <HomeLiveSync />

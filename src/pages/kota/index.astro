@@ -139,7 +139,7 @@ const collectionSchema = {
             <svg class="w-4 h-4 text-[#DFC397]" fill="currentColor" viewBox="0 0 24 24">
               <path d="M19 13h-2V7h2m-6 6h-2V7h2m6 10a2 2 0 0 1-2 2a2 2 0 0 1-2-2a2 2 0 0 1 2-2a2 2 0 0 1 2 2m-10 0a2 2 0 0 1-2 2a2 2 0 0 1-2-2a2 2 0 0 1 2-2a2 2 0 0 1 2 2m11-8v6h-2v-6m-4-6H3a2 2 0 0 0-2 2v10a2 2 0 0 0 2 2h1.2A3 3 0 0 1 7 19a3 3 0 0 1 2.8-2h4.4a3 3 0 0 1 2.8 2a3 3 0 0 1 2.8-2H21a2 2 0 0 0 2-2V9l-3-4h-5z"/>
             </svg>
-            <span>{allCities.length}+ Kota Tersedia</span>
+            <span id="cityCount">{allCities.length}+ Kota Tersedia</span>
           </div>
           <div class="kota-hero__trust-item">
             <svg class="w-4 h-4 text-[#DFC397]" fill="currentColor" viewBox="0 0 24 24">
@@ -689,4 +689,137 @@ const collectionSchema = {
 
   searchInput.addEventListener('input', handleSearch);
 })();
+</script>
+
+<script>
+import type { CityItem } from '../../data/cities';
+import { fetchSupabaseCities } from '../../utils/supabaseCities';
+import { withBase } from '../../utils/paths';
+
+const wrapper = document.getElementById('provincesWrapper');
+const searchInput = document.getElementById('searchAllCitiesInput') as HTMLInputElement | null;
+const emptyState = document.getElementById('allCitiesEmptyState');
+const cityCount = document.getElementById('cityCount');
+
+function filterCityGroups() {
+  if (!wrapper || !searchInput) return;
+  const query = searchInput.value.trim().toLowerCase();
+  let visibleCount = 0;
+
+  wrapper.querySelectorAll<HTMLElement>('[data-province-section]').forEach((section) => {
+    let sectionCount = 0;
+    section.querySelectorAll<HTMLElement>('[data-city-card]').forEach((card) => {
+      const visible = !query
+        || (card.dataset.cityName || '').includes(query)
+        || (card.dataset.provinceName || '').includes(query);
+      card.style.display = visible ? '' : 'none';
+      if (visible) {
+        sectionCount++;
+        visibleCount++;
+      }
+    });
+    section.style.display = sectionCount ? '' : 'none';
+  });
+
+  if (emptyState) emptyState.classList.toggle('hidden', visibleCount > 0);
+}
+
+function createCityCard(city: CityItem): HTMLAnchorElement {
+  const card = document.createElement('a');
+  card.href = withBase(`/kota/${city.slug}/`);
+  card.className = 'city-card group';
+  card.dataset.cityCard = '';
+  card.dataset.cityName = city.name.toLowerCase();
+  card.dataset.provinceName = (city.province_name || '').toLowerCase();
+
+  const image = document.createElement('img');
+  image.src = withBase(city.image || '/images/galeri/gallery-2.webp');
+  image.alt = `Toko Bunga ${city.name}`;
+  image.className = 'city-card__image';
+  image.loading = 'lazy';
+  image.decoding = 'async';
+  image.width = 800;
+  image.height = 600;
+
+  const overlay = document.createElement('div');
+  overlay.className = 'city-card__overlay';
+  const content = document.createElement('div');
+  content.className = 'city-card__content';
+  const row = document.createElement('div');
+  row.className = 'flex items-end justify-between gap-3 w-full';
+  const info = document.createElement('div');
+  info.className = 'min-w-0 flex-1';
+  const title = document.createElement('h3');
+  title.className = 'city-card__title';
+  title.textContent = `Toko Bunga ${city.name}`;
+  const province = document.createElement('p');
+  province.className = 'city-card__province';
+  province.textContent = city.province_name || 'Indonesia';
+  info.append(title, province);
+
+  const arrow = document.createElement('div');
+  arrow.className = 'city-card__arrow';
+  arrow.textContent = '›';
+  row.append(info, arrow);
+  content.append(row);
+  card.append(image, overlay, content);
+  return card;
+}
+
+if (wrapper) {
+  wrapper.replaceChildren();
+  searchInput?.addEventListener('input', filterCityGroups);
+
+  try {
+    const cities = await fetchSupabaseCities();
+    const grouped = new Map<string, CityItem[]>();
+    cities.forEach((city) => {
+      const province = city.province_name || 'Area Pengiriman';
+      const group = grouped.get(province) || [];
+      group.push(city);
+      grouped.set(province, group);
+    });
+
+    [...grouped.keys()].sort((a, b) => {
+      if (a.includes('Jawa Timur')) return -1;
+      if (b.includes('Jawa Timur')) return 1;
+      return a.localeCompare(b);
+    }).forEach((provinceName) => {
+      const section = document.createElement('div');
+      section.className = 'province-group mb-16 last:mb-0';
+      section.dataset.provinceSection = '';
+      const heading = document.createElement('h2');
+      heading.className = 'text-2xl sm:text-3xl lg:text-4xl font-bold text-[#671E2F] font-serif mb-8';
+      heading.textContent = provinceName;
+      const grid = document.createElement('div');
+      grid.className = 'grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 gap-6';
+      (grouped.get(provinceName) || []).forEach((city) => grid.append(createCityCard(city)));
+      section.append(heading, grid);
+      wrapper.append(section);
+    });
+
+    if (cityCount) cityCount.textContent = `${cities.length}+ Kota Tersedia`;
+
+    const collectionSchemaScript = [...document.querySelectorAll('script[type="application/ld+json"]')]
+      .find((script) => script.textContent?.includes('"CollectionPage"'));
+    if (collectionSchemaScript?.textContent) {
+      const schema = JSON.parse(collectionSchemaScript.textContent);
+      schema.mainEntity.itemListElement = cities.map((city, index) => ({
+        '@type': 'ListItem',
+        position: index + 1,
+        name: `${city.name} - Zaloma Florist`,
+        url: new URL(withBase(`/kota/${city.slug}/`), window.location.origin).href,
+      }));
+      collectionSchemaScript.textContent = JSON.stringify(schema);
+    }
+
+    filterCityGroups();
+  } catch (error) {
+    console.error('[Zaloma] Gagal memuat daftar kota dari Supabase:', error);
+    if (emptyState) {
+      emptyState.textContent = 'Daftar kota belum dapat dimuat. Silakan muat ulang halaman.';
+      emptyState.classList.remove('hidden');
+    }
+  }
+}
 </script>

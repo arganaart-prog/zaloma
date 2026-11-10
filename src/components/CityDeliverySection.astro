@@ -1,34 +1,13 @@
 ---
-import { cityToSlug } from '../data/cities';
-import { withBase } from '../utils/paths';
 import { WHATSAPP_NUMBER } from '../data/constants';
+import { withBase } from '../utils/paths';
 
 interface Props {
   currentCitySlug?: string;
-  allCities?: any[];
 }
 
-const { currentCitySlug, allCities = [] } = Astro.props;
-
+const { currentCitySlug } = Astro.props;
 const databaseCities: any[] = [];
-const seenSlugs = new Set<string>();
-
-(allCities || []).forEach(c => {
-  const name = typeof c === 'string' ? c : (c && c.name);
-  if (!name) return;
-  const slug = typeof c === 'string' ? cityToSlug(c) : (c.slug || cityToSlug(c.name));
-  if (slug && !seenSlugs.has(slug)) {
-    seenSlugs.add(slug);
-    databaseCities.push({
-      name,
-      slug,
-      image: typeof c === 'object' && c ? (c.image || c.image_url) : '',
-      province_name: typeof c === 'object' && c ? (c.province_name || c.province) : ''
-    });
-  }
-});
-
-// Maksimal 6 kota di beranda (sisanya hanya muncul saat pencarian)
 const HOME_CITY_LIMIT = 6;
 const waMainLink = `https://wa.me/${WHATSAPP_NUMBER}?text=${encodeURIComponent('Halo Zaloma Florist, saya ingin tanya pengiriman bunga ke kota saya...')}`;
 ---
@@ -36,7 +15,7 @@ const waMainLink = `https://wa.me/${WHATSAPP_NUMBER}?text=${encodeURIComponent('
 <!-- =====================================================
      HOME CITY SHOWCASE (Warna Serasi Zaloma, Maksimal 6 Kota)
      ===================================================== -->
-<section id="city-section" class="city-showcase">
+<section id="city-section" class="city-showcase" data-current-city-slug={currentCitySlug}>
   <div class="city-showcase__container">
     <div class="city-showcase__header">
       <p class="city-showcase__label">LAYANAN PENGIRIMAN ANTAR KOTA</p>
@@ -579,4 +558,90 @@ const waMainLink = `https://wa.me/${WHATSAPP_NUMBER}?text=${encodeURIComponent('
 
   searchInput.addEventListener('input', filterCards);
 })();
+</script>
+
+<script>
+import type { CityItem } from '../data/cities';
+import { fetchSupabaseCities } from '../utils/supabaseCities';
+import { withBase } from '../utils/paths';
+
+const searchInput = document.getElementById('cityShowcaseSearchInput') as HTMLInputElement | null;
+const cardsGrid = document.getElementById('cityShowcaseCardsGrid');
+const emptyState = document.getElementById('cityShowcaseEmpty');
+const currentCitySlug = document.getElementById('city-section')?.getAttribute('data-current-city-slug');
+
+function filterCityCards() {
+  if (!cardsGrid || !searchInput) return;
+  const query = searchInput.value.trim().toLowerCase();
+  const cards = cardsGrid.querySelectorAll<HTMLElement>('.city-destination-card');
+  let visibleCount = 0;
+
+  cards.forEach((card, index) => {
+    const matches = !query
+      ? index < 6
+      : (card.dataset.cityName || '').includes(query)
+        || (card.dataset.provinceName || '').includes(query);
+    card.style.display = matches ? '' : 'none';
+    if (matches) visibleCount++;
+  });
+
+  if (emptyState) {
+    emptyState.textContent = 'Kota yang kamu cari belum tersedia.';
+    emptyState.classList.toggle('hidden', visibleCount > 0);
+  }
+}
+
+function createCityCard(city: CityItem): HTMLAnchorElement {
+  const card = document.createElement('a');
+  card.href = city.slug === currentCitySlug ? '#' : withBase(`/kota/${city.slug}/`);
+  card.className = 'city-destination-card';
+  card.dataset.cityName = city.name.toLowerCase();
+  card.dataset.provinceName = (city.province_name || '').toLowerCase();
+
+  if (city.image) {
+    const image = document.createElement('img');
+    image.src = withBase(city.image);
+    image.alt = `Toko Bunga ${city.name}`;
+    image.className = 'city-destination-card__image';
+    image.loading = 'lazy';
+    image.decoding = 'async';
+    image.width = 800;
+    image.height = 600;
+    card.append(image);
+  }
+
+  const shade = document.createElement('div');
+  shade.className = 'city-destination-card__shade';
+  const content = document.createElement('div');
+  content.className = 'city-destination-card__content';
+  const titleRow = document.createElement('div');
+  titleRow.className = 'city-destination-card__title-row';
+  const title = document.createElement('h3');
+  title.textContent = `Toko Bunga ${city.name}`;
+  const arrow = document.createElement('span');
+  arrow.className = 'city-destination-card__arrow';
+  arrow.textContent = '›';
+  titleRow.append(title, arrow);
+  const province = document.createElement('p');
+  province.textContent = city.province_name || '';
+  content.append(titleRow, province);
+  card.append(shade, content);
+  return card;
+}
+
+if (searchInput && cardsGrid) {
+  searchInput.addEventListener('input', filterCityCards);
+
+  try {
+    const cities = await fetchSupabaseCities();
+    cardsGrid.replaceChildren(...cities.map(createCityCard));
+    filterCityCards();
+  } catch (error) {
+    console.error('[Zaloma] Gagal memuat daftar kota beranda dari Supabase:', error);
+    if (emptyState) {
+      emptyState.textContent = 'Daftar kota belum dapat dimuat. Silakan muat ulang halaman.';
+      emptyState.classList.remove('hidden');
+    }
+  }
+}
 </script>
