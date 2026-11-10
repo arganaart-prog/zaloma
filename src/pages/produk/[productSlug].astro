@@ -86,6 +86,7 @@ export async function getStaticPaths() {
         priceFrom: 0,
         priceLabel: 'Hubungi Kami',
         image: '/images/hero/hero-1.webp',
+        images: [],
         imageWidth: 800,
         imageHeight: 800,
         description: 'Pilihan karangan bunga segar dari Zaloma Florist Malang.',
@@ -950,7 +951,7 @@ const productSchema = {
 
   .related-products-grid {
     display: grid;
-    grid-template-columns: repeat(auto-fit, minmax(min(100%, 14rem), 1fr));
+    grid-template-columns: repeat(auto-fit, minmax(min(100%, 12rem), 1fr));
     gap: clamp(0.75rem, 2vw, 1.5rem);
   }
 

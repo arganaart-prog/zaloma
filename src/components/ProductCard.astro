@@ -34,9 +34,9 @@ const isHandBouquet = product.categorySlug === 'hand-bouquet-malang' || product.
 const isLongTitle = isBungaPapan || displayName.length > 25;
 
 const shapeAspect = cardShape === 'square' ? 'aspect-square' : cardShape ? 'aspect-[4/5]' : '';
-const modernAspect = shapeAspect || aspect || 'aspect-[4/5]';
-const classicAspect = shapeAspect || aspect || 'aspect-[4/5]';
-const compactAspect = shapeAspect || aspect || 'aspect-[4/5]';
+const modernAspect = shapeAspect || aspect || (isHandBouquet ? 'aspect-[4/5]' : 'aspect-[20/19]');
+const classicAspect = shapeAspect || aspect || (isHandBouquet ? 'aspect-[4/5]' : 'aspect-[20/19]');
+const compactAspect = shapeAspect || aspect || (isHandBouquet ? 'aspect-[4/5]' : 'aspect-[4/4.5]');
 ---
 
 {variant === 'compact' ? (
