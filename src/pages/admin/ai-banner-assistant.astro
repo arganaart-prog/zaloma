@@ -1,12 +1,22 @@
 ---
 import '../../styles/global.css';
 
-const title = "AI Banner Generator — Zaloma Florist Admin";
+const title = "AI Banner Assistant — Zaloma Florist Admin";
 
 function withBase(path: string): string {
   const base = import.meta.env.BASE_URL || '/';
   return base.endsWith('/') ? `${base.slice(0, -1)}${path}` : `${base}${path}`;
 }
+
+// Read guidelines from file
+import { readFileSync } from 'fs';
+import { fileURLToPath } from 'url';
+import { dirname, join } from 'path';
+
+const __filename = fileURLToPath(import.meta.url);
+const __dirname = dirname(__filename);
+const guidelinesPath = join(process.cwd(), 'PROMPT-GUIDELINES.md');
+const guidelines = readFileSync(guidelinesPath, 'utf-8');
 ---
 
 <!doctype html>
@@ -18,338 +28,146 @@ function withBase(path: string): string {
     <meta name="robots" content="noindex, nofollow" />
     <link rel="icon" type="image/x-icon" href={withBase('/favicon.ico')} />
   </head>
-  <body class="bg-gradient-to-br from-slate-50 via-white to-slate-50 text-slate-800 font-sans antialiased min-h-screen flex flex-col">
+  <body class="bg-gradient-to-br from-slate-50 via-white to-slate-50 text-slate-800 font-sans antialiased h-screen flex flex-col overflow-hidden">
 
     <!-- Toast Notification -->
     <div id="toast-container" class="fixed top-4 right-4 z-50 flex flex-col gap-2 pointer-events-none" aria-live="polite"></div>
 
     <!-- Header -->
-    <header class="bg-white border-b border-slate-200 shadow-sm">
-      <div class="max-w-7xl mx-auto px-4 py-5 sm:px-6">
+    <header class="bg-white border-b border-slate-200 shadow-sm flex-shrink-0">
+      <div class="max-w-7xl mx-auto px-4 py-4 sm:px-6">
         <div class="flex items-center justify-between">
-          <div>
-            <h1 class="text-2xl font-bold text-slate-900 flex items-center gap-3">
+          <div class="flex items-center gap-4">
+            <div class="flex items-center gap-3">
               <span class="flex h-10 w-10 items-center justify-center rounded-xl bg-gradient-to-br from-[#671e2f] to-[#893144] text-white font-bold text-lg shadow-sm">
-                Z
+                AI
               </span>
-              AI Banner Generator
-            </h1>
-            <p class="text-sm text-slate-500 mt-1">Generate banner dengan DALL-E 3 sesuai brand guidelines Zaloma</p>
+              <div>
+                <h1 class="text-lg font-bold text-slate-900">AI Banner Assistant</h1>
+                <p class="text-xs text-slate-500">Chat dengan AI untuk generate banner prompts</p>
+              </div>
+            </div>
           </div>
           <a href={withBase('/admin/')} class="text-sm font-semibold text-primary hover:text-primary-dark transition-colors">
-            ← Kembali ke Admin
+            ← Kembali
           </a>
         </div>
       </div>
     </header>
 
-    <!-- Main Content -->
-    <main class="flex-1 max-w-7xl mx-auto w-full px-4 py-8 sm:px-6">
+    <!-- Main Chat Container -->
+    <main class="flex-1 max-w-5xl mx-auto w-full px-4 sm:px-6 flex flex-col overflow-hidden py-4">
       
-      <!-- Info Box -->
-      <div class="bg-blue-50 border border-blue-200 rounded-xl p-4 mb-6">
-        <div class="flex gap-3">
+      <!-- API Key Setup (show only once) -->
+      <div id="api-setup" class="bg-blue-50 border border-blue-200 rounded-xl p-4 mb-4 flex-shrink-0">
+        <div class="flex items-start gap-3">
           <svg class="w-5 h-5 text-blue-600 flex-shrink-0 mt-0.5" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2">
-            <path stroke-linecap="round" stroke-linejoin="round" d="M13 16h-1v-4h-1m1-4h.01M21 12a9 9 0 11-18 0 9 9 0 0118 0z" />
+            <path stroke-linecap="round" stroke-linejoin="round" d="M15 7a2 2 0 012 2m4 0a6 6 0 01-7.743 5.743L11 17H9v2H7v2H4a1 1 0 01-1-1v-2.586a1 1 0 01.293-.707l5.964-5.964A6 6 0 1121 9z" />
           </svg>
-          <div class="text-sm text-blue-900">
-            <p class="font-semibold mb-1">Cara Kerja:</p>
-            <ol class="list-decimal list-inside space-y-1 text-blue-800">
-              <li>Masukkan OpenAI API Key Anda</li>
-              <li>Isi form: headline, deskripsi promo, ukuran banner</li>
-              <li>AI akan generate banner sesuai <strong>Brand Guidelines Zaloma</strong></li>
-              <li>Download hasil dan upload ke Banner Promo</li>
-            </ol>
-            <p class="mt-2 text-xs text-blue-700">
-              💡 <strong>Konsistensi otomatis:</strong> Warna burgundy #842D43, cream #FFF8F0, gold #C99A45, style premium florist
-            </p>
-          </div>
-        </div>
-      </div>
-
-      <div class="grid grid-cols-1 lg:grid-cols-2 gap-6">
-        
-        <!-- Left: Input Form -->
-        <div class="space-y-6">
-          <div class="bg-white rounded-2xl border border-slate-200 shadow-sm p-6">
-            <h2 class="text-lg font-bold text-slate-900 mb-4 flex items-center gap-2">
-              <span class="w-2 h-2 rounded-full bg-primary"></span>
-              Form Generate Banner
-            </h2>
-
-            <form id="banner-form" class="space-y-5">
-              
-              <!-- API Key -->
-              <div>
-                <label for="api-key" class="block text-sm font-semibold text-slate-700 mb-2">
-                  OpenAI API Key <span class="text-rose-500">*</span>
-                </label>
-                <input 
-                  type="password" 
-                  id="api-key" 
-                  required 
-                  placeholder="sk-proj-..."
-                  class="w-full px-4 py-3 rounded-lg border border-slate-300 text-sm focus:outline-none focus:border-primary focus:ring-2 focus:ring-primary/20 transition-all font-mono"
-                />
-                <p class="text-xs text-slate-500 mt-1.5">
-                  Get API key at <a href="https://platform.openai.com/api-keys" target="_blank" rel="noopener" class="text-primary font-semibold underline">OpenAI Platform</a>
-                </p>
-              </div>
-
-              <!-- Headline -->
-              <div>
-                <label for="headline" class="block text-sm font-semibold text-slate-700 mb-2">
-                  Headline Utama <span class="text-rose-500">*</span>
-                </label>
-                <input 
-                  type="text" 
-                  id="headline" 
-                  required 
-                  maxlength="100"
-                  placeholder="GRATIS ONGKIR"
-                  class="w-full px-4 py-3 rounded-lg border border-slate-300 text-sm focus:outline-none focus:border-primary focus:ring-2 focus:ring-primary/20 transition-all"
-                />
-              </div>
-
-              <!-- Subheadline -->
-              <div>
-                <label for="subheadline" class="block text-sm font-semibold text-slate-700 mb-2">
-                  Subheadline <span class="text-slate-400 font-normal">(Opsional)</span>
-                </label>
-                <input 
-                  type="text" 
-                  id="subheadline" 
-                  maxlength="100"
-                  placeholder="ke Malang Kota"
-                  class="w-full px-4 py-3 rounded-lg border border-slate-300 text-sm focus:outline-none focus:border-primary focus:ring-2 focus:ring-primary/20 transition-all"
-                />
-              </div>
-
-              <!-- Description -->
-              <div>
-                <label for="description" class="block text-sm font-semibold text-slate-700 mb-2">
-                  Deskripsi Promo <span class="text-rose-500">*</span>
-                </label>
-                <textarea 
-                  id="description" 
-                  required 
-                  rows="3"
-                  maxlength="300"
-                  placeholder="Pesan karangan bunga favorit Anda dengan pengiriman gratis ke seluruh area Malang Kota."
-                  class="w-full px-4 py-3 rounded-lg border border-slate-300 text-sm focus:outline-none focus:border-primary focus:ring-2 focus:ring-primary/20 transition-all resize-y"
-                ></textarea>
-                <p id="desc-count" class="text-xs text-slate-400 mt-1.5">0 / 300</p>
-              </div>
-
-              <!-- Main Subject -->
-              <div>
-                <label for="main-subject" class="block text-sm font-semibold text-slate-700 mb-2">
-                  Objek Utama <span class="text-rose-500">*</span>
-                </label>
-                <input 
-                  type="text" 
-                  id="main-subject" 
-                  required 
-                  placeholder="A premium pink and ivory flower bouquet with burgundy ribbon"
-                  class="w-full px-4 py-3 rounded-lg border border-slate-300 text-sm focus:outline-none focus:border-primary focus:ring-2 focus:ring-primary/20 transition-all"
-                />
-                <p class="text-xs text-slate-400 mt-1.5">Contoh: bouquet bunga, standing flower, bunga papan, dll</p>
-              </div>
-
-              <!-- Banner Size -->
-              <div>
-                <label for="banner-size" class="block text-sm font-semibold text-slate-700 mb-2">
-                  Ukuran Banner <span class="text-rose-500">*</span>
-                </label>
-                <select 
-                  id="banner-size" 
-                  required
-                  class="w-full px-4 py-3 rounded-lg border border-slate-300 text-sm focus:outline-none focus:border-primary focus:ring-2 focus:ring-primary/20 transition-all bg-white cursor-pointer"
-                >
-                  <option value="1792x1024" selected>🖥️ Desktop - 1792x1024 (Landscape 16:9)</option>
-                  <option value="1024x1792">📱 Mobile - 1024x1792 (Portrait 9:16)</option>
-                  <option value="1024x1024">⬛ Square - 1024x1024 (1:1)</option>
-                </select>
-              </div>
-
-              <!-- Submit Button -->
-              <button 
-                type="submit" 
-                id="generate-btn"
-                class="w-full bg-primary hover:bg-primary-dark text-white font-semibold py-3.5 px-6 rounded-lg transition-all duration-150 cursor-pointer text-sm active:scale-[0.99] flex items-center justify-center gap-2 shadow-sm"
-              >
-                <svg class="w-5 h-5" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2">
-                  <path stroke-linecap="round" stroke-linejoin="round" d="M4 16l4.586-4.586a2 2 0 012.828 0L16 16m-2-2l1.586-1.586a2 2 0 012.828 0L20 14m-6-6h.01M6 20h12a2 2 0 002-2V6a2 2 0 00-2-2H6a2 2 0 00-2 2v12a2 2 0 002 2z" />
-                </svg>
-                <span id="generate-text">Generate Banner</span>
-                <svg id="generate-spinner" class="w-5 h-5 animate-spin hidden" fill="none" viewBox="0 0 24 24">
-                  <circle class="opacity-25" cx="12" cy="12" r="10" stroke="currentColor" stroke-width="4"></circle>
-                  <path class="opacity-75" fill="currentColor" d="M4 12a8 8 0 018-8v8H4z"></path>
-                </svg>
-              </button>
-
-              <p class="text-xs text-slate-500 text-center">
-                💰 Biaya: ~$0.04 - $0.08 per gambar (DALL-E 3 Standard Quality)
-              </p>
-
-            </form>
-          </div>
-
-          <!-- Example Prompts -->
-          <div class="bg-slate-50 rounded-xl border border-slate-200 p-5">
-            <h3 class="text-sm font-bold text-slate-700 mb-3">💡 Contoh Banner:</h3>
-            <div class="space-y-2 text-xs">
-              <button type="button" class="example-btn w-full text-left p-3 bg-white rounded-lg border border-slate-200 hover:border-primary/40 hover:bg-primary/5 transition-all cursor-pointer">
-                <p class="font-semibold text-slate-800">Buka 24 Jam</p>
-                <p class="text-slate-600 mt-1">Headline: TOKO KAMI BUKA 24 JAM • Subjek: Premium bouquet with clock motif</p>
-              </button>
-              <button type="button" class="example-btn w-full text-left p-3 bg-white rounded-lg border border-slate-200 hover:border-primary/40 hover:bg-primary/5 transition-all cursor-pointer">
-                <p class="font-semibold text-slate-800">Gratis Ongkir</p>
-                <p class="text-slate-600 mt-1">Headline: GRATIS ONGKIR • Subjek: Delivery van with standing flower</p>
-              </button>
-            </div>
-          </div>
-        </div>
-
-        <!-- Right: Output Result -->
-        <div class="space-y-6">
-          
-          <!-- Result Container -->
-          <div id="result-container" class="hidden bg-white rounded-2xl border border-slate-200 shadow-sm p-6 animate-fade-in">
-            <div class="flex items-center justify-between mb-4">
-              <h2 class="text-lg font-bold text-slate-900 flex items-center gap-2">
-                <span class="w-2 h-2 rounded-full bg-emerald-500"></span>
-                Hasil Generate
-              </h2>
-              <span class="text-xs font-semibold px-2.5 py-1 rounded-full bg-emerald-50 text-emerald-700">
-                Berhasil
-              </span>
-            </div>
-
-            <!-- Image Preview -->
-            <div class="mb-4">
-              <div class="relative rounded-xl overflow-hidden border border-slate-200 bg-slate-50">
-                <img 
-                  id="generated-image" 
-                  src="" 
-                  alt="Generated banner" 
-                  class="w-full h-auto"
-                  style="display: none;"
-                />
-                <div id="image-loading" class="flex items-center justify-center py-32 bg-gradient-to-br from-slate-100 to-slate-50">
-                  <div class="text-center">
-                    <svg class="w-12 h-12 animate-spin mx-auto text-primary mb-3" fill="none" viewBox="0 0 24 24">
-                      <circle class="opacity-25" cx="12" cy="12" r="10" stroke="currentColor" stroke-width="4"></circle>
-                      <path class="opacity-75" fill="currentColor" d="M4 12a8 8 0 018-8v8H4z"></path>
-                    </svg>
-                    <p class="text-sm font-semibold text-slate-600">Generating banner...</p>
-                    <p class="text-xs text-slate-400 mt-1">Ini memakan waktu 15-30 detik</p>
-                  </div>
-                </div>
-              </div>
-              
-              <div class="mt-3 flex items-center justify-between text-xs text-slate-500">
-                <span id="image-info">—</span>
-                <span>Model: DALL-E 3</span>
-              </div>
-            </div>
-
-            <!-- Prompt Used -->
-            <div class="mb-4">
-              <label class="block text-xs font-semibold text-slate-700 mb-2">Prompt yang Digunakan:</label>
-              <div class="relative">
-                <textarea 
-                  id="used-prompt" 
-                  readonly 
-                  rows="6"
-                  class="w-full px-3 py-2 rounded-lg border border-slate-300 text-xs bg-slate-50 resize-y font-mono"
-                ></textarea>
-                <button 
-                  type="button" 
-                  id="copy-prompt-btn"
-                  class="absolute top-2 right-2 px-2.5 py-1 bg-slate-700 text-white text-xs font-semibold rounded-md hover:bg-slate-800 transition-all cursor-pointer"
-                >
-                  Copy
-                </button>
-              </div>
-            </div>
-
-            <!-- Action Buttons -->
+          <div class="flex-1">
+            <p class="text-sm font-semibold text-blue-900 mb-2">Setup OpenAI API Key:</p>
             <div class="flex gap-2">
-              <a 
-                id="download-btn" 
-                download="zaloma-banner.png"
-                href="#"
-                class="flex-1 flex items-center justify-center gap-2 bg-primary hover:bg-primary-dark text-white font-semibold py-3 px-4 rounded-lg text-sm transition-all cursor-pointer"
-              >
-                <svg class="w-4 h-4" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2">
-                  <path stroke-linecap="round" stroke-linejoin="round" d="M4 16v1a3 3 0 003 3h10a3 3 0 003-3v-1m-4-4l-4 4m0 0l-4-4m4 4V4" />
-                </svg>
-                Download
-              </a>
+              <input 
+                type="password" 
+                id="api-key-input" 
+                placeholder="sk-proj-..."
+                class="flex-1 px-3 py-2 text-sm rounded-lg border border-blue-300 focus:outline-none focus:border-blue-500 focus:ring-2 focus:ring-blue-200 font-mono"
+              />
               <button 
-                type="button" 
-                id="regenerate-btn"
-                class="flex items-center justify-center gap-2 bg-slate-100 hover:bg-slate-200 text-slate-700 font-semibold py-3 px-4 rounded-lg text-sm transition-all cursor-pointer"
+                id="save-api-key"
+                class="px-4 py-2 bg-primary text-white text-sm font-semibold rounded-lg hover:bg-primary-dark transition-all cursor-pointer"
               >
-                <svg class="w-4 h-4" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2">
-                  <path stroke-linecap="round" stroke-linejoin="round" d="M4 4v5h.582m15.356 2A8.001 8.001 0 004.582 9m0 0H9m11 11v-5h-.581m0 0a8.003 8.003 0 01-15.357-2m15.357 2H15" />
-                </svg>
-                Ulang
+                Simpan
               </button>
             </div>
-          </div>
-
-          <!-- Guidelines Info -->
-          <div class="bg-white rounded-2xl border border-slate-200 shadow-sm p-6">
-            <h3 class="text-sm font-bold text-slate-900 mb-3 flex items-center gap-2">
-              <svg class="w-4 h-4 text-primary" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2">
-                <path stroke-linecap="round" stroke-linejoin="round" d="M9 12l2 2 4-4m6 2a9 9 0 11-18 0 9 9 0 0118 0z" />
-              </svg>
-              Brand Guidelines Otomatis
-            </h3>
-            <ul class="space-y-2 text-xs text-slate-600">
-              <li class="flex items-start gap-2">
-                <span class="text-primary mt-0.5">•</span>
-                <span><strong>Warna:</strong> Burgundy #842D43, Cream #FFF8F0, Gold #C99A45</span>
-              </li>
-              <li class="flex items-start gap-2">
-                <span class="text-primary mt-0.5">•</span>
-                <span><strong>Style:</strong> Premium florist, elegant editorial, warm romantic</span>
-              </li>
-              <li class="flex items-start gap-2">
-                <span class="text-primary mt-0.5">•</span>
-                <span><strong>Typography:</strong> Elegant serif headline, clean sans-serif body</span>
-              </li>
-              <li class="flex items-start gap-2">
-                <span class="text-primary mt-0.5">•</span>
-                <span><strong>Foto:</strong> Realistic premium florist photography</span>
-              </li>
-              <li class="flex items-start gap-2">
-                <span class="text-primary mt-0.5">•</span>
-                <span><strong>Brand:</strong> ZALOMA FLORIST tetap konsisten</span>
-              </li>
-            </ul>
-            <p class="mt-3 text-xs text-slate-500 italic">
-              ℹ️ Semua aturan dari README_Zaloma_Florist_Prompt_Guidelines.md diterapkan otomatis
+            <p class="text-xs text-blue-700 mt-1.5">
+              Get API key at <a href="https://platform.openai.com/api-keys" target="_blank" rel="noopener" class="underline font-semibold">OpenAI Platform</a>
             </p>
           </div>
-
         </div>
-
       </div>
+
+      <!-- Chat Messages Area -->
+      <div id="chat-messages" class="flex-1 overflow-y-auto space-y-4 mb-4 pr-2 scrollbar-thin scrollbar-thumb-slate-300 scrollbar-track-slate-100">
+        <!-- Welcome message -->
+        <div class="flex gap-3 animate-fade-in">
+          <div class="flex-shrink-0 w-8 h-8 rounded-full bg-gradient-to-br from-purple-500 to-purple-600 flex items-center justify-center text-white font-bold text-sm">
+            AI
+          </div>
+          <div class="flex-1">
+            <div class="bg-white rounded-2xl rounded-tl-sm border border-slate-200 p-4 shadow-sm">
+              <p class="text-sm text-slate-700 leading-relaxed mb-3">
+                👋 Halo! Saya AI Assistant untuk Zaloma Florist. Saya akan membantu Anda membuat prompt banner yang sempurna sesuai brand guidelines.
+              </p>
+              <p class="text-sm text-slate-700 leading-relaxed mb-3">
+                Saya akan bertanya beberapa hal tentang banner yang Anda inginkan, lalu saya akan buatkan prompt JSON yang siap dipakai di DALL-E 3.
+              </p>
+              <p class="text-sm font-semibold text-slate-900">
+                Untuk mulai, ceritakan banner apa yang Anda ingin buat?
+              </p>
+              <p class="text-xs text-slate-500 mt-2">
+                Contoh: "Saya ingin banner gratis ongkir ke Malang" atau "Banner promo Valentine diskon 50%"
+              </p>
+            </div>
+            <p class="text-xs text-slate-400 mt-1">Baru saja</p>
+          </div>
+        </div>
+      </div>
+
+      <!-- Input Area -->
+      <div class="flex-shrink-0 bg-white border border-slate-200 rounded-xl p-3 shadow-sm">
+        <div class="flex gap-2">
+          <textarea 
+            id="user-input" 
+            placeholder="Ketik pesan Anda..."
+            rows="1"
+            class="flex-1 px-4 py-3 text-sm rounded-lg border border-slate-300 focus:outline-none focus:border-primary focus:ring-2 focus:ring-primary/20 resize-none"
+            style="max-height: 120px;"
+          ></textarea>
+          <button 
+            id="send-btn"
+            class="px-6 py-3 bg-primary text-white font-semibold rounded-lg hover:bg-primary-dark transition-all cursor-pointer flex items-center gap-2 disabled:opacity-50 disabled:cursor-not-allowed"
+          >
+            <svg class="w-5 h-5" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2">
+              <path stroke-linecap="round" stroke-linejoin="round" d="M12 19l9 2-9-18-9 18 9-2zm0 0v-8" />
+            </svg>
+            <span class="hidden sm:inline">Kirim</span>
+          </button>
+        </div>
+        <div class="flex items-center justify-between mt-2 px-1">
+          <div class="flex items-center gap-3 text-xs text-slate-500">
+            <span id="status-indicator" class="flex items-center gap-1.5">
+              <span class="w-2 h-2 rounded-full bg-emerald-500"></span>
+              Siap
+            </span>
+          </div>
+          <button 
+            id="reset-chat"
+            class="text-xs font-semibold text-slate-500 hover:text-slate-700 cursor-pointer"
+          >
+            🔄 Reset Chat
+          </button>
+        </div>
+      </div>
+
     </main>
 
-    <!-- Footer -->
-    <footer class="bg-white border-t border-slate-200 mt-auto">
-      <div class="max-w-7xl mx-auto px-4 py-4 sm:px-6 text-center">
-        <p class="text-xs text-slate-500">
-          AI Banner Generator untuk <strong>Zaloma Florist</strong> • Powered by OpenAI DALL-E 3
-        </p>
-      </div>
-    </footer>
+    <script is:inline define:vars={{ guidelines }}>
+      // State management
+      let apiKey = '';
+      let conversationHistory = [];
+      let bannerDetails = {};
+      
+      // Elements
+      const apiSetup = document.getElementById('api-setup');
+      const apiKeyInput = document.getElementById('api-key-input');
+      const saveApiKeyBtn = document.getElementById('save-api-key');
+      const chatMessages = document.getElementById('chat-messages');
+      const userInput = document.getElementById('user-input');
+      const sendBtn = document.getElementById('send-btn');
+      const resetBtn = document.getElementById('reset-chat');
+      const statusIndicator = document.getElementById('status-indicator');
 
-    <script is:inline>
       // Toast function
       function showToast(message, type = 'info') {
         const container = document.getElementById('toast-container');
@@ -362,235 +180,303 @@ function withBase(path: string): string {
         
         setTimeout(() => {
           toast.style.opacity = '0';
-          toast.style.transform = 'translateX(20px)';
           setTimeout(() => toast.remove(), 300);
         }, 4000);
       }
 
-      // Character counter
-      const descInput = document.getElementById('description');
-      const descCount = document.getElementById('desc-count');
-      
-      descInput.addEventListener('input', () => {
-        const count = descInput.value.length;
-        descCount.textContent = `${count} / 300`;
-        descCount.className = count > 300 ? 'text-xs text-rose-600 mt-1.5 font-semibold' : 'text-xs text-slate-400 mt-1.5';
-      });
-
-      // Example buttons
-      document.querySelectorAll('.example-btn').forEach((btn, idx) => {
-        btn.addEventListener('click', () => {
-          if (idx === 0) {
-            document.getElementById('headline').value = 'TOKO KAMI BUKA 24 JAM';
-            document.getElementById('subheadline').value = 'Siap melayani setiap hari';
-            document.getElementById('description').value = 'Pemesanan karangan bunga kapan saja, setiap hari.';
-            document.getElementById('main-subject').value = 'A premium pink and ivory flower bouquet with a burgundy satin ribbon, accompanied by an elegant clock motif';
-          } else {
-            document.getElementById('headline').value = 'GRATIS ONGKIR';
-            document.getElementById('subheadline').value = 'ke Malang Kota';
-            document.getElementById('description').value = 'Pesan karangan bunga favorit Anda dengan pengiriman gratis ke seluruh area Malang Kota.';
-            document.getElementById('main-subject').value = 'A realistic white flower delivery van with Zaloma Florist branding, accompanied by a premium standing flower arrangement';
-          }
-          descInput.dispatchEvent(new Event('input'));
-          showToast('Contoh berhasil dimuat', 'success');
-        });
-      });
-
-      // Build prompt following guidelines
-      function buildPrompt(data) {
-        const { headline, subheadline, description, mainSubject, size } = data;
-        
-        const [width, height] = size.split('x').map(Number);
-        const aspectRatio = width > height ? 'landscape' : width < height ? 'portrait' : 'square';
-        
-        return `Create a premium promotional banner for ZALOMA FLORIST following these exact specifications:
-
-BRAND IDENTITY:
-- Brand name: ZALOMA FLORIST (must be written exactly)
-- Location tagline: FLORIST MALANG
-- Brand style: Premium florist, elegant editorial, warm romantic, refined floral
-
-COLOR PALETTE (STRICT):
-- Primary: Burgundy #842D43
-- Deep burgundy: #641E32
-- Background: Warm ivory cream #FFF8F0 (must dominate)
-- Secondary background: Soft blush #F7E5E3
-- Accent: Champagne gold #C99A45 (restrained, never dominant)
-- Body text: Warm charcoal #625653
-- Neutral: White #FFFFFF
-
-CAMPAIGN CONTENT:
-- Headline: "${headline}"
-${subheadline ? `- Subheadline: "${subheadline}"` : ''}
-- Description: "${description}"
-- Use supplied wording exactly. Do not invent prices, discounts, dates, or claims.
-
-VISUAL SUBJECT:
-- Main subject: ${mainSubject}
-- Photography style: Photorealistic premium florist photography, realistic flower details, natural materials, soft warm lighting
-- Flowers must look fresh, detailed, and professionally arranged
-
-LAYOUT & COMPOSITION:
-- Canvas: ${width}x${height}px (${aspectRatio} orientation)
-- Balanced editorial composition with clear text area and visual subject area
-- Large elegant serif headline (high-contrast, readable)
-- Clean readable sans-serif for supporting text
-- Keep all text, logo, and objects comfortably inside safe area
-- Leave adequate white space, don't crowd the design
-
-DESIGN LANGUAGE:
-- Background: Warm ivory cream with subtle blush transitions
-- Decorative elements: Elegant burgundy curved shapes, thin champagne-gold accents
-- Soft botanical framing where appropriate
-- Typography hierarchy: Prominent headline → supporting text → brand identity
-- Lighting: Soft, warm, premium studio or natural ambient lighting
-
-CONSISTENCY RULES:
-- Match Zaloma Florist's established visual identity
-- Maintain burgundy, ivory, blush, and champagne-gold color family
-- Do NOT introduce new dominant colors (no bright blue, neon purple, neon green, oversaturated orange)
-- Keep elegant, warm, premium, and floral atmosphere
-- Design must feel like part of Zaloma Florist campaign family
-
-AVOID (NEGATIVE PROMPT):
-- No unrelated brand names or logos
-- No green botanical theme as dominant palette
-- No bright/neon colors outside the palette
-- No cyberpunk, futuristic, cartoon, childish, or plastic 3D style
-- No cluttered layout or excessive decorative elements
-- No tiny, crowded, distorted, or misspelled typography
-- No cropping of important text, logos, flowers, or campaign objects
-- Natural green only in realistic leaves and botanical details
-
-OUTPUT:
-- High resolution, polished composition, crisp details
-- Readable typography even when scaled down
-- Professional finished banner ready for publication`;
-      }
-
-      // Form submit - Generate banner
-      const form = document.getElementById('banner-form');
-      const generateBtn = document.getElementById('generate-btn');
-      const generateText = document.getElementById('generate-text');
-      const generateSpinner = document.getElementById('generate-spinner');
-      const resultContainer = document.getElementById('result-container');
-      const imageLoading = document.getElementById('image-loading');
-      const generatedImage = document.getElementById('generated-image');
-      const usedPrompt = document.getElementById('used-prompt');
-      const imageInfo = document.getElementById('image-info');
-      const downloadBtn = document.getElementById('download-btn');
-      const copyPromptBtn = document.getElementById('copy-prompt-btn');
-      const regenerateBtn = document.getElementById('regenerate-btn');
-
-      let lastFormData = null;
-
-      form.addEventListener('submit', async (e) => {
-        e.preventDefault();
-        
-        const apiKey = document.getElementById('api-key').value.trim();
-        const headline = document.getElementById('headline').value.trim();
-        const subheadline = document.getElementById('subheadline').value.trim();
-        const description = document.getElementById('description').value.trim();
-        const mainSubject = document.getElementById('main-subject').value.trim();
-        const size = document.getElementById('banner-size').value;
-        
-        if (!apiKey || !headline || !description || !mainSubject) {
-          showToast('Mohon lengkapi semua field yang required', 'error');
+      // Save API Key
+      saveApiKeyBtn.addEventListener('click', () => {
+        const key = apiKeyInput.value.trim();
+        if (!key) {
+          showToast('Masukkan API key terlebih dahulu', 'error');
+          return;
+        }
+        if (!key.startsWith('sk-')) {
+          showToast('API key tidak valid (harus dimulai dengan sk-)', 'error');
           return;
         }
         
-        lastFormData = { apiKey, headline, subheadline, description, mainSubject, size };
-        await generateBanner(lastFormData);
+        apiKey = key;
+        apiSetup.style.display = 'none';
+        showToast('API key berhasil disimpan', 'success');
       });
 
-      regenerateBtn.addEventListener('click', () => {
-        if (lastFormData) {
-          generateBanner(lastFormData);
+      // Auto-resize textarea
+      userInput.addEventListener('input', function() {
+        this.style.height = 'auto';
+        this.style.height = Math.min(this.scrollHeight, 120) + 'px';
+      });
+
+      // Send message on Enter (Shift+Enter for new line)
+      userInput.addEventListener('keydown', (e) => {
+        if (e.key === 'Enter' && !e.shiftKey) {
+          e.preventDefault();
+          sendMessage();
         }
       });
 
-      async function generateBanner(data) {
-        const { apiKey, size } = data;
+      sendBtn.addEventListener('click', sendMessage);
+      resetBtn.addEventListener('click', resetChat);
+
+      // Add message to chat
+      function addMessage(content, isUser = false, isJson = false) {
+        const messageDiv = document.createElement('div');
+        messageDiv.className = 'flex gap-3 animate-fade-in';
         
-        // Show loading
-        generateBtn.disabled = true;
-        generateText.textContent = 'Generating...';
-        generateSpinner.classList.remove('hidden');
-        resultContainer.classList.remove('hidden');
-        imageLoading.style.display = 'flex';
-        generatedImage.style.display = 'none';
+        if (isUser) {
+          messageDiv.classList.add('justify-end');
+          messageDiv.innerHTML = `
+            <div class="max-w-[80%]">
+              <div class="bg-primary text-white rounded-2xl rounded-tr-sm p-4 shadow-sm">
+                <p class="text-sm leading-relaxed whitespace-pre-wrap">${escapeHtml(content)}</p>
+              </div>
+              <p class="text-xs text-slate-400 mt-1 text-right">Baru saja</p>
+            </div>
+            <div class="flex-shrink-0 w-8 h-8 rounded-full bg-slate-300 flex items-center justify-center text-slate-600 font-bold text-sm">
+              👤
+            </div>
+          `;
+        } else {
+          if (isJson) {
+            // JSON output with copy button
+            messageDiv.innerHTML = `
+              <div class="flex-shrink-0 w-8 h-8 rounded-full bg-gradient-to-br from-purple-500 to-purple-600 flex items-center justify-center text-white font-bold text-sm">
+                AI
+              </div>
+              <div class="flex-1 max-w-[85%]">
+                <div class="bg-gradient-to-br from-emerald-50 to-emerald-100 rounded-2xl rounded-tl-sm border border-emerald-200 p-4 shadow-sm">
+                  <p class="text-sm font-semibold text-emerald-900 mb-3 flex items-center gap-2">
+                    ✅ Prompt JSON Siap!
+                  </p>
+                  <div class="relative">
+                    <pre class="bg-slate-900 text-slate-100 p-4 rounded-lg text-xs overflow-x-auto font-mono max-h-96 overflow-y-auto">${escapeHtml(content)}</pre>
+                    <button 
+                      onclick="copyToClipboard(this)" 
+                      data-content="${escapeHtml(content).replace(/"/g, '&quot;')}"
+                      class="absolute top-2 right-2 px-3 py-1.5 bg-emerald-600 hover:bg-emerald-700 text-white text-xs font-semibold rounded-md transition-all cursor-pointer"
+                    >
+                      📋 Copy
+                    </button>
+                  </div>
+                  <p class="text-xs text-emerald-700 mt-3">
+                    Paste JSON ini ke DALL-E 3 prompt. Semua guidelines Zaloma sudah included.
+                  </p>
+                </div>
+                <p class="text-xs text-slate-400 mt-1">Baru saja</p>
+              </div>
+            `;
+          } else {
+            // Regular AI message
+            messageDiv.innerHTML = `
+              <div class="flex-shrink-0 w-8 h-8 rounded-full bg-gradient-to-br from-purple-500 to-purple-600 flex items-center justify-center text-white font-bold text-sm">
+                AI
+              </div>
+              <div class="flex-1 max-w-[85%]">
+                <div class="bg-white rounded-2xl rounded-tl-sm border border-slate-200 p-4 shadow-sm">
+                  <p class="text-sm text-slate-700 leading-relaxed whitespace-pre-wrap">${formatMessage(content)}</p>
+                </div>
+                <p class="text-xs text-slate-400 mt-1">Baru saja</p>
+              </div>
+            `;
+          }
+        }
         
-        // Build prompt
-        const prompt = buildPrompt(data);
-        usedPrompt.value = prompt;
-        
+        chatMessages.appendChild(messageDiv);
+        chatMessages.scrollTop = chatMessages.scrollHeight;
+      }
+
+      // Format message with markdown-like formatting
+      function formatMessage(text) {
+        return escapeHtml(text)
+          .replace(/\*\*(.*?)\*\*/g, '<strong>$1</strong>')
+          .replace(/\n/g, '<br>');
+      }
+
+      // Escape HTML
+      function escapeHtml(text) {
+        const div = document.createElement('div');
+        div.textContent = text;
+        return div.innerHTML;
+      }
+
+      // Copy to clipboard
+      window.copyToClipboard = async function(button) {
+        const content = button.dataset.content.replace(/&quot;/g, '"');
         try {
-          const response = await fetch('https://api.openai.com/v1/images/generations', {
+          await navigator.clipboard.writeText(content);
+          button.textContent = '✓ Copied!';
+          button.classList.add('bg-emerald-700');
+          showToast('Prompt JSON berhasil di-copy!', 'success');
+          setTimeout(() => {
+            button.textContent = '📋 Copy';
+            button.classList.remove('bg-emerald-700');
+          }, 2000);
+        } catch (err) {
+          showToast('Gagal copy, silakan copy manual', 'error');
+        }
+      };
+
+      // Send message to OpenAI
+      async function sendMessage() {
+        if (!apiKey) {
+          showToast('Simpan API key terlebih dahulu', 'error');
+          apiSetup.style.display = 'block';
+          return;
+        }
+
+        const message = userInput.value.trim();
+        if (!message) return;
+
+        // Add user message
+        addMessage(message, true);
+        userInput.value = '';
+        userInput.style.height = 'auto';
+
+        // Update status
+        statusIndicator.innerHTML = `
+          <svg class="w-3 h-3 animate-spin" fill="none" viewBox="0 0 24 24">
+            <circle class="opacity-25" cx="12" cy="12" r="10" stroke="currentColor" stroke-width="4"></circle>
+            <path class="opacity-75" fill="currentColor" d="M4 12a8 8 0 018-8v8H4z"></path>
+          </svg>
+          AI sedang berpikir...
+        `;
+        sendBtn.disabled = true;
+
+        // Build conversation context
+        conversationHistory.push({
+          role: 'user',
+          content: message
+        });
+
+        try {
+          const response = await fetch('https://api.openai.com/v1/chat/completions', {
             method: 'POST',
             headers: {
               'Authorization': `Bearer ${apiKey}`,
               'Content-Type': 'application/json'
             },
             body: JSON.stringify({
-              model: 'dall-e-3',
-              prompt: prompt,
-              n: 1,
-              size: size,
-              quality: 'standard',
-              response_format: 'url'
+              model: 'gpt-4o-mini',
+              messages: [
+                {
+                  role: 'system',
+                  content: `Anda adalah AI Assistant untuk Zaloma Florist yang membantu admin membuat prompt banner sesuai brand guidelines.
+
+TUGAS ANDA:
+1. Tanyakan detail banner yang diinginkan secara natural (headline, deskripsi promo, objek utama, ukuran)
+2. Jangan tanya semua sekaligus - tanya satu-satu seperti percakapan natural
+3. Ketika admin berkata "berikan promptnya" atau "buatkan promptnya", generate JSON prompt lengkap
+4. JSON harus mengikuti STRICT guidelines Zaloma
+
+BRAND GUIDELINES ZALOMA:
+${guidelines}
+
+ATURAN PERCAKAPAN:
+- Ramah dan helpful
+- Tanyakan detail secara bertahap
+- Pastikan semua info terkumpul sebelum generate prompt
+- Info yang perlu: headline, subheadline (optional), deskripsi, objek utama, ukuran banner
+- Jika admin minta prompt tapi info belum lengkap, tanyakan yang kurang
+- Saat generate prompt, pastikan warna Burgundy #842D43, Cream #FFF8F0, Gold #C99A45
+- Pastikan style premium florist, elegant editorial
+- Output JSON dalam format yang bisa langsung di-copy
+
+CONTOH OUTPUT JSON:
+\`\`\`json
+{
+  "task": "Create a promotional banner for Zaloma Florist.",
+  "brand_identity": {
+    "brand_name": "ZALOMA FLORIST",
+    "location_line": "FLORIST MALANG"
+  },
+  "brand_color_system": {
+    "primary": "#842D43",
+    "background": "#FFF8F0",
+    "accent": "#C99A45"
+  },
+  "campaign_content": {
+    "headline": "[DARI USER]",
+    "description": "[DARI USER]"
+  },
+  "visual_subject": {
+    "main_subject": "[DARI USER]"
+  },
+  "canvas": {
+    "width": 1792,
+    "height": 1024
+  }
+}
+\`\`\`
+
+Jangan jelaskan cara pakai - langsung generate JSON saja saat diminta.`
+                },
+                ...conversationHistory
+              ],
+              temperature: 0.7,
+              max_tokens: 2000
             })
           });
-          
+
           if (!response.ok) {
             const error = await response.json().catch(() => ({}));
             throw new Error(error?.error?.message || `API error (${response.status})`);
           }
+
+          const data = await response.json();
+          const aiMessage = data.choices[0].message.content;
+
+          // Check if response contains JSON (prompt output)
+          const jsonMatch = aiMessage.match(/```json\n([\s\S]*?)\n```/);
           
-          const result = await response.json();
-          const imageUrl = result?.data?.[0]?.url;
-          
-          if (!imageUrl) {
-            throw new Error('Tidak ada URL gambar dari API');
+          if (jsonMatch) {
+            // Extract JSON and show as copyable
+            const jsonContent = jsonMatch[1].trim();
+            addMessage(jsonContent, false, true);
+            
+            // Also add explanation if any
+            const explanation = aiMessage.replace(/```json[\s\S]*?```/, '').trim();
+            if (explanation) {
+              setTimeout(() => addMessage(explanation, false, false), 500);
+            }
+          } else {
+            // Regular conversation
+            addMessage(aiMessage, false, false);
           }
-          
-          // Display image
-          generatedImage.src = imageUrl;
-          generatedImage.onload = () => {
-            imageLoading.style.display = 'none';
-            generatedImage.style.display = 'block';
-          };
-          
-          downloadBtn.href = imageUrl;
-          downloadBtn.download = `zaloma-banner-${Date.now()}.png`;
-          imageInfo.textContent = `${size} • DALL-E 3`;
-          
-          showToast('Banner berhasil di-generate!', 'success');
-          resultContainer.scrollIntoView({ behavior: 'smooth', block: 'nearest' });
-          
+
+          conversationHistory.push({
+            role: 'assistant',
+            content: aiMessage
+          });
+
         } catch (error) {
-          console.error('Generate error:', error);
-          showToast(error.message || 'Gagal generate banner', 'error');
-          resultContainer.classList.add('hidden');
+          console.error('Chat error:', error);
+          showToast(error.message || 'Gagal berkomunikasi dengan AI', 'error');
+          addMessage('Maaf, terjadi kesalahan. Silakan coba lagi.', false, false);
         } finally {
-          generateBtn.disabled = false;
-          generateText.textContent = 'Generate Banner';
-          generateSpinner.classList.add('hidden');
+          statusIndicator.innerHTML = `
+            <span class="w-2 h-2 rounded-full bg-emerald-500"></span>
+            Siap
+          `;
+          sendBtn.disabled = false;
+          userInput.focus();
         }
       }
 
-      // Copy prompt
-      copyPromptBtn.addEventListener('click', async () => {
-        try {
-          await navigator.clipboard.writeText(usedPrompt.value);
-          copyPromptBtn.textContent = '✓ Copied!';
-          showToast('Prompt berhasil di-copy', 'success');
-          setTimeout(() => {
-            copyPromptBtn.textContent = 'Copy';
-          }, 2000);
-        } catch (err) {
-          showToast('Gagal copy, silakan copy manual', 'error');
-        }
-      });
+      // Reset chat
+      function resetChat() {
+        if (!confirm('Reset chat? Semua percakapan akan hilang.')) return;
+        
+        conversationHistory = [];
+        bannerDetails = {};
+        
+        // Clear chat except welcome message
+        const messages = chatMessages.querySelectorAll('.animate-fade-in');
+        messages.forEach((msg, idx) => {
+          if (idx > 0) msg.remove();
+        });
+        
+        showToast('Chat telah direset', 'success');
+      }
 
       // Animations
       const style = document.createElement('style');
@@ -609,8 +495,21 @@ OUTPUT:
           from { opacity: 0; transform: translateY(10px); }
           to { opacity: 1; transform: translateY(0); }
         }
+        .scrollbar-thin::-webkit-scrollbar {
+          width: 6px;
+        }
+        .scrollbar-thumb-slate-300::-webkit-scrollbar-thumb {
+          background-color: #cbd5e1;
+          border-radius: 3px;
+        }
+        .scrollbar-track-slate-100::-webkit-scrollbar-track {
+          background-color: #f1f5f9;
+        }
       `;
       document.head.appendChild(style);
+
+      // Focus input on load
+      userInput.focus();
     </script>
 
   </body>
