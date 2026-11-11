@@ -8,15 +8,48 @@ function withBase(path: string): string {
   return base.endsWith('/') ? `${base.slice(0, -1)}${path}` : `${base}${path}`;
 }
 
-// Read guidelines from file
-import { readFileSync } from 'fs';
-import { fileURLToPath } from 'url';
-import { dirname, join } from 'path';
+// Brand guidelines embedded (dari PROMPT-GUIDELINES.md)
+const guidelines = `
+# Zaloma Florist Brand Guidelines
 
-const __filename = fileURLToPath(import.meta.url);
-const __dirname = dirname(__filename);
-const guidelinesPath = join(process.cwd(), 'PROMPT-GUIDELINES.md');
-const guidelines = readFileSync(guidelinesPath, 'utf-8');
+## Color Palette (STRICT):
+- Primary: Burgundy #842D43
+- Deep: #641E32
+- Background: Warm ivory cream #FFF8F0 (must dominate)
+- Secondary BG: Soft blush #F7E5E3
+- Accent: Champagne gold #C99A45 (restrained, never dominant)
+- Body text: Warm charcoal #625653
+- Neutral: White #FFFFFF
+
+## Visual Style:
+- Premium florist, elegant editorial, warm romantic, refined floral
+- Photorealistic premium florist photography
+- Realistic flower details, natural materials, soft warm lighting
+
+## Typography:
+- Headline: Elegant editorial serif (large, readable)
+- Supporting text: Clean readable sans-serif
+- Brand identity: ZALOMA FLORIST (exact spelling)
+
+## Layout:
+- Balanced editorial composition
+- Clear text area and visual subject area
+- Safe area on all sides
+- No cropping of important elements
+
+## Design Language:
+- Background: Warm ivory cream with subtle blush transitions
+- Decorative elements: Elegant burgundy curved shapes, thin gold accents
+- Lighting: Soft, warm, premium studio or natural ambient
+
+## Negative Prompt (Auto-applied):
+- No unrelated brands/logos
+- No green botanical dominant palette
+- No bright blue, neon purple, neon green, oversaturated orange
+- No cyberpunk, futuristic, cartoon, childish, plastic 3D style
+- No cluttered layout or excessive decorative elements
+- No tiny, crowded, distorted, or misspelled typography
+`;
 ---
 
 <!doctype html>
