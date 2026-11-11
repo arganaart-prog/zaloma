@@ -3182,7 +3182,7 @@ function withBase(path: string): string {
 
         promoBannerGenerateBtn.disabled = true;
         promoBannerGenerateBtn.textContent = 'Menggenerate...';
-        if (promoBannerAiStatus) promoBannerAiStatus.textContent = 'Mengirim prompt ke OpenAI lewat Worker...';
+        if (promoBannerAiStatus) promoBannerAiStatus.textContent = 'Mengirim prompt ke layanan gambar AI lewat Worker...';
 
         try {
           const response = await fetch(`${R2_IMAGE_API_URL}/generate-banner`, {

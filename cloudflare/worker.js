@@ -66,10 +66,12 @@ const BRAND_BANNER_GUIDE = [
 const BANNER_SIZES = {
   desktop: {
     openaiSize: '1536x1024',
+    geminiAspectRatio: '16:9',
     layout: 'Wide desktop hero, exact visual ratio 2:1. Keep the offer text in the center safe area.',
   },
   mobile: {
     openaiSize: '1536x1024',
+    geminiAspectRatio: '4:3',
     layout: 'Mobile banner, visual ratio about 1080:776. Keep the offer text large and inside the center safe area.',
   },
 };
@@ -100,6 +102,24 @@ function resolveImageModel(env) {
   return raw;
 }
 
+function resolveBannerProvider(env) {
+  const provider = String(env.BANNER_AI_PROVIDER || 'openai').trim().toLowerCase();
+  if (provider !== 'openai' && provider !== 'gemini') {
+    const error = new Error('BANNER_AI_PROVIDER harus bernilai openai atau gemini.');
+    error.status = 500;
+    throw error;
+  }
+  return provider;
+}
+
+function resolveGeminiImageModel(env) {
+  return String(env.GEMINI_IMAGE_MODEL || 'gemini-3.1-flash-image').trim();
+}
+
+function resolveBannerModel(env, provider = resolveBannerProvider(env)) {
+  return provider === 'gemini' ? resolveGeminiImageModel(env) : resolveImageModel(env);
+}
+
 function buildImageRequestBody(model, prompt, size) {
   const isGptImage = /^gpt-image/i.test(model);
   if (isGptImage) {
@@ -125,8 +145,55 @@ function buildImageRequestBody(model, prompt, size) {
 
 async function generateBannerImage(env, prompt, sizeKey) {
   const size = BANNER_SIZES[sizeKey];
-  const model = resolveImageModel(env);
+  const provider = resolveBannerProvider(env);
+  const model = resolveBannerModel(env, provider);
   const fullPrompt = `${BRAND_BANNER_GUIDE} ${size.layout} Admin offer: ${prompt}`;
+  if (provider === 'gemini') {
+    const response = await fetch(
+      `https://generativelanguage.googleapis.com/v1beta/models/${encodeURIComponent(model)}:generateContent`,
+      {
+        method: 'POST',
+        headers: {
+          'x-goog-api-key': env.GEMINI_API_KEY,
+          'Content-Type': 'application/json',
+        },
+        body: JSON.stringify({
+          contents: [{ parts: [{ text: fullPrompt }] }],
+          generationConfig: {
+            responseModalities: ['TEXT', 'IMAGE'],
+            imageConfig: {
+              aspectRatio: size.geminiAspectRatio,
+              imageSize: '1K',
+            },
+          },
+        }),
+      },
+    );
+    const payload = await response.json().catch(() => ({}));
+    if (!response.ok) {
+      const message = payload?.error?.message
+        || `Gemini menolak permintaan gambar (${response.status}).`;
+      const error = new Error(message);
+      error.status = response.status >= 400 && response.status < 600 ? response.status : 502;
+      throw error;
+    }
+
+    const parts = payload?.candidates?.flatMap((candidate) => candidate?.content?.parts || []) || [];
+    const imagePart = parts.find((part) => {
+      const data = part?.inlineData?.data || part?.inline_data?.data;
+      return typeof data === 'string' && data;
+    });
+    const imageData = imagePart?.inlineData || imagePart?.inline_data;
+    if (imageData) {
+      return {
+        base64: imageData.data,
+        mime: imageData.mimeType || imageData.mime_type || 'image/png',
+        model,
+      };
+    }
+    throw new Error('Gemini tidak mengembalikan gambar.');
+  }
+
   const response = await fetch('https://api.openai.com/v1/images/generations', {
     method: 'POST',
     headers: {
@@ -219,9 +286,11 @@ export default {
       }
 
       if (request.method === 'POST' && url.pathname === '/generate-banner') {
-        if (!env.OPENAI_API_KEY) {
+        const provider = resolveBannerProvider(env);
+        const apiKey = provider === 'gemini' ? env.GEMINI_API_KEY : env.OPENAI_API_KEY;
+        if (!apiKey) {
           return jsonResponse({
-            error: 'OPENAI_API_KEY belum dipasang di Worker. Tambahkan secret OPENAI_API_KEY lalu deploy ulang.',
+            error: `${provider === 'gemini' ? 'GEMINI_API_KEY' : 'OPENAI_API_KEY'} belum dipasang di Worker. Tambahkan secret tersebut sebelum generate banner.`,
           }, 500, origin, allowedOrigin);
         }
         const body = await request.json().catch(() => null);
@@ -241,7 +310,7 @@ export default {
         }
         return jsonResponse({
           images,
-          model: resolveImageModel(env),
+          model: resolveBannerModel(env, provider),
         }, 200, origin, allowedOrigin);
       }
 
